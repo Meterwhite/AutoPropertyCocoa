@@ -2,7 +2,7 @@
 //  AppDelegate.m
 //  AutoPropertyCocoaDemo
 //
-//  Created by MDLK on 2019/3/19.
+//  Created by Novo on 2019/3/19.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
