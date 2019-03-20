@@ -20,6 +20,7 @@
 		45758A0B2240D31900EE51C3 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 45758A062240D31900EE51C3 /* Person.m */; };
 		45758A0E2240E8AD00EE51C3 /* NSObject+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 45758A0D2240E8AD00EE51C3 /* NSObject+APCExtension.m */; };
 		45758A112242249F00EE51C3 /* NSString+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 45758A102242249F00EE51C3 /* NSString+APCExtension.m */; };
+		9FBB448E2242883B00DBD65C /* AutoLazyPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,8 @@
 		45758A0D2240E8AD00EE51C3 /* NSObject+APCExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCExtension.m"; sourceTree = "<group>"; };
 		45758A0F2242249F00EE51C3 /* NSString+APCExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+APCExtension.h"; sourceTree = "<group>"; };
 		45758A102242249F00EE51C3 /* NSString+APCExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+APCExtension.m"; sourceTree = "<group>"; };
+		9FBB448C2242883B00DBD65C /* AutoLazyPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoLazyPropertyInfo.h; sourceTree = "<group>"; };
+		9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoLazyPropertyInfo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +104,8 @@
 				457589FD2240D31900EE51C3 /* AutoPropertyCocoaConst.m */,
 				45758A012240D31900EE51C3 /* AutoPropertyInfo.h */,
 				457589FE2240D31900EE51C3 /* AutoPropertyInfo.m */,
+				9FBB448C2242883B00DBD65C /* AutoLazyPropertyInfo.h */,
+				9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */,
 				45758A002240D31900EE51C3 /* NSObject+AutoPropertyCocoa.h */,
 				457589FC2240D31900EE51C3 /* NSObject+AutoPropertyCocoa.m */,
 				45758A0C2240E8AD00EE51C3 /* NSObject+APCExtension.h */,
@@ -197,6 +202,7 @@
 				45758A0B2240D31900EE51C3 /* Person.m in Sources */,
 				45758A0E2240E8AD00EE51C3 /* NSObject+APCExtension.m in Sources */,
 				45758A082240D31900EE51C3 /* AutoPropertyCocoaConst.m in Sources */,
+				9FBB448E2242883B00DBD65C /* AutoLazyPropertyInfo.m in Sources */,
 				45758A0A2240D31900EE51C3 /* Man.m in Sources */,
 				45758A112242249F00EE51C3 /* NSString+APCExtension.m in Sources */,
 				45758A092240D31900EE51C3 /* AutoPropertyInfo.m in Sources */,

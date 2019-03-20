@@ -6,32 +6,25 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "NSObject+AutoPropertyCocoa.h"
 #import "AutoPropertyCocoaConst.h"
-#import "NSObject+APCExtension.h"
 #import "AutoPropertyInfo.h"
-#import <objc/runtime.h>
-#import <objc/message.h>
-
-id    _Nullable apc_property       (_Nullable id _self,SEL __cmd);
-void* _Nullable apc_property_imp_byEnc(NSString* eType);
 
 @implementation AutoPropertyInfo
-{
-    NSString*   _org_property_name;
-    NSString*   _des_property_name;
-    Class       _clazz;
-    IMP         _old_implementation;
-    IMP         _new_implementation;
-    SEL         _hooked_selector;
-    id          _hooed_block;
-}
+
+//- (AutoPropertyHookType)hookType
+//{
+//    return _hookType;
+//}
+//
+//- (AutoPropertyValueKind)kindOfValue
+//{
+//    return _kindOfValue;
+//}
 
 + (_Nullable instancetype)infoWithPropertyName:(NSString* _Nonnull)propertyName
-                                        aClass:(Class __unsafe_unretained)aClass
-                                      instance:(id _Nonnull)instance
+                                      aInstance:(id _Nonnull)aInstance
 {
-    return [[self alloc] initWithPropertyName:propertyName aClass:aClass instance:instance];
+    return [[self alloc] initWithPropertyName:propertyName aInstance:aInstance];
 }
 
 + (instancetype)infoWithPropertyName:(NSString* _Nonnull)propertyName
@@ -40,11 +33,13 @@ void* _Nullable apc_property_imp_byEnc(NSString* eType);
     return [[self alloc] initWithPropertyName:propertyName aClass:aClass];
 }
 - (instancetype)initWithPropertyName:(NSString* _Nonnull)propertyName
-                              aClass:(Class __unsafe_unretained)aClass
-                            instance:(id _Nonnull)instance
+                            aInstance:(id _Nonnull)aInstance
 {
-    if(self = [super init]){
+    if(self = [self initWithPropertyName:propertyName aClass:[self class]]){
         
+        _hookType &=    ~AutoPropertyHookedToClass;
+        _hookType |=    AutoPropertyHookedToInstance;
+        _instance =     aInstance;
     }
     return self;
 }
@@ -56,9 +51,15 @@ void* _Nullable apc_property_imp_byEnc(NSString* eType);
         
         objc_property_t property = class_getProperty(aClass, propertyName.UTF8String);
         if(property == nil){
-            return nil;
+            
+            while (nil != (aClass = class_getSuperclass(aClass)))
+                if(nil != (property = class_getProperty(aClass, propertyName.UTF8String)))
+                    break;
+            ///@throw
+            NSAssert(property, @"property do not exist.");
         }
-        _org_property_name                 = propertyName;
+        _hookType               |= AutoPropertyHookedToClass;
+        _org_property_name      = propertyName;
         _clazz                  = aClass;
         NSString*   attr_str    = @(property_getAttributes(property));
         NSArray*    attr_cmps   = [attr_str componentsSeparatedByString:@","];
@@ -243,86 +244,14 @@ void* _Nullable apc_property_imp_byEnc(NSString* eType);
         }
     }
     
-    _des_property_name = _associatedGetter
-    ? NSStringFromSelector(_associatedGetter)
-    : _org_property_name;
+//    _des_property_name = _associatedGetter
+//    ? NSStringFromSelector(_associatedGetter)
+//    : _org_property_name;
     
     return self;
 }
 
 
-- (void)bindGetterWithImplementation:(IMP)implementation
-{
-    _new_implementation = implementation;
-    
-    _old_implementation
-    =
-    class_replaceMethod(_clazz,
-                        NSSelectorFromString(_des_property_name),
-                        implementation,
-                        [NSString stringWithFormat:@"%@@:",_valueTypeEncode].UTF8String);
-    [self cache];
-}
-
-- (void)hookSelector:(SEL)aSelector
-{
-    _hooked_selector = aSelector?:@selector(new);
-    _hooed_block = nil;
-    _hookType = AutoPropertyHookBySelector;
-    
-    IMP newimp = nil;
-    if(_kindOfValue == AutoPropertyValueKindOfObject){
-        
-        newimp = (IMP)apc_property;
-    }else{
-        
-        newimp = (IMP)apc_property_imp_byEnc(_valueTypeEncode);
-    }
-    
-    [self bindGetterWithImplementation:newimp];
-}
-
-- (SEL)hookedSelector
-{
-    return _hooked_selector;
-}
-
-- (void)hookBlock:(id)block
-{
-    _hooked_selector = nil;
-    _hooed_block = [block copy];
-    _hookType = AutoPropertyHookByBlock;
-    
-    IMP newimp = nil;
-    if(_kindOfValue == AutoPropertyValueKindOfObject){
-        
-        newimp = (IMP)apc_property;
-    }else{
-        
-        newimp = (IMP)apc_property_imp_byEnc(_valueTypeEncode);
-    }
-    [self bindGetterWithImplementation:newimp];
-}
-
-- (id)hookedBlock
-{
-    return _hooed_block;
-}
-
-- (void)unhook
-{
-    if(_old_implementation){
-        
-        _new_implementation = nil;
-        
-        class_replaceMethod(_clazz,
-                            NSSelectorFromString(_des_property_name),
-                            _old_implementation,
-                            [NSString stringWithFormat:@"%@@:",_valueTypeEncode].UTF8String);
-    }
-    
-    [self removeFromCache];
-}
 
 - (id)getIvarValueFromTarget:(id)target
 {
@@ -336,230 +265,6 @@ void* _Nullable apc_property_imp_byEnc(NSString* eType);
     }
 }
 
-#define apc_invok_bvSet_fromVal(type,value)\
-    \
-type _val_t;\
-[value getValue:&_val_t];\
-((void (*)(id,SEL,type))objc_msgSend)(target,_associatedSetter,_val_t);
-
-- (void)setValue:(id)value toTarget:(id)target
-{
-    if(_kvcOption & AutoPropertyKVCSetter){
-        
-        if(_kindOfValue == AutoPropertyValueKindOfObject){
-            
-            ((void (*)(id,SEL,id))objc_msgSend)(target,_associatedSetter,value);
-        }else{
-            
-            if([_valueTypeEncode isEqualToString:@"c"]){
-                apc_invok_bvSet_fromVal(char,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"i"]){
-                apc_invok_bvSet_fromVal(int,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"s"]){
-                apc_invok_bvSet_fromVal(short,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"l"]){
-                apc_invok_bvSet_fromVal(long,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"q"]){
-                apc_invok_bvSet_fromVal(long long,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"C"]){
-                apc_invok_bvSet_fromVal(unsigned char,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"I"]){
-                apc_invok_bvSet_fromVal(unsigned int,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"S"]){
-                apc_invok_bvSet_fromVal(unsigned short,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"L"]){
-                apc_invok_bvSet_fromVal(unsigned long,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"Q"]){
-                apc_invok_bvSet_fromVal(unsigned long long,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"f"]){
-                apc_invok_bvSet_fromVal(float,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"d"]){
-                apc_invok_bvSet_fromVal(double,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"B"]){
-                apc_invok_bvSet_fromVal(BOOL,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"*"]){
-                apc_invok_bvSet_fromVal(char*,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@"#"]){
-                apc_invok_bvSet_fromVal(Class,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@":"]){
-                apc_invok_bvSet_fromVal(SEL,value)
-            }
-            else if ([_valueTypeEncode characterAtIndex:0] == '^'){
-                apc_invok_bvSet_fromVal(void*,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@(@encode(APC_RECT))]){
-                apc_invok_bvSet_fromVal(APC_RECT,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@(@encode(APC_POINT))]){
-                apc_invok_bvSet_fromVal(APC_POINT,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@(@encode(APC_SIZE))]){
-                apc_invok_bvSet_fromVal(APC_SIZE,value)
-            }
-            else if ([_valueTypeEncode isEqualToString:@(@encode(NSRange))]){
-                apc_invok_bvSet_fromVal(NSRange,value)
-            }
-            ///enc-m
-        }
-    }else{
-        
-        if(_kindOfValue == AutoPropertyValueKindOfObject){
-            
-            object_setIvar(target, _associatedIvar, value);
-        }else{
-            
-            [target setValue:value forKey:@(ivar_getName(_associatedIvar))];
-        }
-    }
-}
-
-#define apc_invok_bvOldIMP_toVal(type,val)\
-    \
-type _val_t = ((type(*)(id, SEL))_old_implementation)\
-    (target, NSSelectorFromString(_des_property_name));\
-val = [NSValue valueWithBytes:&_val_t objCType:_valueTypeEncode.UTF8String];
-
-- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target
-{
-    if(NO == (_new_implementation && _old_implementation)){
-        
-        return nil;
-    }
-    
-    id ret;
-    
-    if(_kindOfValue == AutoPropertyValueKindOfObject){
-        
-        ret
-        =
-        ((id(*)(id, SEL))_old_implementation)
-        
-            (target, NSSelectorFromString(_des_property_name));
-    }else{
-        
-        
-        if([_valueTypeEncode isEqualToString:@"c"]){
-            apc_invok_bvOldIMP_toVal(char,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"i"]){
-            apc_invok_bvOldIMP_toVal(int,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"s"]){
-            apc_invok_bvOldIMP_toVal(short,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"l"]){
-            apc_invok_bvOldIMP_toVal(long,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"q"]){
-            apc_invok_bvOldIMP_toVal(long long,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"C"]){
-            apc_invok_bvOldIMP_toVal(unsigned char,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"I"]){
-            apc_invok_bvOldIMP_toVal(unsigned int,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"S"]){
-            apc_invok_bvOldIMP_toVal(unsigned short,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"L"]){
-            apc_invok_bvOldIMP_toVal(unsigned long,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"Q"]){
-            apc_invok_bvOldIMP_toVal(unsigned long long,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"f"]){
-            apc_invok_bvOldIMP_toVal(float,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"d"]){
-            apc_invok_bvOldIMP_toVal(double,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"B"]){
-            apc_invok_bvOldIMP_toVal(BOOL,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"*"]){
-            apc_invok_bvOldIMP_toVal(char*,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@"#"]){
-            apc_invok_bvOldIMP_toVal(Class,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@":"]){
-            apc_invok_bvOldIMP_toVal(SEL,ret)
-        }
-        else if ([_valueTypeEncode characterAtIndex:0] == '^'){
-            apc_invok_bvOldIMP_toVal(void*,ret)
-        }
-        else if ([_valueTypeEncode isEqualToString:@(@encode(CGRect))]){
-            apc_invok_bvOldIMP_toVal(CGRect,ret)
-        }
-        ///enc-m
-    }
-    
-    return ret;
-}
-
-
-/**
- Class.property or NSClass.0xAddress
- */
-#define keyForCachedPropertyMap(class,propertyName)\
-([NSString stringWithFormat:@"%@.%@",NSStringFromClass(class),propertyName])
-
-static NSMutableDictionary* _cachedPropertyMap;
-- (void)cache
-{
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        
-        _cachedPropertyMap = [NSMutableDictionary dictionary];
-    });
-    
-    static dispatch_semaphore_t signalSemaphore;
-    static dispatch_once_t onceTokenSemaphore;
-    dispatch_once(&onceTokenSemaphore, ^{
-        signalSemaphore = dispatch_semaphore_create(1);
-    });
-    dispatch_semaphore_wait(signalSemaphore, DISPATCH_TIME_FOREVER);
-    
-    _cachedPropertyMap[keyForCachedPropertyMap(_clazz,_des_property_name)] = self;
-    
-    dispatch_semaphore_signal(signalSemaphore);
-}
-
-- (void)removeFromCache
-{
-    static dispatch_semaphore_t signalSemaphore;
-    static dispatch_once_t onceTokenSemaphore;
-    dispatch_once(&onceTokenSemaphore, ^{
-        signalSemaphore = dispatch_semaphore_create(1);
-    });
-    dispatch_semaphore_wait(signalSemaphore, DISPATCH_TIME_FOREVER);
-    
-    [_cachedPropertyMap removeObjectForKey:keyForCachedPropertyMap(_clazz,_des_property_name)];
-    
-    dispatch_semaphore_signal(signalSemaphore);
-}
-
-+ (_Nullable instancetype)cachedInfoByClass:(Class)clazz
-                               propertyName:(NSString*)propertyName;
-{
-    return _cachedPropertyMap[keyForCachedPropertyMap(clazz,propertyName)];
-}
 
 - (void)access
 {

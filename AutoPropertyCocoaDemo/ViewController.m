@@ -21,7 +21,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    UIView* view;
+    view.frame;
 //    [Person apc_lazyPropertyForKey:@"name" aSelector:@selector(new)];
     
 //    [Person apc_lazyPropertyForKey:@"frame" usingBlock:^id _Nullable(id  _Nonnull _self) {
