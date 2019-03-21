@@ -13,7 +13,7 @@
 		457589EF2240D0BE00EE51C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 457589EE2240D0BE00EE51C3 /* Assets.xcassets */; };
 		457589F22240D0BE00EE51C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 457589F02240D0BE00EE51C3 /* LaunchScreen.storyboard */; };
 		457589F52240D0BE00EE51C3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 457589F42240D0BE00EE51C3 /* main.m */; };
-		45758A072240D31900EE51C3 /* NSObject+AutoPropertyCocoa.m in Sources */ = {isa = PBXBuildFile; fileRef = 457589FC2240D31900EE51C3 /* NSObject+AutoPropertyCocoa.m */; };
+		45758A072240D31900EE51C3 /* NSObject+APCLazyLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = 457589FC2240D31900EE51C3 /* NSObject+APCLazyLoad.m */; };
 		45758A082240D31900EE51C3 /* AutoPropertyCocoaConst.m in Sources */ = {isa = PBXBuildFile; fileRef = 457589FD2240D31900EE51C3 /* AutoPropertyCocoaConst.m */; };
 		45758A092240D31900EE51C3 /* AutoPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 457589FE2240D31900EE51C3 /* AutoPropertyInfo.m */; };
 		45758A0A2240D31900EE51C3 /* Man.m in Sources */ = {isa = PBXBuildFile; fileRef = 45758A042240D31900EE51C3 /* Man.m */; };
@@ -34,11 +34,11 @@
 		457589F12240D0BE00EE51C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		457589F32240D0BE00EE51C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		457589F42240D0BE00EE51C3 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		457589FC2240D31900EE51C3 /* NSObject+AutoPropertyCocoa.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+AutoPropertyCocoa.m"; sourceTree = "<group>"; };
+		457589FC2240D31900EE51C3 /* NSObject+APCLazyLoad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCLazyLoad.m"; sourceTree = "<group>"; };
 		457589FD2240D31900EE51C3 /* AutoPropertyCocoaConst.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoPropertyCocoaConst.m; sourceTree = "<group>"; };
 		457589FE2240D31900EE51C3 /* AutoPropertyInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoPropertyInfo.m; sourceTree = "<group>"; };
 		457589FF2240D31900EE51C3 /* AutoPropertyCocoaConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoPropertyCocoaConst.h; sourceTree = "<group>"; };
-		45758A002240D31900EE51C3 /* NSObject+AutoPropertyCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+AutoPropertyCocoa.h"; sourceTree = "<group>"; };
+		45758A002240D31900EE51C3 /* NSObject+APCLazyLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCLazyLoad.h"; sourceTree = "<group>"; };
 		45758A012240D31900EE51C3 /* AutoPropertyInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoPropertyInfo.h; sourceTree = "<group>"; };
 		45758A032240D31900EE51C3 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
 		45758A042240D31900EE51C3 /* Man.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Man.m; sourceTree = "<group>"; };
@@ -106,8 +106,8 @@
 				457589FE2240D31900EE51C3 /* AutoPropertyInfo.m */,
 				9FBB448C2242883B00DBD65C /* AutoLazyPropertyInfo.h */,
 				9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */,
-				45758A002240D31900EE51C3 /* NSObject+AutoPropertyCocoa.h */,
-				457589FC2240D31900EE51C3 /* NSObject+AutoPropertyCocoa.m */,
+				45758A002240D31900EE51C3 /* NSObject+APCLazyLoad.h */,
+				457589FC2240D31900EE51C3 /* NSObject+APCLazyLoad.m */,
 				45758A0C2240E8AD00EE51C3 /* NSObject+APCExtension.h */,
 				45758A0D2240E8AD00EE51C3 /* NSObject+APCExtension.m */,
 				45758A0F2242249F00EE51C3 /* NSString+APCExtension.h */,
@@ -198,7 +198,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				457589EA2240D0BC00EE51C3 /* ViewController.m in Sources */,
-				45758A072240D31900EE51C3 /* NSObject+AutoPropertyCocoa.m in Sources */,
+				45758A072240D31900EE51C3 /* NSObject+APCLazyLoad.m in Sources */,
 				45758A0B2240D31900EE51C3 /* Person.m in Sources */,
 				45758A0E2240E8AD00EE51C3 /* NSObject+APCExtension.m in Sources */,
 				45758A082240D31900EE51C3 /* AutoPropertyCocoaConst.m in Sources */,

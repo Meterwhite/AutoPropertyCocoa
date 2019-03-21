@@ -21,7 +21,12 @@
 
 #endif
 
+#define APC_BoxSelector(sel) (NSStringFromSelector(@selector(sel)))
 
+#define APC_ProxyClassNameForLazyLoad(class) \
+    ([NSString stringWithFormat:@"%@%@",NSStringFromClass(class),APCClassSuffixForLazyLoad])
+
+FOUNDATION_EXPORT NSString *const APCClassSuffixForLazyLoad;
 
 FOUNDATION_EXPORT NSString *const AWProgramingType_point;
 FOUNDATION_EXPORT NSString *const AWProgramingType_chars;

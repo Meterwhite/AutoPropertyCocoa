@@ -1,0 +1,41 @@
+//
+//  NSObject+AutoWorkPropery.h
+//  AutoWorkProperty
+//
+//  Created by Novo on 2019/3/13.
+//  Copyright © 2019 Novo. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+
+@interface NSObject(APCLazyLoad)
+
+#pragma mark - Lazy load for class.
++ (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property;
+
++ (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
+                     usingBlock:(id _Nullable(^)(id _Nonnull  _self))block;
+
++ (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
+             initializeSelector:(_Nonnull SEL)selector;
+
++ (void)apc_lazyLoadForPropertyHooks:(NSDictionary<NSString*,id>* _Nonnull)propertyHooks;
+
++ (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property;
+
+
+#pragma mark - Lazy load for instance.
+- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)key;
+
+- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)key
+                     usingBlock:(id _Nullable(^)(id _Nonnull  _self))block;
+
+- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)key
+                       selector:(_Nonnull SEL)selector;
+
+- (void)apc_lazyLoadForPropertyHooks:(NSDictionary<NSString*,id>* _Nonnull)propertyHooks;
+
+- (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property;
+@end
+

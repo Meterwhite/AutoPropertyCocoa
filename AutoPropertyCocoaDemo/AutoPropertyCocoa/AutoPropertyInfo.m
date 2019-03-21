@@ -11,16 +11,6 @@
 
 @implementation AutoPropertyInfo
 
-//- (AutoPropertyHookType)hookType
-//{
-//    return _hookType;
-//}
-//
-//- (AutoPropertyValueKind)kindOfValue
-//{
-//    return _kindOfValue;
-//}
-
 + (_Nullable instancetype)infoWithPropertyName:(NSString* _Nonnull)propertyName
                                       aInstance:(id _Nonnull)aInstance
 {
@@ -35,10 +25,10 @@
 - (instancetype)initWithPropertyName:(NSString* _Nonnull)propertyName
                             aInstance:(id _Nonnull)aInstance
 {
-    if(self = [self initWithPropertyName:propertyName aClass:[self class]]){
+    if(self = [self initWithPropertyName:propertyName aClass:[aInstance class]]){
         
-        _hookType &=    ~AutoPropertyHookedToClass;
-        _hookType |=    AutoPropertyHookedToInstance;
+        _kindOfOwner &=    ~AutoPropertyOwnerKindOfClass;
+        _kindOfOwner |=    AutoPropertyOwnerKindOfInstance;
         _instance =     aInstance;
     }
     return self;
@@ -56,9 +46,9 @@
                 if(nil != (property = class_getProperty(aClass, propertyName.UTF8String)))
                     break;
             ///@throw
-            NSAssert(property, @"property do not exist.");
+            NSAssert(property, @"Can not find property.");
         }
-        _hookType               |= AutoPropertyHookedToClass;
+        _kindOfOwner               |= AutoPropertyOwnerKindOfClass;
         _org_property_name      = propertyName;
         _clazz                  = aClass;
         NSString*   attr_str    = @(property_getAttributes(property));
@@ -79,9 +69,11 @@
             return nil;
         }
         
-        _valueTypeEncode = code;
+        _valueAttibute  = code;
+        _valueTypeEncoding      = code;
         if (code.length > 3 && [code hasPrefix:@"@\""]) {
             
+            _valueTypeEncoding = @"@";
             _kindOfValue = AutoPropertyValueKindOfObject;
             code = [code substringWithRange:NSMakeRange(2, code.length - 3)];
             NSUInteger protocolLoc = [code rangeOfString:@"<"].location;
@@ -244,10 +236,6 @@
         }
     }
     
-//    _des_property_name = _associatedGetter
-//    ? NSStringFromSelector(_associatedGetter)
-//    : _org_property_name;
-    
     return self;
 }
 
@@ -279,53 +267,45 @@
 
 - (NSString *)description
 {
-    NSString* policyDes;
+    ///@property(@policy,@getter,@setter)@programmingType -> @property(@ivar)
+    
+    NSMutableString* des = [NSMutableString stringWithString:@"@property("];
+    
     switch (self.policy) {
         case OBJC_ASSOCIATION_ASSIGN:
-            policyDes = @"atomic,weak";
+            [des appendString:@"atomic,weak"];
             break;
         case OBJC_ASSOCIATION_COPY:
-            policyDes = @"atomic,copy";
+            [des appendString:@"atomic,copy"];
             break;
         case OBJC_ASSOCIATION_RETAIN:
-            policyDes = @"atomic,strong";
+            [des appendString:@"atomic,strong"];
             break;
         case OBJC_ASSOCIATION_COPY_NONATOMIC:
-            policyDes = @"nonatomic,copy";
+            [des appendString:@"nonatomic,copy"];
             break;
         case OBJC_ASSOCIATION_RETAIN_NONATOMIC:
-            policyDes = @"nonatomic,strong";
+            [des appendString:@"nonatomic,strong"];
             break;
     }
     
-    
-    NSMutableString* getterSetterDes = [NSMutableString string];
     if(self.associatedGetter){
         
-        [getterSetterDes appendString:@",getter="];
-        [getterSetterDes appendString:NSStringFromSelector(self.associatedGetter)];
+        [des appendFormat:@",getter=%@",NSStringFromSelector(self.associatedGetter)];
     }
     if (self.associatedSetter){
         
-        [getterSetterDes appendString:@",setter="];
-        [getterSetterDes appendString:NSStringFromSelector(self.associatedSetter)];
+        [des appendFormat:@",setter=%@",NSStringFromSelector(self.associatedSetter)];
     }
     
-    NSMutableString* ivarDes = [NSMutableString string];
+    [des appendFormat:@")%@ -> %@",self.programmingType,_org_property_name];
+    
     if(_associatedIvar != nil){
-        
-        [ivarDes appendString:@"("];
-        [ivarDes appendString:@(ivar_getName(_associatedIvar))];
-        [ivarDes appendString:@")"];
+
+        [des appendFormat:@"(%@)",@(ivar_getName(_associatedIvar))];
     }
     
-    return
-    
-    [NSString stringWithFormat:
-     @"@property(%@%@)"
-     "%@ -> %@%@;"
-     ,policyDes,getterSetterDes
-     ,self.programmingType,_org_property_name,ivarDes];
+    return [des copy];
 }
 
 @end

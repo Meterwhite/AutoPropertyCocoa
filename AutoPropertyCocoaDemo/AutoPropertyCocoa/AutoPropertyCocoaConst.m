@@ -3,6 +3,8 @@
 
 #import <Foundation/Foundation.h>
 
+NSString *const  APCClassSuffixForLazyLoad          =   @"/APCProxyClassLazyLoad";
+
 NSString *const  AWProgramingType_point             =   @"void*";
 NSString *const  AWProgramingType_chars             =   @"char*";
 NSString *const  AWProgramingType_id                =   @"id";

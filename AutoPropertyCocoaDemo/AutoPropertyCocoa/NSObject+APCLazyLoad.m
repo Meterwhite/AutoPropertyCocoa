@@ -5,54 +5,90 @@
 //  Created by Novo on 2019/3/13.
 //  Copyright © 2019 Novo. All rights reserved.
 //
-#import "NSObject+AutoPropertyCocoa.h"
+#import "NSObject+APCLazyLoad.h"
 #import "AutoPropertyCocoaConst.h"
 #import "AutoLazyPropertyInfo.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 
-id _Nullable apc_getLazyPropertyInstanceAssociatedPropertyInfo(id _SELF);
+id _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id _SELF);
 
-@implementation NSObject(AutoProperyCocoa)
+@implementation NSObject(APCLazyLoad)
 
-+ (void)apc_lazyPropertyForKey:(NSString *)key
++ (void)apc_lazyLoadForProperty:(NSString *)key
 {
-    [self apc_autoClassProperty:key hookWithBlock:nil hookWithSEL:nil];
+    [self apc_classSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:nil];
 }
 
-+ (void)apc_lazyPropertyForKey:(NSString *)key selector:(SEL)selector
++ (void)apc_lazyLoadForProperty:(NSString *)key initializeSelector:(SEL)selector
 {
-    [self apc_autoClassProperty:key hookWithBlock:nil hookWithSEL:selector];
+    [self apc_classSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:selector];
 }
 
-+ (void)apc_lazyPropertyForKey:(NSString *)key usingBlock:(id  _Nullable (^)(id _Nonnull))block
++ (void)apc_lazyLoadForProperty:(NSString *)key usingBlock:(id  _Nullable (^)(id _Nonnull))block
 {
-    [self apc_autoClassProperty:key hookWithBlock:block hookWithSEL:nil];
+    [self apc_classSetLazyLoadProperty:key hookWithBlock:block hookWithSEL:nil];
 }
 
-+ (void)apc_lazyPropertyForKeyHooks:(NSDictionary *)keyHooks
++ (void)apc_lazyLoadForPropertyHooks:(NSDictionary *)keyHooks
 {
     [keyHooks enumerateKeysAndObjectsUsingBlock:^(NSString*  _Nonnull key, id  _Nonnull hook, BOOL * _Nonnull stop) {
         
         if([hook isKindOfClass:[NSString class]]){
             
-            [self apc_autoClassProperty:key hookWithBlock:hook hookWithSEL:nil];
+            [self apc_classSetLazyLoadProperty:key hookWithBlock:hook hookWithSEL:nil];
         }else{
             
-            [self apc_autoClassProperty:key hookWithBlock:nil hookWithSEL:NSSelectorFromString(hook)];
+            [self apc_classSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:NSSelectorFromString(hook)];
         }
     }];
 }
 
-+ (void)apc_unbindLazyPropertyForKey:(NSString *)key
++ (void)apc_unbindLazyLoadForProperty:(NSString *)key
 {
     [[AutoLazyPropertyInfo cachedInfoByClass:self propertyName:key] unhook];
 }
 
+- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)key
+{
+    [self apc_instanceSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:nil];
+}
 
-- (void)apc_autoClassProperty:(NSString*)propertyName
-                hookWithBlock:(id)block
-                  hookWithSEL:(SEL)aSelector
+- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)key
+                    usingBlock:(id _Nullable(^)(id _Nonnull  _self))block
+{
+    [self apc_instanceSetLazyLoadProperty:key hookWithBlock:block hookWithSEL:nil];
+}
+
+- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)key
+                      selector:(_Nonnull SEL)selector
+{
+    [self apc_instanceSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:selector];
+}
+
+- (void)apc_lazyLoadForPropertyHooks:(NSDictionary* _Nonnull)keyHooks
+{
+    [keyHooks enumerateKeysAndObjectsUsingBlock:^(NSString*  _Nonnull key, id  _Nonnull hook, BOOL * _Nonnull stop) {
+        
+        if([hook isKindOfClass:[NSString class]]){
+            
+            [self apc_instanceSetLazyLoadProperty:key hookWithBlock:hook hookWithSEL:nil];
+        }else{
+            
+            [self apc_instanceSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:NSSelectorFromString(hook)];
+        }
+    }];
+}
+
+- (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)key
+{
+    [apc_lazyLoadGetInstanceAssociatedPropertyInfo(self) unhook];
+}
+
+
+- (void)apc_instanceSetLazyLoadProperty:(NSString*)propertyName
+                          hookWithBlock:(id)block
+                            hookWithSEL:(SEL)aSelector
 {
     AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo infoWithPropertyName:propertyName
                                                                      aInstance:self];
@@ -69,17 +105,17 @@ id _Nullable apc_getLazyPropertyInstanceAssociatedPropertyInfo(id _SELF);
     
     if(block){
         
-        [propertyInfo hookBlock:block];
+        [propertyInfo hookUsingBlock:block];
     }else{
         
-        [propertyInfo hookSelector:aSelector];
+        [propertyInfo hookWithSelector:aSelector];
     }
 }
 
 
-+ (void)apc_autoClassProperty:(NSString*)propertyName
-                hookWithBlock:(id)block
-                  hookWithSEL:(SEL)aSelector
++ (void)apc_classSetLazyLoadProperty:(NSString*)propertyName
+                       hookWithBlock:(id)block
+                         hookWithSEL:(SEL)aSelector
 {
     AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo infoWithPropertyName:propertyName
                                                                              aClass:self];
@@ -96,10 +132,10 @@ id _Nullable apc_getLazyPropertyInstanceAssociatedPropertyInfo(id _SELF);
     
     if(block){
     
-        [propertyInfo hookBlock:block];
+        [propertyInfo hookUsingBlock:block];
     }else{
         
-        [propertyInfo hookSelector:aSelector];
+        [propertyInfo hookWithSelector:aSelector];
     }
 }
 
@@ -109,53 +145,46 @@ id _Nullable apc_getLazyPropertyInstanceAssociatedPropertyInfo(id _SELF);
  */
 id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
 {
-    AutoLazyPropertyInfo* propertyInfo
+    AutoLazyPropertyInfo* lazyPropertyInfo
     =
-    apc_getLazyPropertyInstanceAssociatedPropertyInfo(_SELF);
+    apc_lazyLoadGetInstanceAssociatedPropertyInfo(_SELF);
     
-    if(nil == (propertyInfo = apc_getLazyPropertyInstanceAssociatedPropertyInfo(_SELF))){
+    if(nil == (lazyPropertyInfo = apc_lazyPropertyGetInstanceAssociatedPropertyInfo(_SELF,_CMD)))
         
-        if(nil == (propertyInfo = [AutoLazyPropertyInfo cachedInfoByClass:[_SELF class]
-                                                             propertyName:NSStringFromSelector(_CMD)])){
-//            NSAssert(NO, @"sdf");
-        }
-    }
+        if(nil == (lazyPropertyInfo = [AutoLazyPropertyInfo cachedInfoByClass:[_SELF class] propertyName:NSStringFromSelector(_CMD)]))
+            
+            NSCAssert(NO, @"");
+        
     
-    
-    
-    if(propertyInfo == nil){
-        //@throw
-        return nil;
-    }
     
     id value = nil;
     
     ///Get value.All returned value are boxed;
-    if(propertyInfo.kvcOption & AutoPropertyKVCGetter){
+    if(lazyPropertyInfo.kvcOption & AutoPropertyKVCGetter){
         
-        value = [propertyInfo performOldGetterFromTarget:_SELF];
+        value = [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
     }else{
         
-        value = [propertyInfo getIvarValueFromTarget:_SELF];
+        value = [lazyPropertyInfo getIvarValueFromTarget:_SELF];
     }
     
     
     
     if(value == nil
-       && propertyInfo.kindOfValue == AutoPropertyValueKindOfObject)
+       && lazyPropertyInfo.kindOfValue == AutoPropertyValueKindOfObject)
     {
         
         ///Create default value.
-        Class clzz = propertyInfo.associatedClass;
-        if(propertyInfo.hookType & AutoPropertyHookBySelector)
+        Class clzz = lazyPropertyInfo.associatedClass;
+        if(lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfSelector)
         {
-            NSMethodSignature *signature = [clzz methodSignatureForSelector:propertyInfo.hookedSelector];
+            NSMethodSignature *signature = [clzz methodSignatureForSelector:lazyPropertyInfo.hookedSelector];
             if (signature == nil) {
                 //
             }
             NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
             invocation.target = clzz;
-            invocation.selector = propertyInfo.hookedSelector;
+            invocation.selector = lazyPropertyInfo.hookedSelector;
             [invocation invoke];
             id __unsafe_unretained returnValue;
             if (signature.methodReturnLength) {
@@ -166,32 +195,32 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
         }
         else
         {
-            id(^block_def_val)(id _SELF) = propertyInfo.hookedBlock;
+            id(^block_def_val)(id _SELF) = lazyPropertyInfo.hookedBlock;
             if(block_def_val){
                 
                 value = block_def_val(_SELF);
             }
         }
         
-        [propertyInfo setValue:value toTarget:_SELF];
+        [lazyPropertyInfo setValue:value toTarget:_SELF];
     }
-    else if (propertyInfo.accessCount == 0
-             && propertyInfo.kindOfValue != AutoPropertyValueKindOfObject)
+    else if (lazyPropertyInfo.accessCount == 0
+             && lazyPropertyInfo.kindOfValue != AutoPropertyValueKindOfObject)
     {
-        if((propertyInfo.hookType & AutoPropertyHookByBlock) == NO){
+        if((lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfBlock) == NO){
             //@thorw
         }
         
-        id(^block_def_val)(id _SELF) = propertyInfo.hookedBlock;
+        id(^block_def_val)(id _SELF) = lazyPropertyInfo.hookedBlock;
         if(block_def_val){
             
             value = block_def_val(_SELF);
         }
         
-        [propertyInfo setValue:value toTarget:_SELF];
+        [lazyPropertyInfo setValue:value toTarget:_SELF];
     }
     
-    [propertyInfo access];
+    [lazyPropertyInfo access];
     
     return value;
 }

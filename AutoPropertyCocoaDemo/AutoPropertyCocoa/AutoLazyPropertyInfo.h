@@ -9,18 +9,22 @@
 #import "AutoPropertyInfo.h"
 
 @interface AutoLazyPropertyInfo : AutoPropertyInfo
-- (void)hookSelector:(_Nonnull SEL)aSelector;
-- (_Nonnull SEL)hookedSelector;
 
-- (void)hookBlock:(_Nonnull id)block;
-- (_Nonnull id)hookedBlock;
+@property (nonatomic,copy,readonly)     id  hookedBlock;
+@property (nonatomic,assign,readonly)   SEL hookedSelector;
+
+- (void)hookWithSelector:(_Nonnull SEL)aSelector;
+
+- (void)hookUsingBlock:(_Nonnull id)block;
 
 - (void)unhook;
 
 
-- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target;
+- (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target;
 
 - (void)setValue:(_Nullable id)value toTarget:(_Nonnull id)target;
+
+#pragma mark - Cache for class type.
 
 + (_Nullable instancetype)cachedInfoByClass:(Class)clazz
                                propertyName:(NSString*)propertyName;

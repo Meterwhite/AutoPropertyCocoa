@@ -37,33 +37,41 @@ typedef NS_OPTIONS(NSUInteger,AutoPropertyValueKind){
     AutoPropertyValueKindOfBlock         =   7,
 };
 
-typedef NS_OPTIONS(NSUInteger, AutoPropertyHookType){
+typedef NS_OPTIONS(NSUInteger, AutoPropertyOwnerKind){
     
-    AutoPropertyHookedToClass       =   1   <<  0,
+    AutoPropertyOwnerKindOfClass       =   0,
     
-    AutoPropertyHookedToInstance    =   1   <<  1,
+    AutoPropertyOwnerKindOfInstance    =   1,
+};
+
+typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
     
-    AutoPropertyHookBySelector      =   1   <<  2,
+    AutoPropertyHookKindOfNil       =   0,
     
-    AutoPropertyHookByBlock         =   1   <<  3,
+    AutoPropertyHookKindOfSelector  =   1,
+    
+    AutoPropertyHookKindOfBlock     =   2,
+    
+    AutoPropertyHookKindOfIMP       =   3,
 };
 
 @interface AutoPropertyInfo : NSObject
 {
-    Class                   _clazz;
     NSString*               _org_property_name;
-    AutoPropertyHookType    _hookType;
+    AutoPropertyOwnerKind   _kindOfOwner;
+    AutoPropertyHookKind    _kindOfHook;
     __weak id               _instance;
+    Class                   _clazz;
 }
 
 
-@property (nonatomic,assign,readonly)AutoPropertyHookType    hookType;
+@property (nonatomic,assign,readonly)AutoPropertyOwnerKind   kindOfOwner;
 @property (nonatomic,assign,readonly)AutoPropertyValueKind   kindOfValue;
+@property (nonatomic,assign,readonly)AutoPropertyHookKind    kindOfHook;
 @property (nonatomic,assign,readonly)objc_AssociationPolicy  policy;
 @property (nonatomic,assign,readonly)AutoPropertyKVCOption   kvcOption;
 @property (nonatomic,assign,readonly)BOOL                    isReadonly;
-/** Property return type encodings. */
-@property (nonatomic,copy,readonly)NSString* valueTypeEncode;
+
 
 + (_Nullable instancetype)infoWithPropertyName:(NSString* _Nonnull)propertyName
                                       aInstance:(id _Nonnull)aInstance;
@@ -92,6 +100,8 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookType){
  
  */
 @property (nonatomic,copy,readonly)NSString* programmingType;
+@property (nonatomic,copy,readonly)NSString* valueAttibute;
+@property (nonatomic,copy,readonly)NSString* valueTypeEncoding;
 @property (nonatomic,assign,readonly)Ivar    associatedIvar;
 
 
