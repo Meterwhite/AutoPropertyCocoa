@@ -61,17 +61,18 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
     AutoPropertyOwnerKind   _kindOfOwner;
     AutoPropertyHookKind    _kindOfHook;
     __weak id               _instance;
+    BOOL                    _enable;
     Class                   _clazz;
 }
 
 
-@property (nonatomic,assign,readonly)AutoPropertyOwnerKind   kindOfOwner;
-@property (nonatomic,assign,readonly)AutoPropertyValueKind   kindOfValue;
-@property (nonatomic,assign,readonly)AutoPropertyHookKind    kindOfHook;
-@property (nonatomic,assign,readonly)objc_AssociationPolicy  policy;
-@property (nonatomic,assign,readonly)AutoPropertyKVCOption   kvcOption;
-@property (nonatomic,assign,readonly)BOOL                    isReadonly;
-
+@property (nonatomic,assign,readonly)AutoPropertyOwnerKind  kindOfOwner;
+@property (nonatomic,assign,readonly)AutoPropertyValueKind  kindOfValue;
+@property (nonatomic,assign,readonly)AutoPropertyHookKind   kindOfHook;
+@property (nonatomic,assign,readonly)objc_AssociationPolicy policy;
+@property (nonatomic,assign,readonly)AutoPropertyKVCOption  kvcOption;
+@property (nonatomic,assign,readonly)BOOL                   isReadonly;
+@property (nonatomic,assign,readonly)BOOL                   enable;
 
 + (_Nullable instancetype)infoWithPropertyName:(NSString* _Nonnull)propertyName
                                       aInstance:(id _Nonnull)aInstance;
@@ -99,15 +100,15 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
  Code types written by programmers.
  
  */
-@property (nonatomic,copy,readonly)NSString* programmingType;
-@property (nonatomic,copy,readonly)NSString* valueAttibute;
-@property (nonatomic,copy,readonly)NSString* valueTypeEncoding;
+@property (nonatomic,copy,  readonly)NSString* programmingType;
+@property (nonatomic,copy,  readonly)NSString* valueAttibute;
+@property (nonatomic,copy,  readonly)NSString* valueTypeEncoding;
 @property (nonatomic,assign,readonly)Ivar    associatedIvar;
 
+- (void)invalid;
 
-
-@property (nonatomic,assign,readonly) NSUInteger accessCount;
 - (void)access;
+@property (nonatomic,assign,readonly) NSUInteger accessCount;
 
 
 @end

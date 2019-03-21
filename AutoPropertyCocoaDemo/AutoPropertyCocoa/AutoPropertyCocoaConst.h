@@ -26,25 +26,31 @@
 #define APC_ProxyClassNameForLazyLoad(class) \
     ([NSString stringWithFormat:@"%@%@",NSStringFromClass(class),APCClassSuffixForLazyLoad])
 
+/**
+ Class.property
+ */
+#define keyForCachedPropertyMap(class,propertyName)\
+    ([NSString stringWithFormat:@"%@.%@",NSStringFromClass(class),propertyName])
+
 FOUNDATION_EXPORT NSString *const APCClassSuffixForLazyLoad;
 
-FOUNDATION_EXPORT NSString *const AWProgramingType_point;
-FOUNDATION_EXPORT NSString *const AWProgramingType_chars;
-FOUNDATION_EXPORT NSString *const AWProgramingType_id;
-FOUNDATION_EXPORT NSString *const AWProgramingType_NSBlock;
-FOUNDATION_EXPORT NSString *const AWProgramingType_SEL;
-FOUNDATION_EXPORT NSString *const AWProgramingType_char;
-FOUNDATION_EXPORT NSString *const AWProgramingType_unsignedchar;
-FOUNDATION_EXPORT NSString *const AWProgramingType_int;
-FOUNDATION_EXPORT NSString *const AWProgramingType_unsignedint;
-FOUNDATION_EXPORT NSString *const AWProgramingType_short;
-FOUNDATION_EXPORT NSString *const AWProgramingType_unsignedshort;
-FOUNDATION_EXPORT NSString *const AWProgramingType_long;
-FOUNDATION_EXPORT NSString *const AWProgramingType_unsignedlong;
-FOUNDATION_EXPORT NSString *const AWProgramingType_longlong;
-FOUNDATION_EXPORT NSString *const AWProgramingType_unsignedlonglong;
-FOUNDATION_EXPORT NSString *const AWProgramingType_float;
-FOUNDATION_EXPORT NSString *const AWProgramingType_double;
-FOUNDATION_EXPORT NSString *const AWProgramingType_bool;
+FOUNDATION_EXPORT NSString *const APCProgramingType_point;
+FOUNDATION_EXPORT NSString *const APCProgramingType_chars;
+FOUNDATION_EXPORT NSString *const APCProgramingType_id;
+FOUNDATION_EXPORT NSString *const APCProgramingType_NSBlock;
+FOUNDATION_EXPORT NSString *const APCProgramingType_SEL;
+FOUNDATION_EXPORT NSString *const APCProgramingType_char;
+FOUNDATION_EXPORT NSString *const APCProgramingType_unsignedchar;
+FOUNDATION_EXPORT NSString *const APCProgramingType_int;
+FOUNDATION_EXPORT NSString *const APCProgramingType_unsignedint;
+FOUNDATION_EXPORT NSString *const APCProgramingType_short;
+FOUNDATION_EXPORT NSString *const APCProgramingType_unsignedshort;
+FOUNDATION_EXPORT NSString *const APCProgramingType_long;
+FOUNDATION_EXPORT NSString *const APCProgramingType_unsignedlong;
+FOUNDATION_EXPORT NSString *const APCProgramingType_longlong;
+FOUNDATION_EXPORT NSString *const APCProgramingType_unsignedlonglong;
+FOUNDATION_EXPORT NSString *const APCProgramingType_float;
+FOUNDATION_EXPORT NSString *const APCProgramingType_double;
+FOUNDATION_EXPORT NSString *const APCProgramingType_bool;
 
 #endif

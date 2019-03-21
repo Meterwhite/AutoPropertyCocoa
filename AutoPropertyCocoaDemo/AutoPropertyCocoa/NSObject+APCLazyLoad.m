@@ -11,7 +11,7 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 
-id _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id _SELF);
+AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id instance,SEL _CMD);
 
 @implementation NSObject(APCLazyLoad)
 
@@ -80,9 +80,10 @@ id _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id _SELF);
     }];
 }
 
-- (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)key
+- (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
-    [apc_lazyLoadGetInstanceAssociatedPropertyInfo(self) unhook];
+    [apc_lazyLoadGetInstanceAssociatedPropertyInfo(self , NSSelectorFromString(property))
+     unhook];
 }
 
 
@@ -141,23 +142,27 @@ id _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id _SELF);
 
 
 /**
- This func is actually called.
+ Destination func.
  */
 id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
 {
-    AutoLazyPropertyInfo* lazyPropertyInfo
-    =
-    apc_lazyLoadGetInstanceAssociatedPropertyInfo(_SELF);
+    AutoLazyPropertyInfo* lazyPropertyInfo;
     
-    if(nil == (lazyPropertyInfo = apc_lazyPropertyGetInstanceAssociatedPropertyInfo(_SELF,_CMD)))
+    if(nil == (lazyPropertyInfo = apc_lazyLoadGetInstanceAssociatedPropertyInfo(_SELF,_CMD)))
         
         if(nil == (lazyPropertyInfo = [AutoLazyPropertyInfo cachedInfoByClass:[_SELF class] propertyName:NSStringFromSelector(_CMD)]))
             
             NSCAssert(NO, @"");
         
     
-    
     id value = nil;
+    
+    ///Logic delete for instance property info.
+    if(lazyPropertyInfo.enable == NO
+       && lazyPropertyInfo.kindOfOwner == AutoPropertyOwnerKindOfInstance){
+        
+        return [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
+    }
     
     ///Get value.All returned value are boxed;
     if(lazyPropertyInfo.kvcOption & AutoPropertyKVCGetter){
@@ -167,7 +172,6 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
         
         value = [lazyPropertyInfo getIvarValueFromTarget:_SELF];
     }
-    
     
     
     if(value == nil

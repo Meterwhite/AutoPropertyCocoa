@@ -27,9 +27,9 @@
 {
     if(self = [self initWithPropertyName:propertyName aClass:[aInstance class]]){
         
-        _kindOfOwner &=    ~AutoPropertyOwnerKindOfClass;
-        _kindOfOwner |=    AutoPropertyOwnerKindOfInstance;
-        _instance =     aInstance;
+        _kindOfOwner = AutoPropertyOwnerKindOfInstance;
+        _instance    =  aInstance;
+        _enable      =  YES;
     }
     return self;
 }
@@ -48,9 +48,10 @@
             ///@throw
             NSAssert(property, @"Can not find property.");
         }
-        _kindOfOwner               |= AutoPropertyOwnerKindOfClass;
+        _kindOfOwner            = AutoPropertyOwnerKindOfClass;
         _org_property_name      = propertyName;
         _clazz                  = aClass;
+        _enable                 = YES;
         NSString*   attr_str    = @(property_getAttributes(property));
         NSArray*    attr_cmps   = [attr_str componentsSeparatedByString:@","];
         NSUInteger  dotLoc      = [attr_str rangeOfString:@","].location;
@@ -89,7 +90,7 @@
                 if(protocolLoc == 0){
                     
                     //id<AProtocol>
-                    _programmingType = AWProgramingType_id;
+                    _programmingType = APCProgramingType_id;
                 }else{
                     
                     //AClass<AProtocol>
@@ -101,23 +102,23 @@
         }
         else if ([code isEqualToString:@"@"]){
             //id
-            _programmingType = AWProgramingType_id;
+            _programmingType = APCProgramingType_id;
             _kindOfValue = AutoPropertyValueKindOfObject;
         }else if ([code characterAtIndex:0] == '^'){
             //no more about detail info.
-            _programmingType = AWProgramingType_point;
+            _programmingType = APCProgramingType_point;
             _kindOfValue = AutoPropertyValueKindOfPoint;
         }else if([code isEqualToString:@"@?"]){
             //NSBlock
-            _programmingType = AWProgramingType_NSBlock;
+            _programmingType = APCProgramingType_NSBlock;
             _kindOfValue = AutoPropertyValueKindOfBlock;
         }else if([code isEqualToString:@"*"]){
             //point
-            _programmingType = AWProgramingType_chars;
+            _programmingType = APCProgramingType_chars;
             _kindOfValue = AutoPropertyValueKindOfChars;
         }else if([code isEqualToString:@":"]){
             //SEL
-            _programmingType = AWProgramingType_SEL;
+            _programmingType = APCProgramingType_SEL;
             _kindOfValue = AutoPropertyValueKindOfSEL;
         }else if(code.length > 3
                  && [code characterAtIndex:0] == '{'
@@ -129,55 +130,55 @@
             _kindOfValue = AutoPropertyValueKindOfStructure;
         }else if ([code isEqualToString:@"c"]){
             //char
-            _programmingType = AWProgramingType_char;
+            _programmingType = APCProgramingType_char;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"C"]){
             //unsigned char
-            _programmingType = AWProgramingType_unsignedchar;
+            _programmingType = APCProgramingType_unsignedchar;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"i"]){
             //int
-            _programmingType = AWProgramingType_int;
+            _programmingType = APCProgramingType_int;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"I"]){
             //unsigned int
-            _programmingType = AWProgramingType_unsignedint;
+            _programmingType = APCProgramingType_unsignedint;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"s"]){
             //short
-            _programmingType = AWProgramingType_short;
+            _programmingType = APCProgramingType_short;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"S"]){
             //unsigned short
-            _programmingType =  AWProgramingType_unsignedshort;
+            _programmingType =  APCProgramingType_unsignedshort;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"l"]){
             //long
-            _programmingType = AWProgramingType_long;
+            _programmingType = APCProgramingType_long;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"L"]){
             //unsigned long
-            _programmingType = AWProgramingType_unsignedlong;
+            _programmingType = APCProgramingType_unsignedlong;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"q"]){
             //long long
-            _programmingType = AWProgramingType_longlong;
+            _programmingType = APCProgramingType_longlong;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"Q"]){
             //unsigned long long
-            _programmingType = AWProgramingType_unsignedlonglong;
+            _programmingType = APCProgramingType_unsignedlonglong;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"f"]){
             //float
-            _programmingType = AWProgramingType_float;
+            _programmingType = APCProgramingType_float;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"d"]){
             //double
-            _programmingType = AWProgramingType_double;
+            _programmingType = APCProgramingType_double;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"B"]){
             //bool
-            _programmingType = AWProgramingType_bool;
+            _programmingType = APCProgramingType_bool;
             _kindOfValue = AutoPropertyValueKindOfNumber;
         }
         
@@ -222,15 +223,15 @@
             
             if([item characterAtIndex:0] == 'G'){
                 
-                _associatedGetter   = NSSelectorFromString([item substringFromIndex:1]);
+                _associatedGetter   =  NSSelectorFromString([item substringFromIndex:1]);
                 _kvcOption          |= AutoPropertyKVCGetter;
             }else if([item characterAtIndex:0] == 'S'){
                 
-                _associatedSetter   = NSSelectorFromString([item substringFromIndex:1]);
+                _associatedSetter   =  NSSelectorFromString([item substringFromIndex:1]);
                 _kvcOption          |= AutoPropertyKVCSetter;
             }else if ([item characterAtIndex:0] == 'V'){
                 
-                _associatedIvar     = class_getInstanceVariable(aClass, [var_name substringFromIndex:1].UTF8String);
+                _associatedIvar     =  class_getInstanceVariable(aClass, [var_name substringFromIndex:1].UTF8String);
                 _kvcOption          |= AutoPropertyKVCIVar;
             }
         }
@@ -253,12 +254,19 @@
     }
 }
 
+- (void)invalid
+{
+    _enable      = NO;
+    _accessCount = 0;
+}
 
 - (void)access
 {
-    ++_accessCount;
+    if(_enable){
+        
+        ++_accessCount;
+    }
 }
-
 
 - (NSString *)debugDescription
 {

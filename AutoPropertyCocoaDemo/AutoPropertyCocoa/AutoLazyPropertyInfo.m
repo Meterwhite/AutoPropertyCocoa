@@ -6,10 +6,10 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "NSObject+APCLazyLoad.h"
 #import "AutoPropertyCocoaConst.h"
 #import "NSObject+APCExtension.h"
 #import "AutoLazyPropertyInfo.h"
+#import "NSObject+APCLazyLoad.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 
@@ -99,7 +99,6 @@ const static char _keyForAPCLazyPropertyInstanceAssociatedPropertyInfo = '\0';
                             NSSelectorFromString(_des_property_name),
                             _new_implementation,
                             [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-        [self cache];
     }else{
         
         NSString *proxyClassName = APC_ProxyClassNameForLazyLoad(_clazz);
@@ -124,76 +123,28 @@ const static char _keyForAPCLazyPropertyInstanceAssociatedPropertyInfo = '\0';
         
         ///Hook the isa point.
         object_setClass(_instance, proxyClass);
-        
-        [self cache];
     }
-}
-
-NSMutableDictionary* _Nonnull apc_lazyLoadGetInstanceAssociatedMap(id instance)
-{
-    NSMutableDictionary* map =
-    
-    objc_getAssociatedObject(instance
-                             , &_keyForAPCLazyPropertyInstanceAssociatedPropertyInfo);
-    
-    if(map == nil){
-        
-        static dispatch_semaphore_t signalSemaphore;
-        static dispatch_once_t onceTokenSemaphore;
-        dispatch_once(&onceTokenSemaphore, ^{
-            signalSemaphore = dispatch_semaphore_create(1);
-        });
-        dispatch_semaphore_wait(signalSemaphore, DISPATCH_TIME_FOREVER);
-        {
-            map = [NSMutableDictionary dictionary];
-            objc_setAssociatedObject(instance
-                                     , &_keyForAPCLazyPropertyInstanceAssociatedPropertyInfo
-                                     , map
-                                     , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-        dispatch_semaphore_signal(signalSemaphore);
-    }
-    
-    return map;
-}
-
-AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id instance,SEL _CMD)
-{
-#warning <#message#>
-    ///线程不安全
-    NSMutableDictionary* map = apc_lazyLoadGetInstanceAssociatedMap(instance);
-    
-    return [map objectForKey:NSStringFromSelector(_CMD)];
-}
-
-void apc_lazyLoadSetInstanceAssociatedPropertyInfo(id instance,SEL _CMD,id propertyInfo)
-{
-    NSMutableDictionary* map = apc_lazyLoadGetInstanceAssociatedMap(instance);
-    
-    [map setObject:propertyInfo forKey:NSStringFromSelector(_CMD)];
+    [self cache];
 }
 
 - (void)unhook
 {
-    
     if(_old_implementation){
         
-        _new_implementation = nil;
-        
-        Class clz;
         if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
             
-            clz = _clazz;
+            _new_implementation = nil;
+            class_replaceMethod(_clazz
+                                , NSSelectorFromString(_des_property_name)
+                                , _old_implementation
+                                , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+            
+            [self removeFromCache];
         }else{
             
-            clz = objc_getClass(APC_ProxyClassNameForLazyLoad(_clazz).UTF8String);
+            [self invalid];
         }
-        class_replaceMethod(clz
-                            , NSSelectorFromString(_des_property_name)
-                            , _old_implementation
-                            , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
     }
-    [self removeFromCache];
 }
 
 
@@ -374,24 +325,15 @@ val = [NSValue valueWithBytes:&_val_t objCType:self.valueTypeEncoding.UTF8String
     return ret;
 }
 
-
-/**
- Class.property
- */
-#define keyForCachedPropertyMap(class,propertyName)\
-([NSString stringWithFormat:@"%@.%@",NSStringFromClass(class),propertyName])
-
 static NSMutableDictionary* _cachedClassPropertyInfoMap;
 - (void)cache
 {
     
     if(_kindOfOwner == AutoPropertyOwnerKindOfInstance){
-#warning <#message#>
         ///Bind property info to instance.
-        objc_setAssociatedObject(_instance
-                                 , &_keyForAPCLazyPropertyInstanceAssociatedPropertyInfo
-                                 , self
-                                 , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        apc_lazyLoadSetInstanceAssociatedPropertyInfo(_instance
+                                                      , NSSelectorFromString(_des_property_name)
+                                                      , self);
         return;
     }
     
@@ -415,16 +357,6 @@ static NSMutableDictionary* _cachedClassPropertyInfoMap;
 
 - (void)removeFromCache
 {
-    
-    if(_kindOfOwner == AutoPropertyOwnerKindOfInstance){
-        
-        objc_setAssociatedObject(self
-                                 , &_keyForAPCLazyPropertyInstanceAssociatedPropertyInfo
-                                 , nil
-                                 , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        return;
-    }
-    
     static dispatch_semaphore_t signalSemaphore;
     static dispatch_once_t onceTokenSemaphore;
     dispatch_once(&onceTokenSemaphore, ^{
@@ -441,5 +373,65 @@ static NSMutableDictionary* _cachedClassPropertyInfoMap;
                                propertyName:(NSString*)propertyName;
 {
     return _cachedClassPropertyInfoMap[keyForCachedPropertyMap(clazz,propertyName)];
+}
+
+
+AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id instance,SEL _CMD)
+{
+    NSMutableDictionary* map = apc_lazyLoadGetInstanceAssociatedMap(instance);
+    return [map objectForKey:NSStringFromSelector(_CMD)];
+}
+
+void apc_lazyLoadRemoveInstanceAssociatedPropertyInfo(id instance,SEL _CMD)
+{
+    apc_lazyLoadSetInstanceAssociatedPropertyInfo(instance, _CMD, nil);
+}
+
+//void apc_lazyLoadRemoveAllInstanceAssociatedPropertyInfo(id instance)
+//{
+//    objc_removeAssociatedObjects(instance);
+//}
+
+void apc_lazyLoadSetInstanceAssociatedPropertyInfo(id instance,SEL _CMD,id propertyInfo)
+{
+    NSMutableDictionary* map = apc_lazyLoadGetInstanceAssociatedMap(instance);
+    static dispatch_semaphore_t signalSemaphore;
+    static dispatch_once_t onceTokenSemaphore;
+    dispatch_once(&onceTokenSemaphore, ^{
+        signalSemaphore = dispatch_semaphore_create(1);
+    });
+    dispatch_semaphore_wait(signalSemaphore, DISPATCH_TIME_FOREVER);
+    {
+        [map setObject:propertyInfo forKey:NSStringFromSelector(_CMD)];
+    }
+    dispatch_semaphore_signal(signalSemaphore);
+}
+
+NSMutableDictionary* _Nonnull apc_lazyLoadGetInstanceAssociatedMap(id instance)
+{
+    NSMutableDictionary* map =
+    
+    objc_getAssociatedObject(instance
+                             , &_keyForAPCLazyPropertyInstanceAssociatedPropertyInfo);
+    
+    if(map == nil){
+        
+        static dispatch_semaphore_t signalSemaphore;
+        static dispatch_once_t onceTokenSemaphore;
+        dispatch_once(&onceTokenSemaphore, ^{
+            signalSemaphore = dispatch_semaphore_create(1);
+        });
+        dispatch_semaphore_wait(signalSemaphore, DISPATCH_TIME_FOREVER);
+        {
+            map = [NSMutableDictionary dictionary];
+            objc_setAssociatedObject(instance
+                                     , &_keyForAPCLazyPropertyInstanceAssociatedPropertyInfo
+                                     , map
+                                     , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        dispatch_semaphore_signal(signalSemaphore);
+    }
+    
+    return map;
 }
 @end
