@@ -6,76 +6,76 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 #import "NSObject+APCLazyLoad.h"
-#import "AutoPropertyCocoaConst.h"
 #import "AutoLazyPropertyInfo.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
+#import "APCScope.h"
 
 AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id instance,SEL _CMD);
 
 @implementation NSObject(APCLazyLoad)
 
-+ (void)apc_lazyLoadForProperty:(NSString *)key
++ (void)apc_lazyLoadForProperty:(NSString *)property
 {
-    [self apc_classSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:nil];
+    [self apc_classSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:nil];
 }
 
-+ (void)apc_lazyLoadForProperty:(NSString *)key initializeSelector:(SEL)selector
++ (void)apc_lazyLoadForProperty:(NSString *)property initializeSelector:(SEL)selector
 {
-    [self apc_classSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:selector];
+    [self apc_classSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:selector];
 }
 
-+ (void)apc_lazyLoadForProperty:(NSString *)key usingBlock:(id  _Nullable (^)(id _Nonnull))block
++ (void)apc_lazyLoadForProperty:(NSString *)property usingBlock:(id  _Nullable (^)(id _Nonnull))block
 {
-    [self apc_classSetLazyLoadProperty:key hookWithBlock:block hookWithSEL:nil];
+    [self apc_classSetLazyLoadProperty:property hookWithBlock:block hookWithSEL:nil];
 }
 
-+ (void)apc_lazyLoadForPropertyHooks:(NSDictionary *)keyHooks
++ (void)apc_lazyLoadForPropertyHooks:(NSDictionary *)propertyHooks
 {
-    [keyHooks enumerateKeysAndObjectsUsingBlock:^(NSString*  _Nonnull key, id  _Nonnull hook, BOOL * _Nonnull stop) {
+    [propertyHooks enumerateKeysAndObjectsUsingBlock:^(NSString*  _Nonnull property, id  _Nonnull hook, BOOL * _Nonnull stop) {
         
         if([hook isKindOfClass:[NSString class]]){
             
-            [self apc_classSetLazyLoadProperty:key hookWithBlock:hook hookWithSEL:nil];
+            [self apc_classSetLazyLoadProperty:property hookWithBlock:hook hookWithSEL:nil];
         }else{
             
-            [self apc_classSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:NSSelectorFromString(hook)];
+            [self apc_classSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:NSSelectorFromString(hook)];
         }
     }];
 }
 
-+ (void)apc_unbindLazyLoadForProperty:(NSString *)key
++ (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-    [[AutoLazyPropertyInfo cachedInfoByClass:self propertyName:key] unhook];
+    [[AutoLazyPropertyInfo cachedInfoByClass:self propertyName:property] unhook];
 }
 
-- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)key
+- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
 {
-    [self apc_instanceSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:nil];
+    [self apc_instanceSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:nil];
 }
 
-- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)key
+- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
                     usingBlock:(id _Nullable(^)(id _Nonnull  _self))block
 {
-    [self apc_instanceSetLazyLoadProperty:key hookWithBlock:block hookWithSEL:nil];
+    [self apc_instanceSetLazyLoadProperty:property hookWithBlock:block hookWithSEL:nil];
 }
 
-- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)key
+- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
                       selector:(_Nonnull SEL)selector
 {
-    [self apc_instanceSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:selector];
+    [self apc_instanceSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:selector];
 }
 
-- (void)apc_lazyLoadForPropertyHooks:(NSDictionary* _Nonnull)keyHooks
+- (void)apc_lazyLoadForPropertyHooks:(NSDictionary* _Nonnull)propertyHooks
 {
-    [keyHooks enumerateKeysAndObjectsUsingBlock:^(NSString*  _Nonnull key, id  _Nonnull hook, BOOL * _Nonnull stop) {
+    [propertyHooks enumerateKeysAndObjectsUsingBlock:^(NSString*  _Nonnull property, id  _Nonnull hook, BOOL * _Nonnull stop) {
         
         if([hook isKindOfClass:[NSString class]]){
             
-            [self apc_instanceSetLazyLoadProperty:key hookWithBlock:hook hookWithSEL:nil];
+            [self apc_instanceSetLazyLoadProperty:property hookWithBlock:hook hookWithSEL:nil];
         }else{
             
-            [self apc_instanceSetLazyLoadProperty:key hookWithBlock:nil hookWithSEL:NSSelectorFromString(hook)];
+            [self apc_instanceSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:NSSelectorFromString(hook)];
         }
     }];
 }

@@ -14,9 +14,9 @@
 
 //@property (nonatomic,assign) char* name;
 
-//@property (nonatomic,copy,getter=myGetName,setter=mySetName:)NSString*   name;
+@property (nonatomic,copy,getter=myGetName,setter=mySetName:)NSString*   name;
 
-@property (nonatomic,copy)    NSString*   name;
+//@property (nonatomic,copy)    NSString*   name;
 
 @property (nonatomic,assign,getter=getAge)    NSUInteger  age;
 

@@ -44,10 +44,10 @@
     _kkk = name;
 }
 
-- (NSString*)name
-{
-    return _name;
-}
+//- (NSString*)name
+//{
+//    return _name;
+//}
 
 - (void)setFrame2:(CGRect)frame
 {

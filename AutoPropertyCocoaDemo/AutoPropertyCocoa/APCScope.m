@@ -1,5 +1,5 @@
-#ifndef __AutoWorkPropertyConst__H__
-#define __AutoWorkPropertyConst__H__
+#ifndef __APCScope__H__
+#define __APCScope__H__
 
 #import <Foundation/Foundation.h>
 

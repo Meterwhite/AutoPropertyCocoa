@@ -6,8 +6,8 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "AutoPropertyCocoaConst.h"
 #import "AutoPropertyInfo.h"
+#import "APCScope.h"
 
 @implementation AutoPropertyInfo
 

@@ -1,6 +1,6 @@
 //
 //  ViewController.h
-//  AutoPropertyCocoaDemo
+//  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/19.
 //  Copyright © 2019 Novo. All rights reserved.
