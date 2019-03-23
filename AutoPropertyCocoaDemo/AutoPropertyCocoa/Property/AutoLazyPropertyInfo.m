@@ -18,23 +18,6 @@ void* _Nullable apc_lazy_property_imp_byEnc(NSString* eType);
 
 
 @implementation AutoLazyPropertyInfo
-{
-    IMP         _old_implementation;
-    IMP         _new_implementation;
-    NSString*   _des_property_name;
-    SEL         _hooked_selector;
-    id          _hooked_block;
-}
-
-- (id)hookedBlock
-{
-    return _hooked_block;
-}
-
-- (SEL)hookedSelector
-{
-    return _hooked_selector;
-}
 
 - (instancetype)initWithPropertyName:(NSString* _Nonnull)propertyName
                               aClass:(Class __unsafe_unretained)aClass
@@ -45,16 +28,16 @@ void* _Nullable apc_lazy_property_imp_byEnc(NSString* eType);
         
         self.associatedGetter
         ? NSStringFromSelector(self.associatedGetter)
-        : _org_property_name;
+        : _ogi_property_name;
     }
     return self;
 }
 
-- (void)hookWithSelector:(SEL)aSelector
+- (void)hookUsingUserSelector:(SEL)aSelector
 {
     _kindOfHook     =   AutoPropertyHookKindOfSelector;
-    _hooked_selector=   aSelector?:@selector(new);
-    _hooked_block   =   nil;
+    _userSelector   =   aSelector?:@selector(new);
+    _userBlock      =   nil;
     IMP newimp      =   nil;
     if(self.kindOfValue == AutoPropertyValueKindOfObject){
         
@@ -67,11 +50,11 @@ void* _Nullable apc_lazy_property_imp_byEnc(NSString* eType);
     [self hookPropertyWithImplementation:newimp];
 }
 
-- (void)hookUsingBlock:(id)block
+- (void)hookUsingUserBlock:(id)block
 {
     _kindOfHook     =   AutoPropertyHookKindOfBlock;
-    _hooked_selector=   nil;
-    _hooked_block   =   [block copy];
+    _userSelector   =   nil;
+    _userBlock      =   [block copy];
     IMP newimp      =   nil;
     if(self.kindOfValue == AutoPropertyValueKindOfObject){
         
@@ -100,7 +83,7 @@ const static char _keyForAPCLazyPropertyInstanceAssociatedPropertyInfo = '\0';
                             [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
     }else{
         
-        NSString *proxyClassName = APC_ProxyClassNameForLazyLoad(_clazz);
+        NSString *proxyClassName = APCProxyClassNameForLazyLoad(_clazz);
         
         Class proxyClass = objc_allocateClassPair(_clazz, proxyClassName.UTF8String, 0);
         if(nil != proxyClass){
@@ -232,7 +215,7 @@ static NSMutableDictionary* _cachedClassPropertyInfoMap;
     });
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
     
-    _cachedClassPropertyInfoMap[keyForCachedPropertyMap(_clazz,_des_property_name)] = self;
+    _cachedClassPropertyInfoMap[APCKeyForCachedLazyPropertyMap(_clazz,_des_property_name)] = self;
     
     dispatch_semaphore_signal(semaphore);
 }
@@ -246,7 +229,7 @@ static NSMutableDictionary* _cachedClassPropertyInfoMap;
     });
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
     
-    [_cachedClassPropertyInfoMap removeObjectForKey:keyForCachedPropertyMap(_clazz,_des_property_name)];
+    [_cachedClassPropertyInfoMap removeObjectForKey:APCKeyForCachedLazyPropertyMap(_clazz,_des_property_name)];
     
     dispatch_semaphore_signal(semaphore);
 }
@@ -262,7 +245,7 @@ static NSMutableDictionary* _cachedClassPropertyInfoMap;
         
         clazz = NSClassFromString(className);
     }
-    return _cachedClassPropertyInfoMap[keyForCachedPropertyMap(clazz,propertyName)];
+    return _cachedClassPropertyInfoMap[APCKeyForCachedLazyPropertyMap(clazz,propertyName)];
 }
 
 

@@ -49,7 +49,7 @@
             NSAssert(property, @"Can not find property.");
         }
         _kindOfOwner            = AutoPropertyOwnerKindOfClass;
-        _org_property_name      = propertyName;
+        _ogi_property_name      = propertyName;
         _clazz                  = aClass;
         _enable                 = YES;
         NSString*   attr_str    = @(property_getAttributes(property));
@@ -306,7 +306,7 @@
         [des appendFormat:@",setter=%@",NSStringFromSelector(self.associatedSetter)];
     }
     
-    [des appendFormat:@")%@ -> %@",self.programmingType,_org_property_name];
+    [des appendFormat:@")%@ -> %@",self.programmingType,_ogi_property_name];
     
     if(_associatedIvar != nil){
 

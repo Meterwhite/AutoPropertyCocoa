@@ -57,7 +57,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 
 @interface AutoPropertyInfo : NSObject
 {
-    NSString*               _org_property_name;
+    NSString*               _ogi_property_name;
     AutoPropertyOwnerKind   _kindOfOwner;
     AutoPropertyHookKind    _kindOfHook;
     __weak id               _instance;
@@ -66,13 +66,13 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 }
 
 
+@property (nonatomic,assign,readonly)BOOL                   isReadonly;
+@property (nonatomic,assign,readonly)BOOL                   enable;
 @property (nonatomic,assign,readonly)AutoPropertyOwnerKind  kindOfOwner;
 @property (nonatomic,assign,readonly)AutoPropertyValueKind  kindOfValue;
 @property (nonatomic,assign,readonly)AutoPropertyHookKind   kindOfHook;
-@property (nonatomic,assign,readonly)objc_AssociationPolicy policy;
 @property (nonatomic,assign,readonly)AutoPropertyKVCOption  kvcOption;
-@property (nonatomic,assign,readonly)BOOL                   isReadonly;
-@property (nonatomic,assign,readonly)BOOL                   enable;
+@property (nonatomic,assign,readonly)objc_AssociationPolicy policy;
 
 + (_Nullable instancetype)infoWithPropertyName:(NSString* _Nonnull)propertyName
                                       aInstance:(id _Nonnull)aInstance;
@@ -97,13 +97,12 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 @property (nonatomic,assign,readonly)SEL     associatedSetter;
 
 /**
- Code types written by programmers.
- 
+ The type written by programmer.
  */
 @property (nonatomic,copy,  readonly)NSString* programmingType;
 @property (nonatomic,copy,  readonly)NSString* valueAttibute;
 @property (nonatomic,copy,  readonly)NSString* valueTypeEncoding;
-@property (nonatomic,assign,readonly)Ivar    associatedIvar;
+@property (nonatomic,assign,readonly)Ivar      associatedIvar;
 
 - (void)invalid;
 

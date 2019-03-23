@@ -6,19 +6,15 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "AutoPropertyInfo.h"
+#import "AutoHookPropertyInfo.h"
 
-@interface AutoLazyPropertyInfo : AutoPropertyInfo
+@interface AutoLazyPropertyInfo : AutoHookPropertyInfo
 
-@property (nonatomic,copy,readonly)     id  hookedBlock;
-@property (nonatomic,assign,readonly)   SEL hookedSelector;
+- (void)hookUsingUserSelector:(_Nonnull SEL)aSelector;
 
-- (void)hookWithSelector:(_Nonnull SEL)aSelector;
-
-- (void)hookUsingBlock:(_Nonnull id)block;
+- (void)hookUsingUserBlock:(_Nonnull id)block;
 
 - (void)unhook;
-
 
 - (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target;
 

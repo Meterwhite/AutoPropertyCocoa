@@ -18,6 +18,7 @@
 		45758A092240D31900EE51C3 /* AutoPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 457589FE2240D31900EE51C3 /* AutoPropertyInfo.m */; };
 		45758A0A2240D31900EE51C3 /* Man.m in Sources */ = {isa = PBXBuildFile; fileRef = 45758A042240D31900EE51C3 /* Man.m */; };
 		45758A0B2240D31900EE51C3 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 45758A062240D31900EE51C3 /* Person.m */; };
+		45B532922245EA2B00A89C0F /* AutoHookPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B532912245EA2B00A89C0F /* AutoHookPropertyInfo.m */; };
 		9FBB448E2242883B00DBD65C /* AutoLazyPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +45,8 @@
 		45758A062240D31900EE51C3 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		45B5328D22447E9F00A89C0F /* APCExtScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCExtScope.h; sourceTree = "<group>"; };
 		45B5328E22447F5400A89C0F /* AutoPropertyCocoa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoPropertyCocoa.h; sourceTree = "<group>"; };
+		45B532902245EA2B00A89C0F /* AutoHookPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoHookPropertyInfo.h; sourceTree = "<group>"; };
+		45B532912245EA2B00A89C0F /* AutoHookPropertyInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoHookPropertyInfo.m; sourceTree = "<group>"; };
 		9FBB448C2242883B00DBD65C /* AutoLazyPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoLazyPropertyInfo.h; sourceTree = "<group>"; };
 		9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoLazyPropertyInfo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -121,6 +124,8 @@
 		45B5328F22448DE700A89C0F /* Property */ = {
 			isa = PBXGroup;
 			children = (
+				45B532902245EA2B00A89C0F /* AutoHookPropertyInfo.h */,
+				45B532912245EA2B00A89C0F /* AutoHookPropertyInfo.m */,
 				9FBB448C2242883B00DBD65C /* AutoLazyPropertyInfo.h */,
 				9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */,
 				45758A012240D31900EE51C3 /* AutoPropertyInfo.h */,
@@ -207,6 +212,7 @@
 				45758A0A2240D31900EE51C3 /* Man.m in Sources */,
 				45758A092240D31900EE51C3 /* AutoPropertyInfo.m in Sources */,
 				457589F52240D0BE00EE51C3 /* main.m in Sources */,
+				45B532922245EA2B00A89C0F /* AutoHookPropertyInfo.m in Sources */,
 				457589E72240D0BC00EE51C3 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -23,13 +23,13 @@
 
 
 
-#define APC_ProxyClassNameForLazyLoad(class) \
+#define APCProxyClassNameForLazyLoad(class) \
     ([NSString stringWithFormat:@"%@%@",NSStringFromClass(class),APCClassSuffixForLazyLoad])
 
 /**
  Class.property
  */
-#define keyForCachedPropertyMap(class,propertyName)\
+#define APCKeyForCachedLazyPropertyMap(class,propertyName)\
     ([NSString stringWithFormat:@"%@.%@",NSStringFromClass(class),propertyName])
 
 typedef void*(*APCFunc_S)(id,SEL,id);
@@ -64,10 +64,11 @@ NS_INLINE void apc_setterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* enc,
     if(enc[0] == _C_ID){
         
         ((void(*)(id,SEL,id))imp)(_SELF,_CMD,arg);
+        return;
     }
     
     ///Boxed basic-value.
-    if(![arg isKindOfClass:[NSValue class]]){
+    if(NO == [arg isKindOfClass:[NSValue class]]){
         
         ///@throw
     }

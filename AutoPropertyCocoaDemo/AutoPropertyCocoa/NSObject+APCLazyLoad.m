@@ -106,10 +106,10 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
     
     if(block){
         
-        [propertyInfo hookUsingBlock:block];
+        [propertyInfo hookUsingUserBlock:block];
     }else{
         
-        [propertyInfo hookWithSelector:aSelector];
+        [propertyInfo hookUsingUserSelector:aSelector];
     }
 }
 
@@ -133,10 +133,10 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
     
     if(block){
     
-        [propertyInfo hookUsingBlock:block];
+        [propertyInfo hookUsingUserBlock:block];
     }else{
         
-        [propertyInfo hookWithSelector:aSelector];
+        [propertyInfo hookUsingUserSelector:aSelector];
     }
 }
 
@@ -182,13 +182,13 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
         Class clzz = lazyPropertyInfo.associatedClass;
         if(lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfSelector)
         {
-            NSMethodSignature *signature = [clzz methodSignatureForSelector:lazyPropertyInfo.hookedSelector];
+            NSMethodSignature *signature = [clzz methodSignatureForSelector:lazyPropertyInfo.userSelector];
             if (signature == nil) {
                 //
             }
             NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
             invocation.target = clzz;
-            invocation.selector = lazyPropertyInfo.hookedSelector;
+            invocation.selector = lazyPropertyInfo.userSelector;
             [invocation invoke];
             id __unsafe_unretained returnValue;
             if (signature.methodReturnLength) {
@@ -199,7 +199,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
         }
         else
         {
-            id(^block_def_val)(id _SELF) = lazyPropertyInfo.hookedBlock;
+            id(^block_def_val)(id _SELF) = lazyPropertyInfo.userBlock;
             if(block_def_val){
                 
                 value = block_def_val(_SELF);
@@ -215,7 +215,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
             //@thorw
         }
         
-        id(^block_def_val)(id _SELF) = lazyPropertyInfo.hookedBlock;
+        id(^block_def_val)(id _SELF) = lazyPropertyInfo.userBlock;
         if(block_def_val){
             
             value = block_def_val(_SELF);
