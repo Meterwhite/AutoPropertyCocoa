@@ -8,7 +8,7 @@
 
 #import "AutoHookPropertyInfo.h"
 
-@interface AutoLazyPropertyInfo : AutoHookPropertyInfo
+@interface AutoLazyPropertyInfo : AutoghookPropertyInfo
 
 - (void)hookUsingUserSelector:(_Nonnull SEL)aSelector;
 
@@ -26,5 +26,12 @@
                                propertyName:(NSString*)propertyName;
 
 - (void)cache;
+
+- (void)removeFromCache;
+
++ (void)removeAllCacheAndUnhookForClass:(Class)clazz;
+
+#pragma mark - Cache for instance object.
++ (void)removeAllCacheAndUnhookForInstance:(id _Nonnull)instance;
 @end
 

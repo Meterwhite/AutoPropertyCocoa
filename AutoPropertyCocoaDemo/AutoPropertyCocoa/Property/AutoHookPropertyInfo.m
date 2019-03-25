@@ -1,5 +1,5 @@
 //
-//  AutoHookPropertyInfo.m
+//  AutoghookPropertyInfo.m
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/23.
@@ -8,6 +8,6 @@
 
 #import "AutoHookPropertyInfo.h"
 
-@implementation AutoHookPropertyInfo
+@implementation AutoghookPropertyInfo
 
 @end

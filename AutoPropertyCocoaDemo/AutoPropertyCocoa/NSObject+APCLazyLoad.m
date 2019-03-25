@@ -46,7 +46,14 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
 
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-    [[AutoLazyPropertyInfo cachedInfoByClass:self propertyName:property] unhook];
+    AutoLazyPropertyInfo* p = [AutoLazyPropertyInfo cachedInfoByClass:self propertyName:property];
+    [p unhook];
+    [p removeFromCache];
+}
+
++ (void)apc_unbindLazyLoadAllPropertys
+{
+    [AutoLazyPropertyInfo removeAllCacheAndUnhookForClass:self];
 }
 
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
@@ -86,6 +93,11 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
      unhook];
 }
 
+- (void)apc_unbindLazyLoadAllPropertys
+{
+    [AutoLazyPropertyInfo removeAllCacheAndUnhookForInstance:self];
+}
+
 
 - (void)apc_instanceSetLazyLoadProperty:(NSString*)propertyName
                           hookWithBlock:(id)block
@@ -94,12 +106,12 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
     AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo infoWithPropertyName:propertyName
                                                                      aInstance:self];
     
-    if((propertyInfo.kvcOption & (AutoPropertyKVCSetter | AutoPropertyKVCIVar)) == NO){
+    if((propertyInfo.accessOption & (AutoPropertyComponentOfSetter | AutoPropertyComponentOfIVar)) == NO){
         //can not set
         return;
     }
     
-    if((propertyInfo.kvcOption & (AutoPropertyKVCGetter | AutoPropertyKVCIVar)) == NO){
+    if((propertyInfo.accessOption & (AutoPropertyComponentOfGetter | AutoPropertyComponentOfIVar)) == NO){
         //can not get
         return;
     }
@@ -121,12 +133,12 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
     AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo infoWithPropertyName:propertyName
                                                                              aClass:self];
     
-    if((propertyInfo.kvcOption & (AutoPropertyKVCSetter | AutoPropertyKVCIVar)) == NO){
+    if((propertyInfo.accessOption & (AutoPropertyComponentOfSetter | AutoPropertyComponentOfIVar)) == NO){
         //can not set
         return;
     }
     
-    if((propertyInfo.kvcOption & (AutoPropertyKVCGetter | AutoPropertyKVCIVar)) == NO){
+    if((propertyInfo.accessOption & (AutoPropertyComponentOfGetter | AutoPropertyComponentOfIVar)) == NO){
         //can not get
         return;
     }
@@ -140,7 +152,13 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
     }
 }
 
-
+/**
+ defines
+ :
+ apc_lazy_property + _ + type encode
+ apc_lazy_property + _ + impimage
+ */
+apc_def_vGHook_and_impimage(apc_lazy_property)
 /**
  Destination func.
  */
@@ -165,7 +183,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     }
     
     ///Get value.All returned value are boxed;
-    if(lazyPropertyInfo.kvcOption & AutoPropertyKVCGetter){
+    if(lazyPropertyInfo.accessOption & AutoPropertyComponentOfGetter){
         
         value = [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
     }else{
@@ -227,113 +245,5 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     [lazyPropertyInfo access];
     
     return value;
-}
-
-
-/**
- This getter returns the basic-value.
- */
-#define apc_lazy_property_def(enc,type)\
-    \
-type apc_lazy_property_##enc(_Nullable id _SELF,SEL _CMD)\
-{   \
-    NSValue* value = apc_lazy_property(_SELF, _CMD);\
-    \
-    type ret;\
-    [value getValue:&ret];\
-    \
-    return ret;\
-}\
-
-apc_lazy_property_def(c,char)
-apc_lazy_property_def(i,int)
-apc_lazy_property_def(s,short)
-apc_lazy_property_def(l,long)
-apc_lazy_property_def(q,long long)
-apc_lazy_property_def(C,unsigned char)
-apc_lazy_property_def(I,unsigned int)
-apc_lazy_property_def(S,unsigned short)
-apc_lazy_property_def(L,unsigned long)
-apc_lazy_property_def(Q,unsigned long long)
-apc_lazy_property_def(f,float)
-apc_lazy_property_def(d,double)
-apc_lazy_property_def(B,BOOL)
-apc_lazy_property_def(chars,char*)
-apc_lazy_property_def(class,Class)
-apc_lazy_property_def(sel,SEL)
-apc_lazy_property_def(prt,void*)
-apc_lazy_property_def(rect,APC_RECT)
-apc_lazy_property_def(point,APC_POINT)
-apc_lazy_property_def(size,APC_SIZE)
-apc_lazy_property_def(range,NSRange)
-///enc-m
-
-void* _Nullable apc_lazy_property_imp_byEnc(NSString* enc)
-{
-    if([enc isEqualToString:@"c"]){
-        return apc_lazy_property_c;
-    }
-    else if ([enc isEqualToString:@"i"]){
-        return apc_lazy_property_i;
-    }
-    else if ([enc isEqualToString:@"s"]){
-        return apc_lazy_property_s;
-    }
-    else if ([enc isEqualToString:@"l"]){
-        return apc_lazy_property_l;
-    }
-    else if ([enc isEqualToString:@"q"]){
-        return apc_lazy_property_q;
-    }
-    else if ([enc isEqualToString:@"C"]){
-        return apc_lazy_property_C;
-    }
-    else if ([enc isEqualToString:@"I"]){
-        return apc_lazy_property_I;
-    }
-    else if ([enc isEqualToString:@"S"]){
-        return apc_lazy_property_S;
-    }
-    else if ([enc isEqualToString:@"L"]){
-        return apc_lazy_property_L;
-    }
-    else if ([enc isEqualToString:@"Q"]){
-        return apc_lazy_property_Q;
-    }
-    else if ([enc isEqualToString:@"f"]){
-        return apc_lazy_property_f;
-    }
-    else if ([enc isEqualToString:@"d"]){
-        return apc_lazy_property_d;
-    }
-    else if ([enc isEqualToString:@"B"]){
-        return apc_lazy_property_B;
-    }
-    else if ([enc isEqualToString:@"*"]){
-        return apc_lazy_property_chars;
-    }
-    else if ([enc isEqualToString:@"#"]){
-        return apc_lazy_property_class;
-    }
-    else if ([enc isEqualToString:@":"]){
-        return apc_lazy_property_sel;
-    }
-    else if ([enc characterAtIndex:0] == '^'){
-        return apc_lazy_property_prt;
-    }
-    else if ([enc isEqualToString:@(@encode(APC_RECT))]){
-        return apc_lazy_property_rect;
-    }
-    else if ([enc isEqualToString:@(@encode(APC_POINT))]){
-        return apc_lazy_property_point;
-    }
-    else if ([enc isEqualToString:@(@encode(APC_SIZE))]){
-        return apc_lazy_property_size;
-    }
-    else if ([enc isEqualToString:@(@encode(NSRange))]){
-        return apc_lazy_property_range;
-    }
-    ///enc-m
-    return nil;
 }
 @end

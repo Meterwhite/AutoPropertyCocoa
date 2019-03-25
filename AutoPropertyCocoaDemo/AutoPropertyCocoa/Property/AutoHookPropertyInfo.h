@@ -1,5 +1,5 @@
 //
-//  AutoHookPropertyInfo.h
+//  AutoghookPropertyInfo.h
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/23.
@@ -8,7 +8,7 @@
 
 #import "AutoPropertyInfo.h"
 
-@protocol AutoHookPropertyProtocol <NSObject>
+@protocol AutoghookPropertyProtocol <NSObject>
 
 @optional
 
@@ -19,7 +19,7 @@
 - (void)unhook;
 @end
 
-@interface AutoHookPropertyInfo : AutoPropertyInfo <AutoHookPropertyProtocol>
+@interface AutoghookPropertyInfo : AutoPropertyInfo <AutoghookPropertyProtocol>
 {
     IMP         _old_implementation;
     IMP         _new_implementation;

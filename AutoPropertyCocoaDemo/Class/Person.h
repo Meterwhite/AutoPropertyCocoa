@@ -7,19 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
-
-//delete it
-#import <UIKit/UIKit.h>
+#import "APCScope.h"
 @interface Person : NSObject
 
-//@property (nonatomic,assign) char* name;
+@property (nonatomic,copy)NSString* name;
+@property (nonatomic,copy,getter=myGetName1,setter=mySetName1:)NSString* name1;
+@property (nonatomic,copy,getter=myGetName2)NSString*  name2;
+@property (nonatomic,copy,setter=mySetName3:)NSString* name3;
 
-@property (nonatomic,copy,getter=myGetName,setter=mySetName:)NSString*   name;
+@property (nonatomic,assign)APC_RECT frame;
+@property (nonatomic,assign,getter=myFrame1,setter=mySetFrame1:)APC_RECT frame1;
+@property (nonatomic,assign,getter=myGetFrame2)APC_RECT  frame2;
+@property (nonatomic,assign,setter=mySetFrame3:)APC_RECT frame3;
 
-//@property (nonatomic,copy)    NSString*   name;
-
-@property (nonatomic,assign,getter=getAge)    NSUInteger  age;
-
-@property (nonatomic,assign,getter=getFrame,setter=setFrame2:)  CGRect  frame;
+@property (nonatomic,assign)NSUInteger  age;
 @end
 

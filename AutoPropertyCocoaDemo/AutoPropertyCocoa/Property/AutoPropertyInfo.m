@@ -6,6 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "NSString+APCExtension.h"
 #import "AutoPropertyInfo.h"
 #import "APCScope.h"
 
@@ -28,8 +29,7 @@
     if(self = [self initWithPropertyName:propertyName aClass:[aInstance class]]){
         
         _kindOfOwner = AutoPropertyOwnerKindOfInstance;
-        _instance    =  aInstance;
-        _enable      =  YES;
+        _instance    = aInstance;
     }
     return self;
 }
@@ -46,12 +46,13 @@
                 if(nil != (property = class_getProperty(aClass, propertyName.UTF8String)))
                     break;
             ///@throw
-            NSAssert(property, @"Can not find property.");
+            NSAssert(property, @"Can not find a property named %@.",propertyName);
         }
         _kindOfOwner            = AutoPropertyOwnerKindOfClass;
         _ogi_property_name      = propertyName;
         _clazz                  = aClass;
         _enable                 = YES;
+        
         NSString*   attr_str    = @(property_getAttributes(property));
         NSArray*    attr_cmps   = [attr_str componentsSeparatedByString:@","];
         NSUInteger  dotLoc      = [attr_str rangeOfString:@","].location;
@@ -70,8 +71,8 @@
             return nil;
         }
         
-        _valueAttibute  = code;
-        _valueTypeEncoding      = code;
+        _valueAttibute      = [code copy];
+        _valueTypeEncoding  = [code copy];
         if (code.length > 3 && [code hasPrefix:@"@\""]) {
             
             _valueTypeEncoding = @"@";
@@ -218,24 +219,90 @@
         }
         
         NSString* var_name  = attr_cmps.lastObject;
-        _kvcOption          = AutoPropertyKVCDisable;
+        _accessOption          = AutoPropertyKVCDisable;
         for (NSString* item in attr_cmps) {
             
             if([item characterAtIndex:0] == 'G'){
                 
-                _associatedGetter   =  NSSelectorFromString([item substringFromIndex:1]);
-                _kvcOption          |= AutoPropertyKVCGetter;
+                _propertyGetter   =  NSSelectorFromString([item substringFromIndex:1]);
+                _accessOption          |= AutoPropertyComponentOfGetter;
             }else if([item characterAtIndex:0] == 'S'){
                 
-                _associatedSetter   =  NSSelectorFromString([item substringFromIndex:1]);
-                _kvcOption          |= AutoPropertyKVCSetter;
+                _propertySetter   =  NSSelectorFromString([item substringFromIndex:1]);
+                _accessOption          |= AutoPropertyComponentOfSetter;
             }else if ([item characterAtIndex:0] == 'V'){
                 
                 _associatedIvar     =  class_getInstanceVariable(aClass, [var_name substringFromIndex:1].UTF8String);
-                _kvcOption          |= AutoPropertyKVCIVar;
+                _accessOption          |= AutoPropertyComponentOfIVar;
             }
         }
     }
+    
+    
+    
+    ///AssociatedSetter
+    if(NO == (_accessOption & AutoPropertyComponentOfSetter)){
+        
+        unsigned int count;
+        Method* m_list = class_copyMethodList(_clazz, &count);
+        NSMutableArray* methodNames = [NSMutableArray array];
+        while (count--) {
+            
+            [methodNames addObject:NSStringFromSelector(method_getName(m_list[count]))];
+        }
+        if(methodNames.count > 0){
+            
+            if([methodNames containsObject:_ogi_property_name.apc_kvcAssumedSetterName1]){
+                
+                _associatedSetter = NSSelectorFromString(_ogi_property_name.apc_kvcAssumedSetterName1);
+                _accessOption |= AutoPropertyAssociatedSetter;
+            }else if ([methodNames containsObject:_ogi_property_name.apc_kvcAssumedSetterName2]){
+                
+                _associatedSetter = NSSelectorFromString(_ogi_property_name.apc_kvcAssumedSetterName2);
+                _accessOption |= AutoPropertyAssociatedSetter;
+            }
+        }
+        free(m_list);
+    }
+    
+    ///Ivar
+    if(NO == (_accessOption & AutoPropertyComponentOfIVar)){
+        
+        unsigned int count;
+        Ivar* ivar_list = class_copyIvarList(_clazz, &count);
+        NSUInteger flag = 0;//[0,4]
+        while (count--) {
+            
+            if([@(ivar_getName(ivar_list[count])) isEqualToString:_ogi_property_name.apc_kvcAssumedIvarName1]){
+                
+                _associatedIvar = ivar_list[count];
+                _accessOption   |= AutoPropertyAssociatedIVar;
+                break;
+            }else if (flag < 3
+                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ogi_property_name.apc_kvcAssumedIvarName2]){
+                
+                _associatedIvar = ivar_list[count];
+                _accessOption   |= AutoPropertyAssociatedIVar;
+                flag = 3;
+            }else if (flag < 2
+                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ogi_property_name.apc_kvcAssumedIvarName3]){
+                
+                _associatedIvar = ivar_list[count];
+                _accessOption   |= AutoPropertyAssociatedIVar;
+                flag = 2;
+            }else if (flag < 1
+                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ogi_property_name.apc_kvcAssumedIvarName4]){
+                
+                _associatedIvar = ivar_list[count];
+                _accessOption   |= AutoPropertyAssociatedIVar;
+                flag = 1;
+            }
+        }
+        
+        free(ivar_list);
+    }
+    
+    
     
     return self;
 }
@@ -281,7 +348,13 @@
     
     switch (self.policy) {
         case OBJC_ASSOCIATION_ASSIGN:
-            [des appendString:@"atomic,weak"];
+            [des appendString:@"atomic"];
+            if(_kindOfValue == AutoPropertyValueKindOfObject
+               || _kindOfValue == AutoPropertyValueKindOfBlock){
+                [des appendString:@",weak"];
+            }else{
+                [des appendString:@",assign"];
+            }
             break;
         case OBJC_ASSOCIATION_COPY:
             [des appendString:@"atomic,copy"];
@@ -297,13 +370,13 @@
             break;
     }
     
-    if(self.associatedGetter){
+    if(self.propertyGetter){
         
-        [des appendFormat:@",getter=%@",NSStringFromSelector(self.associatedGetter)];
+        [des appendFormat:@",getter=%@",NSStringFromSelector(self.propertyGetter)];
     }
-    if (self.associatedSetter){
+    if (self.propertySetter){
         
-        [des appendFormat:@",setter=%@",NSStringFromSelector(self.associatedSetter)];
+        [des appendFormat:@",setter=%@",NSStringFromSelector(self.propertySetter)];
     }
     
     [des appendFormat:@")%@ -> %@",self.programmingType,_ogi_property_name];

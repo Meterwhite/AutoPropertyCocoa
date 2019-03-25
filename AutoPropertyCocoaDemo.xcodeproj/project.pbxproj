@@ -19,6 +19,7 @@
 		45758A0A2240D31900EE51C3 /* Man.m in Sources */ = {isa = PBXBuildFile; fileRef = 45758A042240D31900EE51C3 /* Man.m */; };
 		45758A0B2240D31900EE51C3 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 45758A062240D31900EE51C3 /* Person.m */; };
 		45B532922245EA2B00A89C0F /* AutoHookPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B532912245EA2B00A89C0F /* AutoHookPropertyInfo.m */; };
+		45B532962248BA0C00A89C0F /* NSString+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B532952248BA0C00A89C0F /* NSString+APCExtension.m */; };
 		9FBB448E2242883B00DBD65C /* AutoLazyPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +48,8 @@
 		45B5328E22447F5400A89C0F /* AutoPropertyCocoa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoPropertyCocoa.h; sourceTree = "<group>"; };
 		45B532902245EA2B00A89C0F /* AutoHookPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoHookPropertyInfo.h; sourceTree = "<group>"; };
 		45B532912245EA2B00A89C0F /* AutoHookPropertyInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoHookPropertyInfo.m; sourceTree = "<group>"; };
+		45B532942248BA0C00A89C0F /* NSString+APCExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+APCExtension.h"; sourceTree = "<group>"; };
+		45B532952248BA0C00A89C0F /* NSString+APCExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+APCExtension.m"; sourceTree = "<group>"; };
 		9FBB448C2242883B00DBD65C /* AutoLazyPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoLazyPropertyInfo.h; sourceTree = "<group>"; };
 		9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoLazyPropertyInfo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -99,6 +102,7 @@
 		457589FB2240D31900EE51C3 /* AutoPropertyCocoa */ = {
 			isa = PBXGroup;
 			children = (
+				45B532932248B9D800A89C0F /* Category */,
 				45B5328F22448DE700A89C0F /* Property */,
 				45B5328E22447F5400A89C0F /* AutoPropertyCocoa.h */,
 				45B5328D22447E9F00A89C0F /* APCExtScope.h */,
@@ -132,6 +136,15 @@
 				457589FE2240D31900EE51C3 /* AutoPropertyInfo.m */,
 			);
 			path = Property;
+			sourceTree = "<group>";
+		};
+		45B532932248B9D800A89C0F /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				45B532942248BA0C00A89C0F /* NSString+APCExtension.h */,
+				45B532952248BA0C00A89C0F /* NSString+APCExtension.m */,
+			);
+			path = Category;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -207,6 +220,7 @@
 				457589EA2240D0BC00EE51C3 /* ViewController.m in Sources */,
 				45758A072240D31900EE51C3 /* NSObject+APCLazyLoad.m in Sources */,
 				45758A0B2240D31900EE51C3 /* Person.m in Sources */,
+				45B532962248BA0C00A89C0F /* NSString+APCExtension.m in Sources */,
 				45758A082240D31900EE51C3 /* APCScope.m in Sources */,
 				9FBB448E2242883B00DBD65C /* AutoLazyPropertyInfo.m in Sources */,
 				45758A0A2240D31900EE51C3 /* Man.m in Sources */,

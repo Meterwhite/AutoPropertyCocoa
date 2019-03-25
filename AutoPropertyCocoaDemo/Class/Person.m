@@ -10,48 +10,37 @@
 
 @implementation Person
 {
-    NSString* _kkk;
-    CGRect   _frame;
+    NSString* _name_1;
+    APC_RECT _rect_1;
 }
-
-- (instancetype)init
+- (void)mySetName1:(NSString *)name1
 {
-    self = [super init];
-    if (self) {
-        _frame = CGRectMake(1, 1, 1, 1);
-        _age = 1;
-    }
-    return self;
+    _name_1 = name1;
 }
 
-- (NSUInteger)getAge
+- (NSString *)myGetName1
 {
-    return _age;
+    return _name_1;
 }
 
-- (CGRect)getFrame
+
+-(NSString *)myGetName2
 {
-    return _frame;
+    return _name2;
 }
 
-- (NSString *)myGetName
+- (void)mySetName3:(NSString *)name3
 {
-    return _kkk;
+    _name3 = name3;
 }
 
-- (void)mySetName:(NSString *)name
+- (APC_RECT)myFrame1
 {
-    _kkk = name;
+    return _rect_1;
 }
 
-//- (NSString*)name
-//{
-//    return _name;
-//}
-
-- (void)setFrame2:(CGRect)frame
+- (void)mySetFrame1:(APC_RECT)frame1
 {
-    _frame = frame;
+    _rect_1 = frame1;
 }
-
 @end
