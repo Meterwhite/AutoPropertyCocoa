@@ -197,7 +197,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     {
         
         ///Create default value.
-        Class clzz = lazyPropertyInfo.associatedClass;
+        Class clzz = lazyPropertyInfo.propertyClass;
         if(lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfSelector)
         {
             NSMethodSignature *signature = [clzz methodSignatureForSelector:lazyPropertyInfo.userSelector];

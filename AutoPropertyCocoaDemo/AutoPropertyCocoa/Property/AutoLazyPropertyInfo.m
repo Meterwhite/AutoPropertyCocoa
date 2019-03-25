@@ -77,15 +77,16 @@ const static char _keyForAPCLazyPropertyInstanceAssociatedPropertyInfo = '\0';
         ///AutoPropertyOwnerKindOfClass
         _old_implementation
         =
-        class_replaceMethod(_clazz,
+        class_replaceMethod(_des_class,
                             NSSelectorFromString(_des_property_name),
                             _new_implementation,
                             [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+#warning _old_implementation == nil => property is inherited from superclass
     }else{
         
-        NSString *proxyClassName = apc_lazyLoadProxyClassName(_clazz);
+        NSString *proxyClassName = apc_lazyLoadProxyClassName(_des_class);
         
-        Class proxyClass = objc_allocateClassPair(_clazz, proxyClassName.UTF8String, 0);
+        Class proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
         if(nil != proxyClass){
             
             objc_registerClassPair(proxyClass);
@@ -100,7 +101,7 @@ const static char _keyForAPCLazyPropertyInstanceAssociatedPropertyInfo = '\0';
                 
                 _old_implementation
                 =
-                class_getMethodImplementation(_clazz, NSSelectorFromString(_des_property_name));
+                class_getMethodImplementation(_des_class, NSSelectorFromString(_des_property_name));
             }
         }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
             
@@ -120,7 +121,7 @@ const static char _keyForAPCLazyPropertyInstanceAssociatedPropertyInfo = '\0';
         if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
             
             _new_implementation = nil;
-            class_replaceMethod(_clazz
+            class_replaceMethod(_des_class
                                 , NSSelectorFromString(_des_property_name)
                                 , _old_implementation
                                 , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
@@ -201,7 +202,7 @@ static NSMutableDictionary* _cachedClassPropertyInfoMap;
     
     @synchronized (_cachedClassPropertyInfoMap) {
         
-        _cachedClassPropertyInfoMap[apc_lazyLoadKeyForClassPropertyMap(_clazz,_des_property_name)] = self;
+        _cachedClassPropertyInfoMap[apc_lazyLoadKeyForClassPropertyMap(_src_class,_des_class,_des_property_name)] = self;
     }
 }
 
@@ -209,16 +210,19 @@ static NSMutableDictionary* _cachedClassPropertyInfoMap;
 {
     @synchronized (_cachedClassPropertyInfoMap) {
         
-        [_cachedClassPropertyInfoMap removeObjectForKey:apc_lazyLoadKeyForClassPropertyMap(_clazz,_des_property_name)];
+        [_cachedClassPropertyInfoMap removeObjectForKey:apc_lazyLoadKeyForClassPropertyMap(_src_class,_des_class,_des_property_name)];
     }
 }
 
 + (_Nullable instancetype)cachedInfoByClass:(Class)clazz
                                propertyName:(NSString*)propertyName
 {
+    ///Person,Man+APCProxyClassLazyLoad
+    ///==
+    ///Person,Man
     return
     
-    [_cachedClassPropertyInfoMap objectForKey:apc_lazyLoadKeyForClassPropertyMap(apc_lazyLoadGetOgiClass(clazz), propertyName)];
+    [_cachedClassPropertyInfoMap objectForKey:apc_lazyLoadKeyForClassPropertyMap(srcClass,apc_lazyLoadInstanceGetSrcClass(desClass), propertyName)];
 }
 
 + (void)removeAllCacheAndUnhookForClass:(Class)clazz
@@ -263,7 +267,7 @@ static NSMutableDictionary* _cachedClassPropertyInfoMap;
     
     apc_lazyLoadRemoveAllInstanceAssociatedPropertyInfo(instance);
     
-    object_setClass(instance, apc_lazyLoadGetOgiClass([instance class]));
+    object_setClass(instance, apc_lazyLoadInstanceGetSrcClass([instance class]));
 }
 
 
@@ -319,8 +323,14 @@ static NSMutableDictionary* _Nonnull apc_lazyLoadGetInstanceAssociatedMap(id ins
     return map;
 }
 
-NS_INLINE Class apc_lazyLoadGetOgiClass(Class clazz)
+///Person/Man.age
+///Person.age
+///Person/Person+APCProxyClassLazyLoad.age
+#warning 改成Person/Person+APCProxyClassLazyLoad.age
+
+NS_INLINE Class apc_lazyLoadInstanceGetSrcClass(Class clazz)
 {
+    ///Person+APCProxyClassLazyLoad.age
     NSString* className = NSStringFromClass(clazz);
     
     if([className containsString:APCClassSuffixForLazyLoad]){
@@ -332,12 +342,28 @@ NS_INLINE Class apc_lazyLoadGetOgiClass(Class clazz)
     return clazz;
 }
 
+static inline Class apc_lazyLoadGetDesClass(Class clazz)
+{
+    NSString* className = NSStringFromClass(clazz);
+    
+    NSUInteger from = [className rangeOfString:@"/"].location;
+    from = (from == NSNotFound ? 0 : from + 1);
+    NSUInteger to   = [className rangeOfString:@"."].location;
+    className = [className substringWithRange:NSMakeRange(from, to - from)];
+    return NSClassFromString(className);
+}
+
 NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
     return [NSString stringWithFormat:@"%@%@",NSStringFromClass(class),APCClassSuffixForLazyLoad];
 }
 
-NS_INLINE NSString* apc_lazyLoadKeyForClassPropertyMap(Class class,NSString* propertyName){
-    return ([NSString stringWithFormat:@"%@.%@",NSStringFromClass(class),propertyName]);
+static inline NSString* apc_lazyLoadKeyForClassPropertyMap(Class srcClass,Class desClass,NSString* propertyName){
+    
+    if(srcClass == desClass){
+        
+        return [NSString stringWithFormat:@"%@.%@",NSStringFromClass(desClass),propertyName];
+    }
+    return [NSString stringWithFormat:@"%@/%@.%@",NSStringFromClass(srcClass),NSStringFromClass(desClass),propertyName];
 }
 
 NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)

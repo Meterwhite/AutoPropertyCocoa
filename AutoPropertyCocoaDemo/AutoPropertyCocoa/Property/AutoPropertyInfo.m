@@ -39,21 +39,29 @@
 {
     if(self = [super init]){
         
-        objc_property_t property = class_getProperty(aClass, propertyName.UTF8String);
-        if(property == nil){
+        _kindOfOwner       =    AutoPropertyOwnerKindOfClass;
+        _ogi_property_name =    propertyName;
+        _des_class  =    aClass;
+        _enable            =    YES;
+        objc_property_t*        p_list;
+        NSString*               attr_str;
+        unsigned int            count;
+        do {
             
-            while (nil != (aClass = class_getSuperclass(aClass)))
-                if(nil != (property = class_getProperty(aClass, propertyName.UTF8String)))
-                    break;
-            ///@throw
-            NSAssert(property, @"Can not find a property named %@.",propertyName);
-        }
-        _kindOfOwner            = AutoPropertyOwnerKindOfClass;
-        _ogi_property_name      = propertyName;
-        _clazz                  = aClass;
-        _enable                 = YES;
+            p_list = class_copyPropertyList(aClass, &count);
+            while (count--) {
+                
+                if([propertyName isEqualToString:@(property_getName(p_list[count]))]){
+                    
+                    _src_class         =    aClass;
+                    attr_str          = @(property_getAttributes(p_list[count]));
+                }
+            }
+        } while (nil != (aClass = class_getSuperclass(aClass)));
         
-        NSString*   attr_str    = @(property_getAttributes(property));
+        NSAssert(_des_class, @"APC: Can not find a property named %@.",propertyName);
+        
+        
         NSArray*    attr_cmps   = [attr_str componentsSeparatedByString:@","];
         NSUInteger  dotLoc      = [attr_str rangeOfString:@","].location;
         NSString*   code        = nil;
@@ -82,8 +90,8 @@
             if(protocolLoc == NSNotFound){
                 
                 //Class
-                _hasKindOfClass     = YES;
-                _associatedClass    = NSClassFromString((_programmingType = code));
+                _hasKindOfClass = YES;
+                _propertyClass  = NSClassFromString((_programmingType = code));
             }else if([code characterAtIndex:code.length-1] == '>'){
                 
                 //?<Protocol>
@@ -96,8 +104,8 @@
                     
                     //AClass<AProtocol>
                     _hasKindOfClass = YES;
-                    _programmingType = [code substringToIndex:protocolLoc];
-                    _associatedClass = NSClassFromString(code);
+                    _programmingType= [code substringToIndex:protocolLoc];
+                    _propertyClass  = NSClassFromString(code);
                 }
             }
         }
@@ -244,7 +252,7 @@
     if(NO == (_accessOption & AutoPropertyComponentOfSetter)){
         
         unsigned int count;
-        Method* m_list = class_copyMethodList(_clazz, &count);
+        Method* m_list = class_copyMethodList(_des_class, &count);
         NSMutableArray* methodNames = [NSMutableArray array];
         while (count--) {
             
@@ -269,7 +277,7 @@
     if(NO == (_accessOption & AutoPropertyComponentOfIVar)){
         
         unsigned int count;
-        Ivar* ivar_list = class_copyIvarList(_clazz, &count);
+        Ivar* ivar_list = class_copyIvarList(_des_class, &count);
         NSUInteger flag = 0;//[0,4]
         while (count--) {
             

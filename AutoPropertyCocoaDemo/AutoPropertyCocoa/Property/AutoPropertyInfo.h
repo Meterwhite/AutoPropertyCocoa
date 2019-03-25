@@ -71,9 +71,10 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
     NSString*               _ogi_property_name;
     AutoPropertyOwnerKind   _kindOfOwner;
     AutoPropertyHookKind    _kindOfHook;
+    Class                   _des_class;
+    Class                   _src_class;
     __weak id               _instance;
     BOOL                    _enable;
-    Class                   _clazz;
 }
 
 
@@ -103,7 +104,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
  Return NO if the object is marked with 'id'.Return YES otherwise.
  */
 @property (nonatomic,assign,readonly)BOOL    hasKindOfClass;
-@property (nonatomic,assign,readonly)Class   associatedClass;
+@property (nonatomic,assign,readonly)Class   propertyClass;
 @property (nonatomic,assign,readonly)SEL     propertyGetter;
 @property (nonatomic,assign,readonly)SEL     propertySetter;
 

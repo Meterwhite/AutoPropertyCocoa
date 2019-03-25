@@ -31,20 +31,20 @@
 
 - (void)testBaseSubClass
 {
-    [Person apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
-        
-        return @(999);
-    }];
+//    [Person apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
+//
+//        return @(999);
+//    }];
     
     [Man apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
 
         return @(111);
     }];
     
-    NSUInteger age0 = [Person new].age;
-    
-    NSUInteger age1 = [Man new].age;
-    
+    Person* p = [Person new];
+    NSUInteger age0 = p.age;
+    Man* m = [Man new];
+    NSUInteger age1 = m.age;
 }
 
 @end
