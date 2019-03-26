@@ -12,29 +12,29 @@
 typedef NS_OPTIONS (NSUInteger,AutoPropertyAccessOptions){
     
     AutoPropertyKVCDisable          =   0,
-    
+    ///Getter from property attributes.
     AutoPropertyComponentOfGetter   =   1   <<  0,
     
     AutoPropertyComponentOfSetter   =   1   <<  1,
     
     AutoPropertyComponentOfIVar     =   1   <<  2,
-    
+    ///Setter from property list.
     AutoPropertyAssociatedSetter    =   1   <<  3,
-    
+    ///Ivar from ivar list.
     AutoPropertyAssociatedIVar      =   1   <<  4,
     
-    AutoPropertyAccessibilityOfSet  =   AutoPropertyComponentOfSetter
+    AutoPropertySetValueEnable      =   AutoPropertyComponentOfSetter
                                         | AutoPropertyAssociatedSetter
                                         | AutoPropertyComponentOfIVar,
     
-    AutoPropertyAccessibilityOfGet  =   AutoPropertyComponentOfGetter
+    AutoPropertyGetValueEnable      =   AutoPropertyComponentOfGetter
                                         | AutoPropertyComponentOfIVar,
 };
 
 typedef NS_OPTIONS(NSUInteger,AutoPropertyValueKind){
 
     AutoPropertyValueKindOfObject        =   1,
-    
+    ///C number
     AutoPropertyValueKindOfNumber        =   2,
     
     AutoPropertyValueKindOfStructure     =   3,

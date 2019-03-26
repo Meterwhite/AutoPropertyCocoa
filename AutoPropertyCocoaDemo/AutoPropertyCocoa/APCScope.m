@@ -3,7 +3,7 @@
 
 #import <Foundation/Foundation.h>
 
-NSString *const  APCClassSuffixForLazyLoad          =   @"+APCProxyClassLazyLoad";
+NSString *const  APCClassSuffixForLazyLoad          =   @"+APCLazyLoadProxyClass";
 
 NSString *const  APCProgramingType_point             =   @"void*";
 NSString *const  APCProgramingType_chars             =   @"char*";

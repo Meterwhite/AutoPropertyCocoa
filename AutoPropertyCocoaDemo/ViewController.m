@@ -25,21 +25,25 @@
     [super viewDidLoad];
     
     
-    [self testBaseSubClass];
+    [self testClassSuperclassSubclass];
 }
 
 
-- (void)testBaseSubClass
+- (void)testClassSuperclassSubclass
 {
-//    [Person apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
-//
-//        return @(999);
-//    }];
+    [Person apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
+
+        return @(999);
+    }];
     
     [Man apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
-
+        
         return @(111);
     }];
+    
+    [Person apc_unbindLazyLoadForProperty:@"age"];
+    
+//    [Man apc_unbindLazyLoadForProperty:@"age"];
     
     Person* p = [Person new];
     NSUInteger age0 = p.age;

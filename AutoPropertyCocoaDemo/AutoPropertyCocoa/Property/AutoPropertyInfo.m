@@ -41,7 +41,7 @@
         
         _kindOfOwner       =    AutoPropertyOwnerKindOfClass;
         _ogi_property_name =    propertyName;
-        _des_class  =    aClass;
+        _des_class         =    aClass;
         _enable            =    YES;
         objc_property_t*        p_list;
         NSString*               attr_str;
@@ -233,15 +233,15 @@
             if([item characterAtIndex:0] == 'G'){
                 
                 _propertyGetter   =  NSSelectorFromString([item substringFromIndex:1]);
-                _accessOption          |= AutoPropertyComponentOfGetter;
+                _accessOption     |= AutoPropertyComponentOfGetter;
             }else if([item characterAtIndex:0] == 'S'){
                 
                 _propertySetter   =  NSSelectorFromString([item substringFromIndex:1]);
-                _accessOption          |= AutoPropertyComponentOfSetter;
+                _accessOption     |= AutoPropertyComponentOfSetter;
             }else if ([item characterAtIndex:0] == 'V'){
                 
-                _associatedIvar     =  class_getInstanceVariable(aClass, [var_name substringFromIndex:1].UTF8String);
-                _accessOption          |= AutoPropertyComponentOfIVar;
+                _associatedIvar   =  class_getInstanceVariable(_des_class, [var_name substringFromIndex:1].UTF8String);
+                _accessOption     |= AutoPropertyComponentOfIVar;
             }
         }
     }
@@ -319,7 +319,8 @@
 
 - (id)getIvarValueFromTarget:(id)target
 {
-    if(_kindOfValue == AutoPropertyValueKindOfObject){
+    if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
+       self.kindOfValue == AutoPropertyValueKindOfObject){
         
         return object_getIvar(target , _associatedIvar);
     }
@@ -357,10 +358,12 @@
     switch (self.policy) {
         case OBJC_ASSOCIATION_ASSIGN:
             [des appendString:@"atomic"];
-            if(_kindOfValue == AutoPropertyValueKindOfObject
-               || _kindOfValue == AutoPropertyValueKindOfBlock){
+            if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
+               self.kindOfValue == AutoPropertyValueKindOfObject){
+                
                 [des appendString:@",weak"];
             }else{
+                
                 [des appendString:@",assign"];
             }
             break;

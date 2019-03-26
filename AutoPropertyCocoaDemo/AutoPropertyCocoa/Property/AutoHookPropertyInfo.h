@@ -19,6 +19,10 @@
 - (void)unhook;
 @end
 
+
+/**
+ 该类型没有具体实现
+ */
 @interface AutoghookPropertyInfo : AutoPropertyInfo <AutoghookPropertyProtocol>
 {
     IMP         _old_implementation;

@@ -11,7 +11,7 @@
 #import <objc/message.h>
 #import "APCScope.h"
 
-AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id instance,SEL _CMD);
+AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBindedCache(id instance,SEL _CMD);
 
 @implementation NSObject(APCLazyLoad)
 
@@ -53,7 +53,7 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
 
 + (void)apc_unbindLazyLoadAllPropertys
 {
-    [AutoLazyPropertyInfo removeAllCacheAndUnhookForClass:self];
+    [AutoLazyPropertyInfo removeCacheForClass:self];
 }
 
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
@@ -89,13 +89,13 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
 
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
-    [apc_lazyLoadGetInstanceAssociatedPropertyInfo(self , NSSelectorFromString(property))
+    [apc_lazyLoadGetInstanceFromBindedCache(self , NSSelectorFromString(property))
      unhook];
 }
 
 - (void)apc_unbindLazyLoadAllPropertys
 {
-    [AutoLazyPropertyInfo removeAllCacheAndUnhookForInstance:self];
+    [AutoLazyPropertyInfo unbindlazyLoadForInstance:self];
 }
 
 
@@ -106,13 +106,11 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
     AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo infoWithPropertyName:propertyName
                                                                      aInstance:self];
     
-    if((propertyInfo.accessOption & (AutoPropertyComponentOfSetter | AutoPropertyComponentOfIVar)) == NO){
-        //can not set
-        return;
-    }
-    
-    if((propertyInfo.accessOption & (AutoPropertyComponentOfGetter | AutoPropertyComponentOfIVar)) == NO){
-        //can not get
+    if(NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)
+       
+       ||
+       
+       NO  == (propertyInfo.accessOption & AutoPropertySetValueEnable)){
         return;
     }
     
@@ -133,13 +131,11 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceAssociatedPropertyInfo(id
     AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo infoWithPropertyName:propertyName
                                                                              aClass:self];
     
-    if((propertyInfo.accessOption & (AutoPropertyComponentOfSetter | AutoPropertyComponentOfIVar)) == NO){
-        //can not set
-        return;
-    }
-    
-    if((propertyInfo.accessOption & (AutoPropertyComponentOfGetter | AutoPropertyComponentOfIVar)) == NO){
-        //can not get
+    if(NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)
+       
+       ||
+       
+       NO  == (propertyInfo.accessOption & AutoPropertySetValueEnable)){
         return;
     }
     
@@ -166,23 +162,24 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
 {
     AutoLazyPropertyInfo* lazyPropertyInfo;
     
-    if(nil == (lazyPropertyInfo = apc_lazyLoadGetInstanceAssociatedPropertyInfo(_SELF,_CMD)))
+    if(nil == (lazyPropertyInfo = apc_lazyLoadGetInstanceFromBindedCache(_SELF,_CMD)))
         
         if(nil == (lazyPropertyInfo = [AutoLazyPropertyInfo cachedInfoByClass:[_SELF class] propertyName:NSStringFromSelector(_CMD)]))
             
             NSCAssert(NO, @"");
         
     
-    id value = nil;
-    
-    ///Logic delete for instance property info.
-    if(lazyPropertyInfo.enable == NO
-       && lazyPropertyInfo.kindOfOwner == AutoPropertyOwnerKindOfInstance){
+    ///If lazy-load of instance has been logically removed.Performing the old implementation.
+    if(lazyPropertyInfo.enable == NO){
+        
+        NSCAssert(lazyPropertyInfo.kindOfOwner == AutoPropertyOwnerKindOfInstance
+                  , @"APC: This property is invalid.");
         
         return [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
     }
     
-    ///Get value.All returned value are boxed;
+    id value = nil;
+    ///Get value.(All returned value are boxed)
     if(lazyPropertyInfo.accessOption & AutoPropertyComponentOfGetter){
         
         value = [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
@@ -193,52 +190,31 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     
     
     if(value == nil
-       && lazyPropertyInfo.kindOfValue == AutoPropertyValueKindOfObject)
+       
+       && (lazyPropertyInfo.kindOfValue == AutoPropertyValueKindOfBlock ||
+           lazyPropertyInfo.kindOfValue == AutoPropertyValueKindOfObject))
     {
-        
         ///Create default value.
-        Class clzz = lazyPropertyInfo.propertyClass;
-        if(lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfSelector)
-        {
-            NSMethodSignature *signature = [clzz methodSignatureForSelector:lazyPropertyInfo.userSelector];
-            if (signature == nil) {
-                //
-            }
-            NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
-            invocation.target = clzz;
-            invocation.selector = lazyPropertyInfo.userSelector;
-            [invocation invoke];
-            id __unsafe_unretained returnValue;
-            if (signature.methodReturnLength) {
-                
-                [invocation getReturnValue:&returnValue];
-                value = returnValue;
-            }
+        if(lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfSelector){
+            
+            value = [lazyPropertyInfo instancetypeNewObjectByUserSelector];
         }
-        else
-        {
-            id(^block_def_val)(id _SELF) = lazyPropertyInfo.userBlock;
-            if(block_def_val){
-                
-                value = block_def_val(_SELF);
-            }
+        else{
+            
+            value = [lazyPropertyInfo performUserBlock:_SELF];
         }
-        
         [lazyPropertyInfo setValue:value toTarget:_SELF];
     }
     else if (lazyPropertyInfo.accessCount == 0
-             && lazyPropertyInfo.kindOfValue != AutoPropertyValueKindOfObject)
+             
+             && (lazyPropertyInfo.kindOfValue != AutoPropertyValueKindOfBlock ||
+                 lazyPropertyInfo.kindOfValue != AutoPropertyValueKindOfObject))
     {
-        if((lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfBlock) == NO){
-            //@thorw
-        }
         
-        id(^block_def_val)(id _SELF) = lazyPropertyInfo.userBlock;
-        if(block_def_val){
-            
-            value = block_def_val(_SELF);
-        }
+        NSCAssert(lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfBlock
+                 , @"APC: Basic-value only supportted be initialized by 'userblock'.");
         
+        value = [lazyPropertyInfo performUserBlock:_SELF];
         [lazyPropertyInfo setValue:value toTarget:_SELF];
     }
     
