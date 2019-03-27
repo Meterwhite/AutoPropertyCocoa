@@ -51,7 +51,7 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBindedCache(id instan
     [p removeFromCache];
 }
 
-+ (void)apc_unbindLazyLoadAllPropertys
++ (void)apc_unbindLazyLoadAllProperties
 {
     [AutoLazyPropertyInfo removeCacheForClass:self];
 }
@@ -93,7 +93,7 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBindedCache(id instan
      unhook];
 }
 
-- (void)apc_unbindLazyLoadAllPropertys
+- (void)apc_unbindLazyLoadAllProperties
 {
     [AutoLazyPropertyInfo unbindlazyLoadForInstance:self];
 }

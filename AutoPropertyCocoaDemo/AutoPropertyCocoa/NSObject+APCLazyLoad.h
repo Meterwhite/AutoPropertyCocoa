@@ -24,7 +24,7 @@
 
 + (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property;
 
-+ (void)apc_unbindLazyLoadAllPropertys;
++ (void)apc_unbindLazyLoadAllProperties;
 
 
 #pragma mark - Lazy load for instance.
@@ -40,5 +40,5 @@
 
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property;
 
-- (void)apc_unbindLazyLoadAllPropertys;
+- (void)apc_unbindLazyLoadAllProperties;
 @end

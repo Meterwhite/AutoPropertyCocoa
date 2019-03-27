@@ -12,6 +12,7 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import "APCScope.h"
+#import "APCHash.h"
 #import "Person.h"
 #import "Man.h"
 
@@ -25,7 +26,8 @@
     [super viewDidLoad];
     
     
-    [self testClassSuperclassSubclass];
+//    [self testClassSuperclassSubclass];
+    [self testHash];
 }
 
 
@@ -49,6 +51,26 @@
     NSUInteger age0 = p.age;
     Man* m = [Man new];
     NSUInteger age1 = m.age;
+}
+
+- (void)testHash
+{
+    Class p = [Person class];
+    Class m = [Man class];
+    NSString* propertyName = @"age";
+    
+    
+    NSUInteger hashP = [p hash];
+    NSUInteger hashM = [m hash];
+    NSUInteger hashN = [propertyName hash];
+    
+    NSUInteger t0 = apc_hash_pairing(hashM, hashN);
+    
+    unsigned long long d0;
+    unsigned long long d1;
+    apc_hash_depairing(t0, &d0, &d1);
+    
+    
 }
 
 @end

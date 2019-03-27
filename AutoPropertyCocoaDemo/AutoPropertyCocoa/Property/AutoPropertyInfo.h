@@ -68,11 +68,15 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 
 @interface AutoPropertyInfo : NSObject
 {
+@public
+    
+    Class                   _des_class;
+    Class                   _src_class;
+@protected
+    
     NSString*               _ogi_property_name;
     AutoPropertyOwnerKind   _kindOfOwner;
     AutoPropertyHookKind    _kindOfHook;
-    Class                   _des_class;
-    Class                   _src_class;
     __weak id               _instance;
     BOOL                    _enable;
 }
@@ -80,11 +84,12 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 
 @property (nonatomic,assign,readonly)BOOL                       isReadonly;
 @property (nonatomic,assign,readonly)BOOL                       enable;
+
+@property (nonatomic,assign,readonly)AutoPropertyAccessOptions  accessOption;
 @property (nonatomic,assign,readonly)AutoPropertyOwnerKind      kindOfOwner;
 @property (nonatomic,assign,readonly)AutoPropertyValueKind      kindOfValue;
 @property (nonatomic,assign,readonly)AutoPropertyHookKind       kindOfHook;
 @property (nonatomic,assign,readonly)objc_AssociationPolicy     policy;
-@property (nonatomic,assign,readonly)AutoPropertyAccessOptions  accessOption;
 
 + (_Nullable instancetype)infoWithPropertyName:(NSString* _Nonnull)propertyName
                                       aInstance:(id _Nonnull)aInstance;

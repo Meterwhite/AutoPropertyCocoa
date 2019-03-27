@@ -335,10 +335,10 @@ type oghook##_##enc(_Nullable id _SELF,SEL _CMD)\
 
 
 
-#define APCPropertysArray(...)\
-@[APCPropertys(__VA_ARGS__)]
+#define APCPropertiesArray(...)\
+@[APCProperties(__VA_ARGS__)]
 
-#define APCPropertys(...)\
+#define APCProperties(...)\
 submacro_apc_concat(submacro_apc_plist_,submacro_apc_argcount(__VA_ARGS__))(__VA_ARGS__)
 
 #define submacro_apc_plist_2(OBJ, P1)\
