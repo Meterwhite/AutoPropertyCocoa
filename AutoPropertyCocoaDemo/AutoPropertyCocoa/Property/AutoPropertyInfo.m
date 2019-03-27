@@ -400,4 +400,9 @@
     return [des copy];
 }
 
+
+- (NSUInteger)hash
+{
+    return 0;
+}
 @end

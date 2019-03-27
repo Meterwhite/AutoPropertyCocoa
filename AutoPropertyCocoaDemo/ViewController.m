@@ -59,17 +59,20 @@
     Class m = [Man class];
     NSString* propertyName = @"age";
     
+//    size_t s0 = sizeof(NSUInteger);//64
+//    size_t s1 = sizeof(unsigned long long);//64
+//    size_t s2 = sizeof(double);//64
+//    size_t s3 = sizeof(long double);//128
     
     NSUInteger hashP = [p hash];
     NSUInteger hashM = [m hash];
     NSUInteger hashN = [propertyName hash];
     
-    NSUInteger t0 = apc_hash_pairing(hashM, hashN);
+    NSUInteger t0 = apc_hash_cantorpairing(1111, 9999);
     
-    unsigned long long d0;
-    unsigned long long d1;
-    apc_hash_depairing(t0, &d0, &d1);
-    
+    NSUInteger d0;
+    NSUInteger d1;
+    apc_hash_decantorpairing(t0, &d0, &d1);
     
 }
 

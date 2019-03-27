@@ -78,6 +78,8 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
     AutoPropertyOwnerKind   _kindOfOwner;
     AutoPropertyHookKind    _kindOfHook;
     __weak id               _instance;
+@private
+    
     BOOL                    _enable;
 }
 
@@ -131,6 +133,6 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 - (void)access;
 @property (nonatomic,assign,readonly) NSUInteger accessCount;
 
-
+- (NSUInteger)hash;
 @end
 
