@@ -72,9 +72,9 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
     
     Class                   _des_class;
     Class                   _src_class;
+    NSString*               _ogi_property_name;
 @protected
     
-    NSString*               _ogi_property_name;
     AutoPropertyOwnerKind   _kindOfOwner;
     AutoPropertyHookKind    _kindOfHook;
     __weak id               _instance;

@@ -9,5 +9,11 @@
 #import "AutoHookPropertyInfo.h"
 
 @implementation AutoghookPropertyInfo
-
+//- (void)unhook
+//{
+#warning <#message#>
+    //[self performSelector:@selector(subclassResponsibility:)];
+    //装逼
+    //imp to implementation this B
+//}
 @end

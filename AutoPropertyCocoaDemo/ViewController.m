@@ -7,6 +7,8 @@
 //
 
 #import "AutoPropertyCocoa/Property/AutoLazyPropertyInfo.h"
+#import "AutoPropertyCocoa/APCPropertyMapperKey.h"
+#import "AutoPropertyCocoa/APCPropertyMapperCache.h"
 #import "NSObject+APCLazyLoad.h"
 #import "ViewController.h"
 #import <objc/runtime.h>
@@ -26,8 +28,9 @@
     [super viewDidLoad];
     
     
-//    [self testClassSuperclassSubclass];
-    [self testHash];
+    [self testClassSuperclassSubclass];
+//    [self testHash];
+//    [self testMapperCache];
 }
 
 
@@ -43,7 +46,7 @@
         return @(111);
     }];
     
-    [Person apc_unbindLazyLoadForProperty:@"age"];
+//    [Person apc_unbindLazyLoadForProperty:@"age"];
     
 //    [Man apc_unbindLazyLoadForProperty:@"age"];
     
@@ -59,21 +62,59 @@
     Class m = [Man class];
     NSString* propertyName = @"age";
     
-//    size_t s0 = sizeof(NSUInteger);//64
-//    size_t s1 = sizeof(unsigned long long);//64
-//    size_t s2 = sizeof(double);//64
-//    size_t s3 = sizeof(long double);//128
     
     NSUInteger hashP = [p hash];
     NSUInteger hashM = [m hash];
-    NSUInteger hashN = [propertyName hash];
+    NSUInteger hashN = [propertyName hash];//21042608 516213936
     
-    NSUInteger t0 = apc_hash_cantorpairing(1111, 9999);
+//    NSUInteger t0 = apc_hash_cantorpairing(1111, 9999);
+//
+//    NSUInteger d0;
+//    NSUInteger d1;
+//    apc_hash_decantorpairing(t0, &d0, &d1);
     
-    NSUInteger d0;
-    NSUInteger d1;
-    apc_hash_decantorpairing(t0, &d0, &d1);
     
+    NSUInteger h0 = hashM;
+    NSUInteger h1 = hashN;
+    
+    void* ptr = malloc(sizeof(NSUInteger) * 2);
+    
+    memcpy(ptr, &h0, sizeof(NSUInteger));
+    
+    memcpy(ptr+sizeof(NSUInteger), &h1, sizeof(NSUInteger));
+    
+    NSUInteger xx = apc_hash_bytes(ptr, 2 * sizeof(NSUInteger));
+    
+    free(ptr);
+    
+    NSMutableData* data = [NSMutableData data];
+    
+    [data appendBytes:&h0 length:sizeof(NSUInteger)];
+    
+    [data appendBytes:&h1 length:sizeof(NSUInteger)];
+    
+    NSUInteger yy = apc_hash_bytes((uint8_t*)data.bytes, 2 * sizeof(NSUInteger));
+    //21042608 516213936
 }
 
+
+- (void)testMapperCache
+{
+    
+    
+//    APCPropertyMapperCache* cache = [APCPropertyMapperCache cache];
+//
+//    cache addProperty:<#(AutoPropertyInfo *)#>
+    
+    id k0 = [APCPropertyMapperKey keyWithClass:self.class];
+    id k1 = [APCPropertyMapperKey keyWithClass:self.class];
+    
+    NSMutableDictionary* mdic = NSMutableDictionary.dictionary;
+    
+    mdic[k0] = @"A";
+    mdic[k1] = @"B";
+    
+    id xx = mdic[NSStringFromClass(self.class)];
+    NSLog(@"%@",mdic);
+}
 @end

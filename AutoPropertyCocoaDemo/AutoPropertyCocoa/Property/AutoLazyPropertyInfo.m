@@ -6,6 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "APCPropertyMapperCache.h"
 #import "AutoLazyPropertyInfo.h"
 #import "NSObject+APCLazyLoad.h"
 #import <objc/runtime.h>
@@ -91,7 +92,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
             
             AutoLazyPropertyInfo* pinfo_superclass
             =
-            _cacheForClass[apc_lazyLoadKeyForClassCache(_src_class, _src_class, _des_property_name)];
+            [_cacheForClass propertyForDesclass:_des_class property:_des_property_name];
             
             if(nil != pinfo_superclass){
                 
@@ -238,28 +239,23 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 #pragma mark - cache strategy
 
-static NSMutableDictionary* _cacheForClass;
+static APCPropertyMapperCache* _cacheForClass;
 - (void)cache
 {
     
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-        _cacheForClass     =   [NSMutableDictionary dictionary];
+        _cacheForClass     =   [APCPropertyMapperCache cache];
     });
     
-    @synchronized (_cacheForClass) {
-        
-        _cacheForClass[apc_lazyLoadKeyForClassCache(_src_class,_des_class,_des_property_name)] = self;
-    }
+    
+    [_cacheForClass addProperty:self];
 }
 
 - (void)removeFromCache
 {
-    @synchronized (_cacheForClass) {
-        
-        [_cacheForClass removeObjectForKey:apc_lazyLoadKeyForClassCache(_src_class,_des_class,_des_property_name)];
-    }
+    [_cacheForClass removeProperty:self];
 }
 
 - (void)bindInstancePropertyInfo
@@ -273,61 +269,15 @@ static NSMutableDictionary* _cacheForClass;
                                propertyName:(NSString*)propertyName
 {
     clazz = apc_lazyLoadUnproxyClass(clazz);
-    NSEnumerator*   enumerator = _cacheForClass.keyEnumerator;
-    NSString*       matched    = [NSString stringWithFormat:@"%@.%@",NSStringFromClass(clazz),propertyName];
-    NSString*       key;
-    NSUInteger      loc;
-    while (nil != (key = enumerator.nextObject)) {
-        
-        loc = [key rangeOfString:matched].location;
-        if(loc != NSNotFound){
-            //   /a
-            if((key.length == loc + matched.length)
-               && ([key characterAtIndex:loc - 1] == '/')){
-                
-                return _cacheForClass[key];
-            }
-        }
-    }
     
-    return nil;
+    return [_cacheForClass propertyForDesclass:clazz property:propertyName];
 }
 
 + (void)removeCacheForClass:(Class)clazz
 {
     clazz  = apc_lazyLoadUnproxyClass(clazz);
-    @synchronized (_cacheForClass) {
-        
-        NSEnumerator*   enumerator  = _cacheForClass.keyEnumerator;
-        NSString*       clzName     = NSStringFromClass(clazz);
-        NSMutableArray* keysRm      = [NSMutableArray array];
-        NSString*       key;
-        NSUInteger      loc;
-        while ((key = enumerator.nextObject)) {
-            
-            loc = [key rangeOfString:clzName].location;
-            
-            if(NSNotFound != loc){
-                
-                ///Match/Nomatch.p
-                if(loc == 0
-                   
-                   ///Nomatch/Match.p and Match/Match.p
-                   || ([key characterAtIndex:loc - 1] == '/'
-                       && key.length > loc + clzName.length + 1
-                       && [key characterAtIndex:loc + clzName.length] == '.')){
-                    
-                    [keysRm addObject:key];
-                    [_cacheForClass[key] unhook];
-                }
-            }
-        }
-        
-        if(keysRm.count > 0){
-            
-            [_cacheForClass removeObjectsForKeys:keysRm];
-        }
-    }
+    
+    [_cacheForClass removePropertiesWithSrcclass:clazz];
 }
 
 + (void)unbindlazyLoadForInstance:(id _Nonnull)instance
@@ -404,7 +354,7 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
  :
  Class+APCProxyClassLazyLoad -> Class
  */
-NS_INLINE Class apc_lazyLoadUnproxyClass(Class clazz)
+static Class apc_lazyLoadUnproxyClass(Class clazz)
 {
     NSString* className = NSStringFromClass(clazz);
     
@@ -417,27 +367,11 @@ NS_INLINE Class apc_lazyLoadUnproxyClass(Class clazz)
     return clazz;
 }
 
-//static inline Class apc_lazyLoadGetDesClass(Class clazz)
-//{
-//    NSString* className = NSStringFromClass(clazz);
-//
-//    NSUInteger from = [className rangeOfString:@"/"].location;
-//    from = (from == NSNotFound ? 0 : from + 1);
-//    NSUInteger to   = [className rangeOfString:@"."].location;
-//    className = [className substringWithRange:NSMakeRange(from, to - from)];
-//    return NSClassFromString(className);
-//}
-
 /**
  Get proxy clas name with a common class.
  */
 NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
     return [NSString stringWithFormat:@"%@%@",NSStringFromClass(class),APCClassSuffixForLazyLoad];
-}
-
-NS_INLINE NSString* apc_lazyLoadKeyForClassCache(Class srcClass,Class desClass,NSString* propertyName){
-    
-    return [NSString stringWithFormat:@"%@/%@.%@",NSStringFromClass(srcClass),NSStringFromClass(desClass),propertyName];
 }
 
 @end
