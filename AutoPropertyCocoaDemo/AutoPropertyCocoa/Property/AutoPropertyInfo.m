@@ -403,6 +403,13 @@
 
 - (NSUInteger)hash
 {
-    return 0;
+    return
+    
+    [[NSString stringWithFormat:@"%@/%@.%@"
+      , NSStringFromClass(_src_class)
+      , NSStringFromClass(_des_class)
+      , _ogi_property_name]
+     
+     hash];
 }
 @end

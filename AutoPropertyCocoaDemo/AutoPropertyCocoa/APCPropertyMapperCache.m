@@ -53,13 +53,14 @@
 - (void)addProperty:(AutoPropertyInfo *)aProperty
 {
     dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
-#warning self.references add:/aProperty hash
+
     if([self.references containsObject:aProperty]){
         
         dispatch_semaphore_signal(_lock);
         return;
     }
     
+    [self.references addObject:aProperty];
     
     APCPropertyMapperKey* keyForSrc = [APCPropertyMapperKey keyWithClass:aProperty->_src_class];
     
@@ -108,7 +109,7 @@
     dispatch_semaphore_signal(_lock);
 }
 
-- (id)propertyForDesclass:(Class)desclass property:(NSString *)property
+- (__kindof AutoPropertyInfo*)propertyForDesclass:(Class)desclass property:(NSString *)property
 {
     return
     

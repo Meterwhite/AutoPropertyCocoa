@@ -17,8 +17,42 @@
 id    _Nullable apc_lazy_property       (_Nullable id _self,SEL __cmd);
 void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
-
+//static int shift;
 @implementation AutoLazyPropertyInfo
+
+- (BOOL)isEqual:(id)object
+{
+    if(self == object)
+        
+        return YES;
+    
+    return [self hash] == [object hash];
+}
+
+- (NSUInteger)hash
+{
+    
+    if(NO == self.enable) return 0;
+//
+//    return (NSUInteger)(&self);
+    
+#define MAXALIGN (__alignof__(_Complex long double))
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code"
+    static int shift = (MAXALIGN==16 ? 4 : (MAXALIGN==8 ? 3 : 2));
+#pragma clang diagnostic pop
+    
+    return (NSUInteger)((uintptr_t)self >> shift);
+    
+    
+//    _src_class;
+//    _des_class;
+//    _ogi_property_name;
+//    _des_property_name;
+//    _kindOfHook;
+//    _kindOfOwner;
+}
 
 - (instancetype)initWithPropertyName:(NSString* _Nonnull)propertyName
                               aClass:(Class __unsafe_unretained)aClass

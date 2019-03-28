@@ -67,34 +67,19 @@
     NSUInteger hashM = [m hash];
     NSUInteger hashN = [propertyName hash];//21042608 516213936
     
-//    NSUInteger t0 = apc_hash_cantorpairing(1111, 9999);
-//
-//    NSUInteger d0;
-//    NSUInteger d1;
-//    apc_hash_decantorpairing(t0, &d0, &d1);
+    AutoLazyPropertyInfo* p0 = [AutoLazyPropertyInfo infoWithPropertyName:@"age" aClass:p];
+    AutoLazyPropertyInfo* p1 = [AutoLazyPropertyInfo infoWithPropertyName:@"age" aClass:p];
+    [p0 invalid];
+    NSMutableSet* set = [NSMutableSet setWithObjects:p0, p1, nil];
     
+    [p1 invalid];
     
-    NSUInteger h0 = hashM;
-    NSUInteger h1 = hashN;
+    AutoLazyPropertyInfo* p2 = [AutoLazyPropertyInfo infoWithPropertyName:@"age" aClass:p];
+    [p2 invalid];
     
-    void* ptr = malloc(sizeof(NSUInteger) * 2);
+    [set addObject:p2];
     
-    memcpy(ptr, &h0, sizeof(NSUInteger));
-    
-    memcpy(ptr+sizeof(NSUInteger), &h1, sizeof(NSUInteger));
-    
-    NSUInteger xx = apc_hash_bytes(ptr, 2 * sizeof(NSUInteger));
-    
-    free(ptr);
-    
-    NSMutableData* data = [NSMutableData data];
-    
-    [data appendBytes:&h0 length:sizeof(NSUInteger)];
-    
-    [data appendBytes:&h1 length:sizeof(NSUInteger)];
-    
-    NSUInteger yy = apc_hash_bytes((uint8_t*)data.bytes, 2 * sizeof(NSUInteger));
-    //21042608 516213936
+    NSLog(@"%@",set);
 }
 
 
