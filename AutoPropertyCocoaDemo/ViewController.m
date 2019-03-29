@@ -6,10 +6,11 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "AutoPropertyCocoa/Property/AutoLazyPropertyInfo.h"
-#import "AutoPropertyCocoa/APCPropertyMapperKey.h"
-#import "AutoPropertyCocoa/APCPropertyMapperCache.h"
+#import "AutoPropertyInfo.h"
+#import "APCClassPropertyMapperCache.h"
+#import "AutoLazyPropertyInfo.h"
 #import "NSObject+APCLazyLoad.h"
+#import "APCPropertyMapperKey.h"
 #import "ViewController.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
@@ -36,8 +37,9 @@
 
 - (void)testClassSuperclassSubclass
 {
+    
     [Person apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
-
+        
         return @(999);
     }];
     
@@ -46,9 +48,9 @@
         return @(111);
     }];
     
-//    [Person apc_unbindLazyLoadForProperty:@"age"];
+    [Person apc_unbindLazyLoadForProperty:@"age"];
     
-//    [Man apc_unbindLazyLoadForProperty:@"age"];
+    [Man    apc_unbindLazyLoadForProperty:@"age"];
     
     Person* p = [Person new];
     NSUInteger age0 = p.age;
@@ -87,7 +89,7 @@
 {
     
     
-//    APCPropertyMapperCache* cache = [APCPropertyMapperCache cache];
+//    APCClassPropertyMapperCache* cache = [APCClassPropertyMapperCache cache];
 //
 //    cache addProperty:<#(AutoPropertyInfo *)#>
     

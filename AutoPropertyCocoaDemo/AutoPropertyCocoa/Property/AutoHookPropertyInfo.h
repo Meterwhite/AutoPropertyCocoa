@@ -33,7 +33,7 @@
     IMP         _userIMP;
 }
 
-@property (nonatomic,assign,readonly)   SEL userSelector;
-@property (nonatomic,copy,  readonly)   id  userBlock;
-@property (nonatomic,assign,readonly)   IMP userIMP;
+@property (nonatomic,assign,readonly,nullable)   SEL userSelector;
+@property (nonatomic,copy,readonly,nullable)     id  userBlock;
+@property (nonatomic,assign,readonly,nullable)   IMP userIMP;
 @end

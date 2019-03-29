@@ -1,16 +1,16 @@
 //
-//  APCPropertyMapperCache.m
+//  APCClassPropertyMapperCache.m
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/27.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "APCPropertyMapperCache.h"
+#import "APCClassPropertyMapperCache.h"
 #import "APCPropertyMapperKey.h"
 #import "AutoPropertyInfo.h"
 
-@interface APCPropertyMapperCache ()
+@interface APCClassPropertyMapperCache ()
 {
     dispatch_semaphore_t _lock;
 }
@@ -24,7 +24,7 @@
 
 @end
 
-@implementation APCPropertyMapperCache
+@implementation APCClassPropertyMapperCache
 
 + (instancetype)cache
 {
@@ -50,36 +50,33 @@
     return self;
 }
 
+
+/**
+ The same object will be replaced.
+ */
 - (void)addProperty:(AutoPropertyInfo *)aProperty
 {
+    APCPropertyMapperKey* keyForSrc = [APCPropertyMapperKey keyWithClass:aProperty->_src_class];
+    
+    APCPropertyMapperKey* keyForDes = [APCPropertyMapperKey keyWithClass:aProperty->_des_class
+                                                                property:aProperty->_ogi_property_name];
+    
     dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
-
-    if([self.references containsObject:aProperty]){
+    if(YES == [self.references containsObject:aProperty]){
         
-        dispatch_semaphore_signal(_lock);
-        return;
+        [self.references removeObject:aProperty];
     }
     
     [self.references addObject:aProperty];
     
-    APCPropertyMapperKey* keyForSrc = [APCPropertyMapperKey keyWithClass:aProperty->_src_class];
-    
-    APCPropertyMapperKey* keyForDes = [APCPropertyMapperKey keyWithClass:aProperty->_src_class
-                                                              property:aProperty->_ogi_property_name];
-    
-    if(nil == [self.mapperForSrcclassAndProperty objectForKey:keyForSrc]){
+    NSHashTable* pts = [self.mapperForSrcclassAndProperty objectForKey:keyForSrc];
+    if(nil == pts){
         
-        NSHashTable* tab = [NSHashTable weakObjectsHashTable];
-        
-        [tab addObject:aProperty];
-        [self.mapperForSrcclassAndProperty setObject:tab forKey:keyForSrc];
+        pts = [NSHashTable weakObjectsHashTable];
+        [self.mapperForSrcclassAndProperty setObject:pts forKey:keyForSrc];
     }
-
-    
-    if(nil == [self.mapperForDesclassAndProperty objectForKey:keyForDes]){
-        
-        [self.mapperForDesclassAndProperty setObject:keyForDes forKey:aProperty];
-    }
+    [pts addObject:aProperty];
+    [self.mapperForDesclassAndProperty setObject:aProperty forKey:keyForDes];
     
     dispatch_semaphore_signal(_lock);
 }
@@ -109,19 +106,23 @@
     dispatch_semaphore_signal(_lock);
 }
 
-- (__kindof AutoPropertyInfo*)propertyForDesclass:(Class)desclass property:(NSString *)property
+- (__kindof AutoPropertyInfo*)propertyForDesclass:(Class)desclass
+                                         property:(NSString *)property
 {
     return
     
-    [self.mapperForDesclassAndProperty objectForKey:apc_desMapperKeyString(desclass, property)];
+    [self.mapperForDesclassAndProperty objectForKey:
+     [APCPropertyMapperKey keyWithClass:desclass property:property]];
 }
 
 - (NSSet *)propertiesForSrcclass:(Class)srcclass
 {
     return
     
-    [[self.mapperForSrcclassAndProperty objectForKey:apc_srcMapperKeyString(srcclass)]
-      setRepresentation];
+    [[self.mapperForSrcclassAndProperty objectForKey:
+      [APCPropertyMapperKey keyWithClass:srcclass]]
+     
+     setRepresentation];
 }
 
 @end

@@ -1,5 +1,5 @@
 //
-//  APCPropertyMapperCache.h
+//  APCClassPropertyMapperCache.h
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/27.
@@ -14,9 +14,9 @@
 /**
  This Cache is thread-safe.
  */
-@interface APCPropertyMapperCache : NSObject
+@interface APCClassPropertyMapperCache : NSObject
 
-+ (instancetype)cache;
++ (instancetype _Nonnull)cache;
 
 - (void)addProperty:(AutoPropertyInfo* _Nonnull)aProperty;
 - (void)removeProperty:(AutoPropertyInfo* _Nonnull)aProperty;

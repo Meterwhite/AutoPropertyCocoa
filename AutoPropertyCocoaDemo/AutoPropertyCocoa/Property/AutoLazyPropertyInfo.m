@@ -6,7 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "APCPropertyMapperCache.h"
+#import "APCClassPropertyMapperCache.h"
 #import "AutoLazyPropertyInfo.h"
 #import "NSObject+APCLazyLoad.h"
 #import <objc/runtime.h>
@@ -17,42 +17,90 @@
 id    _Nullable apc_lazy_property       (_Nullable id _self,SEL __cmd);
 void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
-//static int shift;
-@implementation AutoLazyPropertyInfo
 
-- (BOOL)isEqual:(id)object
+#pragma mark - Cache for instance
+
+const static char _keyForAPCLazyLoadInstanceBindedCache = '\0';
+static NSMutableDictionary* _Nonnull apc_lazyLoadInstanceBindedCache(id instance)
 {
-    if(self == object)
+    static dispatch_semaphore_t semaphore;
+    static dispatch_once_t onceTokenSemaphore;
+    dispatch_once(&onceTokenSemaphore, ^{
+        semaphore = dispatch_semaphore_create(1);
+    });
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    
+    NSMutableDictionary* map = objc_getAssociatedObject(instance, &_keyForAPCLazyLoadInstanceBindedCache);
+    if(map == nil){
         
-        return YES;
+        map = [NSMutableDictionary dictionary];
+        objc_setAssociatedObject(instance
+                                 , &_keyForAPCLazyLoadInstanceBindedCache
+                                 , map
+                                 , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    dispatch_semaphore_signal(semaphore);
     
-    return [self hash] == [object hash];
+    return map;
 }
 
-- (NSUInteger)hash
+AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBindedCache(id instance,SEL _CMD)
 {
-    
-    if(NO == self.enable) return 0;
-//
-//    return (NSUInteger)(&self);
-    
-#define MAXALIGN (__alignof__(_Complex long double))
-    
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunreachable-code"
-    static int shift = (MAXALIGN==16 ? 4 : (MAXALIGN==8 ? 3 : 2));
-#pragma clang diagnostic pop
-    
-    return (NSUInteger)((uintptr_t)self >> shift);
-    
-    
-//    _src_class;
-//    _des_class;
-//    _ogi_property_name;
-//    _des_property_name;
-//    _kindOfHook;
-//    _kindOfOwner;
+    NSMutableDictionary* map = apc_lazyLoadInstanceBindedCache(instance);
+    return [map objectForKey:NSStringFromSelector(_CMD)];
 }
+
+static void apc_lazyLoadInstanceRemoveAllBindedCache(id instance)
+{
+    objc_setAssociatedObject(instance
+                             , &_keyForAPCLazyLoadInstanceBindedCache
+                             , nil
+                             , OBJC_ASSOCIATION_RETAIN);
+}
+
+NS_INLINE void apc_lazyLoadInstanceSetObjectForBindedCache(id instance,SEL _CMD,id propertyInfo)
+{
+    NSMutableDictionary* map = apc_lazyLoadInstanceBindedCache(instance);
+    @synchronized (map) {
+        
+        [map setObject:propertyInfo forKey:NSStringFromSelector(_CMD)];
+    }
+}
+
+NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
+{
+    return [NSStringFromClass([instance class]) containsString:APCClassSuffixForLazyLoad];
+}
+
+#pragma mark - Class name
+/**
+ Get original class from proxy class if need.
+ :
+ Class+APCProxyClassLazyLoad -> Class
+ */
+static Class apc_lazyLoadUnproxyClass(Class clazz)
+{
+    NSString* className = NSStringFromClass(clazz);
+    
+    if([className containsString:APCClassSuffixForLazyLoad]){
+        
+        className = [className substringToIndex:[className rangeOfString:@"+"].location];
+        
+        clazz = NSClassFromString(className);
+    }
+    return clazz;
+}
+
+/**
+ Get proxy clas name with a common class.
+ */
+NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
+    return [NSString stringWithFormat:@"%@%@",NSStringFromClass(class),APCClassSuffixForLazyLoad];
+}
+
+#pragma mark - AutoLazyPropertyInfo
+
+@implementation AutoLazyPropertyInfo
 
 - (instancetype)initWithPropertyName:(NSString* _Nonnull)propertyName
                               aClass:(Class __unsafe_unretained)aClass
@@ -71,7 +119,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 - (void)hookUsingUserSelector:(SEL)aSelector
 {
     _kindOfHook     =   AutoPropertyHookKindOfSelector;
-    _userSelector   =   aSelector?:@selector(new);
+    _userSelector   =   aSelector?aSelector:@selector(new);
     _userBlock      =   nil;
     IMP newimp      =   nil;
     if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
@@ -126,7 +174,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
             
             AutoLazyPropertyInfo* pinfo_superclass
             =
-            [_cacheForClass propertyForDesclass:_des_class property:_des_property_name];
+            [_cacheForClass propertyForDesclass:_src_class property:_des_property_name];
             
             if(nil != pinfo_superclass){
                 
@@ -246,7 +294,9 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
         
         ///set value by setter
         IMP imp = class_getMethodImplementation([target class]
-                                                , self.propertySetter?:self.associatedSetter);
+                                                , (nil != self.propertySetter)
+                                                ? self.propertySetter
+                                                : self.associatedSetter);
         NSAssert(imp
                  , @"APC: Can not find implementation named %@ in %@"
                  , NSStringFromSelector(self.propertySetter)
@@ -273,14 +323,14 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 #pragma mark - cache strategy
 
-static APCPropertyMapperCache* _cacheForClass;
+static APCClassPropertyMapperCache* _cacheForClass;
 - (void)cache
 {
     
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-        _cacheForClass     =   [APCPropertyMapperCache cache];
+        _cacheForClass     =   [APCClassPropertyMapperCache cache];
     });
     
     
@@ -327,85 +377,28 @@ static APCPropertyMapperCache* _cacheForClass;
     object_setClass(instance, apc_lazyLoadUnproxyClass([instance class]));
 }
 
+//- (BOOL)isEqual:(id)object
+//{
+//    if(self == object)
+//
+//        return YES;
+//
+//    return [self hash] == [object hash];
+//}
 
-#pragma mark - cache for instance
-
-AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBindedCache(id instance,SEL _CMD)
-{
-    NSMutableDictionary* map = apc_lazyLoadInstanceBindedCache(instance);
-    return [map objectForKey:NSStringFromSelector(_CMD)];
-}
-
-static void apc_lazyLoadInstanceRemoveAllBindedCache(id instance)
-{
-    objc_setAssociatedObject(instance
-                             , &_keyForAPCLazyLoadInstanceBindedCache
-                             , nil
-                             , OBJC_ASSOCIATION_RETAIN);
-}
-
-NS_INLINE void apc_lazyLoadInstanceSetObjectForBindedCache(id instance,SEL _CMD,id propertyInfo)
-{
-    NSMutableDictionary* map = apc_lazyLoadInstanceBindedCache(instance);
-    @synchronized (map) {
-        
-        [map setObject:propertyInfo forKey:NSStringFromSelector(_CMD)];
-    }
-}
-
-const static char _keyForAPCLazyLoadInstanceBindedCache = '\0';
-static NSMutableDictionary* _Nonnull apc_lazyLoadInstanceBindedCache(id instance)
-{
-    static dispatch_semaphore_t semaphore;
-    static dispatch_once_t onceTokenSemaphore;
-    dispatch_once(&onceTokenSemaphore, ^{
-        semaphore = dispatch_semaphore_create(1);
-    });
-    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-    
-    NSMutableDictionary* map = objc_getAssociatedObject(instance, &_keyForAPCLazyLoadInstanceBindedCache);
-    if(map == nil){
-        
-        map = [NSMutableDictionary dictionary];
-        objc_setAssociatedObject(instance
-                                 , &_keyForAPCLazyLoadInstanceBindedCache
-                                 , map
-                                 , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    dispatch_semaphore_signal(semaphore);
-    
-    return map;
-}
-
-NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
-{
-    return [NSStringFromClass([instance class]) containsString:APCClassSuffixForLazyLoad];
-}
-
-#pragma mark - cache for class
-/**
- Get original class from proxy class if need.
- :
- Class+APCProxyClassLazyLoad -> Class
- */
-static Class apc_lazyLoadUnproxyClass(Class clazz)
-{
-    NSString* className = NSStringFromClass(clazz);
-    
-    if([className containsString:APCClassSuffixForLazyLoad]){
-        
-        className = [className substringToIndex:[className rangeOfString:@"+"].location];
-        
-        clazz = NSClassFromString(className);
-    }
-    return clazz;
-}
-
-/**
- Get proxy clas name with a common class.
- */
-NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
-    return [NSString stringWithFormat:@"%@%@",NSStringFromClass(class),APCClassSuffixForLazyLoad];
-}
+//- (NSUInteger)hash
+//{
+//#define MAXALIGN (__alignof__(_Complex long double))
+//
+//#pragma clang diagnostic push
+//#pragma clang diagnostic ignored "-Wunreachable-code"
+//
+//    static int shift = (MAXALIGN==16 ? 4 : (MAXALIGN==8 ? 3 : 2));
+//#pragma clang diagnostic pop
+//
+//    return (NSUInteger)((uintptr_t)self >> shift);
+//}
 
 @end
+
+

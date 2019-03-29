@@ -7,11 +7,13 @@
 //
 
 #import "APCPropertyMapperKey.h"
+
 //#import "APCHash.h"
 
 @implementation APCPropertyMapperKey
 {
-    NSUInteger _hash;
+    NSString*   _description;
+    NSUInteger  _hash;
 }
 
 + (instancetype)keyWithClass:(Class _Nonnull)aClass
@@ -31,7 +33,8 @@
     self = [super init];
     if (self) {
         
-        _hash = [apc_desMapperKeyString(aClass,property) hash];
+        _description= apc_desMapperKeyString(aClass,property);
+        _hash       = [_description hash];
         
 //        NSUInteger h0 = [aClass hash];
 //        NSUInteger h1 = [property hash];
@@ -51,7 +54,8 @@
     self = [super init];
     if (self) {
         
-        _hash = [apc_srcMapperKeyString(aClass) hash];
+        _description= apc_srcMapperKeyString(aClass);
+        _hash       = [_description hash];
         
 //        NSUInteger h = [aClass hash];
 //        _hash = apc_hash_bytes((uint8_t*)(&h), sizeof(NSUInteger));
@@ -66,8 +70,9 @@
 
 - (id)copyWithZone:(nullable NSZone *)zone
 {
-    typeof(self) c = [[self.class allocWithZone:zone] init];
-    c->_hash = _hash;
+    APCPropertyMapperKey* c = [[self.class allocWithZone:zone] init];
+    c->_description = _description;
+    c->_hash        = _hash;
     return c;
 }
 
@@ -78,6 +83,20 @@
         return YES;
     
     return _hash == [object hash];
+}
+
+- (NSString *)description
+{
+    return _description;
+}
+
+
+NS_INLINE NSString* apc_desMapperKeyString(Class desClass,NSString* propertyName){
+    return [NSString stringWithFormat:@"%@.%@",NSStringFromClass(desClass),propertyName];
+}
+
+NS_INLINE NSString* apc_srcMapperKeyString(Class srcClass){
+    return NSStringFromClass(srcClass);
 }
 
 @end

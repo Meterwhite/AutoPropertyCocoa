@@ -12,7 +12,7 @@
 
 @implementation AutoPropertyInfo
 
-+ (_Nullable instancetype)infoWithPropertyName:(NSString* _Nonnull)propertyName
++ (instancetype)infoWithPropertyName:(NSString* _Nonnull)propertyName
                                       aInstance:(id _Nonnull)aInstance
 {
     return [[self alloc] initWithPropertyName:propertyName aInstance:aInstance];
@@ -74,10 +74,7 @@
             code = [attr_str substringWithRange:NSMakeRange(loc, dotLoc - loc)];
         }
         
-        if (code.length == 0) {
-            
-            return nil;
-        }
+        NSAssert(code.length > 0, @"APC: Property %@ is disable.",propertyName);
         
         _valueAttibute      = [code copy];
         _valueTypeEncoding  = [code copy];
@@ -400,6 +397,14 @@
     return [des copy];
 }
 
+- (BOOL)isEqual:(id)object
+{
+    if(self == object)
+        
+        return YES;
+    
+    return [self hash] == [object hash];
+}
 
 - (NSUInteger)hash
 {

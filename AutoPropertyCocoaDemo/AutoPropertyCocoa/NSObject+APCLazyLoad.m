@@ -47,7 +47,9 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBindedCache(id instan
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
     AutoLazyPropertyInfo* p = [AutoLazyPropertyInfo cachedInfoByClass:self propertyName:property];
+    
     [p unhook];
+    
     [p removeFromCache];
 }
 
