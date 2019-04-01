@@ -20,8 +20,6 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 
 @implementation AutoTriggerPropertyInfo
 {
-    
-    
     void(^_block_getter_fronttrigger)(id _Nonnull instance);
     void(^_block_getter_posttrigger)(id _Nonnull instance,id _Nullable value);
     void(^_block_getter_usertrigger)(id _Nonnull instance,id _Nullable value);
@@ -219,7 +217,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
         [self cache];
     }else{
         
-        [self bindInstancePropertyInfo];
+//        [self bindInstancePropertyInfo];
     }
     
 }

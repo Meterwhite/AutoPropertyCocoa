@@ -10,7 +10,6 @@
 #import "AutoLazyPropertyInfo.h"
 #import "NSObject+APCLazyLoad.h"
 #import <objc/runtime.h>
-#import <objc/message.h>
 #import "APCScope.h"
 
 
@@ -67,12 +66,7 @@ NS_INLINE void apc_lazyLoadInstanceSetObjectForBindedCache(id instance,SEL _CMD,
     }
 }
 
-NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
-{
-    return [NSStringFromClass([instance class]) containsString:APCClassSuffixForLazyLoad];
-}
-
-#pragma mark - Class name
+#pragma mark - Owner name
 /**
  Get original class from proxy class if need.
  :
@@ -96,6 +90,11 @@ static Class apc_lazyLoadUnproxyClass(Class clazz)
  */
 NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
     return [NSString stringWithFormat:@"%@%@",NSStringFromClass(class),APCClassSuffixForLazyLoad];
+}
+
+NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
+{
+    return [NSStringFromClass([instance class]) containsString:APCClassSuffixForLazyLoad];
 }
 
 #pragma mark - AutoLazyPropertyInfo

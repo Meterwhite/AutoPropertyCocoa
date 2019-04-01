@@ -24,6 +24,7 @@
 		45B53299224B141900A89C0F /* APCClassPropertyMapperCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B53298224B141900A89C0F /* APCClassPropertyMapperCache.m */; };
 		45B5329F224B695500A89C0F /* APCPropertyMapperkey.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */; };
 		45B532A7224F314800A89C0F /* AutoTriggerPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B532A6224F314800A89C0F /* AutoTriggerPropertyInfo.m */; };
+		9F8D85B022524A8F00F358C2 /* APCInstancePropertyCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9F8D85AF22524A8F00F358C2 /* APCInstancePropertyCacheManager.m */; };
 		9FBB448E2242883B00DBD65C /* AutoLazyPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */; };
 /* End PBXBuildFile section */
 
@@ -63,6 +64,8 @@
 		45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCPropertyMapperkey.m; sourceTree = "<group>"; };
 		45B532A5224F314700A89C0F /* AutoTriggerPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoTriggerPropertyInfo.h; sourceTree = "<group>"; };
 		45B532A6224F314800A89C0F /* AutoTriggerPropertyInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoTriggerPropertyInfo.m; sourceTree = "<group>"; };
+		9F8D85AE22524A8F00F358C2 /* APCInstancePropertyCacheManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCInstancePropertyCacheManager.h; sourceTree = "<group>"; };
+		9F8D85AF22524A8F00F358C2 /* APCInstancePropertyCacheManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCInstancePropertyCacheManager.m; sourceTree = "<group>"; };
 		9FBB448C2242883B00DBD65C /* AutoLazyPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoLazyPropertyInfo.h; sourceTree = "<group>"; };
 		9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoLazyPropertyInfo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -127,7 +130,6 @@
 				457589FC2240D31900EE51C3 /* NSObject+APCLazyLoad.m */,
 				4589F8022251B6B900741D3C /* NSObject+APCTriggerProperty.h */,
 				4589F8032251B6B900741D3C /* NSObject+APCTriggerProperty.m */,
-				45B5329A224B5ED100A89C0F /* APCHash.h */,
 			);
 			path = AutoPropertyCocoa;
 			sourceTree = "<group>";
@@ -170,6 +172,7 @@
 		45B532A0224DE8A400A89C0F /* Deprecated */ = {
 			isa = PBXGroup;
 			children = (
+				45B5329A224B5ED100A89C0F /* APCHash.h */,
 			);
 			path = Deprecated;
 			sourceTree = "<group>";
@@ -181,6 +184,8 @@
 				45B53298224B141900A89C0F /* APCClassPropertyMapperCache.m */,
 				45B5329D224B695500A89C0F /* APCPropertyMapperkey.h */,
 				45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */,
+				9F8D85AE22524A8F00F358C2 /* APCInstancePropertyCacheManager.h */,
+				9F8D85AF22524A8F00F358C2 /* APCInstancePropertyCacheManager.m */,
 			);
 			path = Cache;
 			sourceTree = "<group>";
@@ -266,6 +271,7 @@
 				45758A0A2240D31900EE51C3 /* Man.m in Sources */,
 				45758A092240D31900EE51C3 /* AutoPropertyInfo.m in Sources */,
 				457589F52240D0BE00EE51C3 /* main.m in Sources */,
+				9F8D85B022524A8F00F358C2 /* APCInstancePropertyCacheManager.m in Sources */,
 				45B532922245EA2B00A89C0F /* AutoHookPropertyInfo.m in Sources */,
 				45B53299224B141900A89C0F /* APCClassPropertyMapperCache.m in Sources */,
 				457589E72240D0BC00EE51C3 /* AppDelegate.m in Sources */,
@@ -421,6 +427,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = AutoPropertyCocoaDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -437,6 +444,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = AutoPropertyCocoaDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
