@@ -25,6 +25,7 @@
 
 
 FOUNDATION_EXPORT NSString *const APCClassSuffixForLazyLoad;
+FOUNDATION_EXPORT NSString *const APCClassSuffixForTrigger;
 
 FOUNDATION_EXPORT NSString *const APCProgramingType_point;
 FOUNDATION_EXPORT NSString *const APCProgramingType_chars;
@@ -226,6 +227,20 @@ return [NSValue valueWithBytes:&returnValue objCType:enc];
     return nil;
 }
 
+
+#define apc_def_vGHook(enc,type,oghook)\
+\
+type oghook##_##enc(_Nullable id _SELF,SEL _CMD)\
+{   \
+NSValue* value = oghook(_SELF, _CMD);\
+\
+type ret;\
+[value getValue:&ret];\
+\
+return ret;\
+}
+
+
 #define apc_def_vGHook_and_impimage(oghook)\
     \
 apc_def_vGHook(c,char,oghook)\
@@ -250,7 +265,7 @@ apc_def_vGHook(point,APC_POINT,oghook)\
 apc_def_vGHook(size,APC_SIZE,oghook)\
 apc_def_vGHook(range,NSRange,oghook)\
 \
-void* _Nullable oghook##_impimage(NSString* enc)\
+void* _Nullable oghook##_impimage(NSString* _Nonnull enc)\
 {\
     if([enc isEqualToString:@"c"]){\
         return oghook##_c;\
@@ -319,27 +334,119 @@ void* _Nullable oghook##_impimage(NSString* enc)\
 }
 
 
+#define apc_def_vSHook(enc,type,oshook)\
+\
+void oshook##_##enc(_Nullable id _SELF,SEL _CMD,type val)\
+{\
+    \
+    apc_trigger_setter(_SELF, _CMD, [NSValue valueWithBytes:&val objCType:@encode(type)]);\
+}
 
 
-#define apc_def_vGHook(enc,type,oghook)\
-    \
-type oghook##_##enc(_Nullable id _SELF,SEL _CMD)\
-{   \
-    NSValue* value = oghook(_SELF, _CMD);\
-    \
-    type ret;\
-    [value getValue:&ret];\
-    \
-    return ret;\
+#define apc_def_vSHook_and_impimage(oshook)\
+\
+apc_def_vSHook(c,char,oshook)\
+apc_def_vSHook(i,int,oshook)\
+apc_def_vSHook(s,short,oshook)\
+apc_def_vSHook(l,long,oshook)\
+apc_def_vSHook(q,long long,oshook)\
+apc_def_vSHook(C,unsigned char,oshook)\
+apc_def_vSHook(I,unsigned int,oshook)\
+apc_def_vSHook(S,unsigned short,oshook)\
+apc_def_vSHook(L,unsigned long,oshook)\
+apc_def_vSHook(Q,unsigned long long,oshook)\
+apc_def_vSHook(f,float,oshook)\
+apc_def_vSHook(d,double,oshook)\
+apc_def_vSHook(B,BOOL,oshook)\
+apc_def_vSHook(chars,char*,oshook)\
+apc_def_vSHook(class,Class,oshook)\
+apc_def_vSHook(sel,SEL,oshook)\
+apc_def_vSHook(ptr,void*,oshook)\
+apc_def_vSHook(rect,APC_RECT,oshook)\
+apc_def_vSHook(point,APC_POINT,oshook)\
+apc_def_vSHook(size,APC_SIZE,oshook)\
+apc_def_vSHook(range,NSRange,oshook)\
+\
+void* _Nullable oshook##_impimage(NSString* _Nonnull enc)\
+{\
+if([enc isEqualToString:@"c"]){\
+    return oshook##_c;\
 }\
+else if ([enc isEqualToString:@"i"]){\
+    return oshook##_i;\
+}\
+else if ([enc isEqualToString:@"s"]){\
+    return oshook##_s;\
+}\
+else if ([enc isEqualToString:@"l"]){\
+    return oshook##_l;\
+}\
+else if ([enc isEqualToString:@"q"]){\
+    return oshook##_q;\
+}\
+else if ([enc isEqualToString:@"C"]){\
+    return oshook##_C;\
+}\
+else if ([enc isEqualToString:@"I"]){\
+    return oshook##_I;\
+}\
+else if ([enc isEqualToString:@"S"]){\
+    return oshook##_S;\
+}\
+else if ([enc isEqualToString:@"L"]){\
+    return oshook##_L;\
+}\
+else if ([enc isEqualToString:@"Q"]){\
+    return oshook##_Q;\
+}\
+else if ([enc isEqualToString:@"f"]){\
+    return oshook##_f;\
+}\
+else if ([enc isEqualToString:@"d"]){\
+    return oshook##_d;\
+}\
+else if ([enc isEqualToString:@"B"]){\
+    return oshook##_B;\
+}\
+else if ([enc isEqualToString:@"*"]){\
+    return oshook##_chars;\
+}\
+else if ([enc isEqualToString:@"#"]){\
+    return oshook##_class;\
+}\
+else if ([enc isEqualToString:@":"]){\
+    return oshook##_sel;\
+}\
+else if ([enc characterAtIndex:0] == '^'){\
+    return oshook##_ptr;\
+}\
+else if ([enc isEqualToString:@(@encode(APC_RECT))]){\
+    return oshook##_rect;\
+}\
+else if ([enc isEqualToString:@(@encode(APC_POINT))]){\
+    return oshook##_point;\
+}\
+else if ([enc isEqualToString:@(@encode(APC_SIZE))]){\
+    return oshook##_size;\
+}\
+else if ([enc isEqualToString:@(@encode(NSRange))]){\
+    return oshook##_range;\
+}\
+    return nil;\
+}
+///enc-m
 
-
+#pragma mark - Fast
 
 #define APCPropertiesArray(...)\
 @[APCProperties(__VA_ARGS__)]
 
 #define APCProperties(...)\
 submacro_apc_concat(submacro_apc_plist_,submacro_apc_argcount(__VA_ARGS__))(__VA_ARGS__)
+
+
+#pragma mark - submacros
+
 
 #define submacro_apc_plist_2(OBJ, P1)\
 ((void)(NO && ((void)OBJ.P1, NO)), @# P1)

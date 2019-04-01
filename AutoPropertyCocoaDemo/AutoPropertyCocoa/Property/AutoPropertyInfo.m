@@ -41,8 +41,10 @@
         
         _kindOfOwner       =    AutoPropertyOwnerKindOfClass;
         _ogi_property_name =    propertyName;
+        _des_property_name =    propertyName;
         _des_class         =    aClass;
         _enable            =    YES;
+        
         objc_property_t*        p_list;
         NSString*               attr_str;
         unsigned int            count;
@@ -229,11 +231,13 @@
             
             if([item characterAtIndex:0] == 'G'){
                 
-                _propertyGetter   =  NSSelectorFromString([item substringFromIndex:1]);
+                _des_property_name= [item substringFromIndex:1];
+                _propertyGetter   =  NSSelectorFromString(_des_property_name);
                 _accessOption     |= AutoPropertyComponentOfGetter;
             }else if([item characterAtIndex:0] == 'S'){
                 
-                _propertySetter   =  NSSelectorFromString([item substringFromIndex:1]);
+                _des_setter_name  =  [item substringFromIndex:1];
+                _propertySetter   =  NSSelectorFromString(_des_setter_name);
                 _accessOption     |= AutoPropertyComponentOfSetter;
             }else if ([item characterAtIndex:0] == 'V'){
                 
@@ -242,7 +246,6 @@
             }
         }
     }
-    
     
     
     ///AssociatedSetter
@@ -259,12 +262,14 @@
             
             if([methodNames containsObject:_ogi_property_name.apc_kvcAssumedSetterName1]){
                 
-                _associatedSetter = NSSelectorFromString(_ogi_property_name.apc_kvcAssumedSetterName1);
-                _accessOption |= AutoPropertyAssociatedSetter;
+                _des_setter_name    =   _ogi_property_name.apc_kvcAssumedSetterName1;
+                _associatedSetter   =   NSSelectorFromString(_des_setter_name);
+                _accessOption       |=  AutoPropertyAssociatedSetter;
             }else if ([methodNames containsObject:_ogi_property_name.apc_kvcAssumedSetterName2]){
                 
-                _associatedSetter = NSSelectorFromString(_ogi_property_name.apc_kvcAssumedSetterName2);
-                _accessOption |= AutoPropertyAssociatedSetter;
+                _des_setter_name    =   _ogi_property_name.apc_kvcAssumedSetterName2;
+                _associatedSetter   =   NSSelectorFromString(_des_setter_name);
+                _accessOption       |=  AutoPropertyAssociatedSetter;
             }
         }
         free(m_list);
@@ -416,5 +421,18 @@
       , _ogi_property_name]
      
      hash];
+}
+
+#pragma mark - APCPropertyMapperKeyProtocol
+
+- (APCPropertyMapperkey *)classMapperkey
+{
+    return [APCPropertyMapperkey keyWithClass:_src_class];
+}
+
+- (NSSet<APCPropertyMapperkey *> *)propertyMapperkeys
+{
+    return [NSSet setWithObject:[APCPropertyMapperkey keyWithClass:_des_class
+                                                          property:_des_property_name]];
 }
 @end

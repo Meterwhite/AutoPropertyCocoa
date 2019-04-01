@@ -7,7 +7,7 @@
 //
 
 #import "APCClassPropertyMapperCache.h"
-#import "APCPropertyMapperKey.h"
+#import "APCPropertyMapperkey.h"
 #import "AutoPropertyInfo.h"
 
 @interface APCClassPropertyMapperCache ()
@@ -56,12 +56,11 @@
  */
 - (void)addProperty:(AutoPropertyInfo *)aProperty
 {
-    APCPropertyMapperKey* keyForSrc = [APCPropertyMapperKey keyWithClass:aProperty->_src_class];
-    
-    APCPropertyMapperKey* keyForDes = [APCPropertyMapperKey keyWithClass:aProperty->_des_class
-                                                                property:aProperty->_ogi_property_name];
-    
     dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
+    
+    APCPropertyMapperkey*           keyForClass      = [aProperty classMapperkey];
+    NSSet<APCPropertyMapperkey*>*   keysForProperty  = [aProperty propertyMapperkeys];
+    
     if(YES == [self.references containsObject:aProperty]){
         
         [self.references removeObject:aProperty];
@@ -69,14 +68,20 @@
     
     [self.references addObject:aProperty];
     
-    NSHashTable* pts = [self.mapperForSrcclassAndProperty objectForKey:keyForSrc];
-    if(nil == pts){
+    NSHashTable*            pties = [self.mapperForSrcclassAndProperty objectForKey:keyForClass];
+    if(nil == pties){
         
-        pts = [NSHashTable weakObjectsHashTable];
-        [self.mapperForSrcclassAndProperty setObject:pts forKey:keyForSrc];
+        pties = [NSHashTable weakObjectsHashTable];
+        [self.mapperForSrcclassAndProperty setObject:pties forKey:keyForClass];
     }
-    [pts addObject:aProperty];
-    [self.mapperForDesclassAndProperty setObject:aProperty forKey:keyForDes];
+    [pties addObject:aProperty];
+    
+    NSEnumerator*         em = keysForProperty.objectEnumerator;
+    APCPropertyMapperkey* keyForProperty;
+    while (nil != (keyForProperty = em.nextObject)) {
+        
+        [self.mapperForDesclassAndProperty setObject:aProperty forKey:keyForProperty];
+    }
     
     dispatch_semaphore_signal(_lock);
 }
@@ -95,7 +100,7 @@
     dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
     
     id obj;
-    APCPropertyMapperKey* keyForSrc = [APCPropertyMapperKey keyWithClass:srcclass];
+    APCPropertyMapperkey* keyForSrc = [APCPropertyMapperkey keyWithClass:srcclass];
     NSHashTable*    tab = [self.mapperForSrcclassAndProperty objectForKey:keyForSrc];
     NSEnumerator*   e   = tab.objectEnumerator;
     while (nil != (obj = e.nextObject)) {
@@ -112,7 +117,7 @@
     return
     
     [self.mapperForDesclassAndProperty objectForKey:
-     [APCPropertyMapperKey keyWithClass:desclass property:property]];
+     [APCPropertyMapperkey keyWithClass:desclass property:property]];
 }
 
 - (NSSet *)propertiesForSrcclass:(Class)srcclass
@@ -120,7 +125,7 @@
     return
     
     [[self.mapperForSrcclassAndProperty objectForKey:
-      [APCPropertyMapperKey keyWithClass:srcclass]]
+      [APCPropertyMapperkey keyWithClass:srcclass]]
      
      setRepresentation];
 }

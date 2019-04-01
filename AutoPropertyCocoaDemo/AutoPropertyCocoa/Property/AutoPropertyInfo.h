@@ -6,8 +6,8 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <objc/runtime.h>
+#import "APCPropertyMapperkey.h"
+#import "APCScope.h"
 
 typedef NS_OPTIONS (NSUInteger,AutoPropertyAccessOptions){
     
@@ -66,13 +66,15 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
     AutoPropertyHookKindOfIMP       =   3,
 };
 
-@interface AutoPropertyInfo : NSObject
+@interface AutoPropertyInfo : NSObject <APCPropertyMapperKeyProtocol>
 {
 @public
     
     Class                   _des_class;
     Class                   _src_class;
     NSString*               _ogi_property_name;
+    NSString*               _des_property_name;
+    NSString*               _des_setter_name;
 @protected
     
     AutoPropertyOwnerKind   _kindOfOwner;
@@ -97,13 +99,13 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
                                     aInstance:(id _Nonnull)aInstance;
 
 + (instancetype _Nonnull)infoWithPropertyName:(NSString* _Nonnull)propertyName
-                                        aClass:(Class __unsafe_unretained)aClass;
+                                       aClass:(Class _Nonnull __unsafe_unretained)aClass;
 
 - (instancetype _Nonnull)initWithPropertyName:(NSString* _Nonnull)propertyName
                         aInstance:(id _Nonnull)aInstance;
 
 - (instancetype _Nonnull)initWithPropertyName:(NSString* _Nonnull)propertyName
-                              aClass:(Class __unsafe_unretained)aClass;
+                                       aClass:(Class _Nonnull __unsafe_unretained)aClass;
 
 
 - (id _Nullable)getIvarValueFromTarget:(_Nonnull id)target;
@@ -152,5 +154,10 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
  同名属性具有相同hash值
  */
 - (NSUInteger)hash;
+
+#pragma mark - APCPropertyMapperKeyProtocol
+- (APCPropertyMapperkey* _Nonnull)classMapperkey;
+
+- (NSSet<APCPropertyMapperkey*>* _Nonnull)propertyMapperkeys;
 @end
 

@@ -101,19 +101,9 @@ NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
 #pragma mark - AutoLazyPropertyInfo
 
 @implementation AutoLazyPropertyInfo
-
-- (instancetype)initWithPropertyName:(NSString* _Nonnull)propertyName
-                              aClass:(Class __unsafe_unretained)aClass
 {
-    if(self = [super initWithPropertyName:propertyName aClass:aClass]){
-        
-        _des_property_name =
-        
-        self.propertyGetter
-        ? NSStringFromSelector(self.propertyGetter)
-        : _ogi_property_name;
-    }
-    return self;
+    SEL         _userSelector;
+    id          _userBlock;
 }
 
 - (void)hookUsingUserSelector:(SEL)aSelector
@@ -131,7 +121,15 @@ NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
         newimp = (IMP)apc_lazy_property_impimage(self.valueTypeEncoding);
     }
     
-    [self hookPropertyWithImplementation:newimp];
+    [self hookPropertyWithImplementation:newimp option:0];
+    
+    if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+        
+        [self cache];
+    }else{
+        
+        [self bindInstancePropertyInfo];
+    }
 }
 
 - (void)hookUsingUserBlock:(id)block
@@ -148,10 +146,19 @@ NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
         
         newimp = (IMP)apc_lazy_property_impimage(self.valueTypeEncoding);
     }
-    [self hookPropertyWithImplementation:newimp];
+    [self hookPropertyWithImplementation:newimp option:0];
+    
+    ///Cache
+    if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+        
+        [self cache];
+    }else{
+        
+        [self bindInstancePropertyInfo];
+    }
 }
 /** Important */
-- (void)hookPropertyWithImplementation:(IMP)implementation
+- (void)hookPropertyWithImplementation:(IMP)implementation option:(NSUInteger)option
 {
     _new_implementation = implementation;
     
@@ -170,7 +177,7 @@ NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
             ///Overwrite super class property with new property.
             ///Storing the implementation address of the super class
             
-            ///Superclass and subclass used the same old implementation that is from superclass
+            ///Superclass and subclass used the same old implementation that is from superclass.
             
             AutoLazyPropertyInfo* pinfo_superclass
             =
@@ -189,8 +196,6 @@ NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
             }
 //            NSAssert(_old_implementation, @"APC: _old_implementation can not be nil.");
         }
-        
-        [self cache];
     }else{
         
         NSString *proxyClassName = apc_lazyLoadProxyClassName(_des_class);
@@ -219,8 +224,6 @@ NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
         
         ///Hook the isa point.
         object_setClass(_instance, proxyClass);
-        
-        [self bindInstancePropertyInfo];
     }
 }
 

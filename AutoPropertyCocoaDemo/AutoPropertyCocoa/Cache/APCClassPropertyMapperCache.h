@@ -25,6 +25,6 @@
 - (NSSet<__kindof AutoPropertyInfo*>* _Nullable)propertiesForSrcclass:(Class _Nonnull)srcclass;
 
 - (__kindof AutoPropertyInfo* _Nullable)propertyForDesclass:(Class _Nonnull)desclass
-                                          property:(NSString* _Nonnull)property;;
+                                          property:(NSString* _Nonnull)property;
 
 @end

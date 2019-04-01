@@ -150,13 +150,7 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBindedCache(id instan
     }
 }
 
-/**
- defines
- :
- apc_lazy_property + _ + type encode
- apc_lazy_property + _ + impimage
- */
-apc_def_vGHook_and_impimage(apc_lazy_property)
+@end
 /**
  Destination func.
  */
@@ -168,8 +162,8 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
         
         if(nil == (lazyPropertyInfo = [AutoLazyPropertyInfo cachedInfoByClass:[_SELF class] propertyName:NSStringFromSelector(_CMD)]))
             
-            NSCAssert(NO, @"");
-        
+            NSCAssert(NO, @"APC: Lose property info.");
+    
     
     ///If lazy-load of instance has been logically removed.Performing the old implementation.
     if(lazyPropertyInfo.enable == NO){
@@ -214,7 +208,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     {
         
         NSCAssert(lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfBlock
-                 , @"APC: Basic-value only supportted be initialized by 'userblock'.");
+                  , @"APC: Basic-value only supportted be initialized by 'userblock'.");
         
         value = [lazyPropertyInfo performUserBlock:_SELF];
         [lazyPropertyInfo setValue:value toTarget:_SELF];
@@ -224,4 +218,11 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     
     return value;
 }
-@end
+
+/**
+ defines
+ :
+ apc_lazy_property + _ + type encode
+ apc_lazy_property + _ + impimage
+ */
+apc_def_vGHook_and_impimage(apc_lazy_property)

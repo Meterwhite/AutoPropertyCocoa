@@ -11,7 +11,11 @@
 /**
  对子类懒加载父类的属性，子类使用覆盖属性的策略，解绑也没问题
  */
-@interface AutoLazyPropertyInfo : AutoghookPropertyInfo
+@interface AutoLazyPropertyInfo : AutoHookPropertyInfo
+
+@property (nonatomic,assign,readonly,nullable)   SEL userSelector;
+
+@property (nonatomic,copy,readonly,nullable)     id  userBlock;
 
 - (void)hookUsingUserBlock:(_Nonnull id)block;
 

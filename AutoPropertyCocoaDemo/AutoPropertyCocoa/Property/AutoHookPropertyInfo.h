@@ -8,14 +8,13 @@
 
 #import "AutoPropertyInfo.h"
 
-@protocol AutoghookPropertyProtocol <NSObject>
+@protocol AutoHookPropertyProtocol <NSObject>
 
 @optional
-
 - (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target;
-- (void)hookUsingUserSelector:(_Nonnull SEL)aSelector;
-- (void)hookUsingUserBlock:(_Nonnull id)block;
-- (void)hookUsingUserIMP:(_Nonnull IMP)block;
+- (void)performOldSetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value;
+- (void)hookPropertyWithImplementation:(IMP _Nonnull)implementation
+                                option:(NSUInteger)option;
 - (void)unhook;
 @end
 
@@ -23,17 +22,12 @@
 /**
  该类型没有具体实现
  */
-@interface AutoghookPropertyInfo : AutoPropertyInfo <AutoghookPropertyProtocol>
+@interface AutoHookPropertyInfo : AutoPropertyInfo <AutoHookPropertyProtocol>
 {
-    IMP         _old_implementation;
+    IMP         _new_setter_implementation;
+    IMP         _old_setter_implementation;
     IMP         _new_implementation;
-    NSString*   _des_property_name;
-    SEL         _userSelector;
-    id          _userBlock;
-    IMP         _userIMP;
+    IMP         _old_implementation;
 }
 
-@property (nonatomic,assign,readonly,nullable)   SEL userSelector;
-@property (nonatomic,copy,readonly,nullable)     id  userBlock;
-@property (nonatomic,assign,readonly,nullable)   IMP userIMP;
 @end

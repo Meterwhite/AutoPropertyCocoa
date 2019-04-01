@@ -1,16 +1,16 @@
 //
-//  APCPropertyMapperKey.m
+//  APCPropertyMapperkey.m
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/27.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "APCPropertyMapperKey.h"
+#import "APCPropertyMapperkey.h"
 
 //#import "APCHash.h"
 
-@implementation APCPropertyMapperKey
+@implementation APCPropertyMapperkey
 {
     NSString*   _description;
     NSUInteger  _hash;
@@ -70,7 +70,7 @@
 
 - (id)copyWithZone:(nullable NSZone *)zone
 {
-    APCPropertyMapperKey* c = [[self.class allocWithZone:zone] init];
+    APCPropertyMapperkey* c = [[self.class allocWithZone:zone] init];
     c->_description = _description;
     c->_hash        = _hash;
     return c;

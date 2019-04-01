@@ -18,10 +18,12 @@
 		45758A092240D31900EE51C3 /* AutoPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 457589FE2240D31900EE51C3 /* AutoPropertyInfo.m */; };
 		45758A0A2240D31900EE51C3 /* Man.m in Sources */ = {isa = PBXBuildFile; fileRef = 45758A042240D31900EE51C3 /* Man.m */; };
 		45758A0B2240D31900EE51C3 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 45758A062240D31900EE51C3 /* Person.m */; };
+		4589F8042251B6B900741D3C /* NSObject+APCTriggerProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 4589F8032251B6B900741D3C /* NSObject+APCTriggerProperty.m */; };
 		45B532922245EA2B00A89C0F /* AutoHookPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B532912245EA2B00A89C0F /* AutoHookPropertyInfo.m */; };
 		45B532962248BA0C00A89C0F /* NSString+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B532952248BA0C00A89C0F /* NSString+APCExtension.m */; };
 		45B53299224B141900A89C0F /* APCClassPropertyMapperCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B53298224B141900A89C0F /* APCClassPropertyMapperCache.m */; };
-		45B5329F224B695500A89C0F /* APCPropertyMapperKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B5329E224B695500A89C0F /* APCPropertyMapperKey.m */; };
+		45B5329F224B695500A89C0F /* APCPropertyMapperkey.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */; };
+		45B532A7224F314800A89C0F /* AutoTriggerPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B532A6224F314800A89C0F /* AutoTriggerPropertyInfo.m */; };
 		9FBB448E2242883B00DBD65C /* AutoLazyPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */; };
 /* End PBXBuildFile section */
 
@@ -46,6 +48,8 @@
 		45758A042240D31900EE51C3 /* Man.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Man.m; sourceTree = "<group>"; };
 		45758A052240D31900EE51C3 /* Man.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Man.h; sourceTree = "<group>"; };
 		45758A062240D31900EE51C3 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+		4589F8022251B6B900741D3C /* NSObject+APCTriggerProperty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCTriggerProperty.h"; sourceTree = "<group>"; };
+		4589F8032251B6B900741D3C /* NSObject+APCTriggerProperty.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCTriggerProperty.m"; sourceTree = "<group>"; };
 		45B5328D22447E9F00A89C0F /* APCExtScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCExtScope.h; sourceTree = "<group>"; };
 		45B5328E22447F5400A89C0F /* AutoPropertyCocoa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoPropertyCocoa.h; sourceTree = "<group>"; };
 		45B532902245EA2B00A89C0F /* AutoHookPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoHookPropertyInfo.h; sourceTree = "<group>"; };
@@ -55,8 +59,10 @@
 		45B53297224B141900A89C0F /* APCClassPropertyMapperCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassPropertyMapperCache.h; sourceTree = "<group>"; };
 		45B53298224B141900A89C0F /* APCClassPropertyMapperCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassPropertyMapperCache.m; sourceTree = "<group>"; };
 		45B5329A224B5ED100A89C0F /* APCHash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCHash.h; sourceTree = "<group>"; };
-		45B5329D224B695500A89C0F /* APCPropertyMapperKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCPropertyMapperKey.h; sourceTree = "<group>"; };
-		45B5329E224B695500A89C0F /* APCPropertyMapperKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCPropertyMapperKey.m; sourceTree = "<group>"; };
+		45B5329D224B695500A89C0F /* APCPropertyMapperkey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCPropertyMapperkey.h; sourceTree = "<group>"; };
+		45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCPropertyMapperkey.m; sourceTree = "<group>"; };
+		45B532A5224F314700A89C0F /* AutoTriggerPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoTriggerPropertyInfo.h; sourceTree = "<group>"; };
+		45B532A6224F314800A89C0F /* AutoTriggerPropertyInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoTriggerPropertyInfo.m; sourceTree = "<group>"; };
 		9FBB448C2242883B00DBD65C /* AutoLazyPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoLazyPropertyInfo.h; sourceTree = "<group>"; };
 		9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoLazyPropertyInfo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -119,6 +125,8 @@
 				457589FD2240D31900EE51C3 /* APCScope.m */,
 				45758A002240D31900EE51C3 /* NSObject+APCLazyLoad.h */,
 				457589FC2240D31900EE51C3 /* NSObject+APCLazyLoad.m */,
+				4589F8022251B6B900741D3C /* NSObject+APCTriggerProperty.h */,
+				4589F8032251B6B900741D3C /* NSObject+APCTriggerProperty.m */,
 				45B5329A224B5ED100A89C0F /* APCHash.h */,
 			);
 			path = AutoPropertyCocoa;
@@ -144,6 +152,8 @@
 				9FBB448D2242883B00DBD65C /* AutoLazyPropertyInfo.m */,
 				45758A012240D31900EE51C3 /* AutoPropertyInfo.h */,
 				457589FE2240D31900EE51C3 /* AutoPropertyInfo.m */,
+				45B532A5224F314700A89C0F /* AutoTriggerPropertyInfo.h */,
+				45B532A6224F314800A89C0F /* AutoTriggerPropertyInfo.m */,
 			);
 			path = Property;
 			sourceTree = "<group>";
@@ -169,8 +179,8 @@
 			children = (
 				45B53297224B141900A89C0F /* APCClassPropertyMapperCache.h */,
 				45B53298224B141900A89C0F /* APCClassPropertyMapperCache.m */,
-				45B5329D224B695500A89C0F /* APCPropertyMapperKey.h */,
-				45B5329E224B695500A89C0F /* APCPropertyMapperKey.m */,
+				45B5329D224B695500A89C0F /* APCPropertyMapperkey.h */,
+				45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */,
 			);
 			path = Cache;
 			sourceTree = "<group>";
@@ -248,16 +258,18 @@
 				457589EA2240D0BC00EE51C3 /* ViewController.m in Sources */,
 				45758A072240D31900EE51C3 /* NSObject+APCLazyLoad.m in Sources */,
 				45758A0B2240D31900EE51C3 /* Person.m in Sources */,
+				4589F8042251B6B900741D3C /* NSObject+APCTriggerProperty.m in Sources */,
 				45B532962248BA0C00A89C0F /* NSString+APCExtension.m in Sources */,
 				45758A082240D31900EE51C3 /* APCScope.m in Sources */,
 				9FBB448E2242883B00DBD65C /* AutoLazyPropertyInfo.m in Sources */,
+				45B532A7224F314800A89C0F /* AutoTriggerPropertyInfo.m in Sources */,
 				45758A0A2240D31900EE51C3 /* Man.m in Sources */,
 				45758A092240D31900EE51C3 /* AutoPropertyInfo.m in Sources */,
 				457589F52240D0BE00EE51C3 /* main.m in Sources */,
 				45B532922245EA2B00A89C0F /* AutoHookPropertyInfo.m in Sources */,
 				45B53299224B141900A89C0F /* APCClassPropertyMapperCache.m in Sources */,
 				457589E72240D0BC00EE51C3 /* AppDelegate.m in Sources */,
-				45B5329F224B695500A89C0F /* APCPropertyMapperKey.m in Sources */,
+				45B5329F224B695500A89C0F /* APCPropertyMapperkey.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

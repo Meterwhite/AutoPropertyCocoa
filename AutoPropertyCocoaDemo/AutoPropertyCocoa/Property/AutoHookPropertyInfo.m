@@ -8,7 +8,7 @@
 
 #import "AutoHookPropertyInfo.h"
 
-@implementation AutoghookPropertyInfo
+@implementation AutoHookPropertyInfo
 //- (void)unhook
 //{
 #warning <#message#>

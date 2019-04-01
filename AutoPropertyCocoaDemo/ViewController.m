@@ -10,7 +10,7 @@
 #import "APCClassPropertyMapperCache.h"
 #import "AutoLazyPropertyInfo.h"
 #import "NSObject+APCLazyLoad.h"
-#import "APCPropertyMapperKey.h"
+#import "APCPropertyMapperkey.h"
 #import "ViewController.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
@@ -93,8 +93,8 @@
 //
 //    cache addProperty:<#(AutoPropertyInfo *)#>
     
-    id k0 = [APCPropertyMapperKey keyWithClass:self.class];
-    id k1 = [APCPropertyMapperKey keyWithClass:self.class];
+    id k0 = [APCPropertyMapperkey keyWithClass:self.class];
+    id k1 = [APCPropertyMapperkey keyWithClass:self.class];
     
     NSMutableDictionary* mdic = NSMutableDictionary.dictionary;
     

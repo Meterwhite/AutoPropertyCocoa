@@ -15,7 +15,7 @@
 + (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property;
 
 + (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
-                     usingBlock:(id _Nullable(^)(id _Nonnull  _self))block;
+                     usingBlock:(id _Nullable(^_Nonnull)(id _Nonnull  _self))block;
 
 + (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
              initializeSelector:(_Nonnull SEL)selector;
@@ -31,7 +31,7 @@
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property;
 
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
-                     usingBlock:(id _Nullable(^)(id _Nonnull  _self))block;
+                     usingBlock:(id _Nullable(^_Nonnull)(id _Nonnull  _self))block;
 
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
                        selector:(_Nonnull SEL)selector;
