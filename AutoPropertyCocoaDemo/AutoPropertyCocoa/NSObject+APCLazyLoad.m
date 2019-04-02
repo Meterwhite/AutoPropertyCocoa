@@ -5,13 +5,14 @@
 //  Created by Novo on 2019/3/13.
 //  Copyright © 2019 Novo. All rights reserved.
 //
+#import "APCInstancePropertyCacheManager.h"
 #import "NSObject+APCLazyLoad.h"
 #import "AutoLazyPropertyInfo.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import "APCScope.h"
 
-AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBindedCache(id instance,SEL _CMD);
+//AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBoundCache(id instance,SEL _CMD);
 
 @implementation NSObject(APCLazyLoad)
 
@@ -91,8 +92,7 @@ AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBindedCache(id instan
 
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
-    [apc_lazyLoadGetInstanceFromBindedCache(self , NSSelectorFromString(property))
-     unhook];
+    [(AutoLazyPropertyInfo*)[APCInstancePropertyCacheManager boundPropertyForInstance:self cmd:property] unhook];
 }
 
 - (void)apc_unbindLazyLoadAllProperties
@@ -158,7 +158,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
 {
     AutoLazyPropertyInfo* lazyPropertyInfo;
     
-    if(nil == (lazyPropertyInfo = apc_lazyLoadGetInstanceFromBindedCache(_SELF,_CMD)))
+    if(nil == (lazyPropertyInfo = [APCInstancePropertyCacheManager boundPropertyForInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
         
         if(nil == (lazyPropertyInfo = [AutoLazyPropertyInfo cachedInfoByClass:[_SELF class] propertyName:NSStringFromSelector(_CMD)]))
             

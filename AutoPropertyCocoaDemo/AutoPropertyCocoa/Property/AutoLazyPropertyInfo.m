@@ -2,10 +2,11 @@
 //  AutoLazyPropertyInfo.m
 //  AutoPropertyCocoa
 //
-//  Created by NOVO on 2019/3/20.
+//  Created by Novo on 2019/3/20.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "APCInstancePropertyCacheManager.h"
 #import "APCClassPropertyMapperCache.h"
 #import "AutoLazyPropertyInfo.h"
 #import "NSObject+APCLazyLoad.h"
@@ -16,62 +17,7 @@
 id    _Nullable apc_lazy_property       (_Nullable id _self,SEL __cmd);
 void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
-
-#pragma mark - Cache for instance
-
-const static char _keyForAPCLazyLoadInstanceBindedCache = '\0';
-static NSMutableDictionary* _Nonnull apc_lazyLoadInstanceBindedCache(id instance)
-{
-    static dispatch_semaphore_t semaphore;
-    static dispatch_once_t onceTokenSemaphore;
-    dispatch_once(&onceTokenSemaphore, ^{
-        semaphore = dispatch_semaphore_create(1);
-    });
-    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-    
-    NSMutableDictionary* map = objc_getAssociatedObject(instance, &_keyForAPCLazyLoadInstanceBindedCache);
-    if(map == nil){
-        
-        map = [NSMutableDictionary dictionary];
-        objc_setAssociatedObject(instance
-                                 , &_keyForAPCLazyLoadInstanceBindedCache
-                                 , map
-                                 , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    dispatch_semaphore_signal(semaphore);
-    
-    return map;
-}
-
-AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBindedCache(id instance,SEL _CMD)
-{
-    NSMutableDictionary* map = apc_lazyLoadInstanceBindedCache(instance);
-    return [map objectForKey:NSStringFromSelector(_CMD)];
-}
-
-static void apc_lazyLoadInstanceRemoveAllBindedCache(id instance)
-{
-    objc_setAssociatedObject(instance
-                             , &_keyForAPCLazyLoadInstanceBindedCache
-                             , nil
-                             , OBJC_ASSOCIATION_RETAIN);
-}
-
-NS_INLINE void apc_lazyLoadInstanceSetObjectForBindedCache(id instance,SEL _CMD,id propertyInfo)
-{
-    NSMutableDictionary* map = apc_lazyLoadInstanceBindedCache(instance);
-    @synchronized (map) {
-        
-        [map setObject:propertyInfo forKey:NSStringFromSelector(_CMD)];
-    }
-}
-
 #pragma mark - Owner name
-/**
- Get original class from proxy class if need.
- :
- Class+APCProxyClassLazyLoad -> Class
- */
 static Class apc_lazyLoadUnproxyClass(Class clazz)
 {
     NSString* className = NSStringFromClass(clazz);
@@ -127,7 +73,7 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
         [self cache];
     }else{
         
-        [self bindInstancePropertyInfo];
+        [self cacheForInstance];
     }
 }
 
@@ -153,7 +99,7 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
         [self cache];
     }else{
         
-        [self bindInstancePropertyInfo];
+        [self cacheForInstance];
     }
 }
 /** Important */
@@ -325,6 +271,14 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
 
 #pragma mark - cache strategy
 
+
+- (void)cacheForInstance
+{
+    [APCInstancePropertyCacheManager bindProperty:self
+                                      forInstance:_instance
+                                              cmd:_des_property_name];
+}
+
 static APCClassPropertyMapperCache* _cacheForClass;
 - (void)cache
 {
@@ -344,12 +298,6 @@ static APCClassPropertyMapperCache* _cacheForClass;
     [_cacheForClass removeProperty:self];
 }
 
-- (void)bindInstancePropertyInfo
-{
-    apc_lazyLoadInstanceSetObjectForBindedCache(_instance
-                                                  , NSSelectorFromString(_des_property_name)
-                                                  , self);
-}
 
 + (_Nullable instancetype)cachedInfoByClass:(Class)clazz
                                propertyName:(NSString*)propertyName
@@ -369,12 +317,14 @@ static APCClassPropertyMapperCache* _cacheForClass;
 + (void)unbindlazyLoadForInstance:(id _Nonnull)instance
 {
     if(apc_isLazyLoadInstance(instance) == NO){
+        
         return;
     }
     ///unhook instance
-    [[apc_lazyLoadInstanceBindedCache(instance) allValues] makeObjectsPerformSelector:@selector(unhook)];
+    [[APCInstancePropertyCacheManager boundAllPropertiesForInstance:instance]
+     makeObjectsPerformSelector:@selector(unhook)];
     ///remove from cache
-    apc_lazyLoadInstanceRemoveAllBindedCache(instance);
+    [APCInstancePropertyCacheManager boundAllPropertiesRemoveForInstance:instance];
     ///unhook class
     object_setClass(instance, apc_lazyLoadUnproxyClass([instance class]));
 }

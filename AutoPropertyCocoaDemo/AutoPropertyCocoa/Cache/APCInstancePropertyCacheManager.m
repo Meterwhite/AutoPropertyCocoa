@@ -1,83 +1,118 @@
 //
 //  APCInstancePropertyCacheManager.m
-//  AutoPropertyCocoaDemo
+//  AutoPropertyCocoa
 //
-//  Created by NOVO on 2019/4/1.
+//  Created by Novo on 2019/4/1.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
 #import "APCInstancePropertyCacheManager.h"
 //#import <libkern/OSAtomic.h>
 #import "AutoPropertyInfo.h"
+#import <objc/NSObject.h>
 #import <objc/runtime.h>
 //#import <stdatomic.h>
 
-@implementation APCInstancePropertyCacheManager
 #pragma mark - Define key
-const static char _keyForAPCLazyLoadInstanceBindedCache = '\0';
-const static char _keyForAPCTriggerInstanceBindedCache = '\0';
+const static char _keyForAPCInstanceBoundCache = '\0';
+static dispatch_semaphore_t semaphore;
 
 #pragma mark - Instance cache
-static NSMutableDictionary* _Nonnull apc_instanceBindedCache(id instance, uintptr_t k_ptr)
-{
-    NSMutableDictionary* map;
-
-    if(nil != (map = objc_getAssociatedObject(instance, (void*)k_ptr))){
-        
-        return map;
-    }
-
-    static dispatch_semaphore_t semaphore;
-    static dispatch_once_t onceTokenSemaphore;
-    dispatch_once(&onceTokenSemaphore, ^{
-        semaphore = dispatch_semaphore_create(1);
-    });
-    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-
-    if(nil != (map = objc_getAssociatedObject(instance, (void*)k_ptr))){
-        
-        return map;
-    }
-
-    map = [NSMutableDictionary dictionary];
-    objc_setAssociatedObject(instance
-                             , (void*)k_ptr
-                             , map
-                             , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-
-    dispatch_semaphore_signal(semaphore);
-
-    return map;
-}
-
-
-static inline void apc_instanceBindAProperty(id instance, SEL _CMD,id propertyInfo, uintptr_t k_ptr)
-{
-    NSMutableDictionary* map = apc_instanceBindedCache(instance, k_ptr);
-    @synchronized (map) {
-        
-        [map setObject:propertyInfo forKey:NSStringFromSelector(_CMD)];
-    }
-}
-
-
-NS_INLINE AutoPropertyInfo* _Nullable apc_instanceGetBindedProperty(id instance, SEL _CMD,uintptr_t k_ptr)
-{
-    NSMutableDictionary* map = apc_instanceBindedCache(instance,k_ptr);
-    return [map objectForKey:NSStringFromSelector(_CMD)];
-}
-
-NS_INLINE void apc_instanceRemoveAllBindedProperies(id instance, uintptr_t k_ptr)
-{
-    objc_setAssociatedObject(instance
-                             , (void*)k_ptr
-                             , nil
-                             , OBJC_ASSOCIATION_RETAIN);
-}
-
-#pragma mark - Lazy load cache
-+ (void)instanceBindedCache:(id)instance
+static NSMutableDictionary* _Nonnull apc_instanceBoundCache(id instance)
 {
     
+    NSMutableDictionary* cache;
+    NSMapTable*          mapper;
+    
+    if(nil == (mapper = objc_getAssociatedObject(instance
+                                                 , &_keyForAPCInstanceBoundCache))){
+        
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        
+        if(nil == (mapper = objc_getAssociatedObject(instance
+                                                     , &_keyForAPCInstanceBoundCache))){
+            
+            
+            mapper = [NSMapTable strongToStrongObjectsMapTable];
+            objc_setAssociatedObject(instance
+                                     , &_keyForAPCInstanceBoundCache
+                                     , mapper
+                                     , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        
+        
+        dispatch_semaphore_signal(semaphore);
+    }
+    
+    
+    if(nil == (cache = [mapper objectForKey:[instance class]])){
+        
+        @synchronized (mapper) {
+            
+            if(nil == (cache = [mapper objectForKey:[instance class]])){
+                
+                [mapper setObject:(cache = [NSMutableDictionary dictionary]) forKey:[instance class]];
+            }
+        }
+    }
+    return cache;
 }
+
+
+@implementation APCInstancePropertyCacheManager
+
++ (id)allocWithZone:(struct _NSZone *)zone
+{
+    NSAssert(NO, @"Instantiation of APCInstancePropertyCacheManager is not allowed!");
+    
+    return nil;
+}
+
++ (void)initialize
+{
+    semaphore = dispatch_semaphore_create(1);
+}
+
++ (AutoPropertyInfo*)boundPropertyForInstance:(id)instance cmd:(NSString*)cmd
+{
+    NSMutableDictionary* map = apc_instanceBoundCache(instance);
+    return [map objectForKey:cmd];
+}
+
++ (NSArray<__kindof AutoPropertyInfo*>*)boundAllPropertiesForInstance:(id _Nonnull)instance
+{
+    return [apc_instanceBoundCache(instance) allValues];
+}
+
++ (void)bindProperty:(AutoPropertyInfo*)property forInstance:(id)instance cmd:(NSString*)cmd
+{
+    NSMutableDictionary* map = apc_instanceBoundCache(instance);
+    @synchronized (map) {
+        
+        [map setObject:property forKey:cmd];
+    }
+}
+
++ (void)boundPropertyRemoveForInstance:(id)instance cmd:(NSString*)cmd
+{
+    NSMutableDictionary* map = apc_instanceBoundCache(instance);
+    @synchronized (map) {
+        
+        [map removeObjectForKey:cmd];
+    }
+}
+
++ (void)boundAllPropertiesRemoveForInstance:(id)instance
+{
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    
+    objc_setAssociatedObject(instance
+                             , &_keyForAPCInstanceBoundCache
+                             , nil
+                             , OBJC_ASSOCIATION_RETAIN);
+    
+    dispatch_semaphore_signal(semaphore);
+}
+
 @end
+

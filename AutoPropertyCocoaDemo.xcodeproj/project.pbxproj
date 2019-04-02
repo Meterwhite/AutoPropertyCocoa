@@ -182,10 +182,10 @@
 			children = (
 				45B53297224B141900A89C0F /* APCClassPropertyMapperCache.h */,
 				45B53298224B141900A89C0F /* APCClassPropertyMapperCache.m */,
-				45B5329D224B695500A89C0F /* APCPropertyMapperkey.h */,
-				45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */,
 				9F8D85AE22524A8F00F358C2 /* APCInstancePropertyCacheManager.h */,
 				9F8D85AF22524A8F00F358C2 /* APCInstancePropertyCacheManager.m */,
+				45B5329D224B695500A89C0F /* APCPropertyMapperkey.h */,
+				45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */,
 			);
 			path = Cache;
 			sourceTree = "<group>";

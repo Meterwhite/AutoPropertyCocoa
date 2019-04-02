@@ -36,6 +36,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 @interface AutoTriggerPropertyInfo : AutoHookPropertyInfo
 
 @property (nonatomic,assign,readonly) AutoPropertyTriggerOption triggerOption;
+
 #pragma mark - getter trigger
 - (void)getterBindFrontTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block;
 - (void)getterBindPostTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block;
@@ -76,9 +77,9 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 + (_Nullable instancetype)cachedInfoByClass:(Class _Nonnull)clazz
                                propertyName:(NSString* _Nonnull)propertyName;
 
-- (void)cache;
+- (void)cacheForClass;
 
-- (void)removeFromCache;
+- (void)removeFromClassCache;
 
 + (void)removeCacheForClass:(Class _Nonnull)clazz;
 @end

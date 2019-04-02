@@ -28,8 +28,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
-    [self testClassSuperclassSubclass];
+    [self testNormalInstance];
+//    [self testClassSuperclassSubclass];
 //    [self testHash];
 //    [self testMapperCache];
 }
@@ -55,6 +55,25 @@
     Person* p = [Person new];
     NSUInteger age0 = p.age;
     Man* m = [Man new];
+    NSUInteger age1 = m.age;
+}
+
+- (void)testNormalInstance
+{
+    Person* p = [Person new];
+    Man* m = [Man new];
+    
+    [p apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
+        
+        return @(999);
+    }];
+    
+    [m apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
+        
+        return @(111);
+    }];
+    
+    NSUInteger age0 = p.age;
     NSUInteger age1 = m.age;
 }
 
