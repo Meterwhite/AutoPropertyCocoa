@@ -8,7 +8,13 @@
 
 #import "APCPropertyMapperkey.h"
 
-//#import "APCHash.h"
+NS_INLINE NSString* apc_desMapperKeyString(Class desClass,NSString* propertyName){
+    return [NSString stringWithFormat:@"%@.%@",NSStringFromClass(desClass),propertyName];
+}
+
+NS_INLINE NSString* apc_srcMapperKeyString(Class srcClass){
+    return NSStringFromClass(srcClass);
+}
 
 @implementation APCPropertyMapperkey
 {
@@ -89,14 +95,4 @@
 {
     return _description;
 }
-
-
-NS_INLINE NSString* apc_desMapperKeyString(Class desClass,NSString* propertyName){
-    return [NSString stringWithFormat:@"%@.%@",NSStringFromClass(desClass),propertyName];
-}
-
-NS_INLINE NSString* apc_srcMapperKeyString(Class srcClass){
-    return NSStringFromClass(srcClass);
-}
-
 @end

@@ -312,12 +312,8 @@
         free(ivar_list);
     }
     
-    
-    
     return self;
 }
-
-
 
 - (id)getIvarValueFromTarget:(id)target
 {

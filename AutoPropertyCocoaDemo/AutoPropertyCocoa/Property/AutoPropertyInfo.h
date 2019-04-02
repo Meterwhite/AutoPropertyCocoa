@@ -156,6 +156,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 - (NSUInteger)hash;
 
 #pragma mark - APCPropertyMapperKeyProtocol
+
 - (APCPropertyMapperkey* _Nonnull)classMapperkey;
 
 - (NSSet<APCPropertyMapperkey*>* _Nonnull)propertyMapperkeys;

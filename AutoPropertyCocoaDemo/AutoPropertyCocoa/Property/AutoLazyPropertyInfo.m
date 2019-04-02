@@ -54,7 +54,7 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
 - (void)hookUsingUserSelector:(SEL)aSelector
 {
     _kindOfHook     =   AutoPropertyHookKindOfSelector;
-    _userSelector   =   aSelector?aSelector:@selector(new);
+    _userSelector   =   aSelector?:@selector(new);
     _userBlock      =   nil;
     IMP newimp      =   nil;
     if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
@@ -139,7 +139,8 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
                 =
                 class_getMethodImplementation(_src_class, NSSelectorFromString(_des_property_name));
             }
-//            NSAssert(_old_implementation, @"APC: _old_implementation can not be nil.");
+            
+            NSAssert(_old_implementation, @"APC: Can not find old implementation.");
         }
     }else{
         

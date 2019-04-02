@@ -88,12 +88,14 @@ NS_INLINE BOOL apc_isTriggerInstance(id _Nonnull instance)
 {
     _block_getter_fronttrigger = nil;
     _triggerOption &= ~AutoPropertyGetterFrontTrigger;
+    [self tryUnhook];
 }
 
 - (void)getterUnbindPostTrigger
 {
     _block_getter_posttrigger = nil;
     _triggerOption &= ~AutoPropertyGetterPostTrigger;
+    [self tryUnhook];
 }
 
 - (void)getterUnbindUserTrigger
@@ -101,6 +103,7 @@ NS_INLINE BOOL apc_isTriggerInstance(id _Nonnull instance)
     _block_getter_usertrigger   = nil;
     _block_getter_usercondition = nil;
     _triggerOption &= ~AutoPropertyGetterUserTrigger;
+    [self tryUnhook];
 }
 
 - (void)getterPerformFrontTriggerBlock:(id)_SELF
@@ -159,12 +162,14 @@ NS_INLINE BOOL apc_isTriggerInstance(id _Nonnull instance)
 {
     _block_setter_fronttrigger = nil;
     _triggerOption &= ~AutoPropertySetterFrontTrigger;
+    [self tryUnhook];
 }
 
 - (void)setterUnbindPostTrigger
 {
     _block_setter_posttrigger = nil;
     _triggerOption &= ~AutoPropertySetterPostTrigger;
+    [self tryUnhook];
 }
 
 - (void)setterUnbindUserTrigger
@@ -172,6 +177,7 @@ NS_INLINE BOOL apc_isTriggerInstance(id _Nonnull instance)
     _block_setter_usertrigger   = nil;
     _block_setter_usercondition = nil;
     _triggerOption &= ~AutoPropertySetterUserTrigger;
+    [self tryUnhook];
 }
 - (void)setterPerformFrontTriggerBlock:(id)_SELF value:(id)value
 {
@@ -341,29 +347,40 @@ NS_INLINE BOOL apc_isTriggerInstance(id _Nonnull instance)
                            , value);
 }
 
+- (void)tryUnhook
+{
+    if(_triggerOption == AutoPropertyNonTrigger){
+        
+        [self hook];
+    }
+}
+
 - (void)unhook
 {
-    if(_old_implementation && _new_implementation){
+    if(nil == _old_implementation && nil == _new_implementation){
         
-        if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+        return;
+    }
+    
+    if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+        
+        _new_implementation = nil;
+        
+        NSUInteger count
+        =
+        (YES == (self.triggerOption & AutoPropertyTriggerOfGetter))
+        +
+        (YES == (self.triggerOption & AutoPropertyTriggerOfSetter));
+        
+        while (count--) {
             
-            _new_implementation = nil;
-            
-            NSUInteger count
-            =
-            (self.triggerOption & AutoPropertyTriggerOfGetter)
-            +
-            (self.triggerOption & AutoPropertyTriggerOfSetter);
-            
-            while (count--) {
-                
-                class_replaceMethod(_des_class
-                                    , NSSelectorFromString(count==1?_des_property_name:_des_setter_name)
-                                    , _old_implementation
-                                    , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-            }
+            class_replaceMethod(_des_class
+                                , NSSelectorFromString(count==1?_des_property_name:_des_setter_name)
+                                , _old_implementation
+                                , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
         }
     }
+    
     [self invalid];
 }
 
