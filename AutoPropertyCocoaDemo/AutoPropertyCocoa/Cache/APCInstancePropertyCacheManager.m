@@ -114,7 +114,7 @@ static NSMutableDictionary* _Nonnull apc_instanceBoundCache(id instance)
     dispatch_semaphore_signal(semaphore);
 }
 
-+ (BOOL)isBoundAllInvalidForInstance:(id _Nonnull)instance
++ (BOOL)boundContainsValidPropertyForInstance:(id _Nonnull)instance
 {
     NSMutableDictionary* map = apc_instanceBoundCache(instance);
     

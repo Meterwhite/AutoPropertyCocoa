@@ -33,8 +33,8 @@
 
 #pragma mark - Cache for type of class.
 
-+ (_Nullable instancetype)cachedPropertyInfoByClass:(Class _Nonnull __unsafe_unretained)clazz
-                                       property:(NSString* _Nonnull)propertyName;
++ (_Nullable instancetype)cachedWithClass:(Class _Nonnull __unsafe_unretained)clazz
+                                 property:(NSString* _Nonnull)propertyName;
 
 @end
 

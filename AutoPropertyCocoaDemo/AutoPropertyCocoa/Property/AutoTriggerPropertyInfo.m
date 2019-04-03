@@ -8,8 +8,6 @@
 #import "APCInstancePropertyCacheManager.h"
 #import "APCClassPropertyMapperCache.h"
 #import "AutoTriggerPropertyInfo.h"
-#import <objc/runtime.h>
-#import <objc/message.h>
 #import "APCScope.h"
 
 id    _Nullable apc_trigger_getter         (_Nullable id _self,SEL __cmd);
@@ -24,11 +22,15 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     void(^_block_getter_posttrigger)(id _Nonnull instance,id _Nullable value);
     void(^_block_getter_usertrigger)(id _Nonnull instance,id _Nullable value);
     BOOL(^_block_getter_usercondition)(id _Nonnull instance,id _Nullable value);
+    void(^_block_getter_counttrigger)(id _Nonnull instance,id _Nullable value);
+    BOOL(^_block_getter_countcondition)(id _Nonnull instance,id _Nullable value,NSUInteger count);
     
     void(^_block_setter_fronttrigger)(id _Nonnull instance,id _Nullable value);
     void(^_block_setter_posttrigger)(id _Nonnull instance,id _Nullable value);
     void(^_block_setter_usertrigger)(id _Nonnull instance,id _Nullable value);
     BOOL(^_block_setter_usercondition)(id _Nonnull instance,id _Nullable value);
+    void(^_block_setter_counttrigger)(id _Nonnull instance,id _Nullable value);
+    BOOL(^_block_setter_countcondition)(id _Nonnull instance,id _Nullable value,NSUInteger count);
 }
 
 - (instancetype)initWithPropertyName:(NSString* _Nonnull)propertyName
@@ -83,7 +85,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     [self tryUnhook];
 }
 
-- (void)getterPerformFrontTriggerBlock:(id)_SELF
+- (void)performGetterFrontTriggerBlock:(id)_SELF
 {
     if(_block_getter_fronttrigger){
         
@@ -91,7 +93,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     }
 }
 
-- (void)getterPerformPostTriggerBlock:(id)_SELF value:(id)value
+- (void)performGetterPostTriggerBlock:(id)_SELF value:(id)value
 {
     if(_block_getter_posttrigger){
         
@@ -99,7 +101,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     }
 }
 
-- (BOOL)getterPerformConditionBlock:(id)_SELF value:(id)value
+- (BOOL)performGetterConditionBlock:(id)_SELF value:(id)value
 {
     if(_block_getter_usercondition){
         
@@ -108,7 +110,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     return NO;
 }
 
-- (void)getterPerformUserTriggerBlock:(id)_SELF value:(id)value
+- (void)performGetterUserTriggerBlock:(id)_SELF value:(id)value
 {
     if(_block_getter_usertrigger){
         
@@ -156,7 +158,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     _triggerOption &= ~AutoPropertySetterUserTrigger;
     [self tryUnhook];
 }
-- (void)setterPerformFrontTriggerBlock:(id)_SELF value:(id)value
+- (void)performSetterFrontTriggerBlock:(id)_SELF value:(id)value
 {
     if(_block_setter_fronttrigger){
         
@@ -164,7 +166,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     }
 }
 
-- (void)setterPerformPostTriggerBlock:(id)_SELF value:(id)value
+- (void)performSetterPostTriggerBlock:(id)_SELF value:(id)value
 {
     if(_block_getter_posttrigger){
         
@@ -181,7 +183,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     return NO;
 }
 
-- (void)setterPerformUserTriggerBlock:(id)_SELF value:(id)value
+- (void)performSetterUserTriggerBlock:(id)_SELF value:(id)value
 {
     if(_block_setter_usertrigger){
         
@@ -189,7 +191,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     }
 }
 
-#pragma mark - hook
+#pragma mark - Hook
 - (void)hook
 {
     IMP newimp      =   nil;
@@ -221,12 +223,11 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     
     if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
         
-        [self cacheForClass];
+        [self cacheFromClass];
     }else{
         
-        [self cacheForInstance];
+        [self cacheFromInstance];
     }
-    
 }
 
 - (void)hookPropertyWithImplementation:(IMP)implementation option:(NSUInteger)option
@@ -265,7 +266,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
         }else{
             
             Class proxyClass;
-            if(NO == [AutoTriggerPropertyInfo proxyClassInstanceTesting:_instance]){
+            if(NO == [AutoTriggerPropertyInfo testingProxyClassInstance:_instance]){
                 
                 NSString *proxyClassName = self.proxyClassName;
                 proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
@@ -340,6 +341,9 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     }
 }
 
+/**
+ There's only one hook,just remove all infomation.
+ */
 - (void)unhook
 {
     if(nil == _old_implementation && nil == _new_implementation){
@@ -347,39 +351,66 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
         return;
     }
     
+    [self invalid];
+    
     if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
         
-        _new_implementation = nil;
-        
-        NSUInteger count
-        =
-        (YES == (self.triggerOption & AutoPropertyTriggerOfGetter))
-        +
-        (YES == (self.triggerOption & AutoPropertyTriggerOfSetter));
-        
-        while (count--) {
-            
-            class_replaceMethod(_des_class
-                                , NSSelectorFromString(count==1?_des_property_name:_des_setter_name)
-                                , _old_implementation
-                                , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+        [self unhookForClass];
+        [self removeFromClassCache];
+    }else{
+        if(NO == [AutoTriggerPropertyInfo testingProxyClassInstance:_instance]){
+            ///Instance has been unbound by other threads.
+            return;
         }
+        
+        [self unhookForInstance];
+        [self removeFromInstanceCache];
     }
-    
-    [self invalid];
 }
+
+
+- (void)unhookForClass
+{
+    _new_implementation = nil;
+    
+    NSUInteger count
+    =
+    (YES == (self.triggerOption & AutoPropertyTriggerOfGetter))
+    +
+    (YES == (self.triggerOption & AutoPropertyTriggerOfSetter));
+    
+    while (count--) {
+        //1,0
+        class_replaceMethod(_des_class
+                            , NSSelectorFromString(count==1?_des_property_name:_des_setter_name)
+                            , _old_implementation
+                            , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+    }
+}
+
+- (void)unhookForInstance
+{
+    object_setClass(_instance, _des_class);
+    objc_disposeClassPair([_instance class]);
+}
+
 
 #pragma mark - cache strategy
 
-- (void)cacheForInstance
+- (void)cacheFromInstance
 {
     [APCInstancePropertyCacheManager bindProperty:self
                                       toInstance:_instance
                                               cmd:_des_property_name];
 }
 
+- (void)removeFromInstanceCache
+{
+    [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
+}
+
 static APCClassPropertyMapperCache* _cacheForClass;
-- (void)cacheForClass
+- (void)cacheFromClass
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -390,7 +421,7 @@ static APCClassPropertyMapperCache* _cacheForClass;
     [_cacheForClass addProperty:self];
 }
 
-+ (_Nullable instancetype)cachedPropertyInfoByClass:(Class)clazz
++ (_Nullable instancetype)cachedWithClass:(Class)clazz
                                property:(NSString*)property
 {
     clazz = [AutoTriggerPropertyInfo unproxyClass:clazz];
@@ -424,7 +455,7 @@ static APCClassPropertyMapperCache* _cacheForClass;
 }
 
 
-#pragma mark - AutoPropertyHookInstantiationProxyClass
+#pragma mark - AutoPropertyHookProxyClassNameProtocol
 - (NSString*)proxyClassName
 {
     //Class+APCProxyClass.hash
@@ -433,6 +464,7 @@ static APCClassPropertyMapperCache* _cacheForClass;
             , APCClassSuffixForTrigger
             , (unsigned long)[_instance hash]];
 }
+
 + (Class)unproxyClass:(Class)clazz
 {
     NSString* className = NSStringFromClass(clazz);
@@ -445,7 +477,8 @@ static APCClassPropertyMapperCache* _cacheForClass;
     }
     return clazz;
 }
-+ (BOOL)proxyClassInstanceTesting:(id)instance
+
++ (BOOL)testingProxyClassInstance:(id)instance
 {
     return [NSStringFromClass([instance class]) containsString:APCClassSuffixForTrigger];
 }

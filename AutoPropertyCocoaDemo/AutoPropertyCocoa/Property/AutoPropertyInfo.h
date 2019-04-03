@@ -69,7 +69,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 @protocol AutoPropertyHookProxyClassNameProtocol <NSObject>
 
 @required
-+ (BOOL)proxyClassInstanceTesting:(id _Nonnull)instance;
++ (BOOL)testingProxyClassInstance:(id _Nonnull)instance;
 + (Class _Nullable)unproxyClass:(Class _Nonnull __unsafe_unretained)clazz;
 - (NSString* _Nonnull)proxyClassName;
 @end

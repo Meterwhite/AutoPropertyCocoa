@@ -45,10 +45,10 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     
     if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
         
-        [self cacheForClass];
+        [self cacheFromClass];
     }else{
         
-        [self cacheForInstance];
+        [self cacheFromInstance];
     }
 }
 
@@ -71,10 +71,10 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     ///Cache
     if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
         
-        [self cacheForClass];
+        [self cacheFromClass];
     }else{
         
-        [self cacheForInstance];
+        [self cacheFromInstance];
     }
 }
 /** Important */
@@ -120,7 +120,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     }else{
         
         Class proxyClass;
-        if(NO == [AutoLazyPropertyInfo proxyClassInstanceTesting:_instance]){
+        if(NO == [AutoLazyPropertyInfo testingProxyClassInstance:_instance]){
             
             NSString *proxyClassName = self.proxyClassName;
             proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
@@ -172,6 +172,11 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     }
     else
     {
+        if(NO == [AutoLazyPropertyInfo testingProxyClassInstance:_instance]){
+            ///Instance has been unbound by other threads.
+            return;
+        }
+        
         [self unhookForInstance];
         [self removeFromInstanceCache];
     }
@@ -189,17 +194,21 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 - (void)unhookForInstance
 {
-    //这次脱钩后还是代理类型，应该改代理类型
-#warning <#message#>
-    //这次脱钩后是原类型，应该改代？？？
-    //看挂钩的时候怎么挂的，
-    //挂的是代理类型，如果指回去元类型
-    _new_implementation = nil;
-    
-    class_replaceMethod([_instance class]
-                        , NSSelectorFromString(_des_property_name)
-                        , _old_implementation
-                        , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+    if([APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
+        
+        _new_implementation = nil;
+        
+        class_replaceMethod([_instance class]
+                            , NSSelectorFromString(_des_property_name)
+                            , _old_implementation
+                            , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+    }else{
+        
+        
+        object_setClass(_instance, _des_class);
+        
+        objc_disposeClassPair([_instance class]);
+    }
 }
 
 - (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target
@@ -253,11 +262,9 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     if(YES == (self.accessOption & AutoPropertyAssociatedSetter) ||
        YES == (self.accessOption & AutoPropertyComponentOfSetter)){
         
-        ///set value by setter
+        ///Set value by setter
         IMP imp = class_getMethodImplementation([target class]
-                                                , (nil != self.propertySetter)
-                                                ? self.propertySetter
-                                                : self.associatedSetter);
+                                                , self.propertySetter ?: self.associatedSetter);
         NSAssert(imp
                  , @"APC: Can not find implementation named %@ in %@"
                  , NSStringFromSelector(self.propertySetter)
@@ -270,7 +277,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
                                , value);
     }else{
         
-        ///set value to ivar
+        ///Set value to ivar
         if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
            self.kindOfValue == AutoPropertyValueKindOfObject){
             
@@ -284,7 +291,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 #pragma mark - Cache strategy
 
-- (void)cacheForInstance
+- (void)cacheFromInstance
 {
     [APCInstancePropertyCacheManager bindProperty:self
                                        toInstance:_instance
@@ -293,35 +300,19 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 - (void)removeFromInstanceCache
 {
-    if([AutoLazyPropertyInfo proxyClassInstanceTesting:_instance] == NO){
-        
-        return;
-    }
     
     [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
                                                                  cmd:_des_property_name];
     
-    NSArray* p_array = [APCInstancePropertyCacheManager boundAllPropertiesForInstance:_instance];
-    if(p_array.count > 0){
+    if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
         
-        for (AutoLazyPropertyInfo* item in p_array) {
-            
-            if(item.enable){
-                
-                return;
-            }
-        }
-        ///remove from cache
         [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
     }
-    
-    ///unhook class
-    object_setClass(_instance, _des_class);
 }
 
 
 static APCClassPropertyMapperCache* _cacheForClass;
-- (void)cacheForClass
+- (void)cacheFromClass
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -337,7 +328,7 @@ static APCClassPropertyMapperCache* _cacheForClass;
     [_cacheForClass removeProperty:self];
 }
 
-+ (_Nullable instancetype)cachedPropertyInfoByClass:(Class)clazz
++ (_Nullable instancetype)cachedWithClass:(Class)clazz
                                        property:(NSString*)property
 {
     clazz = [self unproxyClass:clazz];
@@ -353,7 +344,7 @@ static APCClassPropertyMapperCache* _cacheForClass;
 }
 
 
-#pragma mark - AutoPropertyHookInstantiationProxyClass
+#pragma mark - AutoPropertyHookProxyClassNameProtocol
 - (NSString*)proxyClassName
 {
     //Class+APCProxyClass.hash
@@ -374,7 +365,7 @@ static APCClassPropertyMapperCache* _cacheForClass;
     }
     return clazz;
 }
-+ (BOOL)proxyClassInstanceTesting:(id)instance
++ (BOOL)testingProxyClassInstance:(id)instance
 {
     return [NSStringFromClass([instance class]) containsString:APCClassSuffixForLazyLoad];
 }

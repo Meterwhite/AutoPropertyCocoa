@@ -18,7 +18,7 @@ id _Nullable apc_trigger_getter(id _Nonnull _SELF, SEL _Nonnull _CMD)
     
     if(triggerPropertyInfo.triggerOption & AutoPropertyGetterFrontTrigger){
         
-        [triggerPropertyInfo getterPerformFrontTriggerBlock:_SELF];
+        [triggerPropertyInfo performGetterFrontTriggerBlock:_SELF];
     }
     
     id ret = [triggerPropertyInfo performOldPropertyFromTarget:_SELF];
@@ -26,14 +26,14 @@ id _Nullable apc_trigger_getter(id _Nonnull _SELF, SEL _Nonnull _CMD)
     
     if(triggerPropertyInfo.triggerOption & AutoPropertyGetterPostTrigger){
         
-        [triggerPropertyInfo getterPerformPostTriggerBlock:_SELF value:ret];
+        [triggerPropertyInfo performGetterPostTriggerBlock:_SELF value:ret];
     }
     
     if(triggerPropertyInfo.triggerOption & AutoPropertyGetterUserTrigger){
         
-        if([triggerPropertyInfo getterPerformConditionBlock:_SELF value:ret]){
+        if([triggerPropertyInfo performGetterConditionBlock:_SELF value:ret]){
             
-            [triggerPropertyInfo getterPerformUserTriggerBlock:_SELF value:ret];
+            [triggerPropertyInfo performGetterUserTriggerBlock:_SELF value:ret];
         }
     }
     
@@ -49,27 +49,27 @@ void apc_trigger_setter(id _Nonnull _SELF, SEL _Nonnull _CMD, id _Nullable value
     
     if(nil == (triggerPropertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
         
-        if(nil == (triggerPropertyInfo = [AutoTriggerPropertyInfo cachedPropertyInfoByClass:[_SELF class] propertyName:NSStringFromSelector(_CMD)]))
+        if(nil == (triggerPropertyInfo = [AutoTriggerPropertyInfo cachedWithClass:[_SELF class] propertyName:NSStringFromSelector(_CMD)]))
             
             NSCAssert(NO, @"APC: Lose property info.");
     
     if(triggerPropertyInfo.triggerOption & AutoPropertySetterFrontTrigger){
         
-        [triggerPropertyInfo setterPerformFrontTriggerBlock:_SELF value:value];
+        [triggerPropertyInfo performSetterFrontTriggerBlock:_SELF value:value];
     }
     
     [triggerPropertyInfo performOldSetterFromTarget:_SELF withValue:value];
     
     if(triggerPropertyInfo.triggerOption & AutoPropertySetterPostTrigger){
         
-        [triggerPropertyInfo setterPerformPostTriggerBlock:_SELF value:value];
+        [triggerPropertyInfo performSetterPostTriggerBlock:_SELF value:value];
     }
     
     if(triggerPropertyInfo.triggerOption & AutoPropertySetterUserTrigger){
         
         if([triggerPropertyInfo setterPerformConditionBlock:_SELF value:value]){
             
-            [triggerPropertyInfo setterPerformUserTriggerBlock:_SELF value:value];
+            [triggerPropertyInfo performSetterUserTriggerBlock:_SELF value:value];
         }
     }
 }

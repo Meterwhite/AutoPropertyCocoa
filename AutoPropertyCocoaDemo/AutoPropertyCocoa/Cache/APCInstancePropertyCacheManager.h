@@ -22,5 +22,5 @@
 
 + (void)boundAllPropertiesRemoveFromInstance:(id _Nonnull)instance;
 
-+ (BOOL)isBoundAllInvalidForInstance:(id _Nonnull)instance;
++ (BOOL)boundContainsValidPropertyForInstance:(id _Nonnull)instance;
 @end
