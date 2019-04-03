@@ -73,7 +73,7 @@ static NSMutableDictionary* _Nonnull apc_instanceBoundCache(id instance)
     semaphore = dispatch_semaphore_create(1);
 }
 
-+ (AutoPropertyInfo*)boundPropertyForInstance:(id)instance cmd:(NSString*)cmd
++ (AutoPropertyInfo*)boundPropertyFromInstance:(id)instance cmd:(NSString*)cmd
 {
     NSMutableDictionary* map = apc_instanceBoundCache(instance);
     return [map objectForKey:cmd];
@@ -84,7 +84,7 @@ static NSMutableDictionary* _Nonnull apc_instanceBoundCache(id instance)
     return [apc_instanceBoundCache(instance) allValues];
 }
 
-+ (void)bindProperty:(AutoPropertyInfo*)property forInstance:(id)instance cmd:(NSString*)cmd
++ (void)bindProperty:(AutoPropertyInfo*)property toInstance:(id)instance cmd:(NSString*)cmd
 {
     NSMutableDictionary* map = apc_instanceBoundCache(instance);
     @synchronized (map) {
@@ -93,7 +93,7 @@ static NSMutableDictionary* _Nonnull apc_instanceBoundCache(id instance)
     }
 }
 
-+ (void)boundPropertyRemoveForInstance:(id)instance cmd:(NSString*)cmd
++ (void)boundPropertyRemoveFromInstance:(id)instance cmd:(NSString*)cmd
 {
     NSMutableDictionary* map = apc_instanceBoundCache(instance);
     @synchronized (map) {
@@ -102,7 +102,7 @@ static NSMutableDictionary* _Nonnull apc_instanceBoundCache(id instance)
     }
 }
 
-+ (void)boundAllPropertiesRemoveForInstance:(id)instance
++ (void)boundAllPropertiesRemoveFromInstance:(id)instance
 {
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
     
@@ -112,6 +112,21 @@ static NSMutableDictionary* _Nonnull apc_instanceBoundCache(id instance)
                              , OBJC_ASSOCIATION_RETAIN);
     
     dispatch_semaphore_signal(semaphore);
+}
+
++ (BOOL)isBoundAllInvalidForInstance:(id _Nonnull)instance
+{
+    NSMutableDictionary* map = apc_instanceBoundCache(instance);
+    
+    NSEnumerator* em = map.objectEnumerator;
+    
+    AutoPropertyInfo* p;
+    while (nil != (p = em.nextObject))
+        if(p.enable == YES)
+            return NO;
+    
+    
+    return YES;
 }
 
 @end

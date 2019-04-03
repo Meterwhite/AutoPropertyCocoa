@@ -6,11 +6,10 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "APCInstancePropertyCacheManager.h"
 #import "NSObject+APCTriggerProperty.h"
 
-@implementation NSObject (APCTriggerProperty)
 
-@end
 
 #pragma mark - hook getter
 id _Nullable apc_trigger_getter(id _Nonnull _SELF, SEL _Nonnull _CMD)
@@ -22,11 +21,8 @@ id _Nullable apc_trigger_getter(id _Nonnull _SELF, SEL _Nonnull _CMD)
         [triggerPropertyInfo getterPerformFrontTriggerBlock:_SELF];
     }
     
-    id ret  = nil;
-    if(triggerPropertyInfo.accessOption & AutoPropertyComponentOfGetter){
-        
-        ret = [triggerPropertyInfo performOldPropertyFromTarget:_SELF];
-    }
+    id ret = [triggerPropertyInfo performOldPropertyFromTarget:_SELF];
+    
     
     if(triggerPropertyInfo.triggerOption & AutoPropertyGetterPostTrigger){
         
@@ -51,15 +47,18 @@ void apc_trigger_setter(id _Nonnull _SELF, SEL _Nonnull _CMD, id _Nullable value
 {
     AutoTriggerPropertyInfo* triggerPropertyInfo;
     
+    if(nil == (triggerPropertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
+        
+        if(nil == (triggerPropertyInfo = [AutoTriggerPropertyInfo cachedPropertyInfoByClass:[_SELF class] propertyName:NSStringFromSelector(_CMD)]))
+            
+            NSCAssert(NO, @"APC: Lose property info.");
+    
     if(triggerPropertyInfo.triggerOption & AutoPropertySetterFrontTrigger){
         
         [triggerPropertyInfo setterPerformFrontTriggerBlock:_SELF value:value];
     }
     
-    if(triggerPropertyInfo.accessOption & AutoPropertyComponentOfSetter){
-        
-        [triggerPropertyInfo performOldSetterFromTarget:_SELF withValue:value];
-    }
+    [triggerPropertyInfo performOldSetterFromTarget:_SELF withValue:value];
     
     if(triggerPropertyInfo.triggerOption & AutoPropertySetterPostTrigger){
         

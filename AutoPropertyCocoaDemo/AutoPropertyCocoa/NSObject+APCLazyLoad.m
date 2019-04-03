@@ -47,16 +47,15 @@
 
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-    AutoLazyPropertyInfo* p = [AutoLazyPropertyInfo cachedInfoByClass:self propertyName:property];
+    AutoLazyPropertyInfo* p = [AutoLazyPropertyInfo cachedPropertyInfoByClass:self property:property];
     
     [p unhook];
-    
-    [p removeFromCache];
 }
 
 + (void)apc_unbindLazyLoadAllProperties
 {
-    [AutoLazyPropertyInfo removeCacheForClass:self];
+//    [AutoLazyPropertyInfo removeCacheForClass:self];
+    
 }
 
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
@@ -92,12 +91,13 @@
 
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
-    [(AutoLazyPropertyInfo*)[APCInstancePropertyCacheManager boundPropertyForInstance:self cmd:property] unhook];
+    [(AutoLazyPropertyInfo*)[APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property] unhook];
 }
 
 - (void)apc_unbindLazyLoadAllProperties
 {
-    [AutoLazyPropertyInfo unbindlazyLoadForInstance:self];
+    [[APCInstancePropertyCacheManager boundAllPropertiesForInstance:self]
+     makeObjectsPerformSelector:@selector(unhook)];
 }
 
 
@@ -158,9 +158,9 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
 {
     AutoLazyPropertyInfo* lazyPropertyInfo;
     
-    if(nil == (lazyPropertyInfo = [APCInstancePropertyCacheManager boundPropertyForInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
+    if(nil == (lazyPropertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
         
-        if(nil == (lazyPropertyInfo = [AutoLazyPropertyInfo cachedInfoByClass:[_SELF class] propertyName:NSStringFromSelector(_CMD)]))
+        if(nil == (lazyPropertyInfo = [AutoLazyPropertyInfo cachedPropertyInfoByClass:[_SELF class] property:NSStringFromSelector(_CMD)]))
             
             NSCAssert(NO, @"APC: Lose property info.");
     

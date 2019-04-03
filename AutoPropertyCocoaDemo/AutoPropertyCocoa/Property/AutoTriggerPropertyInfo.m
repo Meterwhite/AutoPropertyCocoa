@@ -18,29 +18,6 @@ void* _Nullable apc_trigger_getter_impimage(NSString* eType);
 id    _Nullable apc_trigger_setter         (_Nullable id _self,SEL __cmd);
 void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 
-#pragma mark - Owner name
-static Class apc_triggerUnproxyClass(Class clazz)
-{
-    NSString* className = NSStringFromClass(clazz);
-    
-    if([className containsString:APCClassSuffixForLazyLoad]){
-        
-        className = [className substringToIndex:[className rangeOfString:@"+"].location];
-        
-        clazz = NSClassFromString(className);
-    }
-    return clazz;
-}
-
-NS_INLINE NSString* apc_triggerProxyClassName(Class class){
-    return [NSString stringWithFormat:@"%@%@",NSStringFromClass(class),APCClassSuffixForTrigger];
-}
-
-NS_INLINE BOOL apc_isTriggerInstance(id _Nonnull instance)
-{
-    return [NSStringFromClass([instance class]) containsString:APCClassSuffixForTrigger];
-}
-
 @implementation AutoTriggerPropertyInfo
 {
     void(^_block_getter_fronttrigger)(id _Nonnull instance);
@@ -55,7 +32,7 @@ NS_INLINE BOOL apc_isTriggerInstance(id _Nonnull instance)
 }
 
 - (instancetype)initWithPropertyName:(NSString* _Nonnull)propertyName
-                              aClass:(Class __unsafe_unretained)aClass
+                              aClass:(Class)aClass
 {
     if(self = [super initWithPropertyName:propertyName aClass:aClass]){
         
@@ -287,32 +264,40 @@ NS_INLINE BOOL apc_isTriggerInstance(id _Nonnull instance)
             }
         }else{
             
-            NSString *proxyClassName = apc_triggerProxyClassName(_des_class);
-            
-            Class proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
-            if(nil != proxyClass){
+            Class proxyClass;
+            if(NO == [AutoTriggerPropertyInfo proxyClassInstanceTesting:_instance]){
                 
-                objc_registerClassPair(proxyClass);
+                NSString *proxyClassName = self.proxyClassName;
+                proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
+                if(nil != proxyClass){
+                    
+                    objc_registerClassPair(proxyClass);
+                    
+                }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
+                    
+                    NSAssert(proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
+                }
+                
+                ///Hook the isa point.
+                object_setClass(_instance, proxyClass);
+            }else{
+                
+                proxyClass = [_instance class];
+            }
+            
+            _old_implementation
+            =
+            class_replaceMethod(proxyClass
+                                , NSSelectorFromString(_des_property_name)
+                                , _new_implementation
+                                , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+            if(nil == _old_implementation){
                 
                 _old_implementation
                 =
-                class_replaceMethod(proxyClass
-                                    , des_sel
-                                    , _new_implementation
-                                    , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-                if(nil == _old_implementation){
-                    
-                    _old_implementation
-                    =
-                    class_getMethodImplementation(_des_class, des_sel);
-                }
-            }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
-                
-                NSAssert(proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
+                class_getMethodImplementation(_des_class
+                                              , NSSelectorFromString(_des_property_name));
             }
-            
-            ///Hook the isa point.
-            object_setClass(_instance, proxyClass);
         }
     }
 }
@@ -389,7 +374,7 @@ NS_INLINE BOOL apc_isTriggerInstance(id _Nonnull instance)
 - (void)cacheForInstance
 {
     [APCInstancePropertyCacheManager bindProperty:self
-                                      forInstance:_instance
+                                      toInstance:_instance
                                               cmd:_des_property_name];
 }
 
@@ -403,6 +388,14 @@ static APCClassPropertyMapperCache* _cacheForClass;
     });
     
     [_cacheForClass addProperty:self];
+}
+
++ (_Nullable instancetype)cachedPropertyInfoByClass:(Class)clazz
+                               property:(NSString*)property
+{
+    clazz = [AutoTriggerPropertyInfo unproxyClass:clazz];
+    
+    return [_cacheForClass propertyForDesclass:clazz property:property];
 }
 
 - (void)removeFromClassCache
@@ -430,5 +423,31 @@ static APCClassPropertyMapperCache* _cacheForClass;
     return set;
 }
 
+
+#pragma mark - AutoPropertyHookInstantiationProxyClass
+- (NSString*)proxyClassName
+{
+    //Class+APCProxyClass.hash
+    return [NSString stringWithFormat:@"%@%@.%lu"
+            , NSStringFromClass(_des_class)
+            , APCClassSuffixForTrigger
+            , (unsigned long)[_instance hash]];
+}
++ (Class)unproxyClass:(Class)clazz
+{
+    NSString* className = NSStringFromClass(clazz);
+    
+    if([className containsString:APCClassSuffixForTrigger]){
+        
+        className = [className substringToIndex:[className rangeOfString:@"+"].location];
+        
+        clazz = NSClassFromString(className);
+    }
+    return clazz;
+}
++ (BOOL)proxyClassInstanceTesting:(id)instance
+{
+    return [NSStringFromClass([instance class]) containsString:APCClassSuffixForTrigger];
+}
 
 @end

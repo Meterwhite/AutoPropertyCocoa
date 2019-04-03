@@ -33,7 +33,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
                                         | AutoPropertySetterUserTrigger,
 };
 
-@interface AutoTriggerPropertyInfo : AutoHookPropertyInfo
+@interface AutoTriggerPropertyInfo : AutoHookPropertyInfo<AutoPropertyHookProxyClassNameProtocol>
 
 @property (nonatomic,assign,readonly) AutoPropertyTriggerOption triggerOption;
 
@@ -74,7 +74,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 - (void)performOldSetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value;
 
 #pragma mark - Cache
-+ (_Nullable instancetype)cachedInfoByClass:(Class _Nonnull)clazz
++ (_Nullable instancetype)cachedPropertyInfoByClass:(Class _Nonnull)clazz
                                propertyName:(NSString* _Nonnull)propertyName;
 
 - (void)cacheForClass;

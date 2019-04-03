@@ -66,6 +66,14 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
     AutoPropertyHookKindOfIMP       =   3,
 };
 
+@protocol AutoPropertyHookProxyClassNameProtocol <NSObject>
+
+@required
++ (BOOL)proxyClassInstanceTesting:(id _Nonnull)instance;
++ (Class _Nullable)unproxyClass:(Class _Nonnull __unsafe_unretained)clazz;
+- (NSString* _Nonnull)proxyClassName;
+@end
+
 @interface AutoPropertyInfo : NSObject <APCPropertyMapperKeyProtocol>
 {
 @public

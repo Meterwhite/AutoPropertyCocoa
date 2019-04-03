@@ -17,31 +17,6 @@
 id    _Nullable apc_lazy_property       (_Nullable id _self,SEL __cmd);
 void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
-#pragma mark - Owner name
-static Class apc_lazyLoadUnproxyClass(Class clazz)
-{
-    NSString* className = NSStringFromClass(clazz);
-    
-    if([className containsString:APCClassSuffixForLazyLoad]){
-        
-        className = [className substringToIndex:[className rangeOfString:@"+"].location];
-        
-        clazz = NSClassFromString(className);
-    }
-    return clazz;
-}
-
-/**
- Get proxy clas name with a common class.
- */
-NS_INLINE NSString* apc_lazyLoadProxyClassName(Class class){
-    return [NSString stringWithFormat:@"%@%@",NSStringFromClass(class),APCClassSuffixForLazyLoad];
-}
-
-NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
-{
-    return [NSStringFromClass([instance class]) containsString:APCClassSuffixForLazyLoad];
-}
 
 #pragma mark - AutoLazyPropertyInfo
 
@@ -70,7 +45,7 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
     
     if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
         
-        [self cache];
+        [self cacheForClass];
     }else{
         
         [self cacheForInstance];
@@ -96,7 +71,7 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
     ///Cache
     if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
         
-        [self cache];
+        [self cacheForClass];
     }else{
         
         [self cacheForInstance];
@@ -144,33 +119,87 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
         }
     }else{
         
-        NSString *proxyClassName = apc_lazyLoadProxyClassName(_des_class);
-        
-        Class proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
-        if(nil != proxyClass){
+        Class proxyClass;
+        if(NO == [AutoLazyPropertyInfo proxyClassInstanceTesting:_instance]){
             
-            objc_registerClassPair(proxyClass);
+            NSString *proxyClassName = self.proxyClassName;
+            proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
+            if(nil != proxyClass){
+                
+                objc_registerClassPair(proxyClass);
+                
+            }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
+                
+                NSAssert(proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
+            }
+            
+            ///Hook the isa point.
+            object_setClass(_instance, proxyClass);
+        }else{
+            
+            proxyClass = [_instance class];
+        }
+        
+        _old_implementation
+        =
+        class_replaceMethod(proxyClass
+                            , NSSelectorFromString(_des_property_name)
+                            , _new_implementation
+                            , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+        if(nil == _old_implementation){
             
             _old_implementation
             =
-            class_replaceMethod(proxyClass
-                                , NSSelectorFromString(_des_property_name)
-                                , _new_implementation
-                                , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-            if(nil == _old_implementation){
-                
-                _old_implementation
-                =
-                class_getMethodImplementation(_des_class, NSSelectorFromString(_des_property_name));
-            }
-        }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
-            
-            NSAssert(proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
+            class_getMethodImplementation(_des_class
+                                          , NSSelectorFromString(_des_property_name));
         }
-        
-        ///Hook the isa point.
-        object_setClass(_instance, proxyClass);
     }
+}
+
+- (void)unhook
+{
+    if(nil == _old_implementation || nil == _new_implementation){
+        
+        return;
+    }
+        
+    [self invalid];
+    
+    if(_kindOfOwner == AutoPropertyOwnerKindOfClass)
+    {
+        [self unhookForClass];
+        [self removeFromClassCache];
+    }
+    else
+    {
+        [self unhookForInstance];
+        [self removeFromInstanceCache];
+    }
+}
+
+- (void)unhookForClass
+{
+    _new_implementation = nil;
+    
+    class_replaceMethod(_des_class
+                        , NSSelectorFromString(_des_property_name)
+                        , _old_implementation
+                        , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+}
+
+- (void)unhookForInstance
+{
+    //这次脱钩后还是代理类型，应该改代理类型
+#warning <#message#>
+    //这次脱钩后是原类型，应该改代？？？
+    //看挂钩的时候怎么挂的，
+    //挂的是代理类型，如果指回去元类型
+    _new_implementation = nil;
+    
+    class_replaceMethod([_instance class]
+                        , NSSelectorFromString(_des_property_name)
+                        , _old_implementation
+                        , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
 }
 
 - (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target
@@ -186,23 +215,6 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
                            , NSSelectorFromString(_des_property_name)
                            , _old_implementation
                            , self.valueTypeEncoding.UTF8String);
-}
-
-- (void)unhook
-{
-    if(_old_implementation && _new_implementation){
-        
-        if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
-            
-            _new_implementation = nil;
-            
-            class_replaceMethod(_des_class
-                                , NSSelectorFromString(_des_property_name)
-                                , _old_implementation
-                                , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-        }
-    }
-    [self invalid];
 }
 
 - (id _Nullable)instancetypeNewObjectByUserSelector
@@ -270,88 +282,102 @@ NS_INLINE BOOL apc_isLazyLoadInstance(id _Nonnull instance)
     }
 }
 
-#pragma mark - cache strategy
-
+#pragma mark - Cache strategy
 
 - (void)cacheForInstance
 {
     [APCInstancePropertyCacheManager bindProperty:self
-                                      forInstance:_instance
+                                       toInstance:_instance
                                               cmd:_des_property_name];
 }
 
-static APCClassPropertyMapperCache* _cacheForClass;
-- (void)cache
+- (void)removeFromInstanceCache
 {
+    if([AutoLazyPropertyInfo proxyClassInstanceTesting:_instance] == NO){
+        
+        return;
+    }
     
+    [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
+                                                                 cmd:_des_property_name];
+    
+    NSArray* p_array = [APCInstancePropertyCacheManager boundAllPropertiesForInstance:_instance];
+    if(p_array.count > 0){
+        
+        for (AutoLazyPropertyInfo* item in p_array) {
+            
+            if(item.enable){
+                
+                return;
+            }
+        }
+        ///remove from cache
+        [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
+    }
+    
+    ///unhook class
+    object_setClass(_instance, _des_class);
+}
+
+
+static APCClassPropertyMapperCache* _cacheForClass;
+- (void)cacheForClass
+{
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
         _cacheForClass     =   [APCClassPropertyMapperCache cache];
     });
     
-    
     [_cacheForClass addProperty:self];
 }
 
-- (void)removeFromCache
+- (void)removeFromClassCache
 {
     [_cacheForClass removeProperty:self];
 }
 
-
-+ (_Nullable instancetype)cachedInfoByClass:(Class)clazz
-                               propertyName:(NSString*)propertyName
++ (_Nullable instancetype)cachedPropertyInfoByClass:(Class)clazz
+                                       property:(NSString*)property
 {
-    clazz = apc_lazyLoadUnproxyClass(clazz);
+    clazz = [self unproxyClass:clazz];
     
-    return [_cacheForClass propertyForDesclass:clazz property:propertyName];
+    return [_cacheForClass propertyForDesclass:clazz property:property];
 }
 
 + (void)removeCacheForClass:(Class)clazz
 {
-    clazz  = apc_lazyLoadUnproxyClass(clazz);
+    clazz  = [self unproxyClass:clazz];
     
     [_cacheForClass removePropertiesWithSrcclass:clazz];
 }
 
-+ (void)unbindlazyLoadForInstance:(id _Nonnull)instance
+
+#pragma mark - AutoPropertyHookInstantiationProxyClass
+- (NSString*)proxyClassName
 {
-    if(apc_isLazyLoadInstance(instance) == NO){
-        
-        return;
-    }
-    ///unhook instance
-    [[APCInstancePropertyCacheManager boundAllPropertiesForInstance:instance]
-     makeObjectsPerformSelector:@selector(unhook)];
-    ///remove from cache
-    [APCInstancePropertyCacheManager boundAllPropertiesRemoveForInstance:instance];
-    ///unhook class
-    object_setClass(instance, apc_lazyLoadUnproxyClass([instance class]));
+    //Class+APCProxyClass.hash
+    return [NSString stringWithFormat:@"%@%@.%lu"
+            , NSStringFromClass(_des_class)
+            , APCClassSuffixForLazyLoad
+            , (unsigned long)[_instance hash]];
 }
-
-//- (BOOL)isEqual:(id)object
-//{
-//    if(self == object)
-//
-//        return YES;
-//
-//    return [self hash] == [object hash];
-//}
-
-//- (NSUInteger)hash
-//{
-//#define MAXALIGN (__alignof__(_Complex long double))
-//
-//#pragma clang diagnostic push
-//#pragma clang diagnostic ignored "-Wunreachable-code"
-//
-//    static int shift = (MAXALIGN==16 ? 4 : (MAXALIGN==8 ? 3 : 2));
-//#pragma clang diagnostic pop
-//
-//    return (NSUInteger)((uintptr_t)self >> shift);
-//}
-
++ (Class)unproxyClass:(Class)clazz
+{
+    NSString* className = NSStringFromClass(clazz);
+    
+    if([className containsString:APCClassSuffixForLazyLoad]){
+        
+        className = [className substringToIndex:[className rangeOfString:@"+"].location];
+        
+        clazz = NSClassFromString(className);
+    }
+    return clazz;
+}
++ (BOOL)proxyClassInstanceTesting:(id)instance
+{
+    return [NSStringFromClass([instance class]) containsString:APCClassSuffixForLazyLoad];
+}
 @end
 
 

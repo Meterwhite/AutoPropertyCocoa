@@ -63,7 +63,7 @@
     Person* p = [Person new];
     Man* m = [Man new];
     
-    [p apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
+    [Man apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
         
         return @(999);
     }];
@@ -73,7 +73,9 @@
         return @(111);
     }];
     
-    NSUInteger age0 = p.age;
+    [m apc_unbindLazyLoadForProperty:@"age"];
+    
+//    NSUInteger age0 = p.age;
     NSUInteger age1 = m.age;
 }
 
