@@ -54,8 +54,7 @@
 
 + (void)apc_unbindLazyLoadAllProperties
 {
-//    [AutoLazyPropertyInfo removeCacheForClass:self];
-    
+    [AutoLazyPropertyInfo unhookClassAllProperties:self];
 }
 
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property

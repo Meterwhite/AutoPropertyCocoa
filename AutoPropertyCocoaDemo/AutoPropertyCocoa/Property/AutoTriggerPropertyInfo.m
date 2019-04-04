@@ -44,6 +44,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     return self;
 }
 
+#pragma mark - getter
 - (void)getterBindFrontTrigger:(void (^)(id _Nonnull, id _Nullable))block
 {
     _block_getter_fronttrigger = [block copy];
@@ -61,6 +62,13 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     _block_getter_usertrigger   = [block copy];
     _block_getter_usercondition = [condition copy];
     _triggerOption |= AutoPropertyGetterUserTrigger;
+}
+
+- (void)getterBindCountTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition
+{
+    _block_getter_counttrigger   = [block copy];
+    _block_getter_countcondition = [condition copy];
+    _triggerOption |= AutoPropertyGetterCountTrigger;
 }
 
 - (void)getterUnbindFrontTrigger
@@ -85,6 +93,14 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     [self tryUnhook];
 }
 
+- (void)getterUnbindCountTrigger
+{
+    _block_getter_counttrigger   = nil;
+    _block_getter_countcondition = nil;
+    _triggerOption &= ~AutoPropertyGetterCountTrigger;
+    [self tryUnhook];
+}
+
 - (void)performGetterFrontTriggerBlock:(id)_SELF
 {
     if(_block_getter_fronttrigger){
@@ -101,7 +117,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     }
 }
 
-- (BOOL)performGetterConditionBlock:(id)_SELF value:(id)value
+- (BOOL)performGetterUserConditionBlock:(id)_SELF value:(id)value
 {
     if(_block_getter_usercondition){
         
@@ -117,6 +133,25 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
         _block_getter_usertrigger(_SELF,value);
     }
 }
+
+- (void)performGetterCountTriggerBlock:(id)_SELF value:(id)value
+{
+    if(_block_getter_counttrigger){
+        
+        _block_getter_counttrigger(_SELF,value);
+    }
+}
+
+- (BOOL)performGetterCountConditionBlock:(id)_SELF value:(id)value
+{
+    if(_block_getter_countcondition){
+        
+        return _block_getter_countcondition(_SELF, value, self.accessCount);
+    }
+    return NO;
+}
+
+#pragma mark - setter
 
 - (void)setterBindFrontTrigger:(void (^)(id _Nonnull, id _Nullable))block
 {
@@ -135,6 +170,13 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     _block_setter_usertrigger   = [block copy];
     _block_setter_usercondition = [condition copy];
     _triggerOption |= AutoPropertySetterUserTrigger;
+}
+
+- (void)setterBindCountTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition
+{
+    _block_setter_counttrigger   = [block copy];
+    _block_setter_countcondition = [condition copy];
+    _triggerOption |= AutoPropertyGetterUserTrigger;
 }
 
 - (void)setterUnbindFrontTrigger
@@ -158,6 +200,15 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     _triggerOption &= ~AutoPropertySetterUserTrigger;
     [self tryUnhook];
 }
+
+- (void)setterUnbindCountTrigger
+{
+    _block_setter_counttrigger   = nil;
+    _block_setter_countcondition = nil;
+    _triggerOption &= ~AutoPropertySetterCountTrigger;
+    [self tryUnhook];
+}
+
 - (void)performSetterFrontTriggerBlock:(id)_SELF value:(id)value
 {
     if(_block_setter_fronttrigger){
@@ -174,7 +225,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     }
 }
 
-- (BOOL)setterPerformConditionBlock:(id)_SELF value:(id)value
+- (BOOL)performSetterUserConditionBlock:(id)_SELF value:(id)value
 {
     if(_block_setter_usercondition){
         
@@ -190,6 +241,24 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
         _block_setter_usertrigger(_SELF,value);
     }
 }
+
+- (BOOL)performSetterCountConditionBlock:(id)_SELF value:(id)value
+{
+    if(_block_setter_countcondition){
+        
+        return _block_setter_countcondition(_SELF, value, self.accessCount);
+    }
+    return NO;
+}
+
+- (void)performSetterCountTriggerBlock:(id)_SELF value:(id)value
+{
+    if(_block_setter_counttrigger){
+        
+        _block_setter_counttrigger(_SELF,value);
+    }
+}
+
 
 #pragma mark - Hook
 - (void)hook
@@ -237,8 +306,18 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     SEL des_sel = NSSelectorFromString((option == AutoPropertyTriggerOfSetter)
                                        ? _des_setter_name
                                        : _des_property_name);
+    
+    NSMutableString* methodEnc = [NSMutableString string];
+    if(option == AutoPropertyTriggerOfGetter){
+        [methodEnc appendString:self.valueTypeEncoding];
+    }
+    [methodEnc appendString:@"@:"];
+    if(option == AutoPropertyTriggerOfSetter){
+        [methodEnc appendString:self.valueTypeEncoding];
+    }
+    
+    
     if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
-        
         
         ///AutoPropertyOwnerKindOfClass
         _old_implementation
@@ -246,7 +325,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
         class_replaceMethod(_des_class
                             , des_sel
                             , _new_implementation
-                            , [NSString stringWithFormat:@"%@@:", self.valueTypeEncoding].UTF8String);
+                            , methodEnc.UTF8String);
         
         if(nil == _old_implementation && (_des_class != _src_class)){
             
@@ -263,42 +342,43 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
                 =
                 class_getMethodImplementation(_src_class, NSSelectorFromString(_des_property_name));
             }
+        }
+    }
+    else{
+        
+        Class proxyClass;
+        if(NO == [AutoTriggerPropertyInfo testingProxyClassInstance:_instance]){
+            
+            NSString *proxyClassName = self.proxyClassName;
+            proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
+            if(nil != proxyClass){
+                
+                objc_registerClassPair(proxyClass);
+                
+            }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
+                
+                NSAssert(proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
+            }
+            
+            ///Hook the isa point.
+            object_setClass(_instance, proxyClass);
         }else{
             
-            Class proxyClass;
-            if(NO == [AutoTriggerPropertyInfo testingProxyClassInstance:_instance]){
-                
-                NSString *proxyClassName = self.proxyClassName;
-                proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
-                if(nil != proxyClass){
-                    
-                    objc_registerClassPair(proxyClass);
-                    
-                }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
-                    
-                    NSAssert(proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
-                }
-                
-                ///Hook the isa point.
-                object_setClass(_instance, proxyClass);
-            }else{
-                
-                proxyClass = [_instance class];
-            }
+            proxyClass = [_instance class];
+        }
+        
+        _old_implementation
+        =
+        class_replaceMethod(proxyClass
+                            , NSSelectorFromString(_des_property_name)
+                            , _new_implementation
+                            , methodEnc.UTF8String);
+        if(nil == _old_implementation){
             
             _old_implementation
             =
-            class_replaceMethod(proxyClass
-                                , NSSelectorFromString(_des_property_name)
-                                , _new_implementation
-                                , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-            if(nil == _old_implementation){
-                
-                _old_implementation
-                =
-                class_getMethodImplementation(_des_class
-                                              , NSSelectorFromString(_des_property_name));
-            }
+            class_getMethodImplementation(_des_class
+                                          , NSSelectorFromString(_des_property_name));
         }
     }
 }
@@ -333,16 +413,23 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
                            , value);
 }
 
++ (void)unhookClassAllProperties:(Class)clazz
+{
+    clazz  = [self unproxyClass:clazz];
+    
+    [[_cacheForClass propertiesForSrcclass:clazz] makeObjectsPerformSelector:@selector(unhook)];
+}
+
 - (void)tryUnhook
 {
     if(_triggerOption == AutoPropertyNonTrigger){
         
-        [self hook];
+        [self unhook];
     }
 }
 
 /**
- There's only one hook,just remove all infomation.
+ Only one hook,just remove all infomation.
  */
 - (void)unhook
 {
@@ -399,6 +486,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 
 - (void)cacheFromInstance
 {
+#warning <#message#>
     [APCInstancePropertyCacheManager bindProperty:self
                                       toInstance:_instance
                                               cmd:_des_property_name];
@@ -406,7 +494,13 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 
 - (void)removeFromInstanceCache
 {
-    [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
+    [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
+                                                                 cmd:_des_property_name];
+    
+    if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
+        
+        [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
+    }
 }
 
 static APCClassPropertyMapperCache* _cacheForClass;

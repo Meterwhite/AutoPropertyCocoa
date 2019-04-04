@@ -117,7 +117,8 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
             
             NSAssert(_old_implementation, @"APC: Can not find old implementation.");
         }
-    }else{
+    }
+    else{
         
         Class proxyClass;
         if(NO == [AutoLazyPropertyInfo testingProxyClassInstance:_instance]){
@@ -180,6 +181,13 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
         [self unhookForInstance];
         [self removeFromInstanceCache];
     }
+}
+
++ (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz
+{
+    clazz  = [self unproxyClass:clazz];
+    
+    [[_cacheForClass propertiesForSrcclass:clazz] makeObjectsPerformSelector:@selector(unhook)];
 }
 
 - (void)unhookForClass
@@ -310,7 +318,6 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     }
 }
 
-
 static APCClassPropertyMapperCache* _cacheForClass;
 - (void)cacheFromClass
 {
@@ -334,13 +341,6 @@ static APCClassPropertyMapperCache* _cacheForClass;
     clazz = [self unproxyClass:clazz];
     
     return [_cacheForClass propertyForDesclass:clazz property:property];
-}
-
-+ (void)removeCacheForClass:(Class)clazz
-{
-    clazz  = [self unproxyClass:clazz];
-    
-    [_cacheForClass removePropertiesWithSrcclass:clazz];
 }
 
 

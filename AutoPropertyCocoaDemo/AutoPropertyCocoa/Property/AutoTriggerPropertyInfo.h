@@ -49,7 +49,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 - (void)getterBindUserTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block
                     condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value))condition;
 - (void)getterBindCountTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block
-                     countBlock:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value,NSUInteger count))block;
+                     condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value,NSUInteger count))condition;
 
 - (void)getterUnbindFrontTrigger;
 - (void)getterUnbindPostTrigger;
@@ -58,17 +58,17 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 
 - (void)performGetterFrontTriggerBlock:(id _Nonnull)_SELF;
 - (void)performGetterPostTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
-- (BOOL)performGetterConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
+- (BOOL)performGetterUserConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
 - (void)performGetterUserTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
 - (void)performGetterCountTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
+- (BOOL)performGetterCountConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
 #pragma mark - setter trigger
 - (void)setterBindFrontTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block;
 - (void)setterBindPostTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block;
-- (BOOL)setterPerformConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
 - (void)setterBindUserTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block
                     condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value))condition;
 - (void)setterBindCountTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block
-                    countBlock:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value,NSUInteger count))block;
+                    condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value,NSUInteger count))condition;
 
 - (void)setterUnbindFrontTrigger;
 - (void)setterUnbindPostTrigger;
@@ -77,12 +77,15 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 
 - (void)performSetterFrontTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
 - (void)performSetterPostTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
+- (BOOL)performSetterUserConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
 - (void)performSetterUserTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
+- (BOOL)performSetterCountConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
 - (void)performSetterCountTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
+
 #pragma mark - Hook
-- (void)tryUnhook;
-- (void)unhook;
 - (void)hook;
+- (void)tryUnhook;
++ (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz;
 
 #pragma mark - Old
 - (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target;

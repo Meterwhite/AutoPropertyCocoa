@@ -22,6 +22,7 @@
 - (void)hookUsingUserSelector:(_Nonnull SEL)aSelector;
 
 - (void)unhook;
++ (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz;
 
 - (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target;
 
