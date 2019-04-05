@@ -6,11 +6,12 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "AutoPropertyInfo.h"
 #import "APCClassPropertyMapperCache.h"
+#import "NSObject+APCTriggerProperty.h"
 #import "AutoLazyPropertyInfo.h"
 #import "NSObject+APCLazyLoad.h"
 #import "APCPropertyMapperkey.h"
+#import "AutoPropertyInfo.h"
 #import "ViewController.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
@@ -28,29 +29,101 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self testNormalInstance];
+    [self testTriggerFrontNormal];
+//    [self testNormalInstance];
 //    [self testClassSuperclassSubclass];
 //    [self testHash];
 //    [self testMapperCache];
 }
 
 
+- (void)testTriggerFrontNormal
+{
+    [Person apc_frontOfPropertyGetter:@"age" bindWithBlock:^(id  _Nonnull instance) {
+        
+        NSLog(@"Afront of age!");
+    }];
+    
+    [Person apc_backOfPropertyGetter:@"age" bindWithBlock:^(id  _Nonnull instance, id  _Nullable value) {
+        
+        NSLog(@"Abakc of age!");
+    }];
+    
+    [Person apc_propertyGetter:@"age" bindUserCondition:^BOOL(id  _Nonnull instance, id  _Nullable value) {
+        
+        if([value unsignedIntegerValue] == 999){
+            return YES;
+        }
+        return NO;
+    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
+        
+        NSLog(@"Auser condition!");
+    }];
+    
+    [Person apc_propertyGetter:@"age" bindAccessCountCondition:^BOOL(id  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+        
+        if(count == 1){
+            return YES;
+        }
+        return NO;
+    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
+        
+        NSLog(@"Auser count!");
+    }];
+    //////
+    [Person apc_frontOfPropertySetter:@"age" bindWithBlock:^(id  _Nonnull instance) {
+        
+        NSLog(@"front of age!");
+    }];
+    
+    [Person apc_backOfPropertySetter:@"age" bindWithBlock:^(id  _Nonnull instance, id  _Nullable value) {
+       
+         NSLog(@"bakc of age!");
+    }];
+    
+    [Person apc_propertySetter:@"age" bindUserCondition:^BOOL(id  _Nonnull instance, id  _Nullable value) {
+        
+        if([value unsignedIntegerValue] == 999){
+            return YES;
+        }
+        return NO;
+    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
+        
+        NSLog(@"user condition!");
+    }];
+    
+    [Person apc_propertySetter:@"age" bindAccessCountCondition:^BOOL(id  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+        
+        if(count == 1){
+            return YES;
+        }
+        return NO;
+    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
+        
+        NSLog(@"user count!");
+    }];
+    
+    Person* p = [Person new];
+    p.age = 999;
+    NSUInteger age0 = p.age;
+}
+
 - (void)testClassSuperclassSubclass
 {
     
-    [Person apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
-        
-        return @(999);
-    }];
+//    [Person apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
+//
+//        return @(999);
+//    }];
     
     [Man apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
         
         return @(111);
     }];
     
-    [Person apc_unbindLazyLoadForProperty:@"age"];
-    
-    [Man    apc_unbindLazyLoadForProperty:@"age"];
+//    [Person apc_unbindLazyLoadForProperty:@"age"];
+//
+//    [Man    apc_unbindLazyLoadForProperty:@"age"];
     
     Person* p = [Person new];
     NSUInteger age0 = p.age;

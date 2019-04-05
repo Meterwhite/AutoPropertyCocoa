@@ -22,19 +22,19 @@ NS_INLINE NSString* apc_srcMapperKeyString(Class srcClass){
     NSUInteger  _hash;
 }
 
-+ (instancetype)keyWithClass:(Class _Nonnull)aClass
-                    property:(NSString* _Nonnull)property
++ (instancetype)keyWithClass:(Class)aClass
+                    property:(NSString*)property
 {
     return [[self.class alloc] initWithClass:aClass property:property];
 }
 
-+ (instancetype)keyWithClass:(Class _Nonnull)aClass
++ (instancetype)keyWithClass:(Class)aClass
 {
     return [[self.class alloc] initWithClass:aClass];
 }
 
-- (instancetype)initWithClass:(Class _Nonnull)aClass
-                     property:(NSString* _Nonnull)property
+- (instancetype)initWithClass:(Class)aClass
+                     property:(NSString*)property
 {
     self = [super init];
     if (self) {

@@ -164,11 +164,8 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
             NSCAssert(NO, @"APC: Lose property info.");
     
     
-    ///If lazy-load of instance has been logically removed.Performing the old implementation.
+    ///Modified by other thread.
     if(lazyPropertyInfo.enable == NO){
-        
-        NSCAssert(lazyPropertyInfo.kindOfOwner == AutoPropertyOwnerKindOfInstance
-                  , @"APC: This property is invalid.");
         
         return [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
     }

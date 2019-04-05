@@ -45,10 +45,10 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     
     if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
         
-        [self cacheFromClass];
+        [self cacheToClassMapper];
     }else{
         
-        [self cacheFromInstance];
+        [self cacheToInstanceMapper];
     }
 }
 
@@ -71,10 +71,10 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     ///Cache
     if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
         
-        [self cacheFromClass];
+        [self cacheToClassMapper];
     }else{
         
-        [self cacheFromInstance];
+        [self cacheToInstanceMapper];
     }
 }
 /** Important */
@@ -92,7 +92,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
                             , _new_implementation
                             , [NSString stringWithFormat:@"%@@:", self.valueTypeEncoding].UTF8String);
         
-        if(nil == _old_implementation && (_des_class != _src_class)){
+        if(nil == _old_implementation){
             
             ///Overwrite super class property with new property.
             ///Storing the implementation address of the super class
@@ -112,7 +112,8 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
                 ///From super class new imp.
                 _old_implementation
                 =
-                class_getMethodImplementation(_src_class, NSSelectorFromString(_des_property_name));
+                class_getMethodImplementation(_src_class
+                                              , NSSelectorFromString(_des_property_name));
             }
             
             NSAssert(_old_implementation, @"APC: Can not find old implementation.");
@@ -299,7 +300,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 #pragma mark - Cache strategy
 
-- (void)cacheFromInstance
+- (void)cacheToInstanceMapper
 {
     [APCInstancePropertyCacheManager bindProperty:self
                                        toInstance:_instance
@@ -319,7 +320,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 }
 
 static APCClassPropertyMapperCache* _cacheForClass;
-- (void)cacheFromClass
+- (void)cacheToClassMapper
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

@@ -24,6 +24,8 @@
  */
 @interface AutoHookPropertyInfo : AutoPropertyInfo <AutoHookPropertyProtocol>
 {
+@protected
+    
     IMP         _new_setter_implementation;
     IMP         _old_setter_implementation;
     IMP         _new_implementation;

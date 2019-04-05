@@ -152,50 +152,57 @@ static inline id apc_getterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* en
     
     
     if(strcmp(enc, "c") == 0){
+        
+#define apc_invokNG_rbox_by(type,ftype)\
+\
+type returnValue = ((type(*)(id,SEL))imp)(_SELF,_CMD);\
+return [NSNumber numberWith##ftype:returnValue];
+        
+        apc_invokNG_rbox_by(char,Char)
+    }
+    else if(strcmp(enc, "i") == 0){
+        apc_invokNG_rbox_by(int,Int)
+    }
+    else if(strcmp(enc, "s") == 0){
+        apc_invokNG_rbox_by(short,Short)
+    }
+    else if(strcmp(enc, "l") == 0){
+        apc_invokNG_rbox_by(long,Long)
+    }
+    else if(strcmp(enc, "q") == 0){
+        apc_invokNG_rbox_by(long long,LongLong)
+    }
+    else if(strcmp(enc, "C") == 0){
+        apc_invokNG_rbox_by(unsigned char,UnsignedChar)
+    }
+    else if(strcmp(enc, "I") == 0){
+        apc_invokNG_rbox_by(unsigned int,UnsignedInt)
+    }
+    else if(strcmp(enc, "S") == 0){
+        apc_invokNG_rbox_by(unsigned short,UnsignedShort)
+    }
+    else if(strcmp(enc, "L") == 0){
+        apc_invokNG_rbox_by(unsigned long,UnsignedLong)
+    }
+    else if(strcmp(enc, "Q") == 0){
+        apc_invokNG_rbox_by(unsigned long long,UnsignedLongLong)
+    }
+    else if(strcmp(enc, "f") == 0){
+        apc_invokNG_rbox_by(float,Float)
+    }
+    else if(strcmp(enc, "d") == 0){
+        apc_invokNG_rbox_by(double,Double)
+    }
+    else if(strcmp(enc, "B") == 0){
+        apc_invokNG_rbox_by(bool,Bool)
+    }
+    else if(strcmp(enc, "*") == 0){
+        
 #define apc_invokG_rbox_by(type)\
-    \
+\
 type returnValue = ((type(*)(id,SEL))imp)(_SELF,_CMD);\
 return [NSValue valueWithBytes:&returnValue objCType:enc];
         
-        apc_invokG_rbox_by(char)
-    }
-    else if(strcmp(enc, "i") == 0){
-        apc_invokG_rbox_by(int)
-    }
-    else if(strcmp(enc, "s") == 0){
-        apc_invokG_rbox_by(short)
-    }
-    else if(strcmp(enc, "l") == 0){
-        apc_invokG_rbox_by(long)
-    }
-    else if(strcmp(enc, "q") == 0){
-        apc_invokG_rbox_by(long long)
-    }
-    else if(strcmp(enc, "C") == 0){
-        apc_invokG_rbox_by(unsigned char)
-    }
-    else if(strcmp(enc, "I") == 0){
-        apc_invokG_rbox_by(unsigned int)
-    }
-    else if(strcmp(enc, "S") == 0){
-        apc_invokG_rbox_by(unsigned short)
-    }
-    else if(strcmp(enc, "L") == 0){
-        apc_invokG_rbox_by(unsigned long)
-    }
-    else if(strcmp(enc, "Q") == 0){
-        apc_invokG_rbox_by(unsigned long long)
-    }
-    else if(strcmp(enc, "f") == 0){
-        apc_invokG_rbox_by(float)
-    }
-    else if(strcmp(enc, "d") == 0){
-        apc_invokG_rbox_by(double)
-    }
-    else if(strcmp(enc, "B") == 0){
-        apc_invokG_rbox_by(bool)
-    }
-    else if(strcmp(enc, "*") == 0){
         apc_invokG_rbox_by(char *)
     }
     else if(strcmp(enc, "#") == 0){
@@ -342,22 +349,29 @@ void oshook##_##enc(_Nullable id _SELF,SEL _CMD,type val)\
     apc_trigger_setter(_SELF, _CMD, [NSValue valueWithBytes:&val objCType:@encode(type)]);\
 }
 
+#define apc_def_vNSHook(enc,type,oshook,ftype)\
+\
+void oshook##_##enc(_Nullable id _SELF,SEL _CMD,type val)\
+{\
+    \
+    apc_trigger_setter(_SELF, _CMD, [NSNumber numberWith##ftype:val]);\
+}
 
 #define apc_def_vSHook_and_impimage(oshook)\
 \
-apc_def_vSHook(c,char,oshook)\
-apc_def_vSHook(i,int,oshook)\
-apc_def_vSHook(s,short,oshook)\
-apc_def_vSHook(l,long,oshook)\
-apc_def_vSHook(q,long long,oshook)\
-apc_def_vSHook(C,unsigned char,oshook)\
-apc_def_vSHook(I,unsigned int,oshook)\
-apc_def_vSHook(S,unsigned short,oshook)\
-apc_def_vSHook(L,unsigned long,oshook)\
-apc_def_vSHook(Q,unsigned long long,oshook)\
-apc_def_vSHook(f,float,oshook)\
-apc_def_vSHook(d,double,oshook)\
-apc_def_vSHook(B,BOOL,oshook)\
+apc_def_vNSHook(c,char,oshook,Char)\
+apc_def_vNSHook(i,int,oshook,Int)\
+apc_def_vNSHook(s,short,oshook,Short)\
+apc_def_vNSHook(l,long,oshook,Long)\
+apc_def_vNSHook(q,long long,oshook,LongLong)\
+apc_def_vNSHook(C,unsigned char,oshook,UnsignedChar)\
+apc_def_vNSHook(I,unsigned int,oshook,UnsignedInt)\
+apc_def_vNSHook(S,unsigned short,oshook,UnsignedShort)\
+apc_def_vNSHook(L,unsigned long,oshook,UnsignedLong)\
+apc_def_vNSHook(Q,unsigned long long,oshook,UnsignedLongLong)\
+apc_def_vNSHook(f,float,oshook,Float)\
+apc_def_vNSHook(d,double,oshook,Double)\
+apc_def_vNSHook(B,BOOL,oshook,Bool)\
 apc_def_vSHook(chars,char*,oshook)\
 apc_def_vSHook(class,Class,oshook)\
 apc_def_vSHook(sel,SEL,oshook)\

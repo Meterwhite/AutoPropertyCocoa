@@ -93,6 +93,6 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 
 #pragma mark - Cache
 + (_Nullable instancetype)cachedWithClass:(Class _Nonnull)clazz
-                             propertyName:(NSString* _Nonnull)propertyName;
+                             property:(NSString* _Nonnull)property;
 
 @end

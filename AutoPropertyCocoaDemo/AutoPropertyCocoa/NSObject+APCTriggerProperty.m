@@ -28,7 +28,7 @@
 
 + (void)apc_unbindFrontOfPropertyGetter:(NSString*)property
 {
-    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self propertyName:property];
+    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self property:property];
     [p getterUnbindFrontTrigger];
 }
 
@@ -42,7 +42,7 @@
 
 + (void)apc_unbindBackOfPropertyGetter:(NSString *)property
 {
-    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self propertyName:property];
+    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self property:property];
     [p getterUnbindPostTrigger];
 }
 
@@ -56,7 +56,7 @@
 
 + (void)apc_unbindUserConditionOfPropertyGetter:(NSString *)property
 {
-    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self propertyName:property];
+    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self property:property];
     [p getterUnbindUserTrigger];
 }
 
@@ -70,7 +70,7 @@
 
 + (void)apc_unbindAccessCountConditionOfPropertyGetter:(NSString *)property
 {
-    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self propertyName:property];
+    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self property:property];
     [p getterUnbindCountTrigger];
 }
 
@@ -84,21 +84,21 @@
 
 + (void)apc_unbindFrontOfPropertySetter:(NSString*)property
 {
-    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self propertyName:property];
+    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self property:property];
     [p setterUnbindFrontTrigger];
 }
 
 + (void)apc_backOfPropertySetter:(NSString *)property bindWithBlock:(void (^)(id _Nonnull, id _Nullable))block
 {
     [self apc_classSetTriggerProperty:property
-                               option:AutoPropertyGetterPostTrigger
+                               option:AutoPropertySetterPostTrigger
                             condition:nil
                                 block:block];
 }
 
 + (void)apc_unbindBackOfPropertySetter:(NSString *)property
 {
-    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self propertyName:property];
+    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self property:property];
     [p setterUnbindPostTrigger];
 }
 
@@ -112,7 +112,7 @@
 
 + (void)apc_unbindUserConditionOfPropertySetter:(NSString *)property
 {
-    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self propertyName:property];
+    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self property:property];
     [p setterUnbindUserTrigger];
 }
 
@@ -126,7 +126,7 @@
 
 + (void)apc_unbindAccessCountConditionOfPropertySetter:(NSString *)property
 {
-    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self propertyName:property];
+    AutoTriggerPropertyInfo* p = [AutoTriggerPropertyInfo cachedWithClass:self property:property];
     [p setterUnbindCountTrigger];
 }
 
@@ -138,15 +138,23 @@
 {
     if(option == AutoPropertyNonTrigger) return;
     
-    AutoTriggerPropertyInfo* propertyInfo = [AutoTriggerPropertyInfo infoWithPropertyName:propertyName
-                                                                                   aClass:self];
+    AutoTriggerPropertyInfo* propertyInfo = [AutoTriggerPropertyInfo cachedWithClass:self property:propertyName];
     
-    if(NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)
+    if(propertyInfo == nil){
+        
+        propertyInfo = [AutoTriggerPropertyInfo infoWithPropertyName:propertyName
+                                                              aClass:self];
+    }
+    
+    if(((option & AutoPropertyTriggerOfGetter)
+        && (NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)))
        
        ||
        
-       NO  == (propertyInfo.accessOption & AutoPropertySetValueEnable)){
-        return;
+       ((option & AutoPropertyTriggerOfGetter)
+        && (NO  == (propertyInfo.accessOption & AutoPropertySetValueEnable)))){
+        
+           NSAssert(NO, @"APC: Do not have getter or setter.");
     }
     
     
@@ -200,6 +208,12 @@ id _Nullable apc_trigger_getter(id _Nonnull _SELF, SEL _Nonnull _CMD)
 {
     AutoTriggerPropertyInfo* triggerPropertyInfo;
     
+    if(nil == (triggerPropertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
+        
+        if(nil == (triggerPropertyInfo = [AutoTriggerPropertyInfo cachedWithClass:[_SELF class] property:NSStringFromSelector(_CMD)]))
+            
+            NSCAssert(NO, @"APC: Lose property info.");
+    
     if(triggerPropertyInfo.triggerOption & AutoPropertyGetterFrontTrigger){
         
         [triggerPropertyInfo performGetterFrontTriggerBlock:_SELF];
@@ -241,7 +255,13 @@ void apc_trigger_setter(id _Nonnull _SELF, SEL _Nonnull _CMD, id _Nullable value
     
     if(nil == (triggerPropertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
         
-        if(nil == (triggerPropertyInfo = [AutoTriggerPropertyInfo cachedWithClass:[_SELF class] propertyName:NSStringFromSelector(_CMD)]))
+        if(nil == (triggerPropertyInfo = [AutoTriggerPropertyInfo cachedWithClass:[_SELF class] property:NSStringFromSelector(_CMD)]))
+            
+            NSCAssert(NO, @"APC: Lose property info.");
+    
+    if(nil == (triggerPropertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
+        
+        if(nil == (triggerPropertyInfo = [AutoTriggerPropertyInfo cachedWithClass:[_SELF class] property:NSStringFromSelector(_CMD)]))
             
             NSCAssert(NO, @"APC: Lose property info.");
     
@@ -259,7 +279,7 @@ void apc_trigger_setter(id _Nonnull _SELF, SEL _Nonnull _CMD, id _Nullable value
         [triggerPropertyInfo performSetterPostTriggerBlock:_SELF value:value];
     }
     
-    if(triggerPropertyInfo.triggerOption & AutoPropertyGetterCountTrigger){
+    if(triggerPropertyInfo.triggerOption & AutoPropertySetterCountTrigger){
         
         if([triggerPropertyInfo performSetterCountConditionBlock:_SELF value:value]){
             
