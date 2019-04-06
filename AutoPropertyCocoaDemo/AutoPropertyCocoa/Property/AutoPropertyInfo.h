@@ -69,8 +69,8 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 @protocol AutoPropertyHookProxyClassNameProtocol <NSObject>
 
 @required
-+ (BOOL)testingProxyClassInstance:(id _Nonnull)instance;
 + (Class _Nullable)unproxyClass:(Class _Nonnull __unsafe_unretained)clazz;
++ (BOOL)testingProxyClassInstance:(id _Nonnull)instance;
 - (NSString* _Nonnull)proxyClassName;
 @end
 
@@ -103,10 +103,10 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 @property (nonatomic,assign,readonly)AutoPropertyHookKind       kindOfHook;
 @property (nonatomic,assign,readonly)objc_AssociationPolicy     policy;
 
-+ (instancetype _Nonnull)infoWithPropertyName:(NSString* _Nonnull)propertyName
++ (instancetype _Nonnull)instanceWithProperty:(NSString* _Nonnull)propertyName
                                     aInstance:(id _Nonnull)aInstance;
 
-+ (instancetype _Nonnull)infoWithPropertyName:(NSString* _Nonnull)propertyName
++ (instancetype _Nonnull)instanceWithProperty:(NSString* _Nonnull)propertyName
                                        aClass:(Class _Nonnull __unsafe_unretained)aClass;
 
 - (instancetype _Nonnull)initWithPropertyName:(NSString* _Nonnull)propertyName

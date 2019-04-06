@@ -122,14 +122,14 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     else{
         
         Class proxyClass;
-        if(NO == [AutoLazyPropertyInfo testingProxyClassInstance:_instance]){
+        if(NO == [AutoLazyPropertyInfo testingProxyClassInstance:_instance])
+        {
             
             NSString *proxyClassName = self.proxyClassName;
             proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
             if(nil != proxyClass){
                 
                 objc_registerClassPair(proxyClass);
-                
             }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
                 
                 NSAssert(proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
@@ -141,6 +141,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
             
             proxyClass = [_instance class];
         }
+        _proxyClass = proxyClass;
         
         _old_implementation
         =
@@ -216,7 +217,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
         
         object_setClass(_instance, _des_class);
         
-        objc_disposeClassPair([_instance class]);
+        objc_disposeClassPair(_proxyClass);
     }
 }
 

@@ -104,8 +104,7 @@
                           hookWithBlock:(id)block
                             hookWithSEL:(SEL)aSelector
 {
-    AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo infoWithPropertyName:propertyName
-                                                                     aInstance:self];
+    AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo instanceWithProperty:propertyName aInstance:self];
     
     if(NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)
        
@@ -129,8 +128,7 @@
                        hookWithBlock:(id)block
                          hookWithSEL:(SEL)aSelector
 {
-    AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo infoWithPropertyName:propertyName
-                                                                             aClass:self];
+    AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo instanceWithProperty:propertyName aClass:self];
     
     if(NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)
        

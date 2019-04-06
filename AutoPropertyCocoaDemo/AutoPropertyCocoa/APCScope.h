@@ -238,31 +238,38 @@ return [NSValue valueWithBytes:&returnValue objCType:enc];
 #define apc_def_vGHook(enc,type,oghook)\
 \
 type oghook##_##enc(_Nullable id _SELF,SEL _CMD)\
-{   \
-NSValue* value = oghook(_SELF, _CMD);\
+{\
+    NSValue* value = oghook(_SELF, _CMD);\
+    \
+    type ret;\
+    [value getValue:&ret];\
+    \
+    return ret;\
+}
+
+#define apc_def_vNGHook(enc,type,oghook,ftype)\
 \
-type ret;\
-[value getValue:&ret];\
-\
-return ret;\
+type oghook##_##enc(_Nullable id _SELF,SEL _CMD)\
+{\
+    return [((NSNumber*)oghook(_SELF, _CMD)) ftype##Value];\
 }
 
 
 #define apc_def_vGHook_and_impimage(oghook)\
     \
-apc_def_vGHook(c,char,oghook)\
-apc_def_vGHook(i,int,oghook)\
-apc_def_vGHook(s,short,oghook)\
-apc_def_vGHook(l,long,oghook)\
-apc_def_vGHook(q,long long,oghook)\
-apc_def_vGHook(C,unsigned char,oghook)\
-apc_def_vGHook(I,unsigned int,oghook)\
-apc_def_vGHook(S,unsigned short,oghook)\
-apc_def_vGHook(L,unsigned long,oghook)\
-apc_def_vGHook(Q,unsigned long long,oghook)\
-apc_def_vGHook(f,float,oghook)\
-apc_def_vGHook(d,double,oghook)\
-apc_def_vGHook(B,BOOL,oghook)\
+apc_def_vNGHook(c,char,oghook,char)\
+apc_def_vNGHook(i,int,oghook,int)\
+apc_def_vNGHook(s,short,oghook,short)\
+apc_def_vNGHook(l,long,oghook,long)\
+apc_def_vNGHook(q,long long,oghook,longLong)\
+apc_def_vNGHook(C,unsigned char,oghook,unsignedChar)\
+apc_def_vNGHook(I,unsigned int,oghook,unsignedInt)\
+apc_def_vNGHook(S,unsigned short,oghook,unsignedShort)\
+apc_def_vNGHook(L,unsigned long,oghook,unsignedLong)\
+apc_def_vNGHook(Q,unsigned long long,oghook,unsignedLongLong)\
+apc_def_vNGHook(f,float,oghook,float)\
+apc_def_vNGHook(d,double,oghook,double)\
+apc_def_vNGHook(B,BOOL,oghook,bool)\
 apc_def_vGHook(chars,char*,oghook)\
 apc_def_vGHook(class,Class,oghook)\
 apc_def_vGHook(sel,SEL,oghook)\

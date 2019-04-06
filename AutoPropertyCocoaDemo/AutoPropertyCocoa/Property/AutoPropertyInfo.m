@@ -12,19 +12,19 @@
 
 @implementation AutoPropertyInfo
 
-+ (instancetype)infoWithPropertyName:(NSString*)propertyName
-                                      aInstance:(id)aInstance
++ (instancetype)instanceWithProperty:(NSString*)propertyName
+                           aInstance:(id)aInstance
 {
     return [[self alloc] initWithPropertyName:propertyName aInstance:aInstance];
 }
 
-+ (instancetype)infoWithPropertyName:(NSString*)propertyName
-                          aClass:(Class)aClass
++ (instancetype)instanceWithProperty:(NSString*)propertyName
+                              aClass:(Class)aClass
 {
     return [[self alloc] initWithPropertyName:propertyName aClass:aClass];
 }
 - (instancetype)initWithPropertyName:(NSString*)propertyName
-                            aInstance:(id)aInstance
+                           aInstance:(id)aInstance
 {
     if(self = [self initWithPropertyName:propertyName aClass:[aInstance class]]){
         

@@ -142,7 +142,7 @@
     
     if(propertyInfo == nil){
         
-        propertyInfo = [AutoTriggerPropertyInfo infoWithPropertyName:propertyName
+        propertyInfo = [AutoTriggerPropertyInfo instanceWithProperty:propertyName
                                                               aClass:self];
     }
     
@@ -188,6 +188,174 @@
 }
 
 #pragma mark - Instance
+
+- (void)apc_frontOfPropertyGetter:(NSString *)property bindWithBlock:(void (^)(id _Nonnull))block
+{
+    [self apc_classSetTriggerProperty:property
+                               option:AutoPropertyGetterFrontTrigger
+                            condition:nil
+                                block:block];
+}
+
+- (void)apc_unbindFrontOfPropertyGetter:(NSString*)property
+{
+    AutoTriggerPropertyInfo* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+    [p getterUnbindFrontTrigger];
+}
+
+- (void)apc_backOfPropertyGetter:(NSString *)property bindWithBlock:(void (^)(id _Nonnull, id _Nullable))block
+{
+    [self apc_classSetTriggerProperty:property
+                               option:AutoPropertyGetterPostTrigger
+                            condition:nil
+                                block:block];
+}
+
+- (void)apc_unbindBackOfPropertyGetter:(NSString *)property
+{
+    AutoTriggerPropertyInfo* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+    [p getterUnbindPostTrigger];
+}
+
+- (void)apc_propertyGetter:(NSString *)property bindUserCondition:(BOOL (^)(id _Nonnull, id _Nullable))condition withBlock:(void (^)(id _Nonnull, id _Nullable))block
+{
+    [self apc_classSetTriggerProperty:property
+                               option:AutoPropertyGetterUserTrigger
+                            condition:condition
+                                block:block];
+}
+
+- (void)apc_unbindUserConditionOfPropertyGetter:(NSString *)property
+{
+    AutoTriggerPropertyInfo* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+    [p getterUnbindUserTrigger];
+}
+
+- (void)apc_propertyGetter:(NSString *)property bindAccessCountCondition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition withBlock:(void (^)(id _Nonnull, id _Nullable))block
+{
+    [self apc_classSetTriggerProperty:property
+                               option:AutoPropertyGetterCountTrigger
+                            condition:condition
+                                block:block];
+}
+
+- (void)apc_unbindAccessCountConditionOfPropertyGetter:(NSString *)property
+{
+    AutoTriggerPropertyInfo* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+    [p getterUnbindCountTrigger];
+}
+
+- (void)apc_frontOfPropertySetter:(NSString *)property bindWithBlock:(void (^)(id _Nonnull))block
+{
+    [self apc_classSetTriggerProperty:property
+                               option:AutoPropertySetterFrontTrigger
+                            condition:nil
+                                block:block];
+}
+
+- (void)apc_unbindFrontOfPropertySetter:(NSString*)property
+{
+    AutoTriggerPropertyInfo* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+    [p setterUnbindFrontTrigger];
+}
+
+- (void)apc_backOfPropertySetter:(NSString *)property bindWithBlock:(void (^)(id _Nonnull, id _Nullable))block
+{
+    [self apc_classSetTriggerProperty:property
+                               option:AutoPropertySetterPostTrigger
+                            condition:nil
+                                block:block];
+}
+
+- (void)apc_unbindBackOfPropertySetter:(NSString *)property
+{
+    AutoTriggerPropertyInfo* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+    [p setterUnbindPostTrigger];
+}
+
+- (void)apc_propertySetter:(NSString *)property bindUserCondition:(BOOL (^)(id _Nonnull, id _Nullable))condition withBlock:(void (^)(id _Nonnull, id _Nullable))block
+{
+    [self apc_classSetTriggerProperty:property
+                               option:AutoPropertySetterUserTrigger
+                            condition:condition
+                                block:block];
+}
+
+- (void)apc_unbindUserConditionOfPropertySetter:(NSString *)property
+{
+    AutoTriggerPropertyInfo* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+    [p setterUnbindUserTrigger];
+}
+
+- (void)apc_propertySetter:(NSString *)property bindAccessCountCondition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition withBlock:(void (^)(id _Nonnull, id _Nullable))block
+{
+    [self apc_classSetTriggerProperty:property
+                               option:AutoPropertySetterCountTrigger
+                            condition:condition
+                                block:block];
+}
+
+- (void)apc_unbindAccessCountConditionOfPropertySetter:(NSString *)property
+{
+    AutoTriggerPropertyInfo* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+    [p setterUnbindCountTrigger];
+}
+
+- (void)apc_classSetTriggerProperty:(NSString*)propertyName
+                             option:(AutoPropertyTriggerOption)option
+                          condition:(id)condition
+                              block:(id)block
+{
+    if(option == AutoPropertyNonTrigger) return;
+    
+    AutoTriggerPropertyInfo* propertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:propertyName];
+    
+    if(propertyInfo == nil){
+        
+        propertyInfo = [AutoTriggerPropertyInfo instanceWithProperty:propertyName
+                                                           aInstance:self];
+    }
+    
+    if(((option & AutoPropertyTriggerOfGetter)
+        && (NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)))
+       
+       ||
+       
+       ((option & AutoPropertyTriggerOfGetter)
+        && (NO  == (propertyInfo.accessOption & AutoPropertySetValueEnable)))){
+           
+           NSAssert(NO, @"APC: Do not have getter or setter.");
+       }
+    
+    
+    if(option & AutoPropertyGetterFrontTrigger){
+        [propertyInfo getterBindFrontTrigger:block];
+    }
+    if (option & AutoPropertyGetterPostTrigger){
+        [propertyInfo getterBindPostTrigger:block];
+    }
+    if (option & AutoPropertyGetterUserTrigger){
+        [propertyInfo getterBindUserTrigger:block condition:condition];
+    }
+    if (option & AutoPropertyGetterCountTrigger){
+        [propertyInfo getterBindCountTrigger:block condition:condition];
+    }
+    
+    if(option & AutoPropertySetterFrontTrigger){
+        [propertyInfo setterBindFrontTrigger:block];
+    }
+    if (option & AutoPropertySetterPostTrigger){
+        [propertyInfo setterBindPostTrigger:block];
+    }
+    if (option & AutoPropertySetterUserTrigger){
+        [propertyInfo setterBindUserTrigger:block condition:condition];
+    }
+    if (option & AutoPropertySetterCountTrigger){
+        [propertyInfo setterBindCountTrigger:block condition:condition];
+    }
+    
+    [propertyInfo hook];
+}
 
 - (void)apc_unbindTriggerAllProperties
 {

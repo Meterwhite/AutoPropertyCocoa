@@ -297,17 +297,18 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     
     return;
     
-CACHE:{
-    
-    if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+CACHE:
+    {
         
-        [self cacheToClassMapper];
-    }else{
-        
-        [self cacheToInstanceMapper];
+        if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+            
+            [self cacheToClassMapper];
+        }else{
+            
+            [self cacheToInstanceMapper];
+        }
+        return;
     }
-    return;
-}
 }
 
 - (void)hookPropertyWithImplementation:(IMP)implementation option:(NSUInteger)option
@@ -364,29 +365,30 @@ CACHE:{
     }
     else{
         
-        Class proxyClass;
-        if(NO == [AutoTriggerPropertyInfo testingProxyClassInstance:_instance]){
+        if(nil == _proxyClass){
             
-            NSString *proxyClassName = self.proxyClassName;
-            proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
-            if(nil != proxyClass){
+            if(NO == [AutoTriggerPropertyInfo testingProxyClassInstance:_instance]){
                 
-                objc_registerClassPair(proxyClass);
+                NSString *proxyClassName = self.proxyClassName;
+                _proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
+                if(nil != _proxyClass){
+                    
+                    objc_registerClassPair(_proxyClass);
+                }else if(nil == (_proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
+                    
+                    NSAssert(_proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
+                }
                 
-            }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
+                object_setClass(_instance, _proxyClass);
+            }else{
                 
-                NSAssert(proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
+                _proxyClass = [_instance class];
             }
-            
-            object_setClass(_instance, proxyClass);
-        }else{
-            
-            proxyClass = [_instance class];
         }
         
         oldIMP
         =
-        class_replaceMethod(proxyClass
+        class_replaceMethod(_proxyClass
                             , des_sel
                             , implementation
                             , methodEnc.UTF8String);
@@ -503,6 +505,13 @@ CACHE:{
     [APCInstancePropertyCacheManager bindProperty:self
                                        toInstance:_instance
                                               cmd:_des_property_name];
+    
+    if(self.triggerOption & AutoPropertyTriggerOfSetter){
+        
+        [APCInstancePropertyCacheManager bindProperty:self
+                                           toInstance:_instance
+                                                  cmd:_des_setter_name];
+    }
 }
 
 - (void)removeFromInstanceCache

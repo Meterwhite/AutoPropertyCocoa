@@ -13,7 +13,25 @@
 //{
 #warning <#message#>
     //[self performSelector:@selector(subclassResponsibility:)];
-    //装逼
+    //BBBBB
     //imp to implementation this B
 //}
+
+- (void)dealloc
+{
+    if(self.kindOfOwner == AutoPropertyOwnerKindOfInstance){
+        
+        [self disposeRuntimeResource];
+    }
+}
+
+- (void)disposeRuntimeResource
+{
+    if(nil != _proxyClass){
+        
+        objc_disposeClassPair(_proxyClass);
+    }
+}
+
+
 @end
