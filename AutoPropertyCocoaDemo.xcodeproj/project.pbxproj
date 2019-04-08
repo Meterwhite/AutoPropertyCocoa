@@ -51,6 +51,7 @@
 		45758A062240D31900EE51C3 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		4589F8022251B6B900741D3C /* NSObject+APCTriggerProperty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCTriggerProperty.h"; sourceTree = "<group>"; };
 		4589F8032251B6B900741D3C /* NSObject+APCTriggerProperty.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCTriggerProperty.m"; sourceTree = "<group>"; };
+		45B12F4A225AEA54002D825E /* APCPropertyMapperkey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCPropertyMapperkey.h; sourceTree = "<group>"; };
 		45B5328D22447E9F00A89C0F /* APCExtScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCExtScope.h; sourceTree = "<group>"; };
 		45B5328E22447F5400A89C0F /* AutoPropertyCocoa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoPropertyCocoa.h; sourceTree = "<group>"; };
 		45B532902245EA2B00A89C0F /* AutoHookPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoHookPropertyInfo.h; sourceTree = "<group>"; };
@@ -183,6 +184,7 @@
 				45B53298224B141900A89C0F /* APCClassPropertyMapperCache.m */,
 				9F8D85AE22524A8F00F358C2 /* APCInstancePropertyCacheManager.h */,
 				9F8D85AF22524A8F00F358C2 /* APCInstancePropertyCacheManager.m */,
+				45B12F4A225AEA54002D825E /* APCPropertyMapperkey.h */,
 				45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */,
 			);
 			path = Cache;
