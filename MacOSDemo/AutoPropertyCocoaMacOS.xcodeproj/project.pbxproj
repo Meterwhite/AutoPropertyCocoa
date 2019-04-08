@@ -1,0 +1,449 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		45B12F82225B2C06002D825E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F81225B2C06002D825E /* AppDelegate.m */; };
+		45B12F84225B2C07002D825E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F83225B2C07002D825E /* Assets.xcassets */; };
+		45B12F87225B2C07002D825E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F85225B2C07002D825E /* MainMenu.xib */; };
+		45B12F8A225B2C07002D825E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F89225B2C07002D825E /* main.m */; };
+		45B12FE0225B2C9B002D825E /* APCScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FC0225B2C9B002D825E /* APCScope.m */; };
+		45B12FE1225B2C9B002D825E /* APCClassPropertyMapperCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FC2225B2C9B002D825E /* APCClassPropertyMapperCache.m */; };
+		45B12FE2225B2C9B002D825E /* APCPropertyMapperkey.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FC3225B2C9B002D825E /* APCPropertyMapperkey.m */; };
+		45B12FE3225B2C9B002D825E /* APCInstancePropertyCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FC6225B2C9B002D825E /* APCInstancePropertyCacheManager.m */; };
+		45B12FE4225B2C9B002D825E /* NSString+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FCA225B2C9B002D825E /* NSString+APCExtension.m */; };
+		45B12FE5225B2C9B002D825E /* AutoHookPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FCC225B2C9B002D825E /* AutoHookPropertyInfo.m */; };
+		45B12FE6225B2C9B002D825E /* AutoTriggerPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FCE225B2C9B002D825E /* AutoTriggerPropertyInfo.m */; };
+		45B12FE7225B2C9B002D825E /* AutoPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FCF225B2C9B002D825E /* AutoPropertyInfo.m */; };
+		45B12FE8225B2C9B002D825E /* AutoLazyPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FD2225B2C9B002D825E /* AutoLazyPropertyInfo.m */; };
+		45B12FE9225B2C9B002D825E /* NSObject+APCLazyLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FD5225B2C9B002D825E /* NSObject+APCLazyLoad.m */; };
+		45B12FEA225B2C9B002D825E /* NSObject+APCTriggerProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FDA225B2C9B002D825E /* NSObject+APCTriggerProperty.m */; };
+		45B12FEB225B2C9B002D825E /* Man.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FDD225B2C9B002D825E /* Man.m */; };
+		45B12FEC225B2C9B002D825E /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FDF225B2C9B002D825E /* Person.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		45B12F7D225B2C06002D825E /* AutoPropertyCocoaMacOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoPropertyCocoaMacOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		45B12F80225B2C06002D825E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		45B12F81225B2C06002D825E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		45B12F83225B2C07002D825E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		45B12F86225B2C07002D825E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		45B12F88225B2C07002D825E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		45B12F89225B2C07002D825E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		45B12F8B225B2C07002D825E /* AutoPropertyCocoaMacOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AutoPropertyCocoaMacOS.entitlements; sourceTree = "<group>"; };
+		45B12FC0225B2C9B002D825E /* APCScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCScope.m; sourceTree = "<group>"; };
+		45B12FC2225B2C9B002D825E /* APCClassPropertyMapperCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCClassPropertyMapperCache.m; sourceTree = "<group>"; };
+		45B12FC3225B2C9B002D825E /* APCPropertyMapperkey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCPropertyMapperkey.m; sourceTree = "<group>"; };
+		45B12FC4225B2C9B002D825E /* APCInstancePropertyCacheManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCInstancePropertyCacheManager.h; sourceTree = "<group>"; };
+		45B12FC5225B2C9B002D825E /* APCClassPropertyMapperCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCClassPropertyMapperCache.h; sourceTree = "<group>"; };
+		45B12FC6225B2C9B002D825E /* APCInstancePropertyCacheManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCInstancePropertyCacheManager.m; sourceTree = "<group>"; };
+		45B12FC7225B2C9B002D825E /* APCPropertyMapperkey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCPropertyMapperkey.h; sourceTree = "<group>"; };
+		45B12FC9225B2C9B002D825E /* NSString+APCExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+APCExtension.h"; sourceTree = "<group>"; };
+		45B12FCA225B2C9B002D825E /* NSString+APCExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+APCExtension.m"; sourceTree = "<group>"; };
+		45B12FCC225B2C9B002D825E /* AutoHookPropertyInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoHookPropertyInfo.m; sourceTree = "<group>"; };
+		45B12FCD225B2C9B002D825E /* AutoLazyPropertyInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLazyPropertyInfo.h; sourceTree = "<group>"; };
+		45B12FCE225B2C9B002D825E /* AutoTriggerPropertyInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoTriggerPropertyInfo.m; sourceTree = "<group>"; };
+		45B12FCF225B2C9B002D825E /* AutoPropertyInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoPropertyInfo.m; sourceTree = "<group>"; };
+		45B12FD0225B2C9B002D825E /* AutoHookPropertyInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoHookPropertyInfo.h; sourceTree = "<group>"; };
+		45B12FD1225B2C9B002D825E /* AutoTriggerPropertyInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoTriggerPropertyInfo.h; sourceTree = "<group>"; };
+		45B12FD2225B2C9B002D825E /* AutoLazyPropertyInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoLazyPropertyInfo.m; sourceTree = "<group>"; };
+		45B12FD3225B2C9B002D825E /* AutoPropertyInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoPropertyInfo.h; sourceTree = "<group>"; };
+		45B12FD4225B2C9B002D825E /* NSObject+APCTriggerProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCTriggerProperty.h"; sourceTree = "<group>"; };
+		45B12FD5225B2C9B002D825E /* NSObject+APCLazyLoad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCLazyLoad.m"; sourceTree = "<group>"; };
+		45B12FD6225B2C9B002D825E /* AutoPropertyCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoPropertyCocoa.h; sourceTree = "<group>"; };
+		45B12FD7225B2C9B002D825E /* APCScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCScope.h; sourceTree = "<group>"; };
+		45B12FD8225B2C9B002D825E /* NSObject+APCLazyLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCLazyLoad.h"; sourceTree = "<group>"; };
+		45B12FD9225B2C9B002D825E /* APCExtScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCExtScope.h; sourceTree = "<group>"; };
+		45B12FDA225B2C9B002D825E /* NSObject+APCTriggerProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCTriggerProperty.m"; sourceTree = "<group>"; };
+		45B12FDC225B2C9B002D825E /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
+		45B12FDD225B2C9B002D825E /* Man.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Man.m; sourceTree = "<group>"; };
+		45B12FDE225B2C9B002D825E /* Man.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Man.h; sourceTree = "<group>"; };
+		45B12FDF225B2C9B002D825E /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		45B12F7A225B2C06002D825E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		45B12F74225B2C06002D825E = {
+			isa = PBXGroup;
+			children = (
+				45B12F7F225B2C06002D825E /* AutoPropertyCocoaMacOS */,
+				45B12F7E225B2C06002D825E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		45B12F7E225B2C06002D825E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				45B12F7D225B2C06002D825E /* AutoPropertyCocoaMacOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		45B12F7F225B2C06002D825E /* AutoPropertyCocoaMacOS */ = {
+			isa = PBXGroup;
+			children = (
+				45B12FBF225B2C9B002D825E /* AutoPropertyCocoa */,
+				45B12FDB225B2C9B002D825E /* TestClass */,
+				45B12F80225B2C06002D825E /* AppDelegate.h */,
+				45B12F81225B2C06002D825E /* AppDelegate.m */,
+				45B12F83225B2C07002D825E /* Assets.xcassets */,
+				45B12F85225B2C07002D825E /* MainMenu.xib */,
+				45B12F88225B2C07002D825E /* Info.plist */,
+				45B12F89225B2C07002D825E /* main.m */,
+				45B12F8B225B2C07002D825E /* AutoPropertyCocoaMacOS.entitlements */,
+			);
+			path = AutoPropertyCocoaMacOS;
+			sourceTree = "<group>";
+		};
+		45B12FBF225B2C9B002D825E /* AutoPropertyCocoa */ = {
+			isa = PBXGroup;
+			children = (
+				45B12FC0225B2C9B002D825E /* APCScope.m */,
+				45B12FC1225B2C9B002D825E /* Cache */,
+				45B12FC8225B2C9B002D825E /* Category */,
+				45B12FCB225B2C9B002D825E /* Property */,
+				45B12FD4225B2C9B002D825E /* NSObject+APCTriggerProperty.h */,
+				45B12FD5225B2C9B002D825E /* NSObject+APCLazyLoad.m */,
+				45B12FD6225B2C9B002D825E /* AutoPropertyCocoa.h */,
+				45B12FD7225B2C9B002D825E /* APCScope.h */,
+				45B12FD8225B2C9B002D825E /* NSObject+APCLazyLoad.h */,
+				45B12FD9225B2C9B002D825E /* APCExtScope.h */,
+				45B12FDA225B2C9B002D825E /* NSObject+APCTriggerProperty.m */,
+			);
+			name = AutoPropertyCocoa;
+			path = ../../AutoPropertyCocoa;
+			sourceTree = "<group>";
+		};
+		45B12FC1225B2C9B002D825E /* Cache */ = {
+			isa = PBXGroup;
+			children = (
+				45B12FC2225B2C9B002D825E /* APCClassPropertyMapperCache.m */,
+				45B12FC3225B2C9B002D825E /* APCPropertyMapperkey.m */,
+				45B12FC4225B2C9B002D825E /* APCInstancePropertyCacheManager.h */,
+				45B12FC5225B2C9B002D825E /* APCClassPropertyMapperCache.h */,
+				45B12FC6225B2C9B002D825E /* APCInstancePropertyCacheManager.m */,
+				45B12FC7225B2C9B002D825E /* APCPropertyMapperkey.h */,
+			);
+			path = Cache;
+			sourceTree = "<group>";
+		};
+		45B12FC8225B2C9B002D825E /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				45B12FC9225B2C9B002D825E /* NSString+APCExtension.h */,
+				45B12FCA225B2C9B002D825E /* NSString+APCExtension.m */,
+			);
+			path = Category;
+			sourceTree = "<group>";
+		};
+		45B12FCB225B2C9B002D825E /* Property */ = {
+			isa = PBXGroup;
+			children = (
+				45B12FCC225B2C9B002D825E /* AutoHookPropertyInfo.m */,
+				45B12FCD225B2C9B002D825E /* AutoLazyPropertyInfo.h */,
+				45B12FCE225B2C9B002D825E /* AutoTriggerPropertyInfo.m */,
+				45B12FCF225B2C9B002D825E /* AutoPropertyInfo.m */,
+				45B12FD0225B2C9B002D825E /* AutoHookPropertyInfo.h */,
+				45B12FD1225B2C9B002D825E /* AutoTriggerPropertyInfo.h */,
+				45B12FD2225B2C9B002D825E /* AutoLazyPropertyInfo.m */,
+				45B12FD3225B2C9B002D825E /* AutoPropertyInfo.h */,
+			);
+			path = Property;
+			sourceTree = "<group>";
+		};
+		45B12FDB225B2C9B002D825E /* TestClass */ = {
+			isa = PBXGroup;
+			children = (
+				45B12FDC225B2C9B002D825E /* Person.h */,
+				45B12FDD225B2C9B002D825E /* Man.m */,
+				45B12FDE225B2C9B002D825E /* Man.h */,
+				45B12FDF225B2C9B002D825E /* Person.m */,
+			);
+			name = TestClass;
+			path = ../../TestClass;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		45B12F7C225B2C06002D825E /* AutoPropertyCocoaMacOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 45B12F8E225B2C07002D825E /* Build configuration list for PBXNativeTarget "AutoPropertyCocoaMacOS" */;
+			buildPhases = (
+				45B12F79225B2C06002D825E /* Sources */,
+				45B12F7A225B2C06002D825E /* Frameworks */,
+				45B12F7B225B2C06002D825E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AutoPropertyCocoaMacOS;
+			productName = AutoPropertyCocoaMacOS;
+			productReference = 45B12F7D225B2C06002D825E /* AutoPropertyCocoaMacOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		45B12F75225B2C06002D825E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1020;
+				ORGANIZATIONNAME = Novo;
+				TargetAttributes = {
+					45B12F7C225B2C06002D825E = {
+						CreatedOnToolsVersion = 10.2;
+					};
+				};
+			};
+			buildConfigurationList = 45B12F78225B2C06002D825E /* Build configuration list for PBXProject "AutoPropertyCocoaMacOS" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 45B12F74225B2C06002D825E;
+			productRefGroup = 45B12F7E225B2C06002D825E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				45B12F7C225B2C06002D825E /* AutoPropertyCocoaMacOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		45B12F7B225B2C06002D825E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				45B12F84225B2C07002D825E /* Assets.xcassets in Resources */,
+				45B12F87225B2C07002D825E /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		45B12F79225B2C06002D825E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				45B12FE6225B2C9B002D825E /* AutoTriggerPropertyInfo.m in Sources */,
+				45B12FE1225B2C9B002D825E /* APCClassPropertyMapperCache.m in Sources */,
+				45B12FE4225B2C9B002D825E /* NSString+APCExtension.m in Sources */,
+				45B12FE3225B2C9B002D825E /* APCInstancePropertyCacheManager.m in Sources */,
+				45B12FE0225B2C9B002D825E /* APCScope.m in Sources */,
+				45B12FE8225B2C9B002D825E /* AutoLazyPropertyInfo.m in Sources */,
+				45B12FE5225B2C9B002D825E /* AutoHookPropertyInfo.m in Sources */,
+				45B12FE2225B2C9B002D825E /* APCPropertyMapperkey.m in Sources */,
+				45B12FE9225B2C9B002D825E /* NSObject+APCLazyLoad.m in Sources */,
+				45B12FE7225B2C9B002D825E /* AutoPropertyInfo.m in Sources */,
+				45B12FEB225B2C9B002D825E /* Man.m in Sources */,
+				45B12FEA225B2C9B002D825E /* NSObject+APCTriggerProperty.m in Sources */,
+				45B12FEC225B2C9B002D825E /* Person.m in Sources */,
+				45B12F8A225B2C07002D825E /* main.m in Sources */,
+				45B12F82225B2C06002D825E /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		45B12F85225B2C07002D825E /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				45B12F86225B2C07002D825E /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		45B12F8C225B2C07002D825E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		45B12F8D225B2C07002D825E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		45B12F8F225B2C07002D825E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = AutoPropertyCocoaMacOS/AutoPropertyCocoaMacOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = AutoPropertyCocoaMacOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = Novo.AutoPropertyCocoaMacOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		45B12F90225B2C07002D825E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = AutoPropertyCocoaMacOS/AutoPropertyCocoaMacOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = AutoPropertyCocoaMacOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = Novo.AutoPropertyCocoaMacOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		45B12F78225B2C06002D825E /* Build configuration list for PBXProject "AutoPropertyCocoaMacOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				45B12F8C225B2C07002D825E /* Debug */,
+				45B12F8D225B2C07002D825E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		45B12F8E225B2C07002D825E /* Build configuration list for PBXNativeTarget "AutoPropertyCocoaMacOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				45B12F8F225B2C07002D825E /* Debug */,
+				45B12F90225B2C07002D825E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 45B12F75225B2C06002D825E /* Project object */;
+}

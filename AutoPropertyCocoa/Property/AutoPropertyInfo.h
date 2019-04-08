@@ -132,34 +132,33 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 @property (nonatomic,assign,readonly,nullable)SEL     associatedSetter;
 
 /**
- The type written by programmer.
+ The type written by programmer.Like @"int" , @"NSString".
  */
 @property (nonatomic,copy,readonly,nonnull)NSString* programmingType;
 @property (nonatomic,copy,readonly,nonnull)NSString* valueAttibute;
 @property (nonatomic,copy,readonly,nonnull)NSString* valueTypeEncoding;
 @property (nonatomic,assign,readonly,nullable)Ivar   associatedIvar;
 
+
 /**
- 作用于实例对象的失效
+ Befor unhook property and remove property from cache.
  */
 - (void)invalid;
 
 /**
- 访问计数
+ Call it when it is accessed.
  */
 - (void)access;
 @property (nonatomic,assign,readonly) NSUInteger accessCount;
 
 
 /**
- 
- YES = [obj isEqual: @"Srcclass/Desclass.property"];
+ [obj isEqual: @"Srcclass/Desclass.property"] => YES
  */
 - (BOOL)isEqual:(id _Nonnull)object;
 
 /**
- 字符串的哈希值
- 同名属性具有相同hash值
+ Hash from property name.
  */
 - (NSUInteger)hash;
 

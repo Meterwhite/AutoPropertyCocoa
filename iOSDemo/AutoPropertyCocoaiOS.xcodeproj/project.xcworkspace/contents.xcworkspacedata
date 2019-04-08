@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:AutoPropertyCocoaDemo.xcodeproj">
+      location = "self:AutoPropertyCocoaiOS.xcodeproj">
    </FileRef>
 </Workspace>

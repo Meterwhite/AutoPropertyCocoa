@@ -16,7 +16,6 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import "APCScope.h"
-#import "APCHash.h"
 #import "Person.h"
 #import "Man.h"
 
@@ -30,11 +29,11 @@
     [super viewDidLoad];
     
     [self testTriggerFrontNormalInstance];
-//    [self testTriggerFrontNormalClass];
-//    [self testNormalInstance];
-//    [self testClassSuperclassSubclass];
-//    [self testHash];
-//    [self testMapperCache];
+    //    [self testTriggerFrontNormalClass];
+    //    [self testNormalInstance];
+    //    [self testClassSuperclassSubclass];
+    //    [self testHash];
+    //    [self testMapperCache];
 }
 
 
@@ -80,8 +79,8 @@
     }];
     
     [p apc_backOfPropertySetter:@"age" bindWithBlock:^(id  _Nonnull instance, id  _Nullable value) {
-       
-         NSLog(@"bakc of age!");
+        
+        NSLog(@"bakc of age!");
     }];
     
     [p apc_propertySetter:@"age" bindUserCondition:^BOOL(id  _Nonnull instance, id  _Nullable value) {
@@ -186,7 +185,7 @@
 {
     
     [Person apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id  _Nonnull _self) {
-
+        
         return @(999);
     }];
     
@@ -197,7 +196,7 @@
     
     [Man    apc_unbindLazyLoadForProperty:@"age"];
     [Person apc_unbindLazyLoadForProperty:@"age"];
-
+    
     
     Person* p = [Person new];
     NSUInteger age0 = p.age;
@@ -222,7 +221,7 @@
     
     [m apc_unbindLazyLoadForProperty:@"age"];
     
-//    NSUInteger age0 = p.age;
+    //    NSUInteger age0 = p.age;
     NSUInteger age1 = m.age;
 }
 
@@ -257,9 +256,9 @@
 {
     
     
-//    APCClassPropertyMapperCache* cache = [APCClassPropertyMapperCache cache];
-//
-//    cache addProperty:<#(AutoPropertyInfo *)#>
+    //    APCClassPropertyMapperCache* cache = [APCClassPropertyMapperCache cache];
+    //
+    //    cache addProperty:<#(AutoPropertyInfo *)#>
     
     id k0 = [APCPropertyMapperkey keyWithClass:self.class];
     id k1 = [APCPropertyMapperkey keyWithClass:self.class];

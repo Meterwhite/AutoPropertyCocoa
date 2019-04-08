@@ -1,0 +1,464 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		45B12F60225B2AF3002D825E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F5F225B2AF3002D825E /* AppDelegate.m */; };
+		45B12F63225B2AF3002D825E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F62225B2AF3002D825E /* ViewController.m */; };
+		45B12F66225B2AF3002D825E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F64225B2AF3002D825E /* Main.storyboard */; };
+		45B12F68225B2AF6002D825E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F67225B2AF6002D825E /* Assets.xcassets */; };
+		45B12F6B225B2AF6002D825E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F69225B2AF6002D825E /* LaunchScreen.storyboard */; };
+		45B12F6E225B2AF6002D825E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F6D225B2AF6002D825E /* main.m */; };
+		45B12FB2225B2C5D002D825E /* Man.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F93225B2C5D002D825E /* Man.m */; };
+		45B12FB3225B2C5D002D825E /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F95225B2C5D002D825E /* Person.m */; };
+		45B12FB4225B2C5D002D825E /* APCScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F97225B2C5D002D825E /* APCScope.m */; };
+		45B12FB5225B2C5D002D825E /* APCClassPropertyMapperCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F99225B2C5D002D825E /* APCClassPropertyMapperCache.m */; };
+		45B12FB6225B2C5D002D825E /* APCPropertyMapperkey.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F9A225B2C5D002D825E /* APCPropertyMapperkey.m */; };
+		45B12FB7225B2C5D002D825E /* APCInstancePropertyCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F9D225B2C5D002D825E /* APCInstancePropertyCacheManager.m */; };
+		45B12FB8225B2C5D002D825E /* NSString+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA1225B2C5D002D825E /* NSString+APCExtension.m */; };
+		45B12FB9225B2C5D002D825E /* AutoHookPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA3225B2C5D002D825E /* AutoHookPropertyInfo.m */; };
+		45B12FBA225B2C5D002D825E /* AutoTriggerPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA5225B2C5D002D825E /* AutoTriggerPropertyInfo.m */; };
+		45B12FBB225B2C5D002D825E /* AutoPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA6225B2C5D002D825E /* AutoPropertyInfo.m */; };
+		45B12FBC225B2C5D002D825E /* AutoLazyPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA9225B2C5D002D825E /* AutoLazyPropertyInfo.m */; };
+		45B12FBD225B2C5D002D825E /* NSObject+APCLazyLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */; };
+		45B12FBE225B2C5D002D825E /* NSObject+APCTriggerProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		45B12F5B225B2AF3002D825E /* AutoPropertyCocoaiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoPropertyCocoaiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		45B12F5E225B2AF3002D825E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		45B12F5F225B2AF3002D825E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		45B12F61225B2AF3002D825E /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		45B12F62225B2AF3002D825E /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		45B12F65225B2AF3002D825E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		45B12F67225B2AF6002D825E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		45B12F6A225B2AF6002D825E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		45B12F6C225B2AF6002D825E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		45B12F6D225B2AF6002D825E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		45B12F92225B2C5D002D825E /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
+		45B12F93225B2C5D002D825E /* Man.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Man.m; sourceTree = "<group>"; };
+		45B12F94225B2C5D002D825E /* Man.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Man.h; sourceTree = "<group>"; };
+		45B12F95225B2C5D002D825E /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+		45B12F97225B2C5D002D825E /* APCScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCScope.m; sourceTree = "<group>"; };
+		45B12F99225B2C5D002D825E /* APCClassPropertyMapperCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCClassPropertyMapperCache.m; sourceTree = "<group>"; };
+		45B12F9A225B2C5D002D825E /* APCPropertyMapperkey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCPropertyMapperkey.m; sourceTree = "<group>"; };
+		45B12F9B225B2C5D002D825E /* APCInstancePropertyCacheManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCInstancePropertyCacheManager.h; sourceTree = "<group>"; };
+		45B12F9C225B2C5D002D825E /* APCClassPropertyMapperCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCClassPropertyMapperCache.h; sourceTree = "<group>"; };
+		45B12F9D225B2C5D002D825E /* APCInstancePropertyCacheManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCInstancePropertyCacheManager.m; sourceTree = "<group>"; };
+		45B12F9E225B2C5D002D825E /* APCPropertyMapperkey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCPropertyMapperkey.h; sourceTree = "<group>"; };
+		45B12FA0225B2C5D002D825E /* NSString+APCExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+APCExtension.h"; sourceTree = "<group>"; };
+		45B12FA1225B2C5D002D825E /* NSString+APCExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+APCExtension.m"; sourceTree = "<group>"; };
+		45B12FA3225B2C5D002D825E /* AutoHookPropertyInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoHookPropertyInfo.m; sourceTree = "<group>"; };
+		45B12FA4225B2C5D002D825E /* AutoLazyPropertyInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLazyPropertyInfo.h; sourceTree = "<group>"; };
+		45B12FA5225B2C5D002D825E /* AutoTriggerPropertyInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoTriggerPropertyInfo.m; sourceTree = "<group>"; };
+		45B12FA6225B2C5D002D825E /* AutoPropertyInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoPropertyInfo.m; sourceTree = "<group>"; };
+		45B12FA7225B2C5D002D825E /* AutoHookPropertyInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoHookPropertyInfo.h; sourceTree = "<group>"; };
+		45B12FA8225B2C5D002D825E /* AutoTriggerPropertyInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoTriggerPropertyInfo.h; sourceTree = "<group>"; };
+		45B12FA9225B2C5D002D825E /* AutoLazyPropertyInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoLazyPropertyInfo.m; sourceTree = "<group>"; };
+		45B12FAA225B2C5D002D825E /* AutoPropertyInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoPropertyInfo.h; sourceTree = "<group>"; };
+		45B12FAB225B2C5D002D825E /* NSObject+APCTriggerProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCTriggerProperty.h"; sourceTree = "<group>"; };
+		45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCLazyLoad.m"; sourceTree = "<group>"; };
+		45B12FAD225B2C5D002D825E /* AutoPropertyCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoPropertyCocoa.h; sourceTree = "<group>"; };
+		45B12FAE225B2C5D002D825E /* APCScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCScope.h; sourceTree = "<group>"; };
+		45B12FAF225B2C5D002D825E /* NSObject+APCLazyLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCLazyLoad.h"; sourceTree = "<group>"; };
+		45B12FB0225B2C5D002D825E /* APCExtScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCExtScope.h; sourceTree = "<group>"; };
+		45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCTriggerProperty.m"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		45B12F58225B2AF3002D825E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		45B12F52225B2AF3002D825E = {
+			isa = PBXGroup;
+			children = (
+				45B12F5D225B2AF3002D825E /* AutoPropertyCocoaiOS */,
+				45B12F5C225B2AF3002D825E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		45B12F5C225B2AF3002D825E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				45B12F5B225B2AF3002D825E /* AutoPropertyCocoaiOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		45B12F5D225B2AF3002D825E /* AutoPropertyCocoaiOS */ = {
+			isa = PBXGroup;
+			children = (
+				45B12F96225B2C5D002D825E /* AutoPropertyCocoa */,
+				45B12F91225B2C5D002D825E /* TestClass */,
+				45B12F5E225B2AF3002D825E /* AppDelegate.h */,
+				45B12F5F225B2AF3002D825E /* AppDelegate.m */,
+				45B12F61225B2AF3002D825E /* ViewController.h */,
+				45B12F62225B2AF3002D825E /* ViewController.m */,
+				45B12F64225B2AF3002D825E /* Main.storyboard */,
+				45B12F67225B2AF6002D825E /* Assets.xcassets */,
+				45B12F69225B2AF6002D825E /* LaunchScreen.storyboard */,
+				45B12F6C225B2AF6002D825E /* Info.plist */,
+				45B12F6D225B2AF6002D825E /* main.m */,
+			);
+			path = AutoPropertyCocoaiOS;
+			sourceTree = "<group>";
+		};
+		45B12F91225B2C5D002D825E /* TestClass */ = {
+			isa = PBXGroup;
+			children = (
+				45B12F92225B2C5D002D825E /* Person.h */,
+				45B12F93225B2C5D002D825E /* Man.m */,
+				45B12F94225B2C5D002D825E /* Man.h */,
+				45B12F95225B2C5D002D825E /* Person.m */,
+			);
+			name = TestClass;
+			path = ../../TestClass;
+			sourceTree = "<group>";
+		};
+		45B12F96225B2C5D002D825E /* AutoPropertyCocoa */ = {
+			isa = PBXGroup;
+			children = (
+				45B12F97225B2C5D002D825E /* APCScope.m */,
+				45B12F98225B2C5D002D825E /* Cache */,
+				45B12F9F225B2C5D002D825E /* Category */,
+				45B12FA2225B2C5D002D825E /* Property */,
+				45B12FAB225B2C5D002D825E /* NSObject+APCTriggerProperty.h */,
+				45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */,
+				45B12FAD225B2C5D002D825E /* AutoPropertyCocoa.h */,
+				45B12FAE225B2C5D002D825E /* APCScope.h */,
+				45B12FAF225B2C5D002D825E /* NSObject+APCLazyLoad.h */,
+				45B12FB0225B2C5D002D825E /* APCExtScope.h */,
+				45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */,
+			);
+			name = AutoPropertyCocoa;
+			path = ../../AutoPropertyCocoa;
+			sourceTree = "<group>";
+		};
+		45B12F98225B2C5D002D825E /* Cache */ = {
+			isa = PBXGroup;
+			children = (
+				45B12F99225B2C5D002D825E /* APCClassPropertyMapperCache.m */,
+				45B12F9A225B2C5D002D825E /* APCPropertyMapperkey.m */,
+				45B12F9B225B2C5D002D825E /* APCInstancePropertyCacheManager.h */,
+				45B12F9C225B2C5D002D825E /* APCClassPropertyMapperCache.h */,
+				45B12F9D225B2C5D002D825E /* APCInstancePropertyCacheManager.m */,
+				45B12F9E225B2C5D002D825E /* APCPropertyMapperkey.h */,
+			);
+			path = Cache;
+			sourceTree = "<group>";
+		};
+		45B12F9F225B2C5D002D825E /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				45B12FA0225B2C5D002D825E /* NSString+APCExtension.h */,
+				45B12FA1225B2C5D002D825E /* NSString+APCExtension.m */,
+			);
+			path = Category;
+			sourceTree = "<group>";
+		};
+		45B12FA2225B2C5D002D825E /* Property */ = {
+			isa = PBXGroup;
+			children = (
+				45B12FA3225B2C5D002D825E /* AutoHookPropertyInfo.m */,
+				45B12FA4225B2C5D002D825E /* AutoLazyPropertyInfo.h */,
+				45B12FA5225B2C5D002D825E /* AutoTriggerPropertyInfo.m */,
+				45B12FA6225B2C5D002D825E /* AutoPropertyInfo.m */,
+				45B12FA7225B2C5D002D825E /* AutoHookPropertyInfo.h */,
+				45B12FA8225B2C5D002D825E /* AutoTriggerPropertyInfo.h */,
+				45B12FA9225B2C5D002D825E /* AutoLazyPropertyInfo.m */,
+				45B12FAA225B2C5D002D825E /* AutoPropertyInfo.h */,
+			);
+			path = Property;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		45B12F5A225B2AF3002D825E /* AutoPropertyCocoaiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 45B12F71225B2AF6002D825E /* Build configuration list for PBXNativeTarget "AutoPropertyCocoaiOS" */;
+			buildPhases = (
+				45B12F57225B2AF3002D825E /* Sources */,
+				45B12F58225B2AF3002D825E /* Frameworks */,
+				45B12F59225B2AF3002D825E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AutoPropertyCocoaiOS;
+			productName = AutoPropertyCocoaiOS;
+			productReference = 45B12F5B225B2AF3002D825E /* AutoPropertyCocoaiOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		45B12F53225B2AF3002D825E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1020;
+				ORGANIZATIONNAME = Novo;
+				TargetAttributes = {
+					45B12F5A225B2AF3002D825E = {
+						CreatedOnToolsVersion = 10.2;
+					};
+				};
+			};
+			buildConfigurationList = 45B12F56225B2AF3002D825E /* Build configuration list for PBXProject "AutoPropertyCocoaiOS" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 45B12F52225B2AF3002D825E;
+			productRefGroup = 45B12F5C225B2AF3002D825E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				45B12F5A225B2AF3002D825E /* AutoPropertyCocoaiOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		45B12F59225B2AF3002D825E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				45B12F6B225B2AF6002D825E /* LaunchScreen.storyboard in Resources */,
+				45B12F68225B2AF6002D825E /* Assets.xcassets in Resources */,
+				45B12F66225B2AF3002D825E /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		45B12F57225B2AF3002D825E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				45B12FB9225B2C5D002D825E /* AutoHookPropertyInfo.m in Sources */,
+				45B12FB6225B2C5D002D825E /* APCPropertyMapperkey.m in Sources */,
+				45B12FB2225B2C5D002D825E /* Man.m in Sources */,
+				45B12F63225B2AF3002D825E /* ViewController.m in Sources */,
+				45B12FB3225B2C5D002D825E /* Person.m in Sources */,
+				45B12FBD225B2C5D002D825E /* NSObject+APCLazyLoad.m in Sources */,
+				45B12FB7225B2C5D002D825E /* APCInstancePropertyCacheManager.m in Sources */,
+				45B12FBB225B2C5D002D825E /* AutoPropertyInfo.m in Sources */,
+				45B12FBE225B2C5D002D825E /* NSObject+APCTriggerProperty.m in Sources */,
+				45B12FBC225B2C5D002D825E /* AutoLazyPropertyInfo.m in Sources */,
+				45B12FBA225B2C5D002D825E /* AutoTriggerPropertyInfo.m in Sources */,
+				45B12FB5225B2C5D002D825E /* APCClassPropertyMapperCache.m in Sources */,
+				45B12FB8225B2C5D002D825E /* NSString+APCExtension.m in Sources */,
+				45B12FB4225B2C5D002D825E /* APCScope.m in Sources */,
+				45B12F6E225B2AF6002D825E /* main.m in Sources */,
+				45B12F60225B2AF3002D825E /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		45B12F64225B2AF3002D825E /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				45B12F65225B2AF3002D825E /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		45B12F69225B2AF6002D825E /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				45B12F6A225B2AF6002D825E /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		45B12F6F225B2AF6002D825E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		45B12F70225B2AF6002D825E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		45B12F72225B2AF6002D825E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = AutoPropertyCocoaiOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = Novo.AutoPropertyCocoaiOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		45B12F73225B2AF6002D825E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = AutoPropertyCocoaiOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = Novo.AutoPropertyCocoaiOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		45B12F56225B2AF3002D825E /* Build configuration list for PBXProject "AutoPropertyCocoaiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				45B12F6F225B2AF6002D825E /* Debug */,
+				45B12F70225B2AF6002D825E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		45B12F71225B2AF6002D825E /* Build configuration list for PBXNativeTarget "AutoPropertyCocoaiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				45B12F72225B2AF6002D825E /* Debug */,
+				45B12F73225B2AF6002D825E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 45B12F53225B2AF3002D825E /* Project object */;
+}
