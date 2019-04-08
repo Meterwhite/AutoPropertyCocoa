@@ -60,7 +60,6 @@
 		45B53297224B141900A89C0F /* APCClassPropertyMapperCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassPropertyMapperCache.h; sourceTree = "<group>"; };
 		45B53298224B141900A89C0F /* APCClassPropertyMapperCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassPropertyMapperCache.m; sourceTree = "<group>"; };
 		45B5329A224B5ED100A89C0F /* APCHash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCHash.h; sourceTree = "<group>"; };
-		45B5329D224B695500A89C0F /* APCPropertyMapperkey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCPropertyMapperkey.h; sourceTree = "<group>"; };
 		45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCPropertyMapperkey.m; sourceTree = "<group>"; };
 		45B532A5224F314700A89C0F /* AutoTriggerPropertyInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoTriggerPropertyInfo.h; sourceTree = "<group>"; };
 		45B532A6224F314800A89C0F /* AutoTriggerPropertyInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoTriggerPropertyInfo.m; sourceTree = "<group>"; };
@@ -184,7 +183,6 @@
 				45B53298224B141900A89C0F /* APCClassPropertyMapperCache.m */,
 				9F8D85AE22524A8F00F358C2 /* APCInstancePropertyCacheManager.h */,
 				9F8D85AF22524A8F00F358C2 /* APCInstancePropertyCacheManager.m */,
-				45B5329D224B695500A89C0F /* APCPropertyMapperkey.h */,
 				45B5329E224B695500A89C0F /* APCPropertyMapperkey.m */,
 			);
 			path = Cache;
