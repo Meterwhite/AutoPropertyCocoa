@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		456FC471225DBFBF006CD604 /* Superman.m in Sources */ = {isa = PBXBuildFile; fileRef = 456FC470225DBFBF006CD604 /* Superman.m */; };
+		456FC474225EEAC0006CD604 /* NSObject+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 456FC473225EEAC0006CD604 /* NSObject+APCExtension.m */; };
 		45B12F60225B2AF3002D825E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F5F225B2AF3002D825E /* AppDelegate.m */; };
 		45B12F63225B2AF3002D825E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F62225B2AF3002D825E /* ViewController.m */; };
 		45B12F66225B2AF3002D825E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F64225B2AF3002D825E /* Main.storyboard */; };
@@ -26,9 +28,14 @@
 		45B12FBC225B2C5D002D825E /* AutoLazyPropertyInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA9225B2C5D002D825E /* AutoLazyPropertyInfo.m */; };
 		45B12FBD225B2C5D002D825E /* NSObject+APCLazyLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */; };
 		45B12FBE225B2C5D002D825E /* NSObject+APCTriggerProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */; };
+		45B12FF5225B31D3002D825E /* APCTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FF4225B31D3002D825E /* APCTest.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		456FC46F225DBFBE006CD604 /* Superman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Superman.h; sourceTree = "<group>"; };
+		456FC470225DBFBF006CD604 /* Superman.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Superman.m; sourceTree = "<group>"; };
+		456FC472225EEAC0006CD604 /* NSObject+APCExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCExtension.h"; sourceTree = "<group>"; };
+		456FC473225EEAC0006CD604 /* NSObject+APCExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCExtension.m"; sourceTree = "<group>"; };
 		45B12F5B225B2AF3002D825E /* AutoPropertyCocoaiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoPropertyCocoaiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45B12F5E225B2AF3002D825E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		45B12F5F225B2AF3002D825E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -67,6 +74,8 @@
 		45B12FAF225B2C5D002D825E /* NSObject+APCLazyLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCLazyLoad.h"; sourceTree = "<group>"; };
 		45B12FB0225B2C5D002D825E /* APCExtScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCExtScope.h; sourceTree = "<group>"; };
 		45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCTriggerProperty.m"; sourceTree = "<group>"; };
+		45B12FF3225B31D3002D825E /* APCTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCTest.h; sourceTree = "<group>"; };
+		45B12FF4225B31D3002D825E /* APCTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCTest.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,9 +126,13 @@
 		45B12F91225B2C5D002D825E /* TestClass */ = {
 			isa = PBXGroup;
 			children = (
-				45B12F92225B2C5D002D825E /* Person.h */,
-				45B12F93225B2C5D002D825E /* Man.m */,
+				456FC46F225DBFBE006CD604 /* Superman.h */,
+				456FC470225DBFBF006CD604 /* Superman.m */,
+				45B12FF3225B31D3002D825E /* APCTest.h */,
+				45B12FF4225B31D3002D825E /* APCTest.m */,
 				45B12F94225B2C5D002D825E /* Man.h */,
+				45B12F93225B2C5D002D825E /* Man.m */,
+				45B12F92225B2C5D002D825E /* Person.h */,
 				45B12F95225B2C5D002D825E /* Person.m */,
 			);
 			name = TestClass;
@@ -129,17 +142,17 @@
 		45B12F96225B2C5D002D825E /* AutoPropertyCocoa */ = {
 			isa = PBXGroup;
 			children = (
+				45B12FB0225B2C5D002D825E /* APCExtScope.h */,
+				45B12FAE225B2C5D002D825E /* APCScope.h */,
 				45B12F97225B2C5D002D825E /* APCScope.m */,
+				45B12FAD225B2C5D002D825E /* AutoPropertyCocoa.h */,
 				45B12F98225B2C5D002D825E /* Cache */,
 				45B12F9F225B2C5D002D825E /* Category */,
-				45B12FA2225B2C5D002D825E /* Property */,
-				45B12FAB225B2C5D002D825E /* NSObject+APCTriggerProperty.h */,
-				45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */,
-				45B12FAD225B2C5D002D825E /* AutoPropertyCocoa.h */,
-				45B12FAE225B2C5D002D825E /* APCScope.h */,
 				45B12FAF225B2C5D002D825E /* NSObject+APCLazyLoad.h */,
-				45B12FB0225B2C5D002D825E /* APCExtScope.h */,
+				45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */,
+				45B12FAB225B2C5D002D825E /* NSObject+APCTriggerProperty.h */,
 				45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */,
+				45B12FA2225B2C5D002D825E /* Property */,
 			);
 			name = AutoPropertyCocoa;
 			path = ../../AutoPropertyCocoa;
@@ -148,12 +161,12 @@
 		45B12F98225B2C5D002D825E /* Cache */ = {
 			isa = PBXGroup;
 			children = (
-				45B12F99225B2C5D002D825E /* APCClassPropertyMapperCache.m */,
-				45B12F9A225B2C5D002D825E /* APCPropertyMapperkey.m */,
-				45B12F9B225B2C5D002D825E /* APCInstancePropertyCacheManager.h */,
 				45B12F9C225B2C5D002D825E /* APCClassPropertyMapperCache.h */,
+				45B12F99225B2C5D002D825E /* APCClassPropertyMapperCache.m */,
+				45B12F9B225B2C5D002D825E /* APCInstancePropertyCacheManager.h */,
 				45B12F9D225B2C5D002D825E /* APCInstancePropertyCacheManager.m */,
 				45B12F9E225B2C5D002D825E /* APCPropertyMapperkey.h */,
+				45B12F9A225B2C5D002D825E /* APCPropertyMapperkey.m */,
 			);
 			path = Cache;
 			sourceTree = "<group>";
@@ -163,6 +176,8 @@
 			children = (
 				45B12FA0225B2C5D002D825E /* NSString+APCExtension.h */,
 				45B12FA1225B2C5D002D825E /* NSString+APCExtension.m */,
+				456FC472225EEAC0006CD604 /* NSObject+APCExtension.h */,
+				456FC473225EEAC0006CD604 /* NSObject+APCExtension.m */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -170,14 +185,14 @@
 		45B12FA2225B2C5D002D825E /* Property */ = {
 			isa = PBXGroup;
 			children = (
+				45B12FA7225B2C5D002D825E /* AutoHookPropertyInfo.h */,
 				45B12FA3225B2C5D002D825E /* AutoHookPropertyInfo.m */,
 				45B12FA4225B2C5D002D825E /* AutoLazyPropertyInfo.h */,
-				45B12FA5225B2C5D002D825E /* AutoTriggerPropertyInfo.m */,
-				45B12FA6225B2C5D002D825E /* AutoPropertyInfo.m */,
-				45B12FA7225B2C5D002D825E /* AutoHookPropertyInfo.h */,
-				45B12FA8225B2C5D002D825E /* AutoTriggerPropertyInfo.h */,
 				45B12FA9225B2C5D002D825E /* AutoLazyPropertyInfo.m */,
 				45B12FAA225B2C5D002D825E /* AutoPropertyInfo.h */,
+				45B12FA6225B2C5D002D825E /* AutoPropertyInfo.m */,
+				45B12FA8225B2C5D002D825E /* AutoTriggerPropertyInfo.h */,
+				45B12FA5225B2C5D002D825E /* AutoTriggerPropertyInfo.m */,
 			);
 			path = Property;
 			sourceTree = "<group>";
@@ -253,6 +268,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				45B12FB9225B2C5D002D825E /* AutoHookPropertyInfo.m in Sources */,
+				45B12FF5225B31D3002D825E /* APCTest.m in Sources */,
+				456FC474225EEAC0006CD604 /* NSObject+APCExtension.m in Sources */,
 				45B12FB6225B2C5D002D825E /* APCPropertyMapperkey.m in Sources */,
 				45B12FB2225B2C5D002D825E /* Man.m in Sources */,
 				45B12F63225B2AF3002D825E /* ViewController.m in Sources */,
@@ -261,6 +278,7 @@
 				45B12FB7225B2C5D002D825E /* APCInstancePropertyCacheManager.m in Sources */,
 				45B12FBB225B2C5D002D825E /* AutoPropertyInfo.m in Sources */,
 				45B12FBE225B2C5D002D825E /* NSObject+APCTriggerProperty.m in Sources */,
+				456FC471225DBFBF006CD604 /* Superman.m in Sources */,
 				45B12FBC225B2C5D002D825E /* AutoLazyPropertyInfo.m in Sources */,
 				45B12FBA225B2C5D002D825E /* AutoTriggerPropertyInfo.m in Sources */,
 				45B12FB5225B2C5D002D825E /* APCClassPropertyMapperCache.m in Sources */,

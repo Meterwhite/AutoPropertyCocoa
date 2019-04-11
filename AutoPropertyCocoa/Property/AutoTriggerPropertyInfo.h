@@ -92,7 +92,9 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 - (void)performOldSetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value;
 
 #pragma mark - Cache
-+ (_Nullable instancetype)cachedWithClass:(Class _Nonnull)clazz
-                             property:(NSString* _Nonnull)property;
++ (_Nullable instancetype)cachedTargetClass:(Class _Nonnull)clazz
+                                   property:(NSString* _Nonnull)property;
 
++ (_Nullable instancetype)cachedFromAClass:(Class _Nonnull)aClazz
+                                  property:(NSString* _Nonnull)property;
 @end

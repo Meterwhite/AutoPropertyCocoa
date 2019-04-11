@@ -12,6 +12,12 @@
  对子类懒加载父类的属性，子类使用覆盖属性的策略，解绑也没问题
  */
 @interface AutoLazyPropertyInfo : AutoHookPropertyInfo <AutoPropertyHookProxyClassNameProtocol>
+{
+@public
+    
+    SEL         _userSelector;
+    id          _userBlock;
+}
 
 @property (nonatomic,assign,readonly,nullable)   SEL userSelector;
 
@@ -34,8 +40,14 @@
 
 #pragma mark - Cache for type of class.
 
-+ (_Nullable instancetype)cachedWithClass:(Class _Nonnull __unsafe_unretained)clazz
-                                 property:(NSString* _Nonnull)propertyName;
++ (_Nullable instancetype)cachedTargetClass:(Class _Nonnull __unsafe_unretained)clazz
+                                   property:(NSString* _Nonnull)property;
+
++ (_Nullable instancetype)cachedFromAClassByInstance:(id _Nonnull)instance
+                                            property:(NSString* _Nonnull)property;
+
++ (_Nullable instancetype)cachedFromAClass:(Class _Nonnull __unsafe_unretained)aClazz
+                                  property:(NSString* _Nonnull)property;
 
 @end
 

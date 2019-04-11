@@ -8,6 +8,7 @@
 
 #import "APCInstancePropertyCacheManager.h"
 #import "APCClassPropertyMapperCache.h"
+#import "NSObject+APCExtension.h"
 #import "AutoLazyPropertyInfo.h"
 #import "NSObject+APCLazyLoad.h"
 #import <objc/runtime.h>
@@ -21,9 +22,25 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 #pragma mark - AutoLazyPropertyInfo
 
 @implementation AutoLazyPropertyInfo
+
+
+- (instancetype)initWithPropertyName:(NSString *)propertyName aClass:(__unsafe_unretained Class)aClass
 {
-    SEL         _userSelector;
-    id          _userBlock;
+    if(self = [super initWithPropertyName:propertyName
+                                   aClass:aClass]){
+        
+        
+        
+        if(self.kindOfOwner == AutoPropertyOwnerKindOfClass){
+            
+            if(self.kindOfValue != AutoPropertyValueKindOfObject
+               && self.kindOfValue != AutoPropertyValueKindOfBlock){
+                
+                NSAssert(NO, @"APC: Disable binding on basic-value type properties of class types.");
+            }
+        }
+    }
+    return self;
 }
 
 - (void)hookUsingUserSelector:(SEL)aSelector
@@ -55,8 +72,8 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 - (void)hookUsingUserBlock:(id)block
 {
     _kindOfHook     =   AutoPropertyHookKindOfBlock;
-    _userSelector   =   nil;
     _userBlock      =   [block copy];
+    _userSelector   =   nil;
     IMP newimp      =   nil;
     if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
        self.kindOfValue == AutoPropertyValueKindOfObject){
@@ -105,18 +122,16 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
             
             if(nil != pinfo_superclass){
                 
-                ///From super class old imp.
-                _old_implementation = pinfo_superclass->_old_implementation;
+                _old_implementation = pinfo_superclass->_new_implementation;
             }else{
                 
-                ///From super class new imp.
                 _old_implementation
                 =
                 class_getMethodImplementation(_src_class
                                               , NSSelectorFromString(_des_property_name));
             }
             
-            NSAssert(_old_implementation, @"APC: Can not find old implementation.");
+            NSAssert(_old_implementation, @"APC: Can not find original implementation.");
         }
     }
     else{
@@ -228,12 +243,18 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
         return nil;
     }
     
-    return
+    [target apc_lazyload_performOldLoop];
     
+    id ret
+    =
     apc_getterimp_boxinvok(target
                            , NSSelectorFromString(_des_property_name)
                            , _old_implementation
                            , self.valueTypeEncoding.UTF8String);
+    
+    [target apc_lazyload_performOldLoop_break];
+    
+    return ret;
 }
 
 - (id _Nullable)instancetypeNewObjectByUserSelector
@@ -337,13 +358,51 @@ static APCClassPropertyMapperCache* _cacheForClass;
     [_cacheForClass removeProperty:self];
 }
 
-+ (_Nullable instancetype)cachedWithClass:(Class)clazz
-                                       property:(NSString*)property
++ (_Nullable instancetype)cachedTargetClass:(Class)clazz
+                                   property:(NSString*)property
 {
     clazz = [self unproxyClass:clazz];
     
     return [_cacheForClass propertyForDesclass:clazz property:property];
 }
+
++ (instancetype)cachedFromAClassByInstance:(id)instance property:(NSString *)property
+{
+    
+    NSUInteger lenth = [instance apc_lazyload_performOldLoop_lenth];
+    
+    if(lenth == 0){
+        
+        return [self cachedFromAClass:[instance class] property:property];
+    }
+    
+    AutoLazyPropertyInfo*   p;
+    Class                   clazz = [instance class];
+    while (lenth) {
+        
+        while ((clazz = [clazz superclass])) {
+            
+            if(clazz == nil) return p;
+            
+            if(nil != (p = [self cachedTargetClass:clazz property:property])){
+                
+                --lenth;
+                break;
+            }
+        }
+    }
+    
+    return p;
+}
+
++ (_Nullable instancetype)cachedFromAClass:(Class)aClazz
+                                  property:(NSString*)property
+{
+    aClazz = [self unproxyClass:aClazz];
+    
+    return [_cacheForClass searchFromTargetClass:aClazz property:property];
+}
+
 
 
 #pragma mark - AutoPropertyHookProxyClassNameProtocol

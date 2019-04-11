@@ -537,12 +537,20 @@ static APCClassPropertyMapperCache* _cacheForClass;
     [_cacheForClass addProperty:self];
 }
 
-+ (_Nullable instancetype)cachedWithClass:(Class)clazz
-                               property:(NSString*)property
++ (_Nullable instancetype)cachedTargetClass:(Class)clazz
+                                   property:(NSString*)property
 {
     clazz = [AutoTriggerPropertyInfo unproxyClass:clazz];
     
     return [_cacheForClass propertyForDesclass:clazz property:property];
+}
+
++ (instancetype)cachedFromAClass:(Class)aClazz
+                        property:(NSString *)property
+{
+    aClazz = [AutoTriggerPropertyInfo unproxyClass:aClazz];
+    
+    return [_cacheForClass searchFromTargetClass:aClazz property:property];
 }
 
 - (void)removeFromClassCache

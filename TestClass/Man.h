@@ -11,6 +11,5 @@
 
 @interface Man : Person
 
-//@property (nonatomic,assign)NSUInteger  age;
 @end
 

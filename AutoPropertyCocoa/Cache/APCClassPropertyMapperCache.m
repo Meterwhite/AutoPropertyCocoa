@@ -14,12 +14,12 @@
 {
     dispatch_semaphore_t _lock;
 }
-@property (nonatomic,strong) NSMutableSet*  references;
-///strong to weak.
-///(Desclass,propertyName) ----> (weak)p
+@property (nonatomic,strong) NSHashTable*   weakReferences;
+
+///(Desclass,propertyName) ----> p
 @property (nonatomic,strong) NSMapTable*    mapperForDesclassAndProperty;
-///strong to strong.
-///Srcclass ----> (strong){(weak)p0, (weak)p1, ...}
+
+///Srcclass ----> {p0, p1, ...}
 @property (nonatomic,strong) NSMapTable*    mapperForSrcclassAndProperty;
 
 @end
@@ -39,13 +39,11 @@
         
         _lock = dispatch_semaphore_create(1);
         
-        _references = [NSMutableSet setWithCapacity:31];
+        _weakReferences = [NSHashTable weakObjectsHashTable];
         
-        _mapperForDesclassAndProperty
-        = [NSMapTable strongToWeakObjectsMapTable];
+        _mapperForDesclassAndProperty = [NSMapTable strongToStrongObjectsMapTable];
         
-        _mapperForSrcclassAndProperty
-        = [NSMapTable strongToStrongObjectsMapTable];
+        _mapperForSrcclassAndProperty = [NSMapTable strongToStrongObjectsMapTable];
     }
     return self;
 }
@@ -61,17 +59,17 @@
     APCPropertyMapperkey*           keyForClass      = [aProperty classMapperkey];
     NSSet<APCPropertyMapperkey*>*   keysForProperty  = [aProperty propertyMapperkeys];
     
-    if(YES == [self.references containsObject:aProperty]){
+    if(YES == [self.weakReferences containsObject:aProperty]){
         
-        [self.references removeObject:aProperty];
+        [self.weakReferences removeObject:aProperty];
     }
     
-    [self.references addObject:aProperty];
+    [self.weakReferences addObject:aProperty];
     
-    NSHashTable*            pties = [self.mapperForSrcclassAndProperty objectForKey:keyForClass];
+    NSMutableSet*            pties = [self.mapperForSrcclassAndProperty objectForKey:keyForClass];
     if(nil == pties){
         
-        pties = [NSHashTable weakObjectsHashTable];
+        pties = [NSMutableSet set];
         [self.mapperForSrcclassAndProperty setObject:pties forKey:keyForClass];
     }
     [pties addObject:aProperty];
@@ -90,7 +88,14 @@
 {
     dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
     
-    [self.references removeObject:aProperty];
+    [self.weakReferences removeObject:aProperty];
+    
+    [[self.mapperForSrcclassAndProperty objectForKey:aProperty.classMapperkey] removeObject:aProperty];
+    
+    [aProperty.propertyMapperkeys enumerateObjectsUsingBlock:^(APCPropertyMapperkey * _Nonnull aKey, BOOL * _Nonnull stop) {
+        
+        [self.mapperForDesclassAndProperty removeObjectForKey:aKey];
+    }];
     
     dispatch_semaphore_signal(_lock);
 }
@@ -99,13 +104,15 @@
 {
     dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
     
-    id obj;
-    APCPropertyMapperkey* keyForSrc = [APCPropertyMapperkey keyWithClass:srcclass];
-    NSHashTable*    tab = [self.mapperForSrcclassAndProperty objectForKey:keyForSrc];
-    NSEnumerator*   e   = tab.objectEnumerator;
-    while (nil != (obj = e.nextObject)) {
+    APCPropertyMapperkey*   keyForSrc   = [APCPropertyMapperkey keyWithClass:srcclass];
+    NSMutableSet*           set         = [self.mapperForSrcclassAndProperty objectForKey:keyForSrc];
+    NSEnumerator*           e           = set.objectEnumerator;
+    AutoPropertyInfo*       p;
+    [self.mapperForSrcclassAndProperty removeObjectForKey:keyForSrc];
+    while (nil != (p = e.nextObject)) {
         
-        [self.references removeObject:obj];
+        [self.weakReferences removeObject:p];
+        [self.mapperForDesclassAndProperty removeObjectForKey:p.propertyMapperkeys];
     }
     
     dispatch_semaphore_signal(_lock);
@@ -120,14 +127,31 @@
      [APCPropertyMapperkey keyWithClass:desclass property:property]];
 }
 
+- (__kindof AutoPropertyInfo*)searchFromTargetClass:(Class _Nullable)desclass
+                                        property:(NSString *)property
+{
+    if(desclass == nil){
+        
+        return nil;
+    }
+    
+    AutoPropertyInfo* p = [self.mapperForDesclassAndProperty objectForKey:
+                           [APCPropertyMapperkey keyWithClass:desclass property:property]];
+    
+    if(p == nil){
+        
+        return [self searchFromTargetClass:[desclass superclass] property:property];
+    }
+    
+    return p;
+}
+
 - (NSSet *)propertiesForSrcclass:(Class)srcclass
 {
     return
     
     [[self.mapperForSrcclassAndProperty objectForKey:
-      [APCPropertyMapperkey keyWithClass:srcclass]]
-     
-     setRepresentation];
+      [APCPropertyMapperkey keyWithClass:srcclass]] copy];
 }
 
 @end

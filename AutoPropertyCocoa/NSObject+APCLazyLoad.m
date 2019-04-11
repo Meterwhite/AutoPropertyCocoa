@@ -6,6 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 #import "APCInstancePropertyCacheManager.h"
+#import "NSObject+APCExtension.h"
 #import "NSObject+APCLazyLoad.h"
 #import "AutoLazyPropertyInfo.h"
 #import <objc/runtime.h>
@@ -47,7 +48,7 @@
 
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-    AutoLazyPropertyInfo* p = [AutoLazyPropertyInfo cachedWithClass:self property:property];
+    AutoLazyPropertyInfo* p = [AutoLazyPropertyInfo cachedTargetClass:self property:property];
     
     [p unhook];
 }
@@ -63,7 +64,7 @@
 }
 
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
-                    usingBlock:(id _Nullable(^)(id _Nonnull  _self))block
+                    usingBlock:(id _Nullable(^)(id _Nonnull  instance))block
 {
     [self apc_instanceSetLazyLoadProperty:property hookWithBlock:block hookWithSEL:nil];
 }
@@ -104,7 +105,12 @@
                           hookWithBlock:(id)block
                             hookWithSEL:(SEL)aSelector
 {
-    AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo instanceWithProperty:propertyName aInstance:self];
+    AutoLazyPropertyInfo* propertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:propertyName];
+    
+    if(propertyInfo == nil){
+        
+        propertyInfo = [AutoLazyPropertyInfo instanceWithProperty:propertyName aInstance:self];
+    }
     
     if(NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)
        
@@ -128,7 +134,15 @@
                        hookWithBlock:(id)block
                          hookWithSEL:(SEL)aSelector
 {
-    AutoLazyPropertyInfo* propertyInfo = [AutoLazyPropertyInfo instanceWithProperty:propertyName aClass:self];
+    AutoLazyPropertyInfo* propertyInfo
+    =
+    [AutoLazyPropertyInfo cachedTargetClass:self property:propertyName];
+    
+    if(propertyInfo == nil){
+        
+        propertyInfo = [AutoLazyPropertyInfo instanceWithProperty:propertyName aClass:self];
+    }
+    
     
     if(NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)
        
@@ -157,12 +171,13 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     
     if(nil == (lazyPropertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
         
-        if(nil == (lazyPropertyInfo = [AutoLazyPropertyInfo cachedWithClass:[_SELF class] property:NSStringFromSelector(_CMD)]))
+        //Get info from _SELF.
+        //The info tell me where does it search from.
+        if(nil == (lazyPropertyInfo = [AutoLazyPropertyInfo cachedFromAClassByInstance:_SELF property:NSStringFromSelector(_CMD)]))
             
             NSCAssert(NO, @"APC: Lose property info.");
+        
     
-    
-    ///Modified by other thread.
     if(lazyPropertyInfo.enable == NO){
         
         return [lazyPropertyInfo performOldPropertyFromTarget:_SELF];

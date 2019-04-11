@@ -27,4 +27,6 @@
 - (__kindof AutoPropertyInfo* _Nullable)propertyForDesclass:(Class _Nonnull)desclass
                                           property:(NSString* _Nonnull)property;
 
+- (__kindof AutoPropertyInfo* _Nullable)searchFromTargetClass:(Class _Nullable)desclass
+                                                     property:(NSString* _Nonnull)property;
 @end

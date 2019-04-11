@@ -20,6 +20,6 @@
 @property (nonatomic,assign,getter=myGetFrame2)APC_RECT  frame2;
 @property (nonatomic,assign,setter=mySetFrame3:)APC_RECT frame3;
 
-@property (nonatomic,assign)NSUInteger  age;
+@property (nonatomic,assign)NSUInteger age;
 @end
 
