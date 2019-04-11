@@ -290,8 +290,8 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 {
     NSAssert(self.accessOption & AutoPropertySetValueEnable, @"APC: Object %@ must have setter or _ivar.",target);
     
-    if(YES == (self.accessOption & AutoPropertyAssociatedSetter) ||
-       YES == (self.accessOption & AutoPropertyComponentOfSetter)){
+    if((self.accessOption & AutoPropertyAssociatedSetter)
+       || (self.accessOption & AutoPropertyComponentOfSetter)){
         
         ///Set value by setter
         IMP imp = class_getMethodImplementation([target class]

@@ -43,6 +43,15 @@ const static char _keyForAPCLazyLoadPerformOldLoopLock = '\0';
     return lock;
 }
 
+- (BOOL)apc_lazyload_performOldLoop_testing
+{
+    return
+    
+    objc_getAssociatedObject(self, &_keyForAPCLazyLoadPerformOldLoopLenth)
+    ? YES
+    : NO;
+}
+
 - (void)apc_lazyload_performOldLoop
 {
     [[self apc_lazyload_performOldLoop_lock] lock];
@@ -51,7 +60,7 @@ const static char _keyForAPCLazyLoadPerformOldLoopLock = '\0';
     
     lenth = [NSNumber numberWithUnsignedInteger:(lenth
                                                  ? lenth.unsignedIntegerValue + 1
-                                                 : 0)];
+                                                 : 1)];
     
     objc_setAssociatedObject(self
                              , &_keyForAPCLazyLoadPerformOldLoopLenth

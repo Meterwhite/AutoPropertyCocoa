@@ -12,6 +12,7 @@
 
 @interface NSObject (APCExtension)
 
+- (BOOL)apc_lazyload_performOldLoop_testing;
 - (void)apc_lazyload_performOldLoop;
 - (NSUInteger)apc_lazyload_performOldLoop_lenth;
 - (void)apc_lazyload_performOldLoop_break;

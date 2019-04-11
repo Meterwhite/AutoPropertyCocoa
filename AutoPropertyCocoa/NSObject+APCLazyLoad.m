@@ -178,7 +178,8 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
             NSCAssert(NO, @"APC: Lose property info.");
         
     
-    if(lazyPropertyInfo.enable == NO){
+    if(NO == lazyPropertyInfo.enable
+       || YES == [_SELF apc_lazyload_performOldLoop_testing]){
         
         return [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
     }
