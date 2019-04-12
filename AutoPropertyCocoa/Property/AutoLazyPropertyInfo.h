@@ -15,8 +15,9 @@
 {
 @public
     
-    SEL         _userSelector;
-    id          _userBlock;
+    SEL                 _userSelector;
+    id                  _userBlock;
+    APCAtomicUInteger   _perform_oldimp_token;
 }
 
 @property (nonatomic,assign,readonly,nullable)   SEL userSelector;

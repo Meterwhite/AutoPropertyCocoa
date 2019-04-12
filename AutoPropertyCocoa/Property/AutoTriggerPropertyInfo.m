@@ -23,14 +23,14 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     void(^_block_getter_usertrigger)(id _Nonnull instance,id _Nullable value);
     BOOL(^_block_getter_usercondition)(id _Nonnull instance,id _Nullable value);
     void(^_block_getter_counttrigger)(id _Nonnull instance,id _Nullable value);
-    BOOL(^_block_getter_countcondition)(id _Nonnull instance,id _Nullable value,NSUInteger count);
+    BOOL(^_block_getter_countcondition)(id _Nonnull instance,id _Nullable value,APCAtomicUInteger count);
     
     void(^_block_setter_fronttrigger)(id _Nonnull instance,id _Nullable value);
     void(^_block_setter_posttrigger)(id _Nonnull instance,id _Nullable value);
     void(^_block_setter_usertrigger)(id _Nonnull instance,id _Nullable value);
     BOOL(^_block_setter_usercondition)(id _Nonnull instance,id _Nullable value);
     void(^_block_setter_counttrigger)(id _Nonnull instance,id _Nullable value);
-    BOOL(^_block_setter_countcondition)(id _Nonnull instance,id _Nullable value,NSUInteger count);
+    BOOL(^_block_setter_countcondition)(id _Nonnull instance,id _Nullable value,APCAtomicUInteger count);
 }
 
 - (instancetype)initWithPropertyName:(NSString* _Nonnull)propertyName

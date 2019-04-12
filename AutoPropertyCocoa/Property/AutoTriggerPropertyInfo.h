@@ -49,7 +49,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 - (void)getterBindUserTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block
                     condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value))condition;
 - (void)getterBindCountTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block
-                     condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value,NSUInteger count))condition;
+                     condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value,APCAtomicUInteger count))condition;
 
 - (void)getterUnbindFrontTrigger;
 - (void)getterUnbindPostTrigger;
@@ -68,7 +68,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 - (void)setterBindUserTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block
                     condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value))condition;
 - (void)setterBindCountTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block
-                    condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value,NSUInteger count))condition;
+                    condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value,APCAtomicUInteger count))condition;
 
 - (void)setterUnbindFrontTrigger;
 - (void)setterUnbindPostTrigger;

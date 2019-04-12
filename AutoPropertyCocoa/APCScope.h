@@ -3,25 +3,27 @@
 
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
+#import <stdatomic.h>
 
 #if TARGET_OS_IPHONE || TARGET_OS_TV
 
 #import <UIKit/UIKit.h>
-#define APC_RECT            CGRect
-#define APC_POINT           CGPoint
-#define APC_SIZE            CGSize
-#define APC_EDGEINSETS      UIEdgeInsets
+#define APCRect             CGRect
+#define APCPoint            CGPoint
+#define APCSize             CGSize
+#define APCEdgeinsets       UIEdgeInsets
 
 #elif TARGET_OS_MAC
 
 #import <AppKit/AppKit.h>
-#define APC_RECT            NSRect
-#define APC_POINT           NSPoint
-#define APC_SIZE            NSSize
-#define APC_EDGEINSETS      NSEdgeInsets
+#define APCRect             NSRect
+#define APCPoint            NSPoint
+#define APCSize             NSSize
+#define APCEdgeinsets       NSEdgeInsets
 
 #endif
 
+#define APCAtomicUInteger _Atomic(NSUInteger)
 
 
 FOUNDATION_EXPORT NSString *const APCClassSuffixForLazyLoad;
@@ -121,17 +123,17 @@ return;
     else if(enc[0] == _C_PTR){
         apc_invokS_rbox_by(void*)
     }
-    else if(strcmp(enc, @encode(APC_RECT)) == 0){
-        apc_invokS_rbox_by(APC_RECT)
+    else if(strcmp(enc, @encode(APCRect)) == 0){
+        apc_invokS_rbox_by(APCRect)
     }
-    else if(strcmp(enc, @encode(APC_POINT)) == 0){
-        apc_invokS_rbox_by(APC_POINT)
+    else if(strcmp(enc, @encode(APCPoint)) == 0){
+        apc_invokS_rbox_by(APCPoint)
     }
-    else if(strcmp(enc, @encode(APC_SIZE)) == 0){
-        apc_invokS_rbox_by(APC_SIZE)
+    else if(strcmp(enc, @encode(APCSize)) == 0){
+        apc_invokS_rbox_by(APCSize)
     }
-    else if(strcmp(enc, @encode(APC_EDGEINSETS)) == 0){
-        apc_invokS_rbox_by(APC_EDGEINSETS)
+    else if(strcmp(enc, @encode(APCEdgeinsets)) == 0){
+        apc_invokS_rbox_by(APCEdgeinsets)
     }
     else if(strcmp(enc, @encode(NSRange)) == 0){
         apc_invokS_rbox_by(NSRange)
@@ -214,17 +216,17 @@ return [NSValue valueWithBytes:&returnValue objCType:enc];
     else if(enc[0] == _C_PTR){
         apc_invokG_rbox_by(void*)
     }
-    else if(strcmp(enc, @encode(APC_RECT)) == 0){
-        apc_invokG_rbox_by(APC_RECT)
+    else if(strcmp(enc, @encode(APCRect)) == 0){
+        apc_invokG_rbox_by(APCRect)
     }
-    else if(strcmp(enc, @encode(APC_POINT)) == 0){
-        apc_invokG_rbox_by(APC_POINT)
+    else if(strcmp(enc, @encode(APCPoint)) == 0){
+        apc_invokG_rbox_by(APCPoint)
     }
-    else if(strcmp(enc, @encode(APC_SIZE)) == 0){
-        apc_invokG_rbox_by(APC_SIZE)
+    else if(strcmp(enc, @encode(APCSize)) == 0){
+        apc_invokG_rbox_by(APCSize)
     }
-    else if(strcmp(enc, @encode(APC_EDGEINSETS)) == 0){
-        apc_invokG_rbox_by(APC_EDGEINSETS)
+    else if(strcmp(enc, @encode(APCEdgeinsets)) == 0){
+        apc_invokG_rbox_by(APCEdgeinsets)
     }
     else if(strcmp(enc, @encode(NSRange)) == 0){
         apc_invokG_rbox_by(NSRange)
@@ -274,9 +276,9 @@ apc_def_vGHook(chars,char*,oghook)\
 apc_def_vGHook(class,Class,oghook)\
 apc_def_vGHook(sel,SEL,oghook)\
 apc_def_vGHook(ptr,void*,oghook)\
-apc_def_vGHook(rect,APC_RECT,oghook)\
-apc_def_vGHook(point,APC_POINT,oghook)\
-apc_def_vGHook(size,APC_SIZE,oghook)\
+apc_def_vGHook(rect,APCRect,oghook)\
+apc_def_vGHook(point,APCPoint,oghook)\
+apc_def_vGHook(size,APCSize,oghook)\
 apc_def_vGHook(range,NSRange,oghook)\
 \
 void* _Nullable oghook##_impimage(NSString* _Nonnull enc)\
@@ -332,13 +334,13 @@ void* _Nullable oghook##_impimage(NSString* _Nonnull enc)\
     else if ([enc characterAtIndex:0] == '^'){\
         return oghook##_ptr;\
     }\
-    else if ([enc isEqualToString:@(@encode(APC_RECT))]){\
+    else if ([enc isEqualToString:@(@encode(APCRect))]){\
         return oghook##_rect;\
     }\
-    else if ([enc isEqualToString:@(@encode(APC_POINT))]){\
+    else if ([enc isEqualToString:@(@encode(APCPoint))]){\
         return oghook##_point;\
     }\
-    else if ([enc isEqualToString:@(@encode(APC_SIZE))]){\
+    else if ([enc isEqualToString:@(@encode(APCSize))]){\
         return oghook##_size;\
     }\
     else if ([enc isEqualToString:@(@encode(NSRange))]){\
@@ -383,9 +385,9 @@ apc_def_vSHook(chars,char*,oshook)\
 apc_def_vSHook(class,Class,oshook)\
 apc_def_vSHook(sel,SEL,oshook)\
 apc_def_vSHook(ptr,void*,oshook)\
-apc_def_vSHook(rect,APC_RECT,oshook)\
-apc_def_vSHook(point,APC_POINT,oshook)\
-apc_def_vSHook(size,APC_SIZE,oshook)\
+apc_def_vSHook(rect,APCRect,oshook)\
+apc_def_vSHook(point,APCPoint,oshook)\
+apc_def_vSHook(size,APCSize,oshook)\
 apc_def_vSHook(range,NSRange,oshook)\
 \
 void* _Nullable oshook##_impimage(NSString* _Nonnull enc)\
@@ -441,13 +443,13 @@ else if ([enc isEqualToString:@":"]){\
 else if ([enc characterAtIndex:0] == '^'){\
     return oshook##_ptr;\
 }\
-else if ([enc isEqualToString:@(@encode(APC_RECT))]){\
+else if ([enc isEqualToString:@(@encode(APCRect))]){\
     return oshook##_rect;\
 }\
-else if ([enc isEqualToString:@(@encode(APC_POINT))]){\
+else if ([enc isEqualToString:@(@encode(APCPoint))]){\
     return oshook##_point;\
 }\
-else if ([enc isEqualToString:@(@encode(APC_SIZE))]){\
+else if ([enc isEqualToString:@(@encode(APCSize))]){\
     return oshook##_size;\
 }\
 else if ([enc isEqualToString:@(@encode(NSRange))]){\

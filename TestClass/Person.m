@@ -11,7 +11,7 @@
 @implementation Person
 {
     NSString* _name_1;
-    APC_RECT _rect_1;
+    APCRect _rect_1;
 }
 - (void)mySetName1:(NSString *)name1
 {
@@ -34,12 +34,12 @@
     _name3 = name3;
 }
 
-- (APC_RECT)myFrame1
+- (APCRect)myFrame1
 {
     return _rect_1;
 }
 
-- (void)mySetFrame1:(APC_RECT)frame1
+- (void)mySetFrame1:(APCRect)frame1
 {
     _rect_1 = frame1;
 }

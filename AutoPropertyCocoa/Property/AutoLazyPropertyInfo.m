@@ -243,6 +243,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
         return nil;
     }
     
+    //Here will lock current lazy-load property until apc_lazyload_performOldLoop_break be called.
     [target apc_lazyload_performOldLoop];
     
     id ret

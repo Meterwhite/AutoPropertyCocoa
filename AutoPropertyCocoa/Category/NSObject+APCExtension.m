@@ -7,7 +7,9 @@
 //
 
 #import "NSObject+APCExtension.h"
+#import <libkern/OSAtomic.h>
 #import <objc/runtime.h>
+#import <pthread.h>
 
 //const static char _keyForAPCLazyLoadBreakPointClass = '\0';
 
@@ -15,8 +17,8 @@ const static char _keyForAPCLazyLoadPerformOldLoopLenth = '\0';
 const static char _keyForAPCLazyLoadPerformOldLoopLock = '\0';
 
 @implementation NSObject (APCExtension)
-
-- (NSLock*)apc_lazyload_performOldLoop_lock
+/** Thread:lenth */
+- (NSRecursiveLock*)apc_lazyload_performOldLoop_getlock
 {
     static dispatch_semaphore_t semephore;
     static dispatch_once_t onceToken;
@@ -24,15 +26,16 @@ const static char _keyForAPCLazyLoadPerformOldLoopLock = '\0';
         semephore = dispatch_semaphore_create(1);
     });
     
-    NSLock* lock = objc_getAssociatedObject(self, &_keyForAPCLazyLoadPerformOldLoopLock);
+    NSRecursiveLock* lock = objc_getAssociatedObject(self, &_keyForAPCLazyLoadPerformOldLoopLock);
+    
     if(lock == nil){
         
         dispatch_semaphore_wait(semephore, DISPATCH_TIME_FOREVER);
         
-        lock = objc_getAssociatedObject(self, &_keyForAPCLazyLoadPerformOldLoopLock);
+        
         if(lock == nil){
             
-            lock = [[NSLock alloc] init];
+            lock = [[NSRecursiveLock alloc] init];
             objc_setAssociatedObject(self
                                      , &_keyForAPCLazyLoadPerformOldLoopLock
                                      , lock
@@ -40,8 +43,11 @@ const static char _keyForAPCLazyLoadPerformOldLoopLock = '\0';
         }
         dispatch_semaphore_signal(semephore);
     }
+    
     return lock;
 }
+
+
 
 - (BOOL)apc_lazyload_performOldLoop_testing
 {
@@ -54,7 +60,7 @@ const static char _keyForAPCLazyLoadPerformOldLoopLock = '\0';
 
 - (void)apc_lazyload_performOldLoop
 {
-    [[self apc_lazyload_performOldLoop_lock] lock];
+    [[self apc_lazyload_performOldLoop_getlock] lock];
     
     NSNumber* lenth = objc_getAssociatedObject(self, &_keyForAPCLazyLoadPerformOldLoopLenth);
     
@@ -67,7 +73,7 @@ const static char _keyForAPCLazyLoadPerformOldLoopLock = '\0';
                              , lenth
                              , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     
-    [[self apc_lazyload_performOldLoop_lock] unlock];
+    
 }
 - (NSUInteger)apc_lazyload_performOldLoop_lenth
 {
@@ -80,14 +86,14 @@ const static char _keyForAPCLazyLoadPerformOldLoopLock = '\0';
 
 - (void)apc_lazyload_performOldLoop_break
 {
-    [[self apc_lazyload_performOldLoop_lock] lock];
+    
     
     objc_setAssociatedObject(self
                              , &_keyForAPCLazyLoadPerformOldLoopLenth
                              , nil
                              , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     
-    [[self apc_lazyload_performOldLoop_lock] unlock];
+    [[self apc_lazyload_performOldLoop_getlock] unlock];
 }
 
 @end

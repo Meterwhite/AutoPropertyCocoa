@@ -184,7 +184,8 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
         return [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
     }
     
-    id value = nil;
+    
+    id                  value       = nil;
     ///Get value.(All returned value are boxed)
     if(lazyPropertyInfo.accessOption & AutoPropertyComponentOfGetter){
         
@@ -194,7 +195,8 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
         value = [lazyPropertyInfo getIvarValueFromTarget:_SELF];
     }
     
-    
+    atomic_thread_fence(memory_order_seq_cst);
+    APCAtomicUInteger   accessCount = lazyPropertyInfo.accessCount;
     if(value == nil
        
        && (lazyPropertyInfo.kindOfValue == AutoPropertyValueKindOfBlock ||
@@ -211,7 +213,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
         }
         [lazyPropertyInfo setValue:value toTarget:_SELF];
     }
-    else if (lazyPropertyInfo.accessCount == 0
+    else if (accessCount == 0
              
              && (lazyPropertyInfo.kindOfValue != AutoPropertyValueKindOfBlock ||
                  lazyPropertyInfo.kindOfValue != AutoPropertyValueKindOfObject))

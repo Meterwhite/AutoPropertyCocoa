@@ -11,6 +11,9 @@
 #import "APCScope.h"
 
 @implementation AutoPropertyInfo
+{
+    APCAtomicUInteger _accessCount;
+}
 
 + (instancetype)instanceWithProperty:(NSString*)propertyName
                            aInstance:(id)aInstance
@@ -331,15 +334,17 @@
 - (void)invalid
 {
     _enable      = NO;
-    _accessCount = 0;
+    atomic_store(&_accessCount, 0);
 }
 
-- (void)access
+- (APCAtomicUInteger)access
 {
-    if(_enable){
-        
-        ++_accessCount;
-    }
+    return atomic_fetch_add(&_accessCount, 1);
+}
+
+- (APCAtomicUInteger)accessCount
+{
+    return atomic_load(&_accessCount);
 }
 
 - (NSString *)debugDescription
