@@ -3,7 +3,6 @@
 
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
-#import <stdatomic.h>
 
 #if TARGET_OS_IPHONE || TARGET_OS_TV
 
@@ -23,8 +22,14 @@
 
 #endif
 
+#ifndef __STDC_NO_ATOMICS__
+#import <stdatomic.h>
 #define APCAtomicUInteger _Atomic(NSUInteger)
+#else
+#define APCAtomicUInteger NSUInteger
+#endif
 
+#define APCThreadID ([NSThread currentThread])
 
 FOUNDATION_EXPORT NSString *const APCClassSuffixForLazyLoad;
 FOUNDATION_EXPORT NSString *const APCClassSuffixForTrigger;

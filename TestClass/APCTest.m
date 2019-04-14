@@ -209,12 +209,44 @@ apc_testfunc(testUnbindDeadCycle,50)
         return @"Superman";
     }];
     
-    
-    
-    
-//    NSParameterAssert([p.name isEqualToString:@"Person"]);
-//    NSParameterAssert([m.name isEqualToString:@"Man"]);
+    //Normal
+    NSParameterAssert([p.name1 isEqualToString:@"Person"]);
+    NSParameterAssert([m.name1 isEqualToString:@"Man"]);
     NSParameterAssert([sm.name1 isEqualToString:@"Superman"]);
+}
+
+apc_testfunc(testUnbindDeadCycleMultThread,51)
+{
+    APC_TEST_CLEANCLASS
+    
+    Superman*   sm  = [Superman new];
+    
+    [Person apc_lazyLoadForProperty:@"name1" usingBlock:^id _Nullable(id _Nonnull instance) {
+        
+        return @"Person";
+    }];
+    
+    [Man apc_lazyLoadForProperty:@"name1" usingBlock:^id _Nullable(id _Nonnull instance) {
+        
+        return @"Man";
+    }];
+    
+    [Superman apc_lazyLoadForProperty:@"name1" usingBlock:^id _Nullable(id _Nonnull instance) {
+        
+        return @"Superman";
+    }];
+    
+    //APCLazyloadOldLoopController.h -> joinLoop: -> count>4 -> error
+    dispatch_queue_t queue = dispatch_queue_create("Lazy-load", DISPATCH_QUEUE_CONCURRENT);
+    
+    dispatch_apply(30000, queue, ^(size_t s) {
+        
+        int i = 100;
+        while (i--) {
+            NSLog(@"%@",sm.name1);
+        }
+    });
+    
 }
 
 apc_testfunc(testTriggerFrontNormalInstance, 100)

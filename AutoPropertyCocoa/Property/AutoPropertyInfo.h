@@ -148,8 +148,8 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 /**
  Call it when it is accessed.
  */
-- (APCAtomicUInteger)access;
-- (APCAtomicUInteger)accessCount;
+- (void)access;
+- (NSUInteger)accessCount;
 
 
 /**

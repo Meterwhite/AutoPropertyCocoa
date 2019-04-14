@@ -337,14 +337,27 @@
     atomic_store(&_accessCount, 0);
 }
 
-- (APCAtomicUInteger)access
+- (void)access
 {
-    return atomic_fetch_add(&_accessCount, 1);
+#ifndef __STDC_NO_ATOMICS__
+    
+    atomic_fetch_add(&_accessCount, 1);
+#else
+    
+    ++_accessCount;
+#endif
 }
 
-- (APCAtomicUInteger)accessCount
+- (NSUInteger)accessCount
 {
+    
+#ifndef __STDC_NO_ATOMICS__
+    
     return atomic_load(&_accessCount);
+#else
+    
+    return _accessCount;
+#endif
 }
 
 - (NSString *)debugDescription

@@ -7,11 +7,10 @@
 //
 
 #import "APCInstancePropertyCacheManager.h"
+#import "APCLazyloadOldLoopController.h"
 #import "APCClassPropertyMapperCache.h"
-#import "NSObject+APCExtension.h"
 #import "AutoLazyPropertyInfo.h"
 #import "NSObject+APCLazyLoad.h"
-#import <objc/runtime.h>
 #import "APCScope.h"
 
 
@@ -243,8 +242,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
         return nil;
     }
     
-    //Here will lock current lazy-load property until apc_lazyload_performOldLoop_break be called.
-    [target apc_lazyload_performOldLoop];
+    [APCLazyloadOldLoopController joinLoop:target];
     
     id ret
     =
@@ -253,7 +251,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
                            , _old_implementation
                            , self.valueTypeEncoding.UTF8String);
     
-    [target apc_lazyload_performOldLoop_break];
+    [APCLazyloadOldLoopController breakLoop:target];
     
     return ret;
 }
@@ -370,7 +368,8 @@ static APCClassPropertyMapperCache* _cacheForClass;
 + (instancetype)cachedFromAClassByInstance:(id)instance property:(NSString *)property
 {
     
-    NSUInteger lenth = [instance apc_lazyload_performOldLoop_lenth];
+    NSUInteger lenth = [APCLazyloadOldLoopController loopCount:instance];
+    
     
     if(lenth == 0){
         

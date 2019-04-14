@@ -9,13 +9,6 @@
 #import "AutoHookPropertyInfo.h"
 
 @implementation AutoHookPropertyInfo
-//- (void)unhook
-//{
-#warning <#message#>
-    //[self performSelector:@selector(subclassResponsibility:)];
-    //BBBBB
-    //imp to implementation this B
-//}
 
 - (void)dealloc
 {

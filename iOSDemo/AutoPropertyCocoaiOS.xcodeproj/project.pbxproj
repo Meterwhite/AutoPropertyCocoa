@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		456FC471225DBFBF006CD604 /* Superman.m in Sources */ = {isa = PBXBuildFile; fileRef = 456FC470225DBFBF006CD604 /* Superman.m */; };
-		456FC474225EEAC0006CD604 /* NSObject+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 456FC473225EEAC0006CD604 /* NSObject+APCExtension.m */; };
+		456FC4792261B420006CD604 /* APCLazyloadOldLoopController.m in Sources */ = {isa = PBXBuildFile; fileRef = 456FC4782261B420006CD604 /* APCLazyloadOldLoopController.m */; };
 		45B12F60225B2AF3002D825E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F5F225B2AF3002D825E /* AppDelegate.m */; };
 		45B12F63225B2AF3002D825E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F62225B2AF3002D825E /* ViewController.m */; };
 		45B12F68225B2AF6002D825E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F67225B2AF6002D825E /* Assets.xcassets */; };
@@ -33,8 +33,8 @@
 /* Begin PBXFileReference section */
 		456FC46F225DBFBE006CD604 /* Superman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Superman.h; sourceTree = "<group>"; };
 		456FC470225DBFBF006CD604 /* Superman.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Superman.m; sourceTree = "<group>"; };
-		456FC472225EEAC0006CD604 /* NSObject+APCExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCExtension.h"; sourceTree = "<group>"; };
-		456FC473225EEAC0006CD604 /* NSObject+APCExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCExtension.m"; sourceTree = "<group>"; };
+		456FC4772261B420006CD604 /* APCLazyloadOldLoopController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCLazyloadOldLoopController.h; sourceTree = "<group>"; };
+		456FC4782261B420006CD604 /* APCLazyloadOldLoopController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCLazyloadOldLoopController.m; sourceTree = "<group>"; };
 		45B12F5B225B2AF3002D825E /* AutoPropertyCocoaiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoPropertyCocoaiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45B12F5E225B2AF3002D825E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		45B12F5F225B2AF3002D825E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -162,6 +162,8 @@
 				45B12F99225B2C5D002D825E /* APCClassPropertyMapperCache.m */,
 				45B12F9B225B2C5D002D825E /* APCInstancePropertyCacheManager.h */,
 				45B12F9D225B2C5D002D825E /* APCInstancePropertyCacheManager.m */,
+				456FC4772261B420006CD604 /* APCLazyloadOldLoopController.h */,
+				456FC4782261B420006CD604 /* APCLazyloadOldLoopController.m */,
 				45B12F9E225B2C5D002D825E /* APCPropertyMapperkey.h */,
 				45B12F9A225B2C5D002D825E /* APCPropertyMapperkey.m */,
 			);
@@ -173,8 +175,6 @@
 			children = (
 				45B12FA0225B2C5D002D825E /* NSString+APCExtension.h */,
 				45B12FA1225B2C5D002D825E /* NSString+APCExtension.m */,
-				456FC472225EEAC0006CD604 /* NSObject+APCExtension.h */,
-				456FC473225EEAC0006CD604 /* NSObject+APCExtension.m */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -265,8 +265,8 @@
 			files = (
 				45B12FB9225B2C5D002D825E /* AutoHookPropertyInfo.m in Sources */,
 				45B12FF5225B31D3002D825E /* APCTest.m in Sources */,
-				456FC474225EEAC0006CD604 /* NSObject+APCExtension.m in Sources */,
 				45B12FB6225B2C5D002D825E /* APCPropertyMapperkey.m in Sources */,
+				456FC4792261B420006CD604 /* APCLazyloadOldLoopController.m in Sources */,
 				45B12FB2225B2C5D002D825E /* Man.m in Sources */,
 				45B12F63225B2AF3002D825E /* ViewController.m in Sources */,
 				45B12FB3225B2C5D002D825E /* Person.m in Sources */,

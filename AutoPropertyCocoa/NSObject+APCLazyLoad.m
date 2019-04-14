@@ -6,14 +6,11 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 #import "APCInstancePropertyCacheManager.h"
-#import "NSObject+APCExtension.h"
+#import "APCLazyloadOldLoopController.h"
 #import "NSObject+APCLazyLoad.h"
 #import "AutoLazyPropertyInfo.h"
-#import <objc/runtime.h>
-#import <objc/message.h>
 #import "APCScope.h"
 
-//AutoLazyPropertyInfo* _Nullable apc_lazyLoadGetInstanceFromBoundCache(id instance,SEL _CMD);
 
 @implementation NSObject(APCLazyLoad)
 
@@ -163,7 +160,7 @@
 
 @end
 /**
- Destination func.
+ Destination.
  */
 id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
 {
@@ -179,7 +176,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
         
     
     if(NO == lazyPropertyInfo.enable
-       || YES == [_SELF apc_lazyload_performOldLoop_testing]){
+       || YES == [APCLazyloadOldLoopController testingIsInLoop:_SELF]){
         
         return [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
     }
@@ -196,7 +193,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     }
     
     atomic_thread_fence(memory_order_seq_cst);
-    APCAtomicUInteger   accessCount = lazyPropertyInfo.accessCount;
+    NSUInteger   accessCount = lazyPropertyInfo.accessCount;
     if(value == nil
        
        && (lazyPropertyInfo.kindOfValue == AutoPropertyValueKindOfBlock ||
