@@ -7,24 +7,27 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "AutoPropertyInfo.h"
+#import "APCHookProperty.h"
 
 
-OBJC_EXPORT AutoPropertyInfo* _Nullable
-apc_property_getSuperProperty(AutoPropertyInfo* _Nonnull p);
+OBJC_EXPORT APCHookProperty* _Nullable
+apc_property_getSuperProperty(APCHookProperty* _Nonnull p);
 
-//OBJC_EXPORT AutoPropertyInfo* _Nullable
-//apc_property_nextBoundProperty(AutoPropertyInfo* _Nullable p);
+OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nullable
+apc_property_getSuperPropertyList(APCHookProperty* _Nonnull p);
 
-OBJC_EXPORT NSArray<__kindof AutoPropertyInfo*>* _Nonnull
+//OBJC_EXPORT APCHookProperty* _Nullable
+//apc_property_nextBoundProperty(APCHookProperty* _Nullable p);
+
+OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nonnull
 apc_classBoundProperties(Class _Nonnull cls, NSString* _Nonnull property);
 
 //OBJC_EXPORT void
-//apc_property_isRegistered(AutoPropertyInfo* _Nullable p);
+//apc_property_isRegistered(APCHookProperty* _Nullable p);
 
 OBJC_EXPORT void
-apc_addProperty(AutoPropertyInfo* _Nonnull p);
+apc_addProperty(APCHookProperty* _Nonnull p);
 
 
 OBJC_EXPORT void
-apc_removeProperty(AutoPropertyInfo* _Nonnull p);
+apc_removeProperty(APCHookProperty* _Nonnull p);

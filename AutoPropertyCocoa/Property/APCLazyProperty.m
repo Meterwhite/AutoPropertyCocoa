@@ -1,5 +1,5 @@
 //
-//  AutoLazyPropertyInfo.m
+//  APCLazyProperty.m
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/20.
@@ -9,7 +9,7 @@
 #import "APCInstancePropertyCacheManager.h"
 #import "APCLazyloadOldLoopController.h"
 #import "APCClassPropertyMapperController.h"
-#import "AutoLazyPropertyInfo.h"
+#import "APCLazyProperty.h"
 #import "NSObject+APCLazyLoad.h"
 #import "APCScope.h"
 
@@ -18,9 +18,9 @@ id    _Nullable apc_lazy_property       (_Nullable id _self,SEL __cmd);
 void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 
-#pragma mark - AutoLazyPropertyInfo
+#pragma mark - APCLazyProperty
 
-@implementation AutoLazyPropertyInfo
+@implementation APCLazyProperty
 
 
 - (instancetype)initWithPropertyName:(NSString *)propertyName aClass:(__unsafe_unretained Class)aClass
@@ -29,11 +29,11 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
                                    aClass:aClass]){
         
         
-        
-        if(self.kindOfOwner == AutoPropertyOwnerKindOfClass){
+        _methodStyle = APCMethodGetterStyle;
+        if(self.kindOfOwner == APCPropertyOwnerKindOfClass){
             
-            if(self.kindOfValue != AutoPropertyValueKindOfObject
-               && self.kindOfValue != AutoPropertyValueKindOfBlock){
+            if(self.kindOfValue != APCPropertyValueKindOfObject
+               && self.kindOfValue != APCPropertyValueKindOfBlock){
                 
                 NSAssert(NO, @"APC: Disable binding on basic-value type properties of class types.");
             }
@@ -44,12 +44,12 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 - (void)hookUsingUserSelector:(SEL)aSelector
 {
-    _kindOfHook     =   AutoPropertyHookKindOfSelector;
+    _kindOfHook     =   APCPropertyHookKindOfSelector;
     _userSelector   =   aSelector?:@selector(new);
     _userBlock      =   nil;
     IMP newimp      =   nil;
-    if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
-       self.kindOfValue == AutoPropertyValueKindOfObject){
+    if(self.kindOfValue == APCPropertyValueKindOfBlock ||
+       self.kindOfValue == APCPropertyValueKindOfObject){
         
         newimp = (IMP)apc_lazy_property;
     }else{
@@ -59,7 +59,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     
     [self hookPropertyWithImplementation:newimp option:0];
     
-    if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
         [self cacheToClassMapper];
     }else{
@@ -70,12 +70,12 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 - (void)hookUsingUserBlock:(id)block
 {
-    _kindOfHook     =   AutoPropertyHookKindOfBlock;
+    _kindOfHook     =   APCPropertyHookKindOfBlock;
     _userBlock      =   [block copy];
     _userSelector   =   nil;
     IMP newimp      =   nil;
-    if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
-       self.kindOfValue == AutoPropertyValueKindOfObject){
+    if(self.kindOfValue == APCPropertyValueKindOfBlock ||
+       self.kindOfValue == APCPropertyValueKindOfObject){
         
         newimp = (IMP)apc_lazy_property;
     }else{
@@ -85,7 +85,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     [self hookPropertyWithImplementation:newimp option:0];
     
     ///Cache
-    if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
         [self cacheToClassMapper];
     }else{
@@ -98,13 +98,13 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 {
     _new_getter_implementation = implementation;
     
-    if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
-        ///AutoPropertyOwnerKindOfClass
+        ///APCPropertyOwnerKindOfClass
         _old_getter_implementation
         =
         class_replaceMethod(_des_class
-                            , NSSelectorFromString(_des_method_name)
+                            , NSSelectorFromString(_des_getter_name)
                             , _new_getter_implementation
                             , [NSString stringWithFormat:@"%@@:", self.valueTypeEncoding].UTF8String);
         
@@ -115,9 +115,9 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
             
             ///Superclass and subclass used the same old implementation that is from superclass.
             
-            AutoLazyPropertyInfo* pinfo_superclass
+            APCLazyProperty* pinfo_superclass
             =
-            [_cacheForClass propertyForDesclass:_src_class property:_des_method_name];
+            [_cacheForClass propertyForDesclass:_src_class property:_des_getter_name];
             
             if(nil != pinfo_superclass){
                 
@@ -127,7 +127,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
                 _old_getter_implementation
                 =
                 class_getMethodImplementation(_src_class
-                                              , NSSelectorFromString(_des_method_name));
+                                              , NSSelectorFromString(_des_getter_name));
             }
             
             NSAssert(_old_getter_implementation, @"APC: Can not find original implementation.");
@@ -136,7 +136,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     else{
         
         Class proxyClass;
-        if(NO == [AutoLazyPropertyInfo testingProxyClassInstance:_instance])
+        if(NO == [APCLazyProperty testingProxyClassInstance:_instance])
         {
             
             NSString *proxyClassName = self.proxyClassName;
@@ -160,7 +160,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
         _old_getter_implementation
         =
         class_replaceMethod(proxyClass
-                            , NSSelectorFromString(_des_method_name)
+                            , NSSelectorFromString(_des_getter_name)
                             , _new_getter_implementation
                             , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
         if(nil == _old_getter_implementation){
@@ -168,7 +168,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
             _old_getter_implementation
             =
             class_getMethodImplementation(_des_class
-                                          , NSSelectorFromString(_des_method_name));
+                                          , NSSelectorFromString(_des_getter_name));
         }
     }
 }
@@ -182,14 +182,14 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
         
     [self invalid];
     
-    if(_kindOfOwner == AutoPropertyOwnerKindOfClass)
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass)
     {
         [self unhookForClass];
         [self removeFromClassCache];
     }
     else
     {
-        if(NO == [AutoLazyPropertyInfo testingProxyClassInstance:_instance]){
+        if(NO == [APCLazyProperty testingProxyClassInstance:_instance]){
             ///Instance has been unbound by other threads.
             return;
         }
@@ -211,7 +211,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     _new_getter_implementation = nil;
     
     class_replaceMethod(_des_class
-                        , NSSelectorFromString(_des_method_name)
+                        , NSSelectorFromString(_des_getter_name)
                         , _old_getter_implementation
                         , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
 }
@@ -223,7 +223,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
         _new_getter_implementation = nil;
         
         class_replaceMethod([_instance class]
-                            , NSSelectorFromString(_des_method_name)
+                            , NSSelectorFromString(_des_getter_name)
                             , _old_getter_implementation
                             , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
     }else{
@@ -235,7 +235,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     }
 }
 
-- (_Nullable id)performOldSetterFromTarget:(_Nonnull id)target
+- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target
 {
     if(NO == (_new_getter_implementation && _old_getter_implementation)){
         
@@ -247,7 +247,7 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     id ret
     =
     apc_getterimp_boxinvok(target
-                           , NSSelectorFromString(_des_method_name)
+                           , NSSelectorFromString(_des_getter_name)
                            , _old_getter_implementation
                            , self.valueTypeEncoding.UTF8String);
     
@@ -287,10 +287,10 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 - (void)setValue:(id)value toTarget:(id)target
 {
-    NSAssert(self.accessOption & AutoPropertySetValueEnable, @"APC: Object %@ must have setter or _ivar.",target);
+    NSAssert(self.accessOption & APCPropertySetValueEnable, @"APC: Object %@ must have setter or _ivar.",target);
     
-    if((self.accessOption & AutoPropertyAssociatedSetter)
-       || (self.accessOption & AutoPropertyComponentOfSetter)){
+    if((self.accessOption & APCPropertyAssociatedSetter)
+       || (self.accessOption & APCPropertyComponentOfSetter)){
         
         ///Set value by setter
         IMP imp = class_getMethodImplementation([target class]
@@ -308,8 +308,8 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     }else{
         
         ///Set value to ivar
-        if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
-           self.kindOfValue == AutoPropertyValueKindOfObject){
+        if(self.kindOfValue == APCPropertyValueKindOfBlock ||
+           self.kindOfValue == APCPropertyValueKindOfObject){
             
             object_setIvar(target, self.associatedIvar, value);
         }else{
@@ -325,14 +325,14 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 {
     [APCInstancePropertyCacheManager bindProperty:self
                                        toInstance:_instance
-                                              cmd:_des_method_name];
+                                              cmd:_des_getter_name];
 }
 
 - (void)removeFromInstanceCache
 {
     
     [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
-                                                                 cmd:_des_method_name];
+                                                                 cmd:_des_getter_name];
     
     if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
         
@@ -376,7 +376,7 @@ static APCClassPropertyMapperController* _cacheForClass;
         return [self cachedFromAClass:[instance class] property:property];
     }
     
-    AutoLazyPropertyInfo*   p;
+    APCLazyProperty*   p;
     Class                   clazz = [instance class];
     while (lenth) {
         
@@ -405,7 +405,7 @@ static APCClassPropertyMapperController* _cacheForClass;
 
 
 
-#pragma mark - AutoPropertyHookProxyClassNameProtocol
+#pragma mark - APCPropertyHookProxyClassNameProtocol
 - (NSString*)proxyClassName
 {
     //Class+APCProxyClass.hash

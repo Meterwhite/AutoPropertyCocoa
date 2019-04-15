@@ -1,5 +1,5 @@
 //
-//  AutoTriggerPropertyInfo.m
+//  APCTriggerGetterProperty.m
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/30.
@@ -7,7 +7,7 @@
 //
 #import "APCInstancePropertyCacheManager.h"
 #import "APCClassPropertyMapperController.h"
-#import "AutoTriggerPropertyInfo.h"
+#import "APCTriggerGetterProperty.h"
 #import "APCScope.h"
 
 id    _Nullable apc_trigger_getter         (_Nullable id _self,SEL __cmd);
@@ -16,21 +16,14 @@ void* _Nullable apc_trigger_getter_impimage(NSString* eType);
 id    _Nullable apc_trigger_setter         (_Nullable id _self,SEL __cmd);
 void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 
-@implementation AutoTriggerPropertyInfo
+@implementation APCTriggerGetterProperty
 {
-    void(^_block_getter_fronttrigger)(id _Nonnull instance);
-    void(^_block_getter_posttrigger)(id _Nonnull instance,id _Nullable value);
-    void(^_block_getter_usertrigger)(id _Nonnull instance,id _Nullable value);
-    BOOL(^_block_getter_usercondition)(id _Nonnull instance,id _Nullable value);
-    void(^_block_getter_counttrigger)(id _Nonnull instance,id _Nullable value);
-    BOOL(^_block_getter_countcondition)(id _Nonnull instance,id _Nullable value,NSUInteger count);
-    
-    void(^_block_setter_fronttrigger)(id _Nonnull instance,id _Nullable value);
-    void(^_block_setter_posttrigger)(id _Nonnull instance,id _Nullable value);
-    void(^_block_setter_usertrigger)(id _Nonnull instance,id _Nullable value);
-    BOOL(^_block_setter_usercondition)(id _Nonnull instance,id _Nullable value);
-    void(^_block_setter_counttrigger)(id _Nonnull instance,id _Nullable value);
-    BOOL(^_block_setter_countcondition)(id _Nonnull instance,id _Nullable value,NSUInteger count);
+    void(^_block_fronttrigger)(id _Nonnull instance);
+    void(^_block_posttrigger)(id _Nonnull instance,id _Nullable value);
+    void(^_block_usertrigger)(id _Nonnull instance,id _Nullable value);
+    BOOL(^_block_usercondition)(id _Nonnull instance,id _Nullable value);
+    void(^_block_counttrigger)(id _Nonnull instance,id _Nullable value);
+    BOOL(^_block_countcondition)(id _Nonnull instance,id _Nullable value,NSUInteger count);
 }
 
 - (instancetype)initWithPropertyName:(NSString* _Nonnull)propertyName
@@ -38,8 +31,9 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 {
     if(self = [super initWithPropertyName:propertyName aClass:aClass]){
         
-        _kindOfHook     = AutoPropertyHookKindOfIMP;
-        _triggerOption  = AutoPropertyNonTrigger;
+        _kindOfHook     = APCPropertyHookKindOfIMP;
+        _triggerOption  = APCPropertyNonTrigger;
+        _methodStyle    = APCMethodGetterStyle;
     }
     return self;
 }
@@ -47,218 +41,109 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 #pragma mark - getter
 - (void)getterBindFrontTrigger:(void (^)(id _Nonnull, id _Nullable))block
 {
-    _block_getter_fronttrigger = [block copy];
-    _triggerOption |= AutoPropertyGetterFrontTrigger;
+    _block_fronttrigger = [block copy];
+    _triggerOption |= APCPropertyGetterFrontTrigger;
 }
 
 - (void)getterBindPostTrigger:(void (^)(id _Nonnull, id _Nullable))block
 {
-    _block_getter_posttrigger = [block copy];
-    _triggerOption |= AutoPropertyGetterPostTrigger;
+    _block_posttrigger = [block copy];
+    _triggerOption |= APCPropertyGetterPostTrigger;
 }
 
 - (void)getterBindUserTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable))condition
 {
-    _block_getter_usertrigger   = [block copy];
-    _block_getter_usercondition = [condition copy];
-    _triggerOption |= AutoPropertyGetterUserTrigger;
+    _block_usertrigger   = [block copy];
+    _block_usercondition = [condition copy];
+    _triggerOption |= APCPropertyGetterUserTrigger;
 }
 
 - (void)getterBindCountTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition
 {
-    _block_getter_counttrigger   = [block copy];
-    _block_getter_countcondition = [condition copy];
-    _triggerOption |= AutoPropertyGetterCountTrigger;
+    _block_counttrigger   = [block copy];
+    _block_countcondition = [condition copy];
+    _triggerOption |= APCPropertyGetterCountTrigger;
 }
 
 - (void)getterUnbindFrontTrigger
 {
-    _block_getter_fronttrigger = nil;
-    _triggerOption &= ~AutoPropertyGetterFrontTrigger;
+    _block_fronttrigger = nil;
+    _triggerOption &= ~APCPropertyGetterFrontTrigger;
     [self tryUnhook];
 }
 
 - (void)getterUnbindPostTrigger
 {
-    _block_getter_posttrigger = nil;
-    _triggerOption &= ~AutoPropertyGetterPostTrigger;
+    _block_posttrigger = nil;
+    _triggerOption &= ~APCPropertyGetterPostTrigger;
     [self tryUnhook];
 }
 
 - (void)getterUnbindUserTrigger
 {
-    _block_getter_usertrigger   = nil;
-    _block_getter_usercondition = nil;
-    _triggerOption &= ~AutoPropertyGetterUserTrigger;
+    _block_usertrigger   = nil;
+    _block_usercondition = nil;
+    _triggerOption &= ~APCPropertyGetterUserTrigger;
     [self tryUnhook];
 }
 
 - (void)getterUnbindCountTrigger
 {
-    _block_getter_counttrigger   = nil;
-    _block_getter_countcondition = nil;
-    _triggerOption &= ~AutoPropertyGetterCountTrigger;
+    _block_counttrigger   = nil;
+    _block_countcondition = nil;
+    _triggerOption &= ~APCPropertyGetterCountTrigger;
     [self tryUnhook];
 }
 
 - (void)performGetterFrontTriggerBlock:(id)_SELF
 {
-    if(_block_getter_fronttrigger){
+    if(_block_fronttrigger){
         
-        _block_getter_fronttrigger(_SELF);
+        _block_fronttrigger(_SELF);
     }
 }
 
 - (void)performGetterPostTriggerBlock:(id)_SELF value:(id)value
 {
-    if(_block_getter_posttrigger){
+    if(_block_posttrigger){
         
-        _block_getter_posttrigger(_SELF, value);
+        _block_posttrigger(_SELF, value);
     }
 }
 
 - (BOOL)performGetterUserConditionBlock:(id)_SELF value:(id)value
 {
-    if(_block_getter_usercondition){
+    if(_block_usercondition){
         
-        return _block_getter_usercondition(_SELF, value);
+        return _block_usercondition(_SELF, value);
     }
     return NO;
 }
 
 - (void)performGetterUserTriggerBlock:(id)_SELF value:(id)value
 {
-    if(_block_getter_usertrigger){
+    if(_block_usertrigger){
         
-        _block_getter_usertrigger(_SELF,value);
+        _block_usertrigger(_SELF,value);
     }
 }
 
 - (void)performGetterCountTriggerBlock:(id)_SELF value:(id)value
 {
-    if(_block_getter_counttrigger){
+    if(_block_counttrigger){
         
-        _block_getter_counttrigger(_SELF,value);
+        _block_counttrigger(_SELF,value);
     }
 }
 
 - (BOOL)performGetterCountConditionBlock:(id)_SELF value:(id)value
 {
-    if(_block_getter_countcondition){
+    if(_block_countcondition){
         
-        return _block_getter_countcondition(_SELF, value, self.accessCount);
+        return _block_countcondition(_SELF, value, self.accessCount);
     }
     return NO;
 }
-
-#pragma mark - setter
-
-- (void)setterBindFrontTrigger:(void (^)(id _Nonnull, id _Nullable))block
-{
-    _block_setter_fronttrigger = [block copy];
-    _triggerOption |= AutoPropertySetterFrontTrigger;
-}
-
-- (void)setterBindPostTrigger:(void (^)(id _Nonnull, id _Nullable))block
-{
-    _block_setter_posttrigger = [block copy];
-    _triggerOption |= AutoPropertySetterPostTrigger;
-}
-
-- (void)setterBindUserTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable))condition
-{
-    _block_setter_usertrigger   = [block copy];
-    _block_setter_usercondition = [condition copy];
-    _triggerOption |= AutoPropertySetterUserTrigger;
-}
-
-- (void)setterBindCountTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition
-{
-    _block_setter_counttrigger   = [block copy];
-    _block_setter_countcondition = [condition copy];
-    _triggerOption |= AutoPropertySetterCountTrigger;
-}
-
-- (void)setterUnbindFrontTrigger
-{
-    _block_setter_fronttrigger = nil;
-    _triggerOption &= ~AutoPropertySetterFrontTrigger;
-    [self tryUnhook];
-}
-
-- (void)setterUnbindPostTrigger
-{
-    _block_setter_posttrigger = nil;
-    _triggerOption &= ~AutoPropertySetterPostTrigger;
-    [self tryUnhook];
-}
-
-- (void)setterUnbindUserTrigger
-{
-    _block_setter_usertrigger   = nil;
-    _block_setter_usercondition = nil;
-    _triggerOption &= ~AutoPropertySetterUserTrigger;
-    [self tryUnhook];
-}
-
-- (void)setterUnbindCountTrigger
-{
-    _block_setter_counttrigger   = nil;
-    _block_setter_countcondition = nil;
-    _triggerOption &= ~AutoPropertySetterCountTrigger;
-    [self tryUnhook];
-}
-
-- (void)performSetterFrontTriggerBlock:(id)_SELF value:(id)value
-{
-    if(_block_setter_fronttrigger){
-        
-        _block_setter_fronttrigger(_SELF,value);
-    }
-}
-
-- (void)performSetterPostTriggerBlock:(id)_SELF value:(id)value
-{
-    if(_block_setter_posttrigger){
-        
-        _block_setter_posttrigger(_SELF, value);
-    }
-}
-
-- (BOOL)performSetterUserConditionBlock:(id)_SELF value:(id)value
-{
-    if(_block_setter_usercondition){
-        
-        return _block_setter_usercondition(_SELF, value);
-    }
-    return NO;
-}
-
-- (void)performSetterUserTriggerBlock:(id)_SELF value:(id)value
-{
-    if(_block_setter_usertrigger){
-        
-        _block_setter_usertrigger(_SELF,value);
-    }
-}
-
-- (BOOL)performSetterCountConditionBlock:(id)_SELF value:(id)value
-{
-    if(_block_setter_countcondition){
-        
-        return _block_setter_countcondition(_SELF, value, self.accessCount);
-    }
-    return NO;
-}
-
-- (void)performSetterCountTriggerBlock:(id)_SELF value:(id)value
-{
-    if(_block_setter_counttrigger){
-        
-        _block_setter_counttrigger(_SELF,value);
-    }
-}
-
 
 #pragma mark - Hook
 - (void)hook
@@ -266,32 +151,32 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     IMP newimp = nil;
     
     if(nil == _old_getter_implementation
-       && self.triggerOption & AutoPropertyTriggerOfGetter){
+       && self.triggerOption & APCPropertyTriggerOfGetter){
         
-        if(self.kindOfValue == AutoPropertyValueKindOfBlock
-           || self.kindOfValue == AutoPropertyValueKindOfObject){
+        if(self.kindOfValue == APCPropertyValueKindOfBlock
+           || self.kindOfValue == APCPropertyValueKindOfObject){
             
             newimp = (IMP)apc_trigger_getter;
         }else{
             
             newimp = (IMP)apc_trigger_getter_impimage(self.valueTypeEncoding);
         }
-        [self hookPropertyWithImplementation:newimp option:AutoPropertyTriggerOfGetter];
+        [self hookPropertyWithImplementation:newimp option:APCPropertyTriggerOfGetter];
         goto CACHE;
     }
     
     if(nil == _old_setter_implementation
-       && self.triggerOption & AutoPropertyTriggerOfSetter){
+       && self.triggerOption & APCPropertyTriggerOfSetter){
         
-        if(self.kindOfValue == AutoPropertyValueKindOfBlock
-           || self.kindOfValue == AutoPropertyValueKindOfObject){
+        if(self.kindOfValue == APCPropertyValueKindOfBlock
+           || self.kindOfValue == APCPropertyValueKindOfObject){
             
             newimp = (IMP)apc_trigger_setter;
         }else{
             
             newimp = (IMP)apc_trigger_setter_impimage(self.valueTypeEncoding);
         }
-        [self hookPropertyWithImplementation:newimp option:AutoPropertyTriggerOfSetter];
+        [self hookPropertyWithImplementation:newimp option:APCPropertyTriggerOfSetter];
         goto CACHE;
     }
     
@@ -300,7 +185,7 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 CACHE:
     {
         
-        if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+        if(_kindOfOwner == APCPropertyOwnerKindOfClass){
             
             [self cacheToClassMapper];
         }else{
@@ -318,15 +203,15 @@ CACHE:
     NSString*           des_name    = nil;
     SEL                 des_sel     = nil;
     IMP                 oldIMP      = nil;
-    if(option == AutoPropertyTriggerOfGetter){
+    if(option == APCPropertyTriggerOfGetter){
         
         [methodEnc appendString:self.valueTypeEncoding];
         _new_getter_implementation = implementation;
-        des_name = _des_method_name;
+        des_name = _des_getter_name;
         des_sel = NSSelectorFromString(des_name);
     }
     [methodEnc appendString:@"@:"];
-    if(option == AutoPropertyTriggerOfSetter){
+    if(option == APCPropertyTriggerOfSetter){
         
         [methodEnc appendString:self.valueTypeEncoding];
         _new_setter_implementation = implementation;
@@ -335,7 +220,7 @@ CACHE:
     }
     
     
-    if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
         oldIMP
         =
@@ -346,14 +231,14 @@ CACHE:
         
         if(nil == oldIMP){
             
-            AutoTriggerPropertyInfo* pinfo_superclass
+            APCTriggerGetterProperty* pinfo_superclass
             =
             [_cacheForClass propertyForDesclass:_src_class property:des_name];
             
             if(nil != pinfo_superclass){
                 
                 oldIMP =
-                (option == AutoPropertyTriggerOfGetter)
+                (option == APCPropertyTriggerOfGetter)
                 ? pinfo_superclass->_old_getter_implementation
                 : pinfo_superclass->_old_setter_implementation;
                 
@@ -367,7 +252,7 @@ CACHE:
         
         if(nil == _proxyClass){
             
-            if(NO == [AutoTriggerPropertyInfo testingProxyClassInstance:_instance]){
+            if(NO == [APCTriggerGetterProperty testingProxyClassInstance:_instance]){
                 
                 NSString *proxyClassName = self.proxyClassName;
                 _proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
@@ -398,7 +283,7 @@ CACHE:
         }
     }
     
-    if(option == AutoPropertyTriggerOfGetter){
+    if(option == APCPropertyTriggerOfGetter){
         
         _old_getter_implementation         = oldIMP;
     }else{
@@ -407,7 +292,7 @@ CACHE:
     }
 }
 
-- (_Nullable id)performOldSetterFromTarget:(_Nonnull id)target
+- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target
 {
     if(NO == (_new_getter_implementation && _old_getter_implementation)){
         
@@ -417,7 +302,7 @@ CACHE:
     return
     
     apc_getterimp_boxinvok(target
-                           , NSSelectorFromString(_des_method_name)
+                           , NSSelectorFromString(_des_getter_name)
                            , _old_getter_implementation
                            , self.valueTypeEncoding.UTF8String);
 }
@@ -445,7 +330,7 @@ CACHE:
 
 - (void)tryUnhook
 {
-    if(_triggerOption == AutoPropertyNonTrigger){
+    if(_triggerOption == APCPropertyNonTrigger){
         
         [self unhook];
     }
@@ -458,13 +343,13 @@ CACHE:
 {
     
     [self invalid];
-    if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
         [self unhookForClass];
         [self removeFromClassCache];
     }else{
         
-        if(NO == [AutoTriggerPropertyInfo testingProxyClassInstance:_instance]){
+        if(NO == [APCTriggerGetterProperty testingProxyClassInstance:_instance]){
             ///Instance has been unbound by other threads.
             return;
         }
@@ -479,14 +364,14 @@ CACHE:
     
     NSUInteger count
     =
-    (YES == (self.triggerOption & AutoPropertyTriggerOfGetter))
+    (YES == (self.triggerOption & APCPropertyTriggerOfGetter))
     +
-    (YES == (self.triggerOption & AutoPropertyTriggerOfSetter));
+    (YES == (self.triggerOption & APCPropertyTriggerOfSetter));
     
     while (count--) {
         
         class_replaceMethod(_des_class
-                            , NSSelectorFromString(count==1?_des_method_name:_des_setter_name)
+                            , NSSelectorFromString(count==1?_des_getter_name:_des_setter_name)
                             , _old_getter_implementation
                             , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
     }
@@ -504,9 +389,9 @@ CACHE:
 {
     [APCInstancePropertyCacheManager bindProperty:self
                                        toInstance:_instance
-                                              cmd:_des_method_name];
+                                              cmd:_des_getter_name];
     
-    if(self.triggerOption & AutoPropertyTriggerOfSetter){
+    if(self.triggerOption & APCPropertyTriggerOfSetter){
         
         [APCInstancePropertyCacheManager bindProperty:self
                                            toInstance:_instance
@@ -517,7 +402,7 @@ CACHE:
 - (void)removeFromInstanceCache
 {
     [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
-                                                                 cmd:_des_method_name];
+                                                                 cmd:_des_getter_name];
     
     if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
         
@@ -540,7 +425,7 @@ static APCClassPropertyMapperController* _cacheForClass;
 + (_Nullable instancetype)cachedTargetClass:(Class)clazz
                                    property:(NSString*)property
 {
-    clazz = [AutoTriggerPropertyInfo unproxyClass:clazz];
+    clazz = [APCTriggerGetterProperty unproxyClass:clazz];
     
     return [_cacheForClass propertyForDesclass:clazz property:property];
 }
@@ -548,7 +433,7 @@ static APCClassPropertyMapperController* _cacheForClass;
 + (instancetype)cachedFromAClass:(Class)aClazz
                         property:(NSString *)property
 {
-    aClazz = [AutoTriggerPropertyInfo unproxyClass:aClazz];
+    aClazz = [APCTriggerGetterProperty unproxyClass:aClazz];
     
     return [_cacheForClass searchFromTargetClass:aClazz property:property];
 }
@@ -564,9 +449,9 @@ static APCClassPropertyMapperController* _cacheForClass;
     NSMutableSet* set = [NSMutableSet set];
     
     [set addObject:[APCPropertyMapperkey keyWithClass:_des_class
-                                             property:_des_method_name]];
+                                             property:_des_getter_name]];
     
-    if(self.triggerOption & AutoPropertyTriggerOfSetter){
+    if(self.triggerOption & APCPropertyTriggerOfSetter){
         
         [set addObject:[APCPropertyMapperkey keyWithClass:_des_class
                                                  property:_des_setter_name]];
@@ -576,7 +461,7 @@ static APCClassPropertyMapperController* _cacheForClass;
 }
 
 
-#pragma mark - AutoPropertyHookProxyClassNameProtocol
+#pragma mark - APCPropertyHookProxyClassNameProtocol
 - (NSString*)proxyClassName
 {
     //Class+APCProxyClass.hash

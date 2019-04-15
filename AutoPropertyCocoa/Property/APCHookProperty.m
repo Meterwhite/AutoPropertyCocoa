@@ -6,13 +6,13 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "AutoHookPropertyInfo.h"
+#import "APCHookProperty.h"
 
-@implementation AutoHookPropertyInfo
+@implementation APCHookProperty
 
 - (void)dealloc
 {
-    if(self.kindOfOwner == AutoPropertyOwnerKindOfInstance){
+    if(self.kindOfOwner == APCPropertyOwnerKindOfInstance){
         
         [self disposeRuntimeResource];
     }

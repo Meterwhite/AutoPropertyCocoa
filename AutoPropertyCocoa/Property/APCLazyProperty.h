@@ -1,17 +1,14 @@
 //
-//  AutoLazyPropertyInfo.h
+//  APCLazyProperty.h
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/20.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "AutoHookPropertyInfo.h"
+#import "APCHookProperty.h"
 
-/**
- 对子类懒加载父类的属性，子类使用覆盖属性的策略，解绑也没问题
- */
-@interface AutoLazyPropertyInfo : AutoHookPropertyInfo <AutoPropertyHookProxyClassNameProtocol>
+@interface APCLazyProperty : APCHookProperty <APCPropertyHookProxyClassNameProtocol>
 {
 @public
     
@@ -30,7 +27,7 @@
 - (void)unhook;
 + (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz;
 
-- (_Nullable id)performOldSetterFromTarget:(_Nonnull id)target;
+- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target;
 
 - (id _Nullable)instancetypeNewObjectByUserSelector;
 

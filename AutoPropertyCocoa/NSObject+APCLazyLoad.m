@@ -8,7 +8,7 @@
 #import "APCInstancePropertyCacheManager.h"
 #import "APCLazyloadOldLoopController.h"
 #import "NSObject+APCLazyLoad.h"
-#import "AutoLazyPropertyInfo.h"
+#import "APCLazyProperty.h"
 #import "APCScope.h"
 
 
@@ -45,14 +45,14 @@
 
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-    AutoLazyPropertyInfo* p = [AutoLazyPropertyInfo cachedTargetClass:self property:property];
+    APCLazyProperty* p = [APCLazyProperty cachedTargetClass:self property:property];
     
     [p unhook];
 }
 
 + (void)apc_unbindLazyLoadAllProperties
 {
-    [AutoLazyPropertyInfo unhookClassAllProperties:self];
+    [APCLazyProperty unhookClassAllProperties:self];
 }
 
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
@@ -88,7 +88,7 @@
 
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
-    [(AutoLazyPropertyInfo*)[APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property] unhook];
+    [(APCLazyProperty*)[APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property] unhook];
 }
 
 - (void)apc_unbindLazyLoadAllProperties
@@ -102,18 +102,18 @@
                           hookWithBlock:(id)block
                             hookWithSEL:(SEL)aSelector
 {
-    AutoLazyPropertyInfo* propertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:propertyName];
+    APCLazyProperty* propertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:propertyName];
     
     if(propertyInfo == nil){
         
-        propertyInfo = [AutoLazyPropertyInfo instanceWithProperty:propertyName aInstance:self];
+        propertyInfo = [APCLazyProperty instanceWithProperty:propertyName aInstance:self];
     }
     
-    if(NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)
+    if(NO  == (propertyInfo.accessOption & APCPropertyGetValueEnable)
        
        ||
        
-       NO  == (propertyInfo.accessOption & AutoPropertySetValueEnable)){
+       NO  == (propertyInfo.accessOption & APCPropertySetValueEnable)){
         return;
     }
     
@@ -131,21 +131,21 @@
                        hookWithBlock:(id)block
                          hookWithSEL:(SEL)aSelector
 {
-    AutoLazyPropertyInfo* propertyInfo
+    APCLazyProperty* propertyInfo
     =
-    [AutoLazyPropertyInfo cachedTargetClass:self property:propertyName];
+    [APCLazyProperty cachedTargetClass:self property:propertyName];
     
     if(propertyInfo == nil){
         
-        propertyInfo = [AutoLazyPropertyInfo instanceWithProperty:propertyName aClass:self];
+        propertyInfo = [APCLazyProperty instanceWithProperty:propertyName aClass:self];
     }
     
     
-    if(NO  == (propertyInfo.accessOption & AutoPropertyGetValueEnable)
+    if(NO  == (propertyInfo.accessOption & APCPropertyGetValueEnable)
        
        ||
        
-       NO  == (propertyInfo.accessOption & AutoPropertySetValueEnable)){
+       NO  == (propertyInfo.accessOption & APCPropertySetValueEnable)){
         return;
     }
     
@@ -164,13 +164,13 @@
  */
 id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
 {
-    AutoLazyPropertyInfo* lazyPropertyInfo;
+    APCLazyProperty* lazyPropertyInfo;
     
     if(nil == (lazyPropertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
         
         //Get info from _SELF.
         //The info tell me where does it search from.
-        if(nil == (lazyPropertyInfo = [AutoLazyPropertyInfo cachedFromAClassByInstance:_SELF property:NSStringFromSelector(_CMD)]))
+        if(nil == (lazyPropertyInfo = [APCLazyProperty cachedFromAClassByInstance:_SELF property:NSStringFromSelector(_CMD)]))
             
             NSCAssert(NO, @"APC: Lose property info.");
         
@@ -178,15 +178,15 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     if(NO == lazyPropertyInfo.enable
        || YES == [APCLazyloadOldLoopController testingIsInLoop:_SELF]){
         
-        return [lazyPropertyInfo performOldSetterFromTarget:_SELF];
+        return [lazyPropertyInfo performOldGetterFromTarget:_SELF];
     }
     
     
     id                  value       = nil;
     ///Get value.(All returned value are boxed)
-    if(lazyPropertyInfo.accessOption & AutoPropertyComponentOfGetter){
+    if(lazyPropertyInfo.accessOption & APCPropertyComponentOfGetter){
         
-        value = [lazyPropertyInfo performOldSetterFromTarget:_SELF];
+        value = [lazyPropertyInfo performOldGetterFromTarget:_SELF];
     }else{
         
         value = [lazyPropertyInfo getIvarValueFromTarget:_SELF];
@@ -196,11 +196,11 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     NSUInteger   accessCount = lazyPropertyInfo.accessCount;
     if(value == nil
        
-       && (lazyPropertyInfo.kindOfValue == AutoPropertyValueKindOfBlock ||
-           lazyPropertyInfo.kindOfValue == AutoPropertyValueKindOfObject))
+       && (lazyPropertyInfo.kindOfValue == APCPropertyValueKindOfBlock ||
+           lazyPropertyInfo.kindOfValue == APCPropertyValueKindOfObject))
     {
         ///Create default value.
-        if(lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfSelector){
+        if(lazyPropertyInfo.kindOfHook == APCPropertyHookKindOfSelector){
             
             value = [lazyPropertyInfo instancetypeNewObjectByUserSelector];
         }
@@ -212,11 +212,11 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     }
     else if (accessCount == 0
              
-             && (lazyPropertyInfo.kindOfValue != AutoPropertyValueKindOfBlock ||
-                 lazyPropertyInfo.kindOfValue != AutoPropertyValueKindOfObject))
+             && (lazyPropertyInfo.kindOfValue != APCPropertyValueKindOfBlock ||
+                 lazyPropertyInfo.kindOfValue != APCPropertyValueKindOfObject))
     {
         
-        NSCAssert(lazyPropertyInfo.kindOfHook == AutoPropertyHookKindOfBlock
+        NSCAssert(lazyPropertyInfo.kindOfHook == APCPropertyHookKindOfBlock
                   , @"APC: Basic-value only supportted be initialized by 'userblock'.");
         
         value = [lazyPropertyInfo performUserBlock:_SELF];

@@ -7,7 +7,7 @@
 //
 
 #import "APCClassPropertyMapperController.h"
-#import "AutoTriggerPropertyInfo.h"
+#import "APCTriggerGetterProperty.h"
 #import "APCScope.h"
 
 @interface NSObject (APCTriggerProperty)

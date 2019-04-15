@@ -1,5 +1,5 @@
 //
-//  AutoPropertyInfo.h
+//  APCProperty.h
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/14.
@@ -10,64 +10,64 @@
 #import "APCMethodInfo.h"
 #import "APCScope.h"
 
-typedef NS_OPTIONS (NSUInteger,AutoPropertyAccessOptions){
+typedef NS_OPTIONS (NSUInteger,APCPropertyAccessOptions){
     
-    AutoPropertyKVCDisable          =   0,
+    APCPropertyKVCDisable          =   0,
     ///Getter from property attributes.
-    AutoPropertyComponentOfGetter   =   1   <<  0,
+    APCPropertyComponentOfGetter   =   1   <<  0,
     
-    AutoPropertyComponentOfSetter   =   1   <<  1,
+    APCPropertyComponentOfSetter   =   1   <<  1,
     
-    AutoPropertyComponentOfIVar     =   1   <<  2,
+    APCPropertyComponentOfIVar     =   1   <<  2,
     ///Setter from property list.
-    AutoPropertyAssociatedSetter    =   1   <<  3,
+    APCPropertyAssociatedSetter    =   1   <<  3,
     ///Ivar from ivar list.
-    AutoPropertyAssociatedIVar      =   1   <<  4,
+    APCPropertyAssociatedIVar      =   1   <<  4,
     
-    AutoPropertySetValueEnable      =   AutoPropertyComponentOfSetter
-                                        | AutoPropertyAssociatedSetter
-                                        | AutoPropertyComponentOfIVar,
+    APCPropertySetValueEnable      =   APCPropertyComponentOfSetter
+                                        | APCPropertyAssociatedSetter
+                                        | APCPropertyComponentOfIVar,
     
-    AutoPropertyGetValueEnable      =   AutoPropertyComponentOfGetter
-                                        | AutoPropertyComponentOfIVar,
+    APCPropertyGetValueEnable      =   APCPropertyComponentOfGetter
+                                        | APCPropertyComponentOfIVar,
 };
 
-typedef NS_OPTIONS(NSUInteger,AutoPropertyValueKind){
+typedef NS_OPTIONS(NSUInteger,APCPropertyValueKind){
 
-    AutoPropertyValueKindOfObject        =   1,
+    APCPropertyValueKindOfObject        =   1,
     ///C number
-    AutoPropertyValueKindOfNumber        =   2,
+    APCPropertyValueKindOfNumber        =   2,
     
-    AutoPropertyValueKindOfStructure     =   3,
+    APCPropertyValueKindOfStructure     =   3,
     
-    AutoPropertyValueKindOfSEL           =   4,
+    APCPropertyValueKindOfSEL           =   4,
     
-    AutoPropertyValueKindOfPoint         =   5,
+    APCPropertyValueKindOfPoint         =   5,
     ///char*
-    AutoPropertyValueKindOfChars         =   6,
+    APCPropertyValueKindOfChars         =   6,
     
-    AutoPropertyValueKindOfBlock         =   7,
+    APCPropertyValueKindOfBlock         =   7,
 };
 
-typedef NS_OPTIONS(NSUInteger, AutoPropertyOwnerKind){
+typedef NS_OPTIONS(NSUInteger, APCPropertyOwnerKind){
     
-    AutoPropertyOwnerKindOfClass       =   0,
+    APCPropertyOwnerKindOfClass       =   0,
     
-    AutoPropertyOwnerKindOfInstance    =   1,
+    APCPropertyOwnerKindOfInstance    =   1,
 };
 
-typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
+typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
     
-    AutoPropertyHookKindOfNil       =   0,
+    APCPropertyHookKindOfNil       =   0,
     
-    AutoPropertyHookKindOfSelector  =   1,
+    APCPropertyHookKindOfSelector  =   1,
     
-    AutoPropertyHookKindOfBlock     =   2,
+    APCPropertyHookKindOfBlock     =   2,
     
-    AutoPropertyHookKindOfIMP       =   3,
+    APCPropertyHookKindOfIMP       =   3,
 };
 
-@protocol AutoPropertyHookProxyClassNameProtocol <NSObject>
+@protocol APCPropertyHookProxyClassNameProtocol <NSObject>
 
 @required
 + (Class _Nullable)unproxyClass:(Class _Nonnull __unsafe_unretained)clazz;
@@ -75,21 +75,21 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 - (NSString* _Nonnull)proxyClassName;
 @end
 
-@interface AutoPropertyInfo : APCMethodInfo <APCPropertyMapperKeyProtocol>
+@interface APCProperty : NSObject <APCPropertyMapperKeyProtocol>
 {
 @public
     
     Class                   _des_class;
     Class                   _src_class;
-    NSString*               _ori_method_name;
-    NSString*               _des_method_name;
-#warning need delete!
+    NSString*               _ori_property_name;
+    NSString*               _des_getter_name;
     NSString*               _des_setter_name;
 @protected
     
-    AutoPropertyOwnerKind   _kindOfOwner;
-    AutoPropertyHookKind    _kindOfHook;
+    APCPropertyOwnerKind   _kindOfOwner;
+    APCPropertyHookKind    _kindOfHook;
     __weak id               _instance;
+    APCMethodStyle          _methodStyle;
 @private
     
     BOOL                    _enable;
@@ -99,16 +99,17 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 @property (nonatomic,assign,readonly)BOOL                       isReadonly;
 @property (nonatomic,assign,readonly)BOOL                       enable;
 
-@property (nonatomic,assign,readonly)AutoPropertyAccessOptions  accessOption;
-@property (nonatomic,assign,readonly)AutoPropertyOwnerKind      kindOfOwner;
-@property (nonatomic,assign,readonly)AutoPropertyValueKind      kindOfValue;
-@property (nonatomic,assign,readonly)AutoPropertyHookKind       kindOfHook;
-@property (nonatomic,assign,readonly)objc_AssociationPolicy     policy;
+@property (nonatomic,assign,readonly)APCPropertyAccessOptions  accessOption;
+@property (nonatomic,assign,readonly)APCPropertyOwnerKind      kindOfOwner;
+@property (nonatomic,assign,readonly)APCPropertyValueKind      kindOfValue;
+@property (nonatomic,assign,readonly)APCPropertyHookKind       kindOfHook;
+@property (nonatomic,assign,readonly)objc_AssociationPolicy    policy;
+@property (nonatomic,assign,readonly)APCMethodStyle            methodStyle;
 
-+ (instancetype _Nonnull)instanceWithProperty:(NSString* _Nonnull)propertyName
++ (instancetype _Nonnull)instanceWithProperty:(NSString* _Nonnull)property
                                     aInstance:(id _Nonnull)aInstance;
 
-+ (instancetype _Nonnull)instanceWithProperty:(NSString* _Nonnull)propertyName
++ (instancetype _Nonnull)instanceWithProperty:(NSString* _Nonnull)property
                                        aClass:(Class _Nonnull __unsafe_unretained)aClass;
 
 - (instancetype _Nonnull)initWithPropertyName:(NSString* _Nonnull)propertyName

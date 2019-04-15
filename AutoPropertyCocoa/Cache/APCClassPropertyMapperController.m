@@ -8,7 +8,7 @@
 
 #import "APCClassPropertyMapperController.h"
 #import "APCPropertyMapperkey.h"
-#import "AutoPropertyInfo.h"
+#import "APCProperty.h"
 
 @interface APCClassPropertyMapperController ()
 {
@@ -48,7 +48,7 @@
 ///**
 // The same object will be replaced.
 // */
-//- (void)addProperty:(AutoPropertyInfo *)aProperty
+//- (void)addProperty:(APCProperty *)aProperty
 //{
 //    dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
 //
@@ -73,7 +73,7 @@
 //    dispatch_semaphore_signal(_lock);
 //}
 //
-//- (void)removeProperty:(AutoPropertyInfo *)aProperty
+//- (void)removeProperty:(APCProperty *)aProperty
 //{
 //    dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
 //
@@ -94,7 +94,7 @@
 //    APCPropertyMapperkey*   keyForSrc   = [APCPropertyMapperkey keyWithClass:srcclass];
 //    NSMutableSet*           set         = [self.mapperForSrcclassAndProperty objectForKey:keyForSrc];
 //    NSEnumerator*           e           = set.objectEnumerator;
-//    AutoPropertyInfo*       p;
+//    APCProperty*       p;
 //    [self.mapperForSrcclassAndProperty removeObjectForKey:keyForSrc];
 //    while (nil != (p = e.nextObject)) {
 //
@@ -104,7 +104,7 @@
 //    dispatch_semaphore_signal(_lock);
 //}
 //
-//- (__kindof AutoPropertyInfo*)propertyForDesclass:(Class)desclass
+//- (__kindof APCProperty*)propertyForDesclass:(Class)desclass
 //                                         property:(NSString *)property
 //{
 //    return
@@ -113,7 +113,7 @@
 //     [APCPropertyMapperkey keyWithClass:desclass property:property]];
 //}
 //
-//- (__kindof AutoPropertyInfo*)searchFromTargetClass:(Class _Nullable)desclass
+//- (__kindof APCProperty*)searchFromTargetClass:(Class _Nullable)desclass
 //                                        property:(NSString *)property
 //{
 //    if(desclass == nil){
@@ -121,7 +121,7 @@
 //        return nil;
 //    }
 //
-//    AutoPropertyInfo* p = [self.mapperForDesclassAndProperty objectForKey:
+//    APCProperty* p = [self.mapperForDesclassAndProperty objectForKey:
 //                           [APCPropertyMapperkey keyWithClass:desclass property:property]];
 //
 //    if(p == nil){

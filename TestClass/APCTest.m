@@ -6,8 +6,8 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "AutoTriggerPropertyInfo.h"
-#import "AutoLazyPropertyInfo.h"
+#import "APCTriggerGetterProperty.h"
+#import "APCLazyProperty.h"
 #import "AutoPropertyCocoa.h"
 #import <objc/runtime.h>
 #import "APCTest.h"
@@ -65,11 +65,11 @@ static NSMutableDictionary* _f_map;
 + (void)unbindAllClass
 {
     
-    [AutoLazyPropertyInfo unhookClassAllProperties:[Person class]];
-    [AutoLazyPropertyInfo unhookClassAllProperties:[Man class]];
+    [APCLazyProperty unhookClassAllProperties:[Person class]];
+    [APCLazyProperty unhookClassAllProperties:[Man class]];
     
-    [AutoTriggerPropertyInfo unhookClassAllProperties:[Person class]];
-    [AutoTriggerPropertyInfo unhookClassAllProperties:[Man class]];
+    [APCTriggerGetterProperty unhookClassAllProperties:[Person class]];
+    [APCTriggerGetterProperty unhookClassAllProperties:[Man class]];
 }
 
 #pragma mark - demo

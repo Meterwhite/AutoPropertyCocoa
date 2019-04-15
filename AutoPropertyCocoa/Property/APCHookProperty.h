@@ -6,25 +6,28 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "AutoPropertyInfo.h"
+#import "APCProperty.h"
 
-@protocol AutoHookPropertyProtocol <NSObject>
+@protocol APCHookPropertyProtocol <NSObject>
 
 @required
 - (void)disposeRuntimeResource;
 @optional
 - (id _Nullable)performOldSetterFromTarget:(_Nonnull id)target;
-- (void)performOldSetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value;
+- (void)performOldGetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value;
+
+
+
 - (void)hookPropertyWithImplementation:(IMP _Nonnull)implementation
                                 option:(NSUInteger)option;
 - (void)unhook;
 @end
 
-
+@class APCPropertyHook;
 /**
  该类型没有具体实现
  */
-@interface AutoHookPropertyInfo : AutoPropertyInfo <AutoHookPropertyProtocol>
+@interface APCHookProperty : APCProperty <APCHookPropertyProtocol>
 {
 @protected
     
@@ -34,6 +37,8 @@
     IMP         _old_getter_implementation;
     Class       _proxyClass;
 }
+
+@property (nonatomic,weak,nullable) APCPropertyHook* hook;
 
 - (void)disposeRuntimeResource;
 @end

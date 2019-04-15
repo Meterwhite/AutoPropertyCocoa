@@ -1,5 +1,5 @@
 //
-//  AutoPropertyInfo.m
+//  APCProperty.m
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/14.
@@ -7,10 +7,10 @@
 //
 
 #import "NSString+APCExtension.h"
-#import "AutoPropertyInfo.h"
+#import "APCProperty.h"
 #import "APCScope.h"
 
-@implementation AutoPropertyInfo
+@implementation APCProperty
 {
     APCAtomicUInteger _accessCount;
 }
@@ -31,7 +31,7 @@
 {
     if(self = [self initWithPropertyName:propertyName aClass:[aInstance class]]){
         
-        _kindOfOwner = AutoPropertyOwnerKindOfInstance;
+        _kindOfOwner = APCPropertyOwnerKindOfInstance;
         _instance    = aInstance;
     }
     return self;
@@ -42,9 +42,9 @@
 {
     if(self = [super init]){
         
-        _kindOfOwner       =    AutoPropertyOwnerKindOfClass;
-        _ori_method_name =    propertyName;
-        _des_method_name =    propertyName;
+        _kindOfOwner       =    APCPropertyOwnerKindOfClass;
+        _ori_property_name =    propertyName;
+        _des_getter_name =    propertyName;
         _des_class         =    aClass;
         _enable            =    YES;
         
@@ -86,7 +86,7 @@
         if (code.length > 3 && [code hasPrefix:@"@\""]) {
             
             _valueTypeEncoding = @"@";
-            _kindOfValue = AutoPropertyValueKindOfObject;
+            _kindOfValue = APCPropertyValueKindOfObject;
             code = [code substringWithRange:NSMakeRange(2, code.length - 3)];
             NSUInteger protocolLoc = [code rangeOfString:@"<"].location;
             if(protocolLoc == NSNotFound){
@@ -114,23 +114,23 @@
         else if ([code isEqualToString:@"@"]){
             //id
             _programmingType = APCProgramingType_id;
-            _kindOfValue = AutoPropertyValueKindOfObject;
+            _kindOfValue = APCPropertyValueKindOfObject;
         }else if ([code characterAtIndex:0] == '^'){
             //no more about detail info.
             _programmingType = APCProgramingType_point;
-            _kindOfValue = AutoPropertyValueKindOfPoint;
+            _kindOfValue = APCPropertyValueKindOfPoint;
         }else if([code isEqualToString:@"@?"]){
             //NSBlock
             _programmingType = APCProgramingType_NSBlock;
-            _kindOfValue = AutoPropertyValueKindOfBlock;
+            _kindOfValue = APCPropertyValueKindOfBlock;
         }else if([code isEqualToString:@"*"]){
             //point
             _programmingType = APCProgramingType_chars;
-            _kindOfValue = AutoPropertyValueKindOfChars;
+            _kindOfValue = APCPropertyValueKindOfChars;
         }else if([code isEqualToString:@":"]){
             //SEL
             _programmingType = APCProgramingType_SEL;
-            _kindOfValue = AutoPropertyValueKindOfSEL;
+            _kindOfValue = APCPropertyValueKindOfSEL;
         }else if(code.length > 3
                  && [code characterAtIndex:0] == '{'
                  && [code characterAtIndex:code.length-1] == '}'
@@ -138,59 +138,59 @@
             //structual
             code = [[code substringFromIndex:1] componentsSeparatedByString:@"="].firstObject;
             _programmingType = code;
-            _kindOfValue = AutoPropertyValueKindOfStructure;
+            _kindOfValue = APCPropertyValueKindOfStructure;
         }else if ([code isEqualToString:@"c"]){
             //char
             _programmingType = APCProgramingType_char;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"C"]){
             //unsigned char
             _programmingType = APCProgramingType_unsignedchar;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"i"]){
             //int
             _programmingType = APCProgramingType_int;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"I"]){
             //unsigned int
             _programmingType = APCProgramingType_unsignedint;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"s"]){
             //short
             _programmingType = APCProgramingType_short;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"S"]){
             //unsigned short
             _programmingType =  APCProgramingType_unsignedshort;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"l"]){
             //long
             _programmingType = APCProgramingType_long;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"L"]){
             //unsigned long
             _programmingType = APCProgramingType_unsignedlong;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"q"]){
             //long long
             _programmingType = APCProgramingType_longlong;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"Q"]){
             //unsigned long long
             _programmingType = APCProgramingType_unsignedlonglong;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"f"]){
             //float
             _programmingType = APCProgramingType_float;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"d"]){
             //double
             _programmingType = APCProgramingType_double;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"B"]){
             //bool
             _programmingType = APCProgramingType_bool;
-            _kindOfValue = AutoPropertyValueKindOfNumber;
+            _kindOfValue = APCPropertyValueKindOfNumber;
         }
         
         ///readonly
@@ -229,30 +229,30 @@
         }
         
         NSString* var_name  = attr_cmps.lastObject;
-        _accessOption          = AutoPropertyKVCDisable;
+        _accessOption          = APCPropertyKVCDisable;
         for (NSString* item in attr_cmps) {
             
             if([item characterAtIndex:0] == 'G'){
                 
-                _des_method_name= [item substringFromIndex:1];
-                _propertyGetter   =  NSSelectorFromString(_des_method_name);
-                _accessOption     |= AutoPropertyComponentOfGetter;
+                _des_getter_name= [item substringFromIndex:1];
+                _propertyGetter   =  NSSelectorFromString(_des_getter_name);
+                _accessOption     |= APCPropertyComponentOfGetter;
             }else if([item characterAtIndex:0] == 'S'){
                 
                 _des_setter_name  =  [item substringFromIndex:1];
                 _propertySetter   =  NSSelectorFromString(_des_setter_name);
-                _accessOption     |= AutoPropertyComponentOfSetter;
+                _accessOption     |= APCPropertyComponentOfSetter;
             }else if ([item characterAtIndex:0] == 'V'){
                 
                 _associatedIvar   =  class_getInstanceVariable(_des_class, [var_name substringFromIndex:1].UTF8String);
-                _accessOption     |= AutoPropertyComponentOfIVar;
+                _accessOption     |= APCPropertyComponentOfIVar;
             }
         }
     }
     
     
     ///AssociatedSetter
-    if(NO == (_accessOption & AutoPropertyComponentOfSetter)){
+    if(NO == (_accessOption & APCPropertyComponentOfSetter)){
         
         unsigned int count;
         Method* m_list = class_copyMethodList(_des_class, &count);
@@ -263,51 +263,51 @@
         }
         if(methodNames.count > 0){
             
-            if([methodNames containsObject:_ori_method_name.apc_kvcAssumedSetterName1]){
+            if([methodNames containsObject:_ori_property_name.apc_kvcAssumedSetterName1]){
                 
-                _des_setter_name    =   _ori_method_name.apc_kvcAssumedSetterName1;
+                _des_setter_name    =   _ori_property_name.apc_kvcAssumedSetterName1;
                 _associatedSetter   =   NSSelectorFromString(_des_setter_name);
-                _accessOption       |=  AutoPropertyAssociatedSetter;
-            }else if ([methodNames containsObject:_ori_method_name.apc_kvcAssumedSetterName2]){
+                _accessOption       |=  APCPropertyAssociatedSetter;
+            }else if ([methodNames containsObject:_ori_property_name.apc_kvcAssumedSetterName2]){
                 
-                _des_setter_name    =   _ori_method_name.apc_kvcAssumedSetterName2;
+                _des_setter_name    =   _ori_property_name.apc_kvcAssumedSetterName2;
                 _associatedSetter   =   NSSelectorFromString(_des_setter_name);
-                _accessOption       |=  AutoPropertyAssociatedSetter;
+                _accessOption       |=  APCPropertyAssociatedSetter;
             }
         }
         free(m_list);
     }
     
     ///Ivar
-    if(NO == (_accessOption & AutoPropertyComponentOfIVar)){
+    if(NO == (_accessOption & APCPropertyComponentOfIVar)){
         
         unsigned int count;
         Ivar* ivar_list = class_copyIvarList(_des_class, &count);
         NSUInteger flag = 0;//[0,4]
         while (count--) {
             
-            if([@(ivar_getName(ivar_list[count])) isEqualToString:_ori_method_name.apc_kvcAssumedIvarName1]){
+            if([@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName1]){
                 
                 _associatedIvar = ivar_list[count];
-                _accessOption   |= AutoPropertyAssociatedIVar;
+                _accessOption   |= APCPropertyAssociatedIVar;
                 break;
             }else if (flag < 3
-                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_method_name.apc_kvcAssumedIvarName2]){
+                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName2]){
                 
                 _associatedIvar = ivar_list[count];
-                _accessOption   |= AutoPropertyAssociatedIVar;
+                _accessOption   |= APCPropertyAssociatedIVar;
                 flag = 3;
             }else if (flag < 2
-                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_method_name.apc_kvcAssumedIvarName3]){
+                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName3]){
                 
                 _associatedIvar = ivar_list[count];
-                _accessOption   |= AutoPropertyAssociatedIVar;
+                _accessOption   |= APCPropertyAssociatedIVar;
                 flag = 2;
             }else if (flag < 1
-                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_method_name.apc_kvcAssumedIvarName4]){
+                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName4]){
                 
                 _associatedIvar = ivar_list[count];
-                _accessOption   |= AutoPropertyAssociatedIVar;
+                _accessOption   |= APCPropertyAssociatedIVar;
                 flag = 1;
             }
         }
@@ -320,8 +320,8 @@
 
 - (id)getIvarValueFromTarget:(id)target
 {
-    if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
-       self.kindOfValue == AutoPropertyValueKindOfObject){
+    if(self.kindOfValue == APCPropertyValueKindOfBlock ||
+       self.kindOfValue == APCPropertyValueKindOfObject){
         
         return object_getIvar(target , _associatedIvar);
     }
@@ -374,8 +374,8 @@
     switch (self.policy) {
         case OBJC_ASSOCIATION_ASSIGN:
             [des appendString:@"atomic"];
-            if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
-               self.kindOfValue == AutoPropertyValueKindOfObject){
+            if(self.kindOfValue == APCPropertyValueKindOfBlock ||
+               self.kindOfValue == APCPropertyValueKindOfObject){
                 
                 [des appendString:@",weak"];
             }else{
@@ -406,7 +406,7 @@
         [des appendFormat:@",setter=%@",NSStringFromSelector(self.propertySetter)];
     }
     
-    [des appendFormat:@")%@ -> %@",self.programmingType,_ori_method_name];
+    [des appendFormat:@")%@ -> %@",self.programmingType,_ori_property_name];
     
     if(_associatedIvar != nil){
 
@@ -432,7 +432,7 @@
     [[NSString stringWithFormat:@"%@/%@.%@"
       , NSStringFromClass(_src_class)
       , NSStringFromClass(_des_class)
-      , _ori_method_name]
+      , _ori_property_name]
      
      hash];
 }
@@ -447,6 +447,6 @@
 - (NSSet<APCPropertyMapperkey *> *)propertyMapperkeys
 {
     return [NSSet setWithObject:[APCPropertyMapperkey keyWithClass:_des_class
-                                                          property:_des_method_name]];
+                                                          property:_des_getter_name]];
 }
 @end

@@ -6,86 +6,124 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "APCPropertyHook.h"
+#import "APCMethodHook.h"
 #import "APCRuntime.h"
-///class : property : boundItems
-static NSMapTable*  _apc_runtime_classmapper;
-static dispatch_semaphore_t _apc_runtime_lock;
 
-#define APC_RUNTIME_LOCK dispatch_semaphore_wait(_apc_runtime_lock, DISPATCH_TIME_FOREVER)
-#define APC_RUNTIME_UNLOCK dispatch_semaphore_signal(_apc_runtime_lock)
+#define APC_RUNTIME_LOCK \
+\
+dispatch_semaphore_wait(_apc_runtime_mapperlock, DISPATCH_TIME_FOREVER)
 
-static NSMapTable* apc_runtime_classmapper()
+#define APC_RUNTIME_UNLOCK \
+\
+dispatch_semaphore_signal(_apc_runtime_mapperlock)
+
+static dispatch_semaphore_t _apc_runtime_mapperlock;
+
+///class : property : Hook : Properties
+static NSMapTable*  _apc_runtime_property_classmapper;
+
+static NSMapTable* apc_runtime_property_classmapper()
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _apc_runtime_classmapper = [NSMapTable strongToStrongObjectsMapTable];
-        _apc_runtime_lock = dispatch_semaphore_create(1);
+        _apc_runtime_mapperlock = dispatch_semaphore_create(1);
+        _apc_runtime_property_classmapper = [NSMapTable strongToStrongObjectsMapTable];
     });
-    return _apc_runtime_classmapper;
+    return _apc_runtime_property_classmapper;
 }
 
-NS_INLINE NSMutableArray* _Nonnull
-apc_runtime_propertymapper(Class __unsafe_unretained _Nonnull clazz, NSString* _Nonnull property)
+NS_INLINE APCPropertyHook* _Nonnull
+apc_runtime_propertyhook(Class __unsafe_unretained _Nonnull clazz, NSString* _Nonnull property)
 {
+    return [[apc_runtime_property_classmapper() objectForKey:clazz] objectForKey:property];
+}
+
+
+void apc_addProperty(APCHookProperty* p)
+{
+    APC_RUNTIME_LOCK;
     
-    NSMutableDictionary* dictionary = [apc_runtime_classmapper() objectForKey:clazz];
+    NSMutableDictionary* dictionary = [apc_runtime_property_classmapper() objectForKey:p->_des_class];
     
-    NSMutableArray* items;
+    APCPropertyHook* hook;
     
     if(dictionary == nil){
         
         dictionary = [NSMutableDictionary dictionary];
+        [apc_runtime_property_classmapper() setObject:dictionary forKey:p->_des_class];
     }
     
-    items = dictionary[property];
+    hook = dictionary[p->_des_getter_name];
     
-    if(items == nil){
+    if(hook == nil){
         
-        items = [NSMutableArray array];
-        return (dictionary[property] = [NSMutableArray array]);
-    }
-    
-    return dictionary[property];
-}
-
-
-
-
-void apc_addProperty(AutoPropertyInfo* p)
-{
-    APC_RUNTIME_LOCK;
-    
-    
-    NSMutableArray* items = apc_runtime_propertymapper( p->_des_class, p->_des_method_name);
-    NSUInteger idx = [items indexOfObject:p];
-    if(idx != NSNotFound){
+        hook = [APCPropertyHook hookWithProperty:p];
+        dictionary[p->_des_getter_name] = hook;
         
-        [items removeObject:p];
+        APC_RUNTIME_UNLOCK;
+        return;
     }
-    [items addObject:p];
+    
+    [hook bindProperty:p];
     
     APC_RUNTIME_UNLOCK;
 }
 
-void apc_removeProperty(AutoPropertyInfo* p)
+void apc_removeProperty(APCHookProperty* p)
 {
-    APC_RUNTIME_LOCK;
-    
-    NSMutableArray* items = apc_runtime_propertymapper( p->_des_class, p->_des_method_name);
-    [items removeObject:p];
-    
-    APC_RUNTIME_UNLOCK;
+    [apc_runtime_propertyhook( p->_des_class, p->_des_getter_name) unbindProperty:p];
 }
 
 NSArray* apc_classBoundProperties(Class cls, NSString* property)
 {
-    return apc_runtime_propertymapper(cls , property);
+    return [apc_runtime_propertyhook(cls , property) boundProperties];
 }
 
-AutoPropertyInfo* apc_property_getSuperProperty(AutoPropertyInfo* p)
+APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 {
-    Class clazz = p->_des_class;
-    NSString* property = p->_des_method_name;
+    Class               clazz = p->_des_class;
+    APCHookProperty*   item;
+    NSEnumerator*       e;
+    while (nil != (clazz = class_getSuperclass(clazz))) {
+        
+        if(nil != [apc_runtime_property_classmapper() objectForKey:clazz]){
+            
+            e = apc_runtime_propertyhook(clazz, p->_des_getter_name).propertyEnumerator;
+            while (nil != (item = e.nextObject)) {
+                
+                if([[p class] isEqual: [item class]]){
+                    
+                    return p;
+                }
+            }
+        }
+    }
     
-    [apc_runtime_classmapper() objectForKey:clazz];
+    return nil;
+}
+
+NSArray<__kindof APCHookProperty*>*
+apc_property_getSuperPropertyList(APCHookProperty* p)
+{
+    NSMutableArray*     ret     =   [NSMutableArray array];
+    Class               clazz   =   p->_des_class;
+    APCHookProperty*   item;
+    NSEnumerator*       e;
+    while (nil != (clazz = class_getSuperclass(clazz))) {
+        
+        if(nil != [apc_runtime_property_classmapper() objectForKey:clazz]){
+            
+            e = apc_runtime_propertyhook(clazz, p->_des_getter_name).propertyEnumerator;
+            while (nil != (item = e.nextObject)) {
+                
+                if([[p class] isEqual: [item class]]){
+                    
+                    [ret addObject:p];
+                }
+            }
+        }
+    }
+    
+    return [ret copy];
 }

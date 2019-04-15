@@ -7,7 +7,7 @@
 //
 
 #import "APCInstancePropertyCacheManager.h"
-#import "AutoPropertyInfo.h"
+#import "APCProperty.h"
 #import "APCScope.h"
 
 
@@ -58,18 +58,18 @@ static NSMutableDictionary* _Nonnull apc_instanceBoundCache(id instance)
     return nil;
 }
 
-+ (AutoPropertyInfo*)boundPropertyFromInstance:(id)instance cmd:(NSString*)cmd
++ (APCProperty*)boundPropertyFromInstance:(id)instance cmd:(NSString*)cmd
 {
     NSMutableDictionary* map = apc_instanceBoundCache(instance);
     return [map objectForKey:cmd];
 }
 
-+ (NSArray<__kindof AutoPropertyInfo*>*)boundAllPropertiesForInstance:(id _Nonnull)instance
++ (NSArray<__kindof APCProperty*>*)boundAllPropertiesForInstance:(id _Nonnull)instance
 {
     return [apc_instanceBoundCache(instance) allValues];
 }
 
-+ (void)bindProperty:(AutoPropertyInfo*)property toInstance:(id)instance cmd:(NSString*)cmd
++ (void)bindProperty:(APCProperty*)property toInstance:(id)instance cmd:(NSString*)cmd
 {
     NSMutableDictionary* map = apc_instanceBoundCache(instance);
     @synchronized (map) {
@@ -101,7 +101,7 @@ static NSMutableDictionary* _Nonnull apc_instanceBoundCache(id instance)
     
     NSEnumerator* em = map.objectEnumerator;
     
-    AutoPropertyInfo* p;
+    APCProperty* p;
     while (nil != (p = em.nextObject))
         if(p.enable == YES)
             return NO;

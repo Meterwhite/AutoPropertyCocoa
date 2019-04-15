@@ -9,13 +9,20 @@
 #import <Foundation/Foundation.h>
 
 typedef NS_OPTIONS (NSUInteger,APCMethodStyle){
+    ///v@:
+    APCMethodDeallocStyle       =   0,
     
-    APCMethodGetterStyle        =   0,
+    ///@@:
+    APCMethodGetterStyle        =   1,
     
-    APCMethodSetterStyle        =   1,
+    ///v@:@
+    APCMethodSetterStyle        =   2,
 };
 
 @interface APCMethodInfo : NSObject
+{
+    
+}
 
 @property (nonatomic,assign) APCMethodStyle methodStyle;
 

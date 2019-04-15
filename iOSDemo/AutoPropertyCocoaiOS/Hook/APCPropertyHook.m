@@ -1,12 +1,13 @@
 //
 //  APCPropertyHook.m
-//  AutoPropertyCocoaiOS
+//  AutoPropertyCocoa
 //
 //  Created by MDLK on 2019/4/15.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
 #import "APCPropertyHook.h"
+#import "APCHookProperty.h"
 #import "APCScope.h"
 
 id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
@@ -25,16 +26,17 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 
 @implementation APCPropertyHook
 {
-    NSMutableArray<AutoHookPropertyInfo *>* _boundProperties;
-    AutoHookPropertyInfo*                   _propertyInfo;
+#warning add lock
+    NSMutableArray<APCHookProperty *>* _boundProperties;
+    APCHookProperty*                   _propertyInfo;
 }
 
-+ (instancetype)hookWithProperty:(AutoHookPropertyInfo *)property
++ (instancetype)hookWithProperty:(APCHookProperty *)property
 {
     return [[self alloc] initWithProperty:property];
 }
 
-- (instancetype)initWithProperty:(AutoHookPropertyInfo *)property
+- (instancetype)initWithProperty:(APCHookProperty *)property
 {
     self = [super init];
     if (self) {
@@ -46,23 +48,29 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     return self;
 }
 
-- (void)bindProperty:(AutoHookPropertyInfo *)property
+- (NSEnumerator<APCHookProperty *> *)propertyEnumerator
 {
-    NSAssert((_propertyInfo->_des_class == property->_des_class)
-              && ([_propertyInfo->_des_method_name isEqualToString:property->_des_method_name]), @"APC: Class name and property name are one by one mapped.");
-    
-    [_boundProperties addObject:property];
+    return _boundProperties.objectEnumerator;
 }
 
-- (void)unbindProperty:(AutoHookPropertyInfo *)property
+- (void)bindProperty:(APCHookProperty *)property
 {
     NSAssert((_propertyInfo->_des_class == property->_des_class)
-             && ([_propertyInfo->_des_method_name isEqualToString:property->_des_method_name]), @"APC: Class name and property name are one by one mapped.");
+              && ([_propertyInfo->_des_getter_name isEqualToString:property->_des_getter_name]), @"APC: Class name and property name are one by one mapped.");
+    
+    [_boundProperties addObject:property];
+    property.hook = self;
+}
+
+- (void)unbindProperty:(APCHookProperty *)property
+{
+    NSAssert((_propertyInfo->_des_class == property->_des_class)
+             && ([_propertyInfo->_des_getter_name isEqualToString:property->_des_getter_name]), @"APC: Class name and property name are one by one mapped.");
     
     [property invalid];
     
     [_boundProperties removeObject:property];
-    
+    property.hook = nil;
     if(self.isEmpty){
         
         [self unhook];
@@ -74,7 +82,7 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     return [_boundProperties count];
 }
 
-- (NSArray<AutoHookPropertyInfo *> *)boundProperties
+- (NSArray<APCHookProperty *> *)boundProperties
 {
     return [_boundProperties copy];
 }
@@ -84,27 +92,27 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 //    AutoHookPropertyInfo* property = [_boundProperties firstObject];
     
     IMP newimp;
-    if(_propertyInfo.kindOfValue == AutoPropertyValueKindOfBlock ||
-       _propertyInfo.kindOfValue == AutoPropertyValueKindOfObject){
-        
-        newimp = _propertyInfo.methodStyle==APCMethodGetterStyle
-        ? (IMP)apc_propertyhook_getter
-        : (IMP)apc_propertyhook_setter;
+    if(_propertyInfo.kindOfValue == APCPropertyValueKindOfBlock ||
+       _propertyInfo.kindOfValue == APCPropertyValueKindOfObject){
+#warning <#message#>
+//        newimp = _propertyInfo.methodStyle==APCMethodGetterStyle
+//        ? (IMP)apc_propertyhook_getter
+//        : (IMP)apc_propertyhook_setter;
     }else{
         
-        newimp = _propertyInfo.methodStyle==APCMethodGetterStyle
-        ? (IMP)apc_propertyhook_getter_impimage(_propertyInfo.valueTypeEncoding)
-        : (IMP)apc_propertyhook_setter_impimage(_propertyInfo.valueTypeEncoding);
+//        newimp = _propertyInfo.methodStyle==APCMethodGetterStyle
+//        ? (IMP)apc_propertyhook_getter_impimage(_propertyInfo.valueTypeEncoding)
+//        : (IMP)apc_propertyhook_setter_impimage(_propertyInfo.valueTypeEncoding);
     }
     
     _new_implementation = newimp;
     
-    if(_propertyInfo.kindOfOwner == AutoPropertyOwnerKindOfClass){
+    if(_propertyInfo.kindOfOwner == APCPropertyOwnerKindOfClass){
         
         _old_implementation
         =
         class_replaceMethod(_propertyInfo->_des_class
-                            , NSSelectorFromString(_propertyInfo->_des_method_name)
+                            , NSSelectorFromString(_propertyInfo->_des_getter_name)
                             , _new_implementation
                             , [NSString stringWithFormat:@"%@@:", _propertyInfo.valueTypeEncoding].UTF8String);
         if(nil == _old_implementation){
@@ -125,7 +133,7 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
                 _old_implementation
                 =
                 class_getMethodImplementation(_propertyInfo->_src_class
-                                              , NSSelectorFromString(_propertyInfo->_des_method_name));
+                                              , NSSelectorFromString(_propertyInfo->_des_getter_name));
             }
             
             NSAssert(_old_implementation, @"APC: Can not find original implementation.");
@@ -143,18 +151,18 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
         return;
     }
     
-    if(_propertyInfo.kindOfOwner == AutoPropertyOwnerKindOfClass)
+    if(_propertyInfo.kindOfOwner == APCPropertyOwnerKindOfClass)
     {
         _new_implementation = nil;
         
         class_replaceMethod(_propertyInfo->_des_class
-                            , NSSelectorFromString(_propertyInfo->_des_method_name)
+                            , NSSelectorFromString(_propertyInfo->_des_getter_name)
                             , _old_implementation
                             , [NSString stringWithFormat:@"%@@:",_propertyInfo.valueTypeEncoding].UTF8String);
     }
     else
     {
-//        if(NO == [AutoLazyPropertyInfo testingProxyClassInstance:_instance]){
+//        if(NO == [APCLazyProperty testingProxyClassInstance:_instance]){
 //            ///Instance has been unbound by other threads.
 //            return;
 //        }
