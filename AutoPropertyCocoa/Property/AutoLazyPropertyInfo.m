@@ -8,7 +8,7 @@
 
 #import "APCInstancePropertyCacheManager.h"
 #import "APCLazyloadOldLoopController.h"
-#import "APCClassPropertyMapperCache.h"
+#import "APCClassPropertyMapperController.h"
 #import "AutoLazyPropertyInfo.h"
 #import "NSObject+APCLazyLoad.h"
 #import "APCScope.h"
@@ -96,19 +96,19 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 /** Important */
 - (void)hookPropertyWithImplementation:(IMP)implementation option:(NSUInteger)option
 {
-    _new_implementation = implementation;
+    _new_getter_implementation = implementation;
     
     if(_kindOfOwner == AutoPropertyOwnerKindOfClass){
         
         ///AutoPropertyOwnerKindOfClass
-        _old_implementation
+        _old_getter_implementation
         =
         class_replaceMethod(_des_class
-                            , NSSelectorFromString(_des_property_name)
-                            , _new_implementation
+                            , NSSelectorFromString(_des_method_name)
+                            , _new_getter_implementation
                             , [NSString stringWithFormat:@"%@@:", self.valueTypeEncoding].UTF8String);
         
-        if(nil == _old_implementation){
+        if(nil == _old_getter_implementation){
             
             ///Overwrite super class property with new property.
             ///Storing the implementation address of the super class
@@ -117,20 +117,20 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
             
             AutoLazyPropertyInfo* pinfo_superclass
             =
-            [_cacheForClass propertyForDesclass:_src_class property:_des_property_name];
+            [_cacheForClass propertyForDesclass:_src_class property:_des_method_name];
             
             if(nil != pinfo_superclass){
                 
-                _old_implementation = pinfo_superclass->_new_implementation;
+                _old_getter_implementation = pinfo_superclass->_new_getter_implementation;
             }else{
                 
-                _old_implementation
+                _old_getter_implementation
                 =
                 class_getMethodImplementation(_src_class
-                                              , NSSelectorFromString(_des_property_name));
+                                              , NSSelectorFromString(_des_method_name));
             }
             
-            NSAssert(_old_implementation, @"APC: Can not find original implementation.");
+            NSAssert(_old_getter_implementation, @"APC: Can not find original implementation.");
         }
     }
     else{
@@ -157,25 +157,25 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
         }
         _proxyClass = proxyClass;
         
-        _old_implementation
+        _old_getter_implementation
         =
         class_replaceMethod(proxyClass
-                            , NSSelectorFromString(_des_property_name)
-                            , _new_implementation
+                            , NSSelectorFromString(_des_method_name)
+                            , _new_getter_implementation
                             , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-        if(nil == _old_implementation){
+        if(nil == _old_getter_implementation){
             
-            _old_implementation
+            _old_getter_implementation
             =
             class_getMethodImplementation(_des_class
-                                          , NSSelectorFromString(_des_property_name));
+                                          , NSSelectorFromString(_des_method_name));
         }
     }
 }
 
 - (void)unhook
 {
-    if(nil == _old_implementation || nil == _new_implementation){
+    if(nil == _old_getter_implementation || nil == _new_getter_implementation){
         
         return;
     }
@@ -208,11 +208,11 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 - (void)unhookForClass
 {
-    _new_implementation = nil;
+    _new_getter_implementation = nil;
     
     class_replaceMethod(_des_class
-                        , NSSelectorFromString(_des_property_name)
-                        , _old_implementation
+                        , NSSelectorFromString(_des_method_name)
+                        , _old_getter_implementation
                         , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
 }
 
@@ -220,11 +220,11 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 {
     if([APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
         
-        _new_implementation = nil;
+        _new_getter_implementation = nil;
         
         class_replaceMethod([_instance class]
-                            , NSSelectorFromString(_des_property_name)
-                            , _old_implementation
+                            , NSSelectorFromString(_des_method_name)
+                            , _old_getter_implementation
                             , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
     }else{
         
@@ -235,9 +235,9 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     }
 }
 
-- (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target
+- (_Nullable id)performOldSetterFromTarget:(_Nonnull id)target
 {
-    if(NO == (_new_implementation && _old_implementation)){
+    if(NO == (_new_getter_implementation && _old_getter_implementation)){
         
         return nil;
     }
@@ -247,8 +247,8 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     id ret
     =
     apc_getterimp_boxinvok(target
-                           , NSSelectorFromString(_des_property_name)
-                           , _old_implementation
+                           , NSSelectorFromString(_des_method_name)
+                           , _old_getter_implementation
                            , self.valueTypeEncoding.UTF8String);
     
     [APCLazyloadOldLoopController breakLoop:target];
@@ -325,14 +325,14 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 {
     [APCInstancePropertyCacheManager bindProperty:self
                                        toInstance:_instance
-                                              cmd:_des_property_name];
+                                              cmd:_des_method_name];
 }
 
 - (void)removeFromInstanceCache
 {
     
     [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
-                                                                 cmd:_des_property_name];
+                                                                 cmd:_des_method_name];
     
     if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
         
@@ -340,13 +340,13 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     }
 }
 
-static APCClassPropertyMapperCache* _cacheForClass;
+static APCClassPropertyMapperController* _cacheForClass;
 - (void)cacheToClassMapper
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-        _cacheForClass     =   [APCClassPropertyMapperCache cache];
+        _cacheForClass     =   [APCClassPropertyMapperController cache];
     });
     
     [_cacheForClass addProperty:self];

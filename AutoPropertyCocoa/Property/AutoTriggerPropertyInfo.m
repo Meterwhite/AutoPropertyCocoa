@@ -6,7 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 #import "APCInstancePropertyCacheManager.h"
-#import "APCClassPropertyMapperCache.h"
+#import "APCClassPropertyMapperController.h"
 #import "AutoTriggerPropertyInfo.h"
 #import "APCScope.h"
 
@@ -265,11 +265,11 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 {
     IMP newimp = nil;
     
-    if(nil == _old_implementation
+    if(nil == _old_getter_implementation
        && self.triggerOption & AutoPropertyTriggerOfGetter){
         
-        if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
-           self.kindOfValue == AutoPropertyValueKindOfObject){
+        if(self.kindOfValue == AutoPropertyValueKindOfBlock
+           || self.kindOfValue == AutoPropertyValueKindOfObject){
             
             newimp = (IMP)apc_trigger_getter;
         }else{
@@ -283,8 +283,8 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     if(nil == _old_setter_implementation
        && self.triggerOption & AutoPropertyTriggerOfSetter){
         
-        if(self.kindOfValue == AutoPropertyValueKindOfBlock ||
-           self.kindOfValue == AutoPropertyValueKindOfObject){
+        if(self.kindOfValue == AutoPropertyValueKindOfBlock
+           || self.kindOfValue == AutoPropertyValueKindOfObject){
             
             newimp = (IMP)apc_trigger_setter;
         }else{
@@ -321,8 +321,8 @@ CACHE:
     if(option == AutoPropertyTriggerOfGetter){
         
         [methodEnc appendString:self.valueTypeEncoding];
-        _new_implementation = implementation;
-        des_name = _des_property_name;
+        _new_getter_implementation = implementation;
+        des_name = _des_method_name;
         des_sel = NSSelectorFromString(des_name);
     }
     [methodEnc appendString:@"@:"];
@@ -354,7 +354,7 @@ CACHE:
                 
                 oldIMP =
                 (option == AutoPropertyTriggerOfGetter)
-                ? pinfo_superclass->_old_implementation
+                ? pinfo_superclass->_old_getter_implementation
                 : pinfo_superclass->_old_setter_implementation;
                 
             }else{
@@ -400,16 +400,16 @@ CACHE:
     
     if(option == AutoPropertyTriggerOfGetter){
         
-        _old_implementation         = oldIMP;
+        _old_getter_implementation         = oldIMP;
     }else{
         
         _old_setter_implementation  = oldIMP;
     }
 }
 
-- (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target
+- (_Nullable id)performOldSetterFromTarget:(_Nonnull id)target
 {
-    if(NO == (_new_implementation && _old_implementation)){
+    if(NO == (_new_getter_implementation && _old_getter_implementation)){
         
         return nil;
     }
@@ -417,8 +417,8 @@ CACHE:
     return
     
     apc_getterimp_boxinvok(target
-                           , NSSelectorFromString(_des_property_name)
-                           , _old_implementation
+                           , NSSelectorFromString(_des_method_name)
+                           , _old_getter_implementation
                            , self.valueTypeEncoding.UTF8String);
 }
 
@@ -475,7 +475,7 @@ CACHE:
 
 - (void)unhookForClass
 {
-    _new_implementation = nil;
+    _new_getter_implementation = nil;
     
     NSUInteger count
     =
@@ -486,8 +486,8 @@ CACHE:
     while (count--) {
         
         class_replaceMethod(_des_class
-                            , NSSelectorFromString(count==1?_des_property_name:_des_setter_name)
-                            , _old_implementation
+                            , NSSelectorFromString(count==1?_des_method_name:_des_setter_name)
+                            , _old_getter_implementation
                             , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
     }
 }
@@ -504,7 +504,7 @@ CACHE:
 {
     [APCInstancePropertyCacheManager bindProperty:self
                                        toInstance:_instance
-                                              cmd:_des_property_name];
+                                              cmd:_des_method_name];
     
     if(self.triggerOption & AutoPropertyTriggerOfSetter){
         
@@ -517,7 +517,7 @@ CACHE:
 - (void)removeFromInstanceCache
 {
     [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
-                                                                 cmd:_des_property_name];
+                                                                 cmd:_des_method_name];
     
     if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
         
@@ -525,13 +525,13 @@ CACHE:
     }
 }
 
-static APCClassPropertyMapperCache* _cacheForClass;
+static APCClassPropertyMapperController* _cacheForClass;
 - (void)cacheToClassMapper
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-        _cacheForClass     =   [APCClassPropertyMapperCache cache];
+        _cacheForClass     =   [APCClassPropertyMapperController cache];
     });
     
     [_cacheForClass addProperty:self];
@@ -564,7 +564,7 @@ static APCClassPropertyMapperCache* _cacheForClass;
     NSMutableSet* set = [NSMutableSet set];
     
     [set addObject:[APCPropertyMapperkey keyWithClass:_des_class
-                                             property:_des_property_name]];
+                                             property:_des_method_name]];
     
     if(self.triggerOption & AutoPropertyTriggerOfSetter){
         

@@ -88,7 +88,7 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyTriggerOption) {
 + (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz;
 
 #pragma mark - Old
-- (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target;
+- (_Nullable id)performOldSetterFromTarget:(_Nonnull id)target;
 - (void)performOldSetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value;
 
 #pragma mark - Cache

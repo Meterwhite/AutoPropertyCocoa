@@ -382,12 +382,17 @@ id _Nullable apc_trigger_getter(id _Nonnull _SELF, SEL _Nonnull _CMD)
             
             NSCAssert(NO, @"APC: Lose property info.");
     
+    if(NO == triggerPropertyInfo.enable){
+#warning control old loop for trigger property?
+        return [triggerPropertyInfo performOldSetterFromTarget:_SELF];
+    }
+    
     if(triggerPropertyInfo.triggerOption & AutoPropertyGetterFrontTrigger){
         
         [triggerPropertyInfo performGetterFrontTriggerBlock:_SELF];
     }
     
-    id ret = [triggerPropertyInfo performOldPropertyFromTarget:_SELF];
+    id ret = [triggerPropertyInfo performOldSetterFromTarget:_SELF];
     
     
     if(triggerPropertyInfo.triggerOption & AutoPropertyGetterPostTrigger){
@@ -410,6 +415,8 @@ id _Nullable apc_trigger_getter(id _Nonnull _SELF, SEL _Nonnull _CMD)
             [triggerPropertyInfo performGetterUserTriggerBlock:_SELF value:ret];
         }
     }
+    
+    [triggerPropertyInfo access];
     
     return ret;
 }

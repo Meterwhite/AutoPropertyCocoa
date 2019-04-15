@@ -360,7 +360,7 @@ void* _Nullable oghook##_impimage(NSString* _Nonnull enc)\
 void oshook##_##enc(_Nullable id _SELF,SEL _CMD,type val)\
 {\
     \
-    apc_trigger_setter(_SELF, _CMD, [NSValue valueWithBytes:&val objCType:@encode(type)]);\
+    oshook(_SELF, _CMD, [NSValue valueWithBytes:&val objCType:@encode(type)]);\
 }
 
 #define apc_def_vNSHook(enc,type,oshook,ftype)\
@@ -368,7 +368,7 @@ void oshook##_##enc(_Nullable id _SELF,SEL _CMD,type val)\
 void oshook##_##enc(_Nullable id _SELF,SEL _CMD,type val)\
 {\
     \
-    apc_trigger_setter(_SELF, _CMD, [NSNumber numberWith##ftype:val]);\
+    oshook(_SELF, _CMD, [NSNumber numberWith##ftype:val]);\
 }
 
 #define apc_def_vSHook_and_impimage(oshook)\

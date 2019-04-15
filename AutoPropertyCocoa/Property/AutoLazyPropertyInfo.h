@@ -17,7 +17,6 @@
     
     SEL                 _userSelector;
     id                  _userBlock;
-    NSUInteger          _perform_oldimp_token;
 }
 
 @property (nonatomic,assign,readonly,nullable)   SEL userSelector;
@@ -31,7 +30,7 @@
 - (void)unhook;
 + (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz;
 
-- (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target;
+- (_Nullable id)performOldSetterFromTarget:(_Nonnull id)target;
 
 - (id _Nullable)instancetypeNewObjectByUserSelector;
 

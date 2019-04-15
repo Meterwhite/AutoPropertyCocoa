@@ -10,7 +10,7 @@
 
 
 /**
- Make property thread safe and break dead cycle when lazy-load property perform old imp from subclass to superclass.
+ Make property thread safe and break dead cycle when old imp of lazy-load property performed from subclass to superclass.
  */
 @interface APCLazyloadOldLoopController : NSObject
 

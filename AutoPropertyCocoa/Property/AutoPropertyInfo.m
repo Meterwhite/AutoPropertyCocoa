@@ -43,8 +43,8 @@
     if(self = [super init]){
         
         _kindOfOwner       =    AutoPropertyOwnerKindOfClass;
-        _ogi_property_name =    propertyName;
-        _des_property_name =    propertyName;
+        _ori_method_name =    propertyName;
+        _des_method_name =    propertyName;
         _des_class         =    aClass;
         _enable            =    YES;
         
@@ -234,8 +234,8 @@
             
             if([item characterAtIndex:0] == 'G'){
                 
-                _des_property_name= [item substringFromIndex:1];
-                _propertyGetter   =  NSSelectorFromString(_des_property_name);
+                _des_method_name= [item substringFromIndex:1];
+                _propertyGetter   =  NSSelectorFromString(_des_method_name);
                 _accessOption     |= AutoPropertyComponentOfGetter;
             }else if([item characterAtIndex:0] == 'S'){
                 
@@ -263,14 +263,14 @@
         }
         if(methodNames.count > 0){
             
-            if([methodNames containsObject:_ogi_property_name.apc_kvcAssumedSetterName1]){
+            if([methodNames containsObject:_ori_method_name.apc_kvcAssumedSetterName1]){
                 
-                _des_setter_name    =   _ogi_property_name.apc_kvcAssumedSetterName1;
+                _des_setter_name    =   _ori_method_name.apc_kvcAssumedSetterName1;
                 _associatedSetter   =   NSSelectorFromString(_des_setter_name);
                 _accessOption       |=  AutoPropertyAssociatedSetter;
-            }else if ([methodNames containsObject:_ogi_property_name.apc_kvcAssumedSetterName2]){
+            }else if ([methodNames containsObject:_ori_method_name.apc_kvcAssumedSetterName2]){
                 
-                _des_setter_name    =   _ogi_property_name.apc_kvcAssumedSetterName2;
+                _des_setter_name    =   _ori_method_name.apc_kvcAssumedSetterName2;
                 _associatedSetter   =   NSSelectorFromString(_des_setter_name);
                 _accessOption       |=  AutoPropertyAssociatedSetter;
             }
@@ -286,25 +286,25 @@
         NSUInteger flag = 0;//[0,4]
         while (count--) {
             
-            if([@(ivar_getName(ivar_list[count])) isEqualToString:_ogi_property_name.apc_kvcAssumedIvarName1]){
+            if([@(ivar_getName(ivar_list[count])) isEqualToString:_ori_method_name.apc_kvcAssumedIvarName1]){
                 
                 _associatedIvar = ivar_list[count];
                 _accessOption   |= AutoPropertyAssociatedIVar;
                 break;
             }else if (flag < 3
-                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ogi_property_name.apc_kvcAssumedIvarName2]){
+                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_method_name.apc_kvcAssumedIvarName2]){
                 
                 _associatedIvar = ivar_list[count];
                 _accessOption   |= AutoPropertyAssociatedIVar;
                 flag = 3;
             }else if (flag < 2
-                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ogi_property_name.apc_kvcAssumedIvarName3]){
+                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_method_name.apc_kvcAssumedIvarName3]){
                 
                 _associatedIvar = ivar_list[count];
                 _accessOption   |= AutoPropertyAssociatedIVar;
                 flag = 2;
             }else if (flag < 1
-                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ogi_property_name.apc_kvcAssumedIvarName4]){
+                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_method_name.apc_kvcAssumedIvarName4]){
                 
                 _associatedIvar = ivar_list[count];
                 _accessOption   |= AutoPropertyAssociatedIVar;
@@ -406,7 +406,7 @@
         [des appendFormat:@",setter=%@",NSStringFromSelector(self.propertySetter)];
     }
     
-    [des appendFormat:@")%@ -> %@",self.programmingType,_ogi_property_name];
+    [des appendFormat:@")%@ -> %@",self.programmingType,_ori_method_name];
     
     if(_associatedIvar != nil){
 
@@ -432,7 +432,7 @@
     [[NSString stringWithFormat:@"%@/%@.%@"
       , NSStringFromClass(_src_class)
       , NSStringFromClass(_des_class)
-      , _ogi_property_name]
+      , _ori_method_name]
      
      hash];
 }
@@ -447,6 +447,6 @@
 - (NSSet<APCPropertyMapperkey *> *)propertyMapperkeys
 {
     return [NSSet setWithObject:[APCPropertyMapperkey keyWithClass:_des_class
-                                                          property:_des_property_name]];
+                                                          property:_des_method_name]];
 }
 @end

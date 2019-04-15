@@ -10,9 +10,10 @@
 
 @protocol AutoHookPropertyProtocol <NSObject>
 
+@required
 - (void)disposeRuntimeResource;
 @optional
-- (_Nullable id)performOldPropertyFromTarget:(_Nonnull id)target;
+- (id _Nullable)performOldSetterFromTarget:(_Nonnull id)target;
 - (void)performOldSetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value;
 - (void)hookPropertyWithImplementation:(IMP _Nonnull)implementation
                                 option:(NSUInteger)option;
@@ -29,8 +30,8 @@
     
     IMP         _new_setter_implementation;
     IMP         _old_setter_implementation;
-    IMP         _new_implementation;
-    IMP         _old_implementation;
+    IMP         _new_getter_implementation;
+    IMP         _old_getter_implementation;
     Class       _proxyClass;
 }
 

@@ -178,7 +178,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     if(NO == lazyPropertyInfo.enable
        || YES == [APCLazyloadOldLoopController testingIsInLoop:_SELF]){
         
-        return [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
+        return [lazyPropertyInfo performOldSetterFromTarget:_SELF];
     }
     
     
@@ -186,7 +186,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     ///Get value.(All returned value are boxed)
     if(lazyPropertyInfo.accessOption & AutoPropertyComponentOfGetter){
         
-        value = [lazyPropertyInfo performOldPropertyFromTarget:_SELF];
+        value = [lazyPropertyInfo performOldSetterFromTarget:_SELF];
     }else{
         
         value = [lazyPropertyInfo getIvarValueFromTarget:_SELF];

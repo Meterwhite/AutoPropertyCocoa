@@ -7,6 +7,7 @@
 //
 
 #import "APCPropertyMapperkey.h"
+#import "APCMethodInfo.h"
 #import "APCScope.h"
 
 typedef NS_OPTIONS (NSUInteger,AutoPropertyAccessOptions){
@@ -74,14 +75,15 @@ typedef NS_OPTIONS(NSUInteger, AutoPropertyHookKind){
 - (NSString* _Nonnull)proxyClassName;
 @end
 
-@interface AutoPropertyInfo : NSObject <APCPropertyMapperKeyProtocol>
+@interface AutoPropertyInfo : APCMethodInfo <APCPropertyMapperKeyProtocol>
 {
 @public
     
     Class                   _des_class;
     Class                   _src_class;
-    NSString*               _ogi_property_name;
-    NSString*               _des_property_name;
+    NSString*               _ori_method_name;
+    NSString*               _des_method_name;
+#warning need delete!
     NSString*               _des_setter_name;
 @protected
     
