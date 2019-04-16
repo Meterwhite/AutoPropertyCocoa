@@ -23,9 +23,10 @@
 {
     if(self = [super initWithPropertyName:propertyName aClass:aClass]){
         
-        _kindOfHook     = APCPropertyHookKindOfIMP;
+        _kindOfUserHook     = APCPropertyHookKindOfIMP;
         _triggerOption  = APCPropertyNonTrigger;
         _methodStyle    = APCMethodSetterStyle;
+        _hooked_name       = _des_setter_name;
     }
     return self;
 }
@@ -62,15 +63,12 @@
 {
     _block_fronttrigger = nil;
     _triggerOption &= ~APCPropertySetterFrontTrigger;
-
-#warning [self tryUnhook];
 }
 
 - (void)setterUnbindPostTrigger
 {
     _block_posttrigger = nil;
     _triggerOption &= ~APCPropertySetterPostTrigger;
-   #warning [self tryUnhook];
 }
 
 - (void)setterUnbindUserTrigger
@@ -78,7 +76,6 @@
     _block_usertrigger   = nil;
     _block_usercondition = nil;
     _triggerOption &= ~APCPropertySetterUserTrigger;
- #warning   [self tryUnhook];
 }
 
 - (void)setterUnbindCountTrigger
@@ -86,7 +83,6 @@
     _block_counttrigger   = nil;
     _block_countcondition = nil;
     _triggerOption &= ~APCPropertySetterCountTrigger;
-#warning [self tryUnhook];
 }
 
 - (void)performSetterFrontTriggerBlock:(id)_SELF value:(id)value

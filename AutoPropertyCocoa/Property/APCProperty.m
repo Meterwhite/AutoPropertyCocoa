@@ -42,12 +42,12 @@
 {
     if(self = [super init]){
         
-        _kindOfOwner       =    APCPropertyOwnerKindOfClass;
-        _ori_property_name =    propertyName;
-        _des_getter_name =    propertyName;
-        _des_class         =    aClass;
-        _enable            =    YES;
-        
+        _kindOfOwner        =   APCPropertyOwnerKindOfClass;
+        _ori_property_name  =   propertyName;
+        _des_getter_name =      propertyName;
+        _des_class          =   aClass;
+        _enable             =   YES;
+        _hashcode           =   0;
         objc_property_t*        p_list;
         NSString*               attr_str;
         unsigned int            count;
@@ -427,14 +427,16 @@
 
 - (NSUInteger)hash
 {
-    return
-    
-    [[NSString stringWithFormat:@"%@/%@.%@"
-      , NSStringFromClass(_src_class)
-      , NSStringFromClass(_des_class)
-      , _ori_property_name]
-     
-     hash];
+    if(_hashcode == 0){
+        
+        _hashcode = [[NSString stringWithFormat:@"%@/%@.%@"
+                      , NSStringFromClass(_src_class)
+                      , NSStringFromClass(_des_class)
+                      , _ori_property_name]
+                     
+                     hash];
+    }
+    return _hashcode;
 }
 
 #pragma mark - APCPropertyMapperKeyProtocol

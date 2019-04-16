@@ -7,7 +7,6 @@
 //
 
 #import "APCPropertyMapperkey.h"
-#import "APCMethodInfo.h"
 #import "APCScope.h"
 
 typedef NS_OPTIONS (NSUInteger,APCPropertyAccessOptions){
@@ -58,7 +57,7 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyOwnerKind){
 
 typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
     
-    APCPropertyHookKindOfNil       =   0,
+    APCPropertyHookKindOfEmpty     =   0,
     
     APCPropertyHookKindOfSelector  =   1,
     
@@ -79,32 +78,31 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
 {
 @public
     
+    NSUInteger              _hashcode;
     Class                   _des_class;
     Class                   _src_class;
-    NSString*               _ori_property_name;
-    NSString*               _des_getter_name;
-    NSString*               _des_setter_name;
+    NSString*               _ori_property_name;//user
+    NSString*               _des_getter_name;//property getter
+    NSString*               _des_setter_name;//property setter
 @protected
     
-    APCPropertyOwnerKind   _kindOfOwner;
-    APCPropertyHookKind    _kindOfHook;
+    APCPropertyHookKind     _kindOfUserHook;
+    APCPropertyOwnerKind    _kindOfOwner;
     __weak id               _instance;
-    APCMethodStyle          _methodStyle;
 @private
     
     BOOL                    _enable;
 }
 
 
-@property (nonatomic,assign,readonly)BOOL                       isReadonly;
-@property (nonatomic,assign,readonly)BOOL                       enable;
 
+@property (nonatomic,assign,readonly)APCPropertyHookKind       kindOfUserHook;
 @property (nonatomic,assign,readonly)APCPropertyAccessOptions  accessOption;
 @property (nonatomic,assign,readonly)APCPropertyOwnerKind      kindOfOwner;
 @property (nonatomic,assign,readonly)APCPropertyValueKind      kindOfValue;
-@property (nonatomic,assign,readonly)APCPropertyHookKind       kindOfHook;
+@property (nonatomic,assign,readonly)BOOL                      isReadonly;
 @property (nonatomic,assign,readonly)objc_AssociationPolicy    policy;
-@property (nonatomic,assign,readonly)APCMethodStyle            methodStyle;
+@property (nonatomic,assign,readonly)BOOL                      enable;
 
 + (instancetype _Nonnull)instanceWithProperty:(NSString* _Nonnull)property
                                     aInstance:(id _Nonnull)aInstance;
@@ -161,7 +159,7 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
 - (BOOL)isEqual:(id _Nonnull)object;
 
 /**
- Hash from property name.
+ OriginalClass/TargetClass.UserProperty
  */
 - (NSUInteger)hash;
 

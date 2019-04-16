@@ -31,9 +31,10 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 {
     if(self = [super initWithPropertyName:propertyName aClass:aClass]){
         
-        _kindOfHook     = APCPropertyHookKindOfIMP;
+        _kindOfUserHook     = APCPropertyHookKindOfIMP;
         _triggerOption  = APCPropertyNonTrigger;
         _methodStyle    = APCMethodGetterStyle;
+        _hooked_name       = _des_getter_name;
     }
     return self;
 }
@@ -69,14 +70,12 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 {
     _block_fronttrigger = nil;
     _triggerOption &= ~APCPropertyGetterFrontTrigger;
-    [self tryUnhook];
 }
 
 - (void)getterUnbindPostTrigger
 {
     _block_posttrigger = nil;
     _triggerOption &= ~APCPropertyGetterPostTrigger;
-    [self tryUnhook];
 }
 
 - (void)getterUnbindUserTrigger
@@ -84,7 +83,6 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     _block_usertrigger   = nil;
     _block_usercondition = nil;
     _triggerOption &= ~APCPropertyGetterUserTrigger;
-    [self tryUnhook];
 }
 
 - (void)getterUnbindCountTrigger
@@ -92,7 +90,6 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
     _block_counttrigger   = nil;
     _block_countcondition = nil;
     _triggerOption &= ~APCPropertyGetterCountTrigger;
-    [self tryUnhook];
 }
 
 - (void)performGetterFrontTriggerBlock:(id)_SELF
@@ -146,236 +143,237 @@ void* _Nullable apc_trigger_setter_impimage(NSString* eType);
 }
 
 #pragma mark - Hook
-- (void)hook
-{
-    IMP newimp = nil;
-    
-    if(nil == _old_getter_implementation
-       && self.triggerOption & APCPropertyTriggerOfGetter){
-        
-        if(self.kindOfValue == APCPropertyValueKindOfBlock
-           || self.kindOfValue == APCPropertyValueKindOfObject){
-            
-            newimp = (IMP)apc_trigger_getter;
-        }else{
-            
-            newimp = (IMP)apc_trigger_getter_impimage(self.valueTypeEncoding);
-        }
-        [self hookPropertyWithImplementation:newimp option:APCPropertyTriggerOfGetter];
-        goto CACHE;
-    }
-    
-    if(nil == _old_setter_implementation
-       && self.triggerOption & APCPropertyTriggerOfSetter){
-        
-        if(self.kindOfValue == APCPropertyValueKindOfBlock
-           || self.kindOfValue == APCPropertyValueKindOfObject){
-            
-            newimp = (IMP)apc_trigger_setter;
-        }else{
-            
-            newimp = (IMP)apc_trigger_setter_impimage(self.valueTypeEncoding);
-        }
-        [self hookPropertyWithImplementation:newimp option:APCPropertyTriggerOfSetter];
-        goto CACHE;
-    }
-    
-    return;
-    
-CACHE:
-    {
-        
-        if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-            
-            [self cacheToClassMapper];
-        }else{
-            
-            [self cacheToInstanceMapper];
-        }
-        return;
-    }
-}
+//- (void)hook
+//{
+//    IMP newimp = nil;
+//
+//    if(nil == _old_getter_implementation
+//       && self.triggerOption & APCPropertyTriggerOfGetter){
+//
+//        if(self.kindOfValue == APCPropertyValueKindOfBlock
+//           || self.kindOfValue == APCPropertyValueKindOfObject){
+//
+//            newimp = (IMP)apc_trigger_getter;
+//        }else{
+//
+//            newimp = (IMP)apc_trigger_getter_impimage(self.valueTypeEncoding);
+//        }
+//        [self hookPropertyWithImplementation:newimp option:APCPropertyTriggerOfGetter];
+//        goto CACHE;
+//    }
+//
+//    if(nil == _old_setter_implementation
+//       && self.triggerOption & APCPropertyTriggerOfSetter){
+//
+//        if(self.kindOfValue == APCPropertyValueKindOfBlock
+//           || self.kindOfValue == APCPropertyValueKindOfObject){
+//
+//            newimp = (IMP)apc_trigger_setter;
+//        }else{
+//
+//            newimp = (IMP)apc_trigger_setter_impimage(self.valueTypeEncoding);
+//        }
+//        [self hookPropertyWithImplementation:newimp option:APCPropertyTriggerOfSetter];
+//        goto CACHE;
+//    }
+//
+//    return;
+//
+//CACHE:
+//    {
+//
+//        if(_kindOfOwner == APCPropertyOwnerKindOfClass){
+//
+//            [self cacheToClassMapper];
+//        }else{
+//
+//            [self cacheToInstanceMapper];
+//        }
+//        return;
+//    }
+//}
 
-- (void)hookPropertyWithImplementation:(IMP)implementation option:(NSUInteger)option
-{
-    
-    NSMutableString*    methodEnc   = [NSMutableString string];
-    NSString*           des_name    = nil;
-    SEL                 des_sel     = nil;
-    IMP                 oldIMP      = nil;
-    if(option == APCPropertyTriggerOfGetter){
-        
-        [methodEnc appendString:self.valueTypeEncoding];
-        _new_getter_implementation = implementation;
-        des_name = _des_getter_name;
-        des_sel = NSSelectorFromString(des_name);
-    }
-    [methodEnc appendString:@"@:"];
-    if(option == APCPropertyTriggerOfSetter){
-        
-        [methodEnc appendString:self.valueTypeEncoding];
-        _new_setter_implementation = implementation;
-        des_name = _des_setter_name;
-        des_sel = NSSelectorFromString(des_name);
-    }
-    
-    
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-        
-        oldIMP
-        =
-        class_replaceMethod(_des_class
-                            , des_sel
-                            , implementation
-                            , methodEnc.UTF8String);
-        
-        if(nil == oldIMP){
-            
-            APCTriggerGetterProperty* pinfo_superclass
-            =
-            [_cacheForClass propertyForDesclass:_src_class property:des_name];
-            
-            if(nil != pinfo_superclass){
-                
-                oldIMP =
-                (option == APCPropertyTriggerOfGetter)
-                ? pinfo_superclass->_old_getter_implementation
-                : pinfo_superclass->_old_setter_implementation;
-                
-            }else{
-                
-                oldIMP = class_getMethodImplementation(_src_class, des_sel);
-            }
-        }
-    }
-    else{
-        
-        if(nil == _proxyClass){
-            
-            if(NO == [APCTriggerGetterProperty testingProxyClassInstance:_instance]){
-                
-                NSString *proxyClassName = self.proxyClassName;
-                _proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
-                if(nil != _proxyClass){
-                    
-                    objc_registerClassPair(_proxyClass);
-                }else if(nil == (_proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
-                    
-                    NSAssert(_proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
-                }
-                
-                object_setClass(_instance, _proxyClass);
-            }else{
-                
-                _proxyClass = [_instance class];
-            }
-        }
-        
-        oldIMP
-        =
-        class_replaceMethod(_proxyClass
-                            , des_sel
-                            , implementation
-                            , methodEnc.UTF8String);
-        if(nil == oldIMP){
-            
-            oldIMP = class_getMethodImplementation(_des_class, des_sel);
-        }
-    }
-    
-    if(option == APCPropertyTriggerOfGetter){
-        
-        _old_getter_implementation         = oldIMP;
-    }else{
-        
-        _old_setter_implementation  = oldIMP;
-    }
-}
+//- (void)hookPropertyWithImplementation:(IMP)implementation option:(NSUInteger)option
+//{
+
+//    NSMutableString*    methodEnc   = [NSMutableString string];
+//    NSString*           des_name    = nil;
+//    SEL                 des_sel     = nil;
+//    IMP                 oldIMP      = nil;
+//    if(option == APCPropertyTriggerOfGetter){
+//
+//        [methodEnc appendString:self.valueTypeEncoding];
+//        _new_getter_implementation = implementation;
+//        des_name = _des_getter_name;
+//        des_sel = NSSelectorFromString(des_name);
+//    }
+//    [methodEnc appendString:@"@:"];
+//    if(option == APCPropertyTriggerOfSetter){
+//
+//        [methodEnc appendString:self.valueTypeEncoding];
+//        _new_setter_implementation = implementation;
+//        des_name = _des_setter_name;
+//        des_sel = NSSelectorFromString(des_name);
+//    }
+//
+//
+//    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
+//
+//        oldIMP
+//        =
+//        class_replaceMethod(_des_class
+//                            , des_sel
+//                            , implementation
+//                            , methodEnc.UTF8String);
+//
+//        if(nil == oldIMP){
+//
+//            APCTriggerGetterProperty* pinfo_superclass
+//            =
+//            [_cacheForClass propertyForDesclass:_src_class property:des_name];
+//
+//            if(nil != pinfo_superclass){
+//
+//                oldIMP =
+//                (option == APCPropertyTriggerOfGetter)
+//                ? pinfo_superclass->_old_getter_implementation
+//                : pinfo_superclass->_old_setter_implementation;
+//
+//            }else{
+//
+//                oldIMP = class_getMethodImplementation(_src_class, des_sel);
+//            }
+//        }
+//    }
+//    else{
+//
+//        if(nil == _proxyClass){
+//
+//            if(NO == [APCTriggerGetterProperty testingProxyClassInstance:_instance]){
+//
+//                NSString *proxyClassName = self.proxyClassName;
+//                _proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
+//                if(nil != _proxyClass){
+//
+//                    objc_registerClassPair(_proxyClass);
+//                }else if(nil == (_proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
+//
+//                    NSAssert(_proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
+//                }
+//
+//                object_setClass(_instance, _proxyClass);
+//            }else{
+//
+//                _proxyClass = [_instance class];
+//            }
+//        }
+//
+//        oldIMP
+//        =
+//        class_replaceMethod(_proxyClass
+//                            , des_sel
+//                            , implementation
+//                            , methodEnc.UTF8String);
+//        if(nil == oldIMP){
+//
+//            oldIMP = class_getMethodImplementation(_des_class, des_sel);
+//        }
+//    }
+//
+//    if(option == APCPropertyTriggerOfGetter){
+//
+//        _old_getter_implementation         = oldIMP;
+//    }else{
+//
+//        _old_setter_implementation  = oldIMP;
+//    }
+//}
 
 - (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target
 {
-    if(NO == (_new_getter_implementation && _old_getter_implementation)){
-        
-        return nil;
-    }
-    
-    return
-    
-    apc_getterimp_boxinvok(target
-                           , NSSelectorFromString(_des_getter_name)
-                           , _old_getter_implementation
-                           , self.valueTypeEncoding.UTF8String);
+    return nil;
+//    if(NO == (_new_getter_implementation && _old_getter_implementation)){
+//
+//        return nil;
+//    }
+//
+//    return
+//
+//    apc_getterimp_boxinvok(target
+//                           , NSSelectorFromString(_des_getter_name)
+//                           , _old_getter_implementation
+//                           , self.valueTypeEncoding.UTF8String);
 }
 
 - (void)performOldSetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value
 {
-    if(NO == (_new_setter_implementation && _old_setter_implementation)){
-        
-        return;
-    }
-    
-    apc_setterimp_boxinvok(target
-                           , NSSelectorFromString(_des_setter_name)
-                           , _old_setter_implementation
-                           , self.valueTypeEncoding.UTF8String
-                           , value);
+//    if(NO == (_new_setter_implementation && _old_setter_implementation)){
+//
+//        return;
+//    }
+//
+//    apc_setterimp_boxinvok(target
+//                           , NSSelectorFromString(_des_setter_name)
+//                           , _old_setter_implementation
+//                           , self.valueTypeEncoding.UTF8String
+//                           , value);
 }
 
-+ (void)unhookClassAllProperties:(Class)clazz
-{
-    clazz  = [self unproxyClass:clazz];
-    
-    [[_cacheForClass propertiesForSrcclass:clazz] makeObjectsPerformSelector:@selector(unhook)];
-}
+//+ (void)unhookClassAllProperties:(Class)clazz
+//{
+//    clazz  = [self unproxyClass:clazz];
+//
+//    [[_cacheForClass propertiesForSrcclass:clazz] makeObjectsPerformSelector:@selector(unhook)];
+//}
 
-- (void)tryUnhook
-{
-    if(_triggerOption == APCPropertyNonTrigger){
-        
-        [self unhook];
-    }
-}
+//- (void)tryUnhook
+//{
+//    if(_triggerOption == APCPropertyNonTrigger){
+//
+//        [self unhook];
+//    }
+//}
 
 /**
  Only one hook,just remove all infomation.
  */
-- (void)unhook
-{
-    
-    [self invalid];
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-        
-        [self unhookForClass];
-        [self removeFromClassCache];
-    }else{
-        
-        if(NO == [APCTriggerGetterProperty testingProxyClassInstance:_instance]){
-            ///Instance has been unbound by other threads.
-            return;
-        }
-        [self unhookForInstance];
-        [self removeFromInstanceCache];
-    }
-}
+//- (void)unhook
+//{
+//
+//    [self invalid];
+//    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
+//
+//        [self unhookForClass];
+//        [self removeFromClassCache];
+//    }else{
+//
+//        if(NO == [APCTriggerGetterProperty testingProxyClassInstance:_instance]){
+//            ///Instance has been unbound by other threads.
+//            return;
+//        }
+//        [self unhookForInstance];
+//        [self removeFromInstanceCache];
+//    }
+//}
 
-- (void)unhookForClass
-{
-    _new_getter_implementation = nil;
-    
-    NSUInteger count
-    =
-    (YES == (self.triggerOption & APCPropertyTriggerOfGetter))
-    +
-    (YES == (self.triggerOption & APCPropertyTriggerOfSetter));
-    
-    while (count--) {
-        
-        class_replaceMethod(_des_class
-                            , NSSelectorFromString(count==1?_des_getter_name:_des_setter_name)
-                            , _old_getter_implementation
-                            , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-    }
-}
+//- (void)unhookForClass
+//{
+//    _new_getter_implementation = nil;
+//    
+//    NSUInteger count
+//    =
+//    (YES == (self.triggerOption & APCPropertyTriggerOfGetter))
+//    +
+//    (YES == (self.triggerOption & APCPropertyTriggerOfSetter));
+//    
+//    while (count--) {
+//        
+//        class_replaceMethod(_des_class
+//                            , NSSelectorFromString(count==1?_des_getter_name:_des_setter_name)
+//                            , _old_getter_implementation
+//                            , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+//    }
+//}
 
 - (void)unhookForInstance
 {
@@ -385,80 +383,80 @@ CACHE:
 
 #pragma mark - cache strategy
 
-- (void)cacheToInstanceMapper
-{
-    [APCInstancePropertyCacheManager bindProperty:self
-                                       toInstance:_instance
-                                              cmd:_des_getter_name];
-    
-    if(self.triggerOption & APCPropertyTriggerOfSetter){
-        
-        [APCInstancePropertyCacheManager bindProperty:self
-                                           toInstance:_instance
-                                                  cmd:_des_setter_name];
-    }
-}
-
-- (void)removeFromInstanceCache
-{
-    [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
-                                                                 cmd:_des_getter_name];
-    
-    if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
-        
-        [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
-    }
-}
-
-static APCClassPropertyMapperController* _cacheForClass;
-- (void)cacheToClassMapper
-{
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        
-        _cacheForClass     =   [APCClassPropertyMapperController cache];
-    });
-    
-    [_cacheForClass addProperty:self];
-}
-
-+ (_Nullable instancetype)cachedTargetClass:(Class)clazz
-                                   property:(NSString*)property
-{
-    clazz = [APCTriggerGetterProperty unproxyClass:clazz];
-    
-    return [_cacheForClass propertyForDesclass:clazz property:property];
-}
-
-+ (instancetype)cachedFromAClass:(Class)aClazz
-                        property:(NSString *)property
-{
-    aClazz = [APCTriggerGetterProperty unproxyClass:aClazz];
-    
-    return [_cacheForClass searchFromTargetClass:aClazz property:property];
-}
-
-- (void)removeFromClassCache
-{
-    [_cacheForClass removeProperty:self];
-}
+//- (void)cacheToInstanceMapper
+//{
+//    [APCInstancePropertyCacheManager bindProperty:self
+//                                       toInstance:_instance
+//                                              cmd:_des_getter_name];
+//
+//    if(self.triggerOption & APCPropertyTriggerOfSetter){
+//
+//        [APCInstancePropertyCacheManager bindProperty:self
+//                                           toInstance:_instance
+//                                                  cmd:_des_setter_name];
+//    }
+//}
+//
+//- (void)removeFromInstanceCache
+//{
+//    [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
+//                                                                 cmd:_des_getter_name];
+//
+//    if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
+//
+//        [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
+//    }
+//}
+//
+//static APCClassPropertyMapperController* _cacheForClass;
+//- (void)cacheToClassMapper
+//{
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//
+//        _cacheForClass     =   [APCClassPropertyMapperController cache];
+//    });
+//
+//    [_cacheForClass addProperty:self];
+//}
+//
+//+ (_Nullable instancetype)cachedTargetClass:(Class)clazz
+//                                   property:(NSString*)property
+//{
+//    clazz = [APCTriggerGetterProperty unproxyClass:clazz];
+//
+//    return [_cacheForClass propertyForDesclass:clazz property:property];
+//}
+//
+//+ (instancetype)cachedFromAClass:(Class)aClazz
+//                        property:(NSString *)property
+//{
+//    aClazz = [APCTriggerGetterProperty unproxyClass:aClazz];
+//
+//    return [_cacheForClass searchFromTargetClass:aClazz property:property];
+//}
+//
+//- (void)removeFromClassCache
+//{
+//    [_cacheForClass removeProperty:self];
+//}
 
 #pragma mark - APCPropertyMapperKeyProtocol
-- (NSSet<APCPropertyMapperkey *> *)propertyMapperkeys
-{
-    NSMutableSet* set = [NSMutableSet set];
-    
-    [set addObject:[APCPropertyMapperkey keyWithClass:_des_class
-                                             property:_des_getter_name]];
-    
-    if(self.triggerOption & APCPropertyTriggerOfSetter){
-        
-        [set addObject:[APCPropertyMapperkey keyWithClass:_des_class
-                                                 property:_des_setter_name]];
-    }
-    
-    return set;
-}
+//- (NSSet<APCPropertyMapperkey *> *)propertyMapperkeys
+//{
+//    NSMutableSet* set = [NSMutableSet set];
+//
+//    [set addObject:[APCPropertyMapperkey keyWithClass:_des_class
+//                                             property:_des_getter_name]];
+//
+//    if(self.triggerOption & APCPropertyTriggerOfSetter){
+//
+//        [set addObject:[APCPropertyMapperkey keyWithClass:_des_class
+//                                                 property:_des_setter_name]];
+//    }
+//
+//    return set;
+//}
 
 
 #pragma mark - APCPropertyHookProxyClassNameProtocol

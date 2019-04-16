@@ -29,7 +29,7 @@
 		45B12FBE225B2C5D002D825E /* NSObject+APCTriggerProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */; };
 		45B12FF5225B31D3002D825E /* APCTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FF4225B31D3002D825E /* APCTest.m */; };
 		45D44A5C22645D55005F1B2E /* APCPropertyHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D44A5B22645D55005F1B2E /* APCPropertyHook.m */; };
-		45D44A6022647506005F1B2E /* APCMethodInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D44A5F22647506005F1B2E /* APCMethodInfo.m */; };
+		45D44A6022647506005F1B2E /* APCMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D44A5F22647506005F1B2E /* APCMethod.m */; };
 		45D44A6422647DBB005F1B2E /* APCRuntime.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D44A6322647DBB005F1B2E /* APCRuntime.m */; };
 		9FCF5DE92264D93A0059A876 /* APCTriggerSetterProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FCF5DE82264D93A0059A876 /* APCTriggerSetterProperty.m */; };
 		9FCF5DED2264E03D0059A876 /* APCMethodHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FCF5DEC2264E03D0059A876 /* APCMethodHook.m */; };
@@ -81,8 +81,8 @@
 		45B12FF4225B31D3002D825E /* APCTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCTest.m; sourceTree = "<group>"; };
 		45D44A5A22645D55005F1B2E /* APCPropertyHook.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCPropertyHook.h; sourceTree = "<group>"; };
 		45D44A5B22645D55005F1B2E /* APCPropertyHook.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCPropertyHook.m; sourceTree = "<group>"; };
-		45D44A5E22647506005F1B2E /* APCMethodInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCMethodInfo.h; sourceTree = "<group>"; };
-		45D44A5F22647506005F1B2E /* APCMethodInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCMethodInfo.m; sourceTree = "<group>"; };
+		45D44A5E22647506005F1B2E /* APCMethod.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCMethod.h; sourceTree = "<group>"; };
+		45D44A5F22647506005F1B2E /* APCMethod.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCMethod.m; sourceTree = "<group>"; };
 		45D44A6222647DBB005F1B2E /* APCRuntime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCRuntime.h; sourceTree = "<group>"; };
 		45D44A6322647DBB005F1B2E /* APCRuntime.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCRuntime.m; sourceTree = "<group>"; };
 		9FCF5DE72264D93A0059A876 /* APCTriggerSetterProperty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCTriggerSetterProperty.h; sourceTree = "<group>"; };
@@ -121,9 +121,6 @@
 		45B12F5D225B2AF3002D825E /* AutoPropertyCocoaiOS */ = {
 			isa = PBXGroup;
 			children = (
-				9FCF5DEA2264E0100059A876 /* Hook */,
-				45D44A6122647DA3005F1B2E /* APCRuntime */,
-				45D44A5D226474CF005F1B2E /* Method */,
 				45B12F96225B2C5D002D825E /* AutoPropertyCocoa */,
 				45B12F91225B2C5D002D825E /* TestClass */,
 				45B12F5E225B2AF3002D825E /* AppDelegate.h */,
@@ -158,11 +155,13 @@
 			isa = PBXGroup;
 			children = (
 				45B12FB0225B2C5D002D825E /* APCExtScope.h */,
+				45D44A6122647DA3005F1B2E /* APCRuntime */,
 				45B12FAE225B2C5D002D825E /* APCScope.h */,
 				45B12F97225B2C5D002D825E /* APCScope.m */,
 				45B12FAD225B2C5D002D825E /* AutoPropertyCocoa.h */,
 				45B12F98225B2C5D002D825E /* Cache */,
 				45B12F9F225B2C5D002D825E /* Category */,
+				45D44A5D226474CF005F1B2E /* Method */,
 				45B12FAF225B2C5D002D825E /* NSObject+APCLazyLoad.h */,
 				45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */,
 				45B12FAB225B2C5D002D825E /* NSObject+APCTriggerProperty.h */,
@@ -215,8 +214,8 @@
 		45D44A5D226474CF005F1B2E /* Method */ = {
 			isa = PBXGroup;
 			children = (
-				45D44A5E22647506005F1B2E /* APCMethodInfo.h */,
-				45D44A5F22647506005F1B2E /* APCMethodInfo.m */,
+				45D44A5E22647506005F1B2E /* APCMethod.h */,
+				45D44A5F22647506005F1B2E /* APCMethod.m */,
 			);
 			path = Method;
 			sourceTree = "<group>";
@@ -224,6 +223,7 @@
 		45D44A6122647DA3005F1B2E /* APCRuntime */ = {
 			isa = PBXGroup;
 			children = (
+				9FCF5DEA2264E0100059A876 /* Hook */,
 				45D44A65226485CB005F1B2E /* RuntimeCache */,
 				45D44A6222647DBB005F1B2E /* APCRuntime.h */,
 				45D44A6322647DBB005F1B2E /* APCRuntime.m */,
@@ -324,7 +324,7 @@
 				45B12FB9225B2C5D002D825E /* APCHookProperty.m in Sources */,
 				45B12FF5225B31D3002D825E /* APCTest.m in Sources */,
 				45B12FB6225B2C5D002D825E /* APCPropertyMapperkey.m in Sources */,
-				45D44A6022647506005F1B2E /* APCMethodInfo.m in Sources */,
+				45D44A6022647506005F1B2E /* APCMethod.m in Sources */,
 				456FC4792261B420006CD604 /* APCLazyloadOldLoopController.m in Sources */,
 				45B12FB2225B2C5D002D825E /* Man.m in Sources */,
 				45B12F63225B2AF3002D825E /* ViewController.m in Sources */,

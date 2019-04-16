@@ -64,12 +64,12 @@ static NSMutableDictionary* _f_map;
 [APCTest unbindAllClass];
 + (void)unbindAllClass
 {
+#warning <#message#>
+//    [APCLazyProperty unhookClassAllProperties:[Person class]];
+//    [APCLazyProperty unhookClassAllProperties:[Man class]];
     
-    [APCLazyProperty unhookClassAllProperties:[Person class]];
-    [APCLazyProperty unhookClassAllProperties:[Man class]];
-    
-    [APCTriggerGetterProperty unhookClassAllProperties:[Person class]];
-    [APCTriggerGetterProperty unhookClassAllProperties:[Man class]];
+//    [APCTriggerGetterProperty unhookClassAllProperties:[Person class]];
+//    [APCTriggerGetterProperty unhookClassAllProperties:[Man class]];
 }
 
 #pragma mark - demo

@@ -15,7 +15,7 @@
 
 + (void)apc_unbindTriggerAllProperties
 {
-    [APCTriggerGetterProperty unhookClassAllProperties:self];
+//    [APCTriggerGetterProperty unhookClassAllProperties:self];
 }
 
 #pragma mark - Class
@@ -29,8 +29,8 @@
 
 + (void)apc_unbindFrontOfPropertyGetter:(NSString*)property
 {
-    APCTriggerGetterProperty* p = [APCTriggerGetterProperty cachedTargetClass:self property:property];
-    [p getterUnbindFrontTrigger];
+//    APCTriggerGetterProperty* p = [APCTriggerGetterProperty cachedTargetClass:self property:property];
+//    [p getterUnbindFrontTrigger];
 }
 
 + (void)apc_backOfPropertyGetter:(NSString *)property bindWithBlock:(void (^)(id _Nonnull, id _Nullable))block
@@ -43,8 +43,8 @@
 
 + (void)apc_unbindBackOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = [APCTriggerGetterProperty cachedTargetClass:self property:property];
-    [p getterUnbindPostTrigger];
+//    APCTriggerGetterProperty* p = [APCTriggerGetterProperty cachedTargetClass:self property:property];
+//    [p getterUnbindPostTrigger];
 }
 
 + (void)apc_propertyGetter:(NSString *)property bindUserCondition:(BOOL (^)(id _Nonnull, id _Nullable))condition withBlock:(void (^)(id _Nonnull, id _Nullable))block
@@ -57,8 +57,8 @@
 
 + (void)apc_unbindUserConditionOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = [APCTriggerGetterProperty cachedTargetClass:self property:property];
-    [p getterUnbindUserTrigger];
+//    APCTriggerGetterProperty* p = [APCTriggerGetterProperty cachedTargetClass:self property:property];
+//    [p getterUnbindUserTrigger];
 }
 
 + (void)apc_propertyGetter:(NSString *)property bindAccessCountCondition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition withBlock:(void (^)(id _Nonnull, id _Nullable))block
@@ -71,8 +71,8 @@
 
 + (void)apc_unbindAccessCountConditionOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = [APCTriggerGetterProperty cachedTargetClass:self property:property];
-    [p getterUnbindCountTrigger];
+//    APCTriggerGetterProperty* p = [APCTriggerGetterProperty cachedTargetClass:self property:property];
+//    [p getterUnbindCountTrigger];
 }
 
 + (void)apc_frontOfPropertySetter:(NSString *)property bindWithBlock:(void (^)(id _Nonnull))block
@@ -139,7 +139,8 @@
 {
     if(option == APCPropertyNonTrigger) return;
     
-    APCTriggerGetterProperty* propertyInfo = [APCTriggerGetterProperty cachedFromAClass:self property:propertyName];
+#warning get it
+    APCTriggerGetterProperty* propertyInfo;
     
     if(propertyInfo == nil){
         

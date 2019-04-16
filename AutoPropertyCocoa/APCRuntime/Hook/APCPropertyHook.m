@@ -2,7 +2,7 @@
 //  APCPropertyHook.m
 //  AutoPropertyCocoa
 //
-//  Created by MDLK on 2019/4/15.
+//  Created by Novo on 2019/4/15.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
@@ -48,6 +48,16 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     return self;
 }
 
+- (Class)hookclass
+{
+    return _propertyInfo->_des_class;
+}
+
+- (NSString *)hookMethod
+{
+    return _propertyInfo->_des_getter_name;
+}
+
 - (NSEnumerator<APCHookProperty *> *)propertyEnumerator
 {
     return _boundProperties.objectEnumerator;
@@ -59,7 +69,7 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
               && ([_propertyInfo->_des_getter_name isEqualToString:property->_des_getter_name]), @"APC: Class name and property name are one by one mapped.");
     
     [_boundProperties addObject:property];
-    property.hook = self;
+    [property bindingToHook:self];
 }
 
 - (void)unbindProperty:(APCHookProperty *)property
@@ -70,7 +80,9 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     [property invalid];
     
     [_boundProperties removeObject:property];
-    property.hook = nil;
+    
+    [property bindingToHook:nil];
+    
     if(self.isEmpty){
         
         [self unhook];

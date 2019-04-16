@@ -6,6 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "APCMethod.h"
 #import "APCProperty.h"
 
 @protocol APCHookPropertyProtocol <NSObject>
@@ -13,32 +14,38 @@
 @required
 - (void)disposeRuntimeResource;
 @optional
+
 - (id _Nullable)performOldSetterFromTarget:(_Nonnull id)target;
-- (void)performOldGetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value;
 
-
-
-- (void)hookPropertyWithImplementation:(IMP _Nonnull)implementation
-                                option:(NSUInteger)option;
-- (void)unhook;
+- (void)performOldGetterFromTarget:(_Nonnull id)target
+                         withValue:(id _Nullable)value;
 @end
 
 @class APCPropertyHook;
 /**
  该类型没有具体实现
  */
-@interface APCHookProperty : APCProperty <APCHookPropertyProtocol>
+@interface APCHookProperty : APCProperty <APCHookPropertyProtocol,APCMethodProtocol>
 {
-@protected
+@public
     
-    IMP         _new_setter_implementation;
-    IMP         _old_setter_implementation;
-    IMP         _new_getter_implementation;
-    IMP         _old_getter_implementation;
-    Class       _proxyClass;
-}
+    NSString*       _hooked_name;
+@protected
 
-@property (nonatomic,weak,nullable) APCPropertyHook* hook;
+    APCMethodStyle  _methodStyle;
+    Class           _proxyClass;
+}
+@property (nonatomic,copy,readonly,nonnull) NSString*       hookedMethod;
+@property (nonatomic,assign,readonly)       APCMethodStyle  methodStyle;
+@property (nonatomic,weak,readonly,nullable)APCPropertyHook*hook;
+
+- (void)bindingToHook:(APCPropertyHook* _Nullable)hook;
 
 - (void)disposeRuntimeResource;
+
+
+/**
+ Class.hooedMethod
+ */
+- (NSUInteger)hash;
 @end

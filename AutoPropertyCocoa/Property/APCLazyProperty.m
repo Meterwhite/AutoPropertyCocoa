@@ -14,8 +14,8 @@
 #import "APCScope.h"
 
 
-id    _Nullable apc_lazy_property       (_Nullable id _self,SEL __cmd);
-void* _Nullable apc_lazy_property_impimage(NSString* eType);
+//id    _Nullable apc_lazy_property       (_Nullable id _self,SEL __cmd);
+//void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 
 #pragma mark - APCLazyProperty
@@ -29,7 +29,8 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
                                    aClass:aClass]){
         
         
-        _methodStyle = APCMethodGetterStyle;
+        _methodStyle    =   APCMethodGetterStyle;
+        _hooked_name       =   _des_getter_name;
         if(self.kindOfOwner == APCPropertyOwnerKindOfClass){
             
             if(self.kindOfValue != APCPropertyValueKindOfObject
@@ -42,218 +43,219 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
     return self;
 }
 
-- (void)hookUsingUserSelector:(SEL)aSelector
+- (void)bindingUserSelector:(SEL)aSelector
 {
-    _kindOfHook     =   APCPropertyHookKindOfSelector;
+    _kindOfUserHook =   APCPropertyHookKindOfSelector;
     _userSelector   =   aSelector?:@selector(new);
     _userBlock      =   nil;
-    IMP newimp      =   nil;
-    if(self.kindOfValue == APCPropertyValueKindOfBlock ||
-       self.kindOfValue == APCPropertyValueKindOfObject){
-        
-        newimp = (IMP)apc_lazy_property;
-    }else{
-        
-        newimp = (IMP)apc_lazy_property_impimage(self.valueTypeEncoding);
-    }
-    
-    [self hookPropertyWithImplementation:newimp option:0];
-    
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-        
-        [self cacheToClassMapper];
-    }else{
-        
-        [self cacheToInstanceMapper];
-    }
+//    IMP newimp      =   nil;
+//    if(self.kindOfValue == APCPropertyValueKindOfBlock ||
+//       self.kindOfValue == APCPropertyValueKindOfObject){
+//
+//        newimp = (IMP)apc_lazy_property;
+//    }else{
+//
+//        newimp = (IMP)apc_lazy_property_impimage(self.valueTypeEncoding);
+//    }
+//
+//    [self hookPropertyWithImplementation:newimp option:0];
+//
+//    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
+//
+//        [self cacheToClassMapper];
+//    }else{
+//
+//        [self cacheToInstanceMapper];
+//    }
 }
 
-- (void)hookUsingUserBlock:(id)block
+- (void)bindindUserBlock:(id)block
 {
-    _kindOfHook     =   APCPropertyHookKindOfBlock;
+    _kindOfUserHook     =   APCPropertyHookKindOfBlock;
     _userBlock      =   [block copy];
     _userSelector   =   nil;
-    IMP newimp      =   nil;
-    if(self.kindOfValue == APCPropertyValueKindOfBlock ||
-       self.kindOfValue == APCPropertyValueKindOfObject){
-        
-        newimp = (IMP)apc_lazy_property;
-    }else{
-        
-        newimp = (IMP)apc_lazy_property_impimage(self.valueTypeEncoding);
-    }
-    [self hookPropertyWithImplementation:newimp option:0];
-    
-    ///Cache
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-        
-        [self cacheToClassMapper];
-    }else{
-        
-        [self cacheToInstanceMapper];
-    }
+//    IMP newimp      =   nil;
+//    if(self.kindOfValue == APCPropertyValueKindOfBlock ||
+//       self.kindOfValue == APCPropertyValueKindOfObject){
+//
+//        newimp = (IMP)apc_lazy_property;
+//    }else{
+//
+//        newimp = (IMP)apc_lazy_property_impimage(self.valueTypeEncoding);
+//    }
+//    [self hookPropertyWithImplementation:newimp option:0];
+
+//    ///Cache
+//    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
+//
+//        [self cacheToClassMapper];
+//    }else{
+//
+//        [self cacheToInstanceMapper];
+//    }
 }
 /** Important */
-- (void)hookPropertyWithImplementation:(IMP)implementation option:(NSUInteger)option
-{
-    _new_getter_implementation = implementation;
-    
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-        
-        ///APCPropertyOwnerKindOfClass
-        _old_getter_implementation
-        =
-        class_replaceMethod(_des_class
-                            , NSSelectorFromString(_des_getter_name)
-                            , _new_getter_implementation
-                            , [NSString stringWithFormat:@"%@@:", self.valueTypeEncoding].UTF8String);
-        
-        if(nil == _old_getter_implementation){
-            
-            ///Overwrite super class property with new property.
-            ///Storing the implementation address of the super class
-            
-            ///Superclass and subclass used the same old implementation that is from superclass.
-            
-            APCLazyProperty* pinfo_superclass
-            =
-            [_cacheForClass propertyForDesclass:_src_class property:_des_getter_name];
-            
-            if(nil != pinfo_superclass){
-                
-                _old_getter_implementation = pinfo_superclass->_new_getter_implementation;
-            }else{
-                
-                _old_getter_implementation
-                =
-                class_getMethodImplementation(_src_class
-                                              , NSSelectorFromString(_des_getter_name));
-            }
-            
-            NSAssert(_old_getter_implementation, @"APC: Can not find original implementation.");
-        }
-    }
-    else{
-        
-        Class proxyClass;
-        if(NO == [APCLazyProperty testingProxyClassInstance:_instance])
-        {
-            
-            NSString *proxyClassName = self.proxyClassName;
-            proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
-            if(nil != proxyClass){
-                
-                objc_registerClassPair(proxyClass);
-            }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
-                
-                NSAssert(proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
-            }
-            
-            ///Hook the isa point.
-            object_setClass(_instance, proxyClass);
-        }else{
-            
-            proxyClass = [_instance class];
-        }
-        _proxyClass = proxyClass;
-        
-        _old_getter_implementation
-        =
-        class_replaceMethod(proxyClass
-                            , NSSelectorFromString(_des_getter_name)
-                            , _new_getter_implementation
-                            , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-        if(nil == _old_getter_implementation){
-            
-            _old_getter_implementation
-            =
-            class_getMethodImplementation(_des_class
-                                          , NSSelectorFromString(_des_getter_name));
-        }
-    }
-}
+//- (void)hookPropertyWithImplementation:(IMP)implementation option:(NSUInteger)option
+//{
+//    _new_getter_implementation = implementation;
+//
+//    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
+//
+//        ///APCPropertyOwnerKindOfClass
+//        _old_getter_implementation
+//        =
+//        class_replaceMethod(_des_class
+//                            , NSSelectorFromString(_des_getter_name)
+//                            , _new_getter_implementation
+//                            , [NSString stringWithFormat:@"%@@:", self.valueTypeEncoding].UTF8String);
+//
+//        if(nil == _old_getter_implementation){
+//
+//            ///Overwrite super class property with new property.
+//            ///Storing the implementation address of the super class
+//
+//            ///Superclass and subclass used the same old implementation that is from superclass.
+//
+//            APCLazyProperty* pinfo_superclass
+//            =
+//            [_cacheForClass propertyForDesclass:_src_class property:_des_getter_name];
+//
+//            if(nil != pinfo_superclass){
+//
+//                _old_getter_implementation = pinfo_superclass->_new_getter_implementation;
+//            }else{
+//
+//                _old_getter_implementation
+//                =
+//                class_getMethodImplementation(_src_class
+//                                              , NSSelectorFromString(_des_getter_name));
+//            }
+//
+//            NSAssert(_old_getter_implementation, @"APC: Can not find original implementation.");
+//        }
+//    }
+//    else{
+//
+//        Class proxyClass;
+//        if(NO == [APCLazyProperty testingProxyClassInstance:_instance])
+//        {
+//
+//            NSString *proxyClassName = self.proxyClassName;
+//            proxyClass = objc_allocateClassPair(_des_class, proxyClassName.UTF8String, 0);
+//            if(nil != proxyClass){
+//
+//                objc_registerClassPair(proxyClass);
+//            }else if(nil == (proxyClass = objc_getClass(proxyClassName.UTF8String))){///Proxy already exists.
+//
+//                NSAssert(proxyClass, @"Can not register class(:%@) at runtime.",proxyClassName);
+//            }
+//
+//            ///Hook the isa point.
+//            object_setClass(_instance, proxyClass);
+//        }else{
+//
+//            proxyClass = [_instance class];
+//        }
+//        _proxyClass = proxyClass;
+//
+//        _old_getter_implementation
+//        =
+//        class_replaceMethod(proxyClass
+//                            , NSSelectorFromString(_des_getter_name)
+//                            , _new_getter_implementation
+//                            , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+//        if(nil == _old_getter_implementation){
+//
+//            _old_getter_implementation
+//            =
+//            class_getMethodImplementation(_des_class
+//                                          , NSSelectorFromString(_des_getter_name));
+//        }
+//    }
+//}
 
-- (void)unhook
-{
-    if(nil == _old_getter_implementation || nil == _new_getter_implementation){
-        
-        return;
-    }
-        
-    [self invalid];
-    
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass)
-    {
-        [self unhookForClass];
-        [self removeFromClassCache];
-    }
-    else
-    {
-        if(NO == [APCLazyProperty testingProxyClassInstance:_instance]){
-            ///Instance has been unbound by other threads.
-            return;
-        }
-        
-        [self unhookForInstance];
-        [self removeFromInstanceCache];
-    }
-}
+//- (void)unhook
+//{
+//    if(nil == _old_getter_implementation || nil == _new_getter_implementation){
+//
+//        return;
+//    }
+//
+//    [self invalid];
+//
+//    if(_kindOfOwner == APCPropertyOwnerKindOfClass)
+//    {
+//        [self unhookForClass];
+//        [self removeFromClassCache];
+//    }
+//    else
+//    {
+//        if(NO == [APCLazyProperty testingProxyClassInstance:_instance]){
+//            ///Instance has been unbound by other threads.
+//            return;
+//        }
+//
+//        [self unhookForInstance];
+//        [self removeFromInstanceCache];
+//    }
+//}
 
-+ (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz
-{
-    clazz  = [self unproxyClass:clazz];
-    
-    [[_cacheForClass propertiesForSrcclass:clazz] makeObjectsPerformSelector:@selector(unhook)];
-}
+//+ (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz
+//{
+//    clazz  = [self unproxyClass:clazz];
+//
+//    [[_cacheForClass propertiesForSrcclass:clazz] makeObjectsPerformSelector:@selector(unhook)];
+//}
 
-- (void)unhookForClass
-{
-    _new_getter_implementation = nil;
-    
-    class_replaceMethod(_des_class
-                        , NSSelectorFromString(_des_getter_name)
-                        , _old_getter_implementation
-                        , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-}
+//- (void)unhookForClass
+//{
+//    _new_getter_implementation = nil;
+//
+//    class_replaceMethod(_des_class
+//                        , NSSelectorFromString(_des_getter_name)
+//                        , _old_getter_implementation
+//                        , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+//}
 
-- (void)unhookForInstance
-{
-    if([APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
-        
-        _new_getter_implementation = nil;
-        
-        class_replaceMethod([_instance class]
-                            , NSSelectorFromString(_des_getter_name)
-                            , _old_getter_implementation
-                            , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
-    }else{
-        
-        
-        object_setClass(_instance, _des_class);
-        
-        objc_disposeClassPair(_proxyClass);
-    }
-}
+//- (void)unhookForInstance
+//{
+//    if([APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
+//
+//        _new_getter_implementation = nil;
+//
+//        class_replaceMethod([_instance class]
+//                            , NSSelectorFromString(_des_getter_name)
+//                            , _old_getter_implementation
+//                            , [NSString stringWithFormat:@"%@@:",self.valueTypeEncoding].UTF8String);
+//    }else{
+//
+//
+//        object_setClass(_instance, _des_class);
+//
+//        objc_disposeClassPair(_proxyClass);
+//    }
+//}
 
 - (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target
 {
-    if(NO == (_new_getter_implementation && _old_getter_implementation)){
-        
-        return nil;
-    }
-    
-    [APCLazyloadOldLoopController joinLoop:target];
-    
-    id ret
-    =
-    apc_getterimp_boxinvok(target
-                           , NSSelectorFromString(_des_getter_name)
-                           , _old_getter_implementation
-                           , self.valueTypeEncoding.UTF8String);
-    
-    [APCLazyloadOldLoopController breakLoop:target];
-    
-    return ret;
+    return nil;
+//    if(NO == (_new_getter_implementation && _old_getter_implementation)){
+//
+//        return nil;
+//    }
+//
+//    [APCLazyloadOldLoopController joinLoop:target];
+//
+//    id ret
+//    =
+//    apc_getterimp_boxinvok(target
+//                           , NSSelectorFromString(_des_getter_name)
+//                           , _old_getter_implementation
+//                           , self.valueTypeEncoding.UTF8String);
+//
+//    [APCLazyloadOldLoopController breakLoop:target];
+//
+//    return ret;
 }
 
 - (id _Nullable)instancetypeNewObjectByUserSelector
@@ -321,87 +323,87 @@ void* _Nullable apc_lazy_property_impimage(NSString* eType);
 
 #pragma mark - Cache strategy
 
-- (void)cacheToInstanceMapper
-{
-    [APCInstancePropertyCacheManager bindProperty:self
-                                       toInstance:_instance
-                                              cmd:_des_getter_name];
-}
-
-- (void)removeFromInstanceCache
-{
-    
-    [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
-                                                                 cmd:_des_getter_name];
-    
-    if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
-        
-        [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
-    }
-}
-
-static APCClassPropertyMapperController* _cacheForClass;
-- (void)cacheToClassMapper
-{
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        
-        _cacheForClass     =   [APCClassPropertyMapperController cache];
-    });
-    
-    [_cacheForClass addProperty:self];
-}
-
-- (void)removeFromClassCache
-{
-    [_cacheForClass removeProperty:self];
-}
-
-+ (_Nullable instancetype)cachedTargetClass:(Class)clazz
-                                   property:(NSString*)property
-{
-    clazz = [self unproxyClass:clazz];
-    
-    return [_cacheForClass propertyForDesclass:clazz property:property];
-}
-
-+ (instancetype)cachedFromAClassByInstance:(id)instance property:(NSString *)property
-{
-    
-    NSUInteger lenth = [APCLazyloadOldLoopController loopCount:instance];
-    
-    
-    if(lenth == 0){
-        
-        return [self cachedFromAClass:[instance class] property:property];
-    }
-    
-    APCLazyProperty*   p;
-    Class                   clazz = [instance class];
-    while (lenth) {
-        
-        while ((clazz = [clazz superclass])) {
-            
-            if(clazz == nil) return p;
-            
-            if(nil != (p = [self cachedTargetClass:clazz property:property])){
-                
-                --lenth;
-                break;
-            }
-        }
-    }
-    
-    return p;
-}
-
-+ (_Nullable instancetype)cachedFromAClass:(Class)aClazz
-                                  property:(NSString*)property
-{
-    aClazz = [self unproxyClass:aClazz];
-    
-    return [_cacheForClass searchFromTargetClass:aClazz property:property];
-}
+//- (void)cacheToInstanceMapper
+//{
+//    [APCInstancePropertyCacheManager bindProperty:self
+//                                       toInstance:_instance
+//                                              cmd:_des_getter_name];
+//}
+//
+//- (void)removeFromInstanceCache
+//{
+//
+//    [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
+//                                                                 cmd:_des_getter_name];
+//
+//    if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
+//
+//        [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
+//    }
+//}
+//
+//static APCClassPropertyMapperController* _cacheForClass;
+//- (void)cacheToClassMapper
+//{
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//
+//        _cacheForClass     =   [APCClassPropertyMapperController cache];
+//    });
+//
+//    [_cacheForClass addProperty:self];
+//}
+//
+//- (void)removeFromClassCache
+//{
+//    [_cacheForClass removeProperty:self];
+//}
+//
+//+ (_Nullable instancetype)cachedTargetClass:(Class)clazz
+//                                   property:(NSString*)property
+//{
+//    clazz = [self unproxyClass:clazz];
+//
+//    return [_cacheForClass propertyForDesclass:clazz property:property];
+//}
+//
+//+ (instancetype)cachedFromAClassByInstance:(id)instance property:(NSString *)property
+//{
+//
+//    NSUInteger lenth = [APCLazyloadOldLoopController loopCount:instance];
+//
+//
+//    if(lenth == 0){
+//
+//        return [self cachedFromAClass:[instance class] property:property];
+//    }
+//
+//    APCLazyProperty*   p;
+//    Class                   clazz = [instance class];
+//    while (lenth) {
+//
+//        while ((clazz = [clazz superclass])) {
+//
+//            if(clazz == nil) return p;
+//
+//            if(nil != (p = [self cachedTargetClass:clazz property:property])){
+//
+//                --lenth;
+//                break;
+//            }
+//        }
+//    }
+//
+//    return p;
+//}
+//
+//+ (_Nullable instancetype)cachedFromAClass:(Class)aClazz
+//                                  property:(NSString*)property
+//{
+//    aClazz = [self unproxyClass:aClazz];
+//
+//    return [_cacheForClass searchFromTargetClass:aClazz property:property];
+//}
 
 
 

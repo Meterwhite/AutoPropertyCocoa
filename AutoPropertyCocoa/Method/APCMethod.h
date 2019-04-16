@@ -1,5 +1,5 @@
 //
-//  APCMethodInfo.h
+//  APCMethod.h
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/15.
@@ -19,12 +19,18 @@ typedef NS_OPTIONS (NSUInteger,APCMethodStyle){
     APCMethodSetterStyle        =   2,
 };
 
-@interface APCMethodInfo : NSObject
-{
-    
-}
+@protocol APCMethodProtocol <NSObject>
 
-@property (nonatomic,assign) APCMethodStyle methodStyle;
+@required
+@property (nonatomic,assign,readonly) APCMethodStyle methodStyle;
+
+@end
+
+
+@interface APCMethod : NSObject<APCMethodProtocol>
+
+
+@property (nonatomic,assign,readonly) APCMethodStyle methodStyle;
 
 @end
 

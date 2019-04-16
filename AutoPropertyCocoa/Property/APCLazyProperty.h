@@ -20,12 +20,10 @@
 
 @property (nonatomic,copy,readonly,nullable)     id  userBlock;
 
-- (void)hookUsingUserBlock:(_Nonnull id)block;
+- (void)bindindUserBlock:(_Nonnull id)block;
 
-- (void)hookUsingUserSelector:(_Nonnull SEL)aSelector;
+- (void)bindingUserSelector:(_Nonnull SEL)aSelector;
 
-- (void)unhook;
-+ (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz;
 
 - (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target;
 
@@ -37,14 +35,14 @@
 
 #pragma mark - Cache for type of class.
 
-+ (_Nullable instancetype)cachedTargetClass:(Class _Nonnull __unsafe_unretained)clazz
-                                   property:(NSString* _Nonnull)property;
-
-+ (_Nullable instancetype)cachedFromAClassByInstance:(id _Nonnull)instance
-                                            property:(NSString* _Nonnull)property;
-
-+ (_Nullable instancetype)cachedFromAClass:(Class _Nonnull __unsafe_unretained)aClazz
-                                  property:(NSString* _Nonnull)property;
+//+ (_Nullable instancetype)cachedTargetClass:(Class _Nonnull __unsafe_unretained)clazz
+//                                   property:(NSString* _Nonnull)property;
+//
+//+ (_Nullable instancetype)cachedFromAClassByInstance:(id _Nonnull)instance
+//                                            property:(NSString* _Nonnull)property;
+//
+//+ (_Nullable instancetype)cachedFromAClass:(Class _Nonnull __unsafe_unretained)aClazz
+//                                  property:(NSString* _Nonnull)property;
 
 @end
 

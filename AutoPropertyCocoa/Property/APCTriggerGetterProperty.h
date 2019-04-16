@@ -64,18 +64,18 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyTriggerOption) {
 - (BOOL)performGetterCountConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
 
 #pragma mark - Hook
-- (void)hook;
-- (void)tryUnhook;
-+ (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz;
+//- (void)hook;
+//- (void)tryUnhook;
+//+ (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz;
 
 #pragma mark - Old
 - (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target;
 - (void)performOldSetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value;
 
 #pragma mark - Cache
-+ (_Nullable instancetype)cachedTargetClass:(Class _Nonnull)clazz
-                                   property:(NSString* _Nonnull)property;
-
-+ (_Nullable instancetype)cachedFromAClass:(Class _Nonnull)aClazz
-                                  property:(NSString* _Nonnull)property;
+//+ (_Nullable instancetype)cachedTargetClass:(Class _Nonnull)clazz
+//                                   property:(NSString* _Nonnull)property;
+//
+//+ (_Nullable instancetype)cachedFromAClass:(Class _Nonnull)aClazz
+//                                  property:(NSString* _Nonnull)property;
 @end
