@@ -35,6 +35,7 @@
     APCMethodStyle  _methodStyle;
     Class           _proxyClass;
 }
+@property (nonatomic,copy,readonly,nullable)NSString*       methodTypeEncoding;
 @property (nonatomic,copy,readonly,nonnull) NSString*       hookedMethod;
 @property (nonatomic,assign,readonly)       APCMethodStyle  methodStyle;
 @property (nonatomic,weak,readonly,nullable)APCPropertyHook*hook;

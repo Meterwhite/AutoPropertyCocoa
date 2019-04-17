@@ -143,16 +143,18 @@
 			isa = PBXGroup;
 			children = (
 				45B12FB0225B2C5D002D825E /* APCExtScope.h */,
-				45D44A6122647DA3005F1B2E /* APCRuntime */,
+				45D44A6222647DBB005F1B2E /* APCRuntime.h */,
+				45D44A6322647DBB005F1B2E /* APCRuntime.m */,
 				45B12FAE225B2C5D002D825E /* APCScope.h */,
 				45B12F97225B2C5D002D825E /* APCScope.m */,
 				45B12FAD225B2C5D002D825E /* AutoPropertyCocoa.h */,
-				45B12F9F225B2C5D002D825E /* Category */,
-				45D44A5D226474CF005F1B2E /* Method */,
 				45B12FAF225B2C5D002D825E /* NSObject+APCLazyLoad.h */,
 				45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */,
 				45B12FAB225B2C5D002D825E /* NSObject+APCTriggerProperty.h */,
 				45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */,
+				45B12F9F225B2C5D002D825E /* Category */,
+				9FCF5DEA2264E0100059A876 /* Hook */,
+				45D44A5D226474CF005F1B2E /* Method */,
 				45B12FA2225B2C5D002D825E /* Property */,
 			);
 			name = AutoPropertyCocoa;
@@ -192,16 +194,6 @@
 				45D44A5F22647506005F1B2E /* APCMethod.m */,
 			);
 			path = Method;
-			sourceTree = "<group>";
-		};
-		45D44A6122647DA3005F1B2E /* APCRuntime */ = {
-			isa = PBXGroup;
-			children = (
-				45D44A6222647DBB005F1B2E /* APCRuntime.h */,
-				45D44A6322647DBB005F1B2E /* APCRuntime.m */,
-				9FCF5DEA2264E0100059A876 /* Hook */,
-			);
-			path = APCRuntime;
 			sourceTree = "<group>";
 		};
 		9FCF5DEA2264E0100059A876 /* Hook */ = {

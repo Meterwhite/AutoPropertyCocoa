@@ -9,6 +9,13 @@
 #import <Foundation/Foundation.h>
 #import "APCHookProperty.h"
 
+#pragma mark - For hook
+OBJC_EXPORT APCPropertyHook* _Nullable
+apc_lookup_propertyhook(Class __unsafe_unretained _Nonnull clazz, NSString* _Nonnull property);
+
+OBJC_EXPORT APCPropertyHook* _Nullable
+apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
+
 #pragma mark - For class
 
 OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nonnull
@@ -51,24 +58,21 @@ OBJC_EXPORT void
 apc_object_hookRecursive_break(id _Nonnull instance, SEL _Nonnull _CMD);
 
 
-#pragma mark - Proxy class
+#pragma mark - Proxy class(For instance)
 OBJC_EXPORT BOOL
 apc_class_conformsProxyClass(Class _Nonnull __unsafe_unretained cls);
-
-OBJC_EXPORT APCProxyClass _Nonnull
-apc_class_registerProxyClass(Class _Nonnull __unsafe_unretained cls
-                             , id _Nonnull instance);
 
 OBJC_EXPORT void
 apc_class_disposeProxyClass(APCProxyClass _Nonnull __unsafe_unretained cls);
 
-OBJC_EXPORT Class _Nonnull
+OBJC_EXPORT Class _Nullable
 apc_class_unproxyClass(APCProxyClass _Nonnull __unsafe_unretained cls);
 
 OBJC_EXPORT APCProxyClass _Nonnull
 apc_object_hookWithProxyClass(id _Nonnull instance);
 
+OBJC_EXPORT APCProxyClass _Nullable
+apc_instance_unhookFromProxyClass(APCProxyInstance* _Nonnull instance);
+
 OBJC_EXPORT BOOL
 apc_object_isProxyInstance(id _Nonnull instance);
-
-

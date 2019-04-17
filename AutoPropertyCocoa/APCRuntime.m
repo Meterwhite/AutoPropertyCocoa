@@ -42,6 +42,27 @@ apc_runtime_propertyhook(Class __unsafe_unretained _Nonnull clazz, NSString* _No
     return [[apc_runtime_property_classmapper() objectForKey:clazz] objectForKey:property];
 }
 
+#pragma mark - For hook - export
+APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
+{
+    return apc_runtime_propertyhook(clazz, property);
+}
+
+APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
+{
+    APCPropertyHook* root = hook;
+    
+    do {
+        if(root.superhook == nil){
+            
+            break;
+        }
+        root = root.superhook;
+    } while (true);
+    
+    return root;
+}
+
 #pragma mark - For class - export
 void apc_registerProperty(APCHookProperty* p)
 {
@@ -295,90 +316,81 @@ void apc_object_hookRecursive_break(id instance, SEL _Nonnull _CMD)
 }
 
 #pragma mark - Proxy class - private
-static const char* _apcProxyClassSuffix = "+APCProxyClass";
+static const char* _apcProxyClassID = ".APCProxyClass+";
 /** free! */
-NS_INLINE char* apc_getProxyClassName(Class cls, id instance)
+static char* apc_instanceProxyClassName(id instance)
 {
-    char strhash[20] = {0};
-    sprintf(strhash,"%lu",[instance hash]);
-    
-#error <#message#>
-    
-    const char* cname = class_getName(cls);
-    char* buf = malloc(strlen(cname) + strlen(_apcProxyClassSuffix) + 1);
+    const char* cname = class_getName(object_getClass(instance));
+    char h_str[2*sizeof(NSUInteger)] = {0};
+    sprintf(h_str,"%lX",[instance hash]);
+    char* buf = malloc(strlen(cname) + strlen(_apcProxyClassID) + strlen(h_str) + 1);
     buf[0] = '\0';
     strcat(buf, cname);
-    strcat(buf, _apcProxyClassSuffix);
-    
-    
-    
+    strcat(buf, _apcProxyClassID);
+    strcat(buf, h_str);
     return buf;
 }
 
 #pragma mark - Proxy class - export
-APCProxyClass apc_class_registerProxyClass(Class cls,id instance)
-{
-    if(apc_class_conformsProxyClass(cls)){
-        
-        return cls;
-    }
-    char* name = apc_getProxyClassName(cls, instance);
-    cls =  objc_allocateClassPair(cls, name, 0);
-    if(cls != nil){
-        
-        objc_registerClassPair(cls);
-    }else if (nil == (cls = objc_getClass(name))){
-        
-        fprintf(stderr, "APC: Can not register class '%s' at runtime.",name);
-    }
-    free(name);
-    return cls;
-}
-
 BOOL apc_class_conformsProxyClass(Class cls)
 {
-    const char* cname = class_getName(cls);
-    char* str = strstr(cname, _apcProxyClassSuffix);
-    if(str != '\0' && (str + strlen(_apcProxyClassSuffix)) == '\0'){
-        
-        return YES;
-    }
-    return NO;
-}
-
-void apc_class_disposeProxyClass(APCProxyClass cls)
-{
-    objc_disposeClassPair(cls);
+    return ('\0' != strstr(class_getName(cls), _apcProxyClassID));
 }
 
 Class apc_class_unproxyClass(APCProxyClass cls)
 {
     const char* cname = class_getName(cls);
-    char* loc = strstr(cname, _apcProxyClassSuffix);
-    
-    if(loc != '\0' && (loc + strlen(_apcProxyClassSuffix)) == '\0'){
+    char* loc = strstr(cname, _apcProxyClassID);
+    if(loc != '\0'){
         
         char* name = malloc(1 + loc - cname);
         strncpy(name, cname, loc - cname);
         name[loc - cname] = '\0';
+        Class ret = objc_getClass(name);
         free(name);
-        return objc_getClass(name);
+        return ret;
     }
     return (Class)0;
 }
 
-
-APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
+void apc_class_disposeProxyClass(APCProxyClass cls)
 {
-    if(apc_object_isProxyInstance(instance)){
+    if(YES == apc_class_conformsProxyClass(cls)){
         
-        return object_getClass(instance);
+        objc_disposeClassPair(cls);
     }
-    
-    return apc_class_registerProxyClass(object_getClass(instance));
 }
 
 BOOL apc_object_isProxyInstance(id instance)
 {
-    return apc_class_conformsProxyClass([instance class]);
+    return apc_class_conformsProxyClass(object_getClass(instance));
+}
+
+APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
+{
+    char*           name = apc_instanceProxyClassName(instance);
+    APCProxyClass   cls  = objc_allocateClassPair(object_getClass(instance), name, 0);
+    if(cls != nil){
+        
+        objc_registerClassPair(cls);
+        object_setClass(instance, cls);
+    }else if (nil == (cls = objc_getClass(name))){
+        
+        fprintf(stderr, "APC: Can not register class '%s' at runtime.",name);
+    }
+    free(name);
+    
+    return cls;
+}
+
+APCProxyClass apc_instance_unhookFromProxyClass(APCProxyInstance* instance)
+{
+    if(NO == apc_class_conformsProxyClass(object_getClass(instance))){
+        
+        return nil;
+    }
+    
+    return (APCProxyClass)
+    
+    object_setClass(instance, apc_class_unproxyClass(object_getClass(instance)));
 }

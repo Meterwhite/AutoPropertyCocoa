@@ -8,6 +8,7 @@
 
 #import "APCPropertyHook.h"
 #import "APCHookProperty.h"
+#import "APCRuntime.h"
 #import "APCScope.h"
 
 id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
@@ -101,19 +102,19 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 
 - (void)hook
 {
-//    AutoHookPropertyInfo* property = [_boundProperties firstObject];
+    //    AutoHookPropertyInfo* property = [_boundProperties firstObject];
     
     IMP newimp;
     
     if(_propertyInfo.kindOfValue == APCPropertyValueKindOfBlock ||
        _propertyInfo.kindOfValue == APCPropertyValueKindOfObject){
-
-        newimp = _propertyInfo.methodStyle==APCMethodGetterStyle
+        
+        newimp = (_propertyInfo.methodStyle == APCMethodGetterStyle)
         ? (IMP)apc_propertyhook_getter
         : (IMP)apc_propertyhook_setter;
     }else{
         
-        newimp = _propertyInfo.methodStyle==APCMethodGetterStyle
+        newimp = (_propertyInfo.methodStyle == APCMethodGetterStyle)
         ? (IMP)apc_propertyhook_getter_impimage(_propertyInfo.valueTypeEncoding)
         : (IMP)apc_propertyhook_setter_impimage(_propertyInfo.valueTypeEncoding);
     }
@@ -125,9 +126,9 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
         _old_implementation
         =
         class_replaceMethod(_propertyInfo->_des_class
-                            , NSSelectorFromString(_propertyInfo->_des_getter_name)
+                            , NSSelectorFromString(_propertyInfo->_hooked_name)
                             , _new_implementation
-                            , [NSString stringWithFormat:@"%@@:", _propertyInfo.valueTypeEncoding].UTF8String);
+                            , _propertyInfo.methodTypeEncoding.UTF8String);
         if(nil == _old_implementation){
             
             ///Overwrite super class property with new property.
@@ -136,24 +137,46 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
             ///Superclass and subclass used the same old implementation that is from superclass.
             
 #warning 搜索APCRuntime...
-            APCPropertyHook* superHook;
-            
-            if(nil != superHook){
+            APCPropertyHook* rootHook
+            = apc_propertyhook_rootHook(apc_lookup_propertyhook(_propertyInfo->_des_class
+                                                                , _propertyInfo->_hooked_name));
+            if(nil != rootHook){
                 
-                _old_implementation = superHook->_new_implementation;
+                _old_implementation = rootHook->_old_implementation;
             }else{
                 
                 _old_implementation
                 =
                 class_getMethodImplementation(_propertyInfo->_src_class
-                                              , NSSelectorFromString(_propertyInfo->_des_getter_name));
+                                              , NSSelectorFromString(_propertyInfo->_hooked_name));
             }
             
             NSAssert(_old_implementation, @"APC: Can not find original implementation.");
         }
     }else{
         
-        //...
+        APCProxyClass proxyClass;
+        if(NO == apc_object_isProxyInstance(_propertyInfo->_instance)){
+            
+            proxyClass = apc_object_hookWithProxyClass(_propertyInfo->_instance);
+        }else{
+            
+            proxyClass = object_getClass(_propertyInfo->_instance);
+        }
+        
+        _old_implementation
+        =
+        class_replaceMethod(proxyClass
+                            , NSSelectorFromString(_propertyInfo->_hooked_name)
+                            , _new_implementation
+                            , _propertyInfo.methodTypeEncoding.UTF8String);
+        if(nil == _old_implementation){
+            
+            _old_implementation
+            =
+            class_getMethodImplementation(_propertyInfo->_des_class
+                                          , NSSelectorFromString(_propertyInfo->_hooked_name));
+        }
     }
 }
 

@@ -83,11 +83,11 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
     NSString*               _ori_property_name;//user
     NSString*               _des_getter_name;//property getter
     NSString*               _des_setter_name;//property setter
+    __weak id               _instance;
 @protected
     
     APCPropertyHookKind     _kindOfUserHook;
     APCPropertyOwnerKind    _kindOfOwner;
-    __weak id               _instance;
 @private
     
     BOOL                    _enable;

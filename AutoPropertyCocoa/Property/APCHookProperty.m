@@ -9,6 +9,9 @@
 #import "APCHookProperty.h"
 
 @implementation APCHookProperty
+{
+    NSString*   _methodTypeEncoding;
+}
 
 - (instancetype)initWithPropertyName:(NSString *)propertyName aClass:(__unsafe_unretained Class)aClass
 {
@@ -26,6 +29,28 @@
         _hashcode = 0;
     }
     return self;
+}
+
+- (NSString *)methodTypeEncoding
+{
+    if(nil == _methodTypeEncoding){
+        
+        switch (_methodStyle) {
+            case APCMethodGetterStyle:
+            {
+                _methodTypeEncoding = [NSString stringWithFormat:@"%@@:", self.valueTypeEncoding];
+            }
+                break;
+            case APCMethodSetterStyle:
+            {
+                _methodTypeEncoding = [NSString stringWithFormat:@"v@:%@", self.valueTypeEncoding];
+            }
+                break;
+            default:
+                break;
+        }
+    }
+    return _methodTypeEncoding;
 }
 
 - (NSString *)hookedMethod
