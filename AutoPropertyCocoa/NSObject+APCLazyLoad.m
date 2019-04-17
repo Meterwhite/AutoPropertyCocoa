@@ -5,8 +5,6 @@
 //  Created by Novo on 2019/3/13.
 //  Copyright © 2019 Novo. All rights reserved.
 //
-#import "APCInstancePropertyCacheManager.h"
-#import "APCLazyloadOldLoopController.h"
 #import "NSObject+APCLazyLoad.h"
 #import "APCLazyProperty.h"
 #import "APCScope.h"
@@ -102,7 +100,8 @@
                           hookWithBlock:(id)block
                             hookWithSEL:(SEL)aSelector
 {
-    APCLazyProperty* propertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:propertyName];
+#warning <#message#>
+    APCLazyProperty* propertyInfo;
     
     if(propertyInfo == nil){
         
@@ -174,11 +173,11 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
             NSCAssert(NO, @"APC: Lose property info.");
         
     
-    if(NO == lazyPropertyInfo.enable
-       || YES == [APCLazyloadOldLoopController testingIsInLoop:_SELF]){
-        
-        return [lazyPropertyInfo performOldGetterFromTarget:_SELF];
-    }
+//    if(NO == lazyPropertyInfo.enable
+//       || YES == [APCLazyloadOldLoopController testingIsInLoop:_SELF]){
+//
+//        return [lazyPropertyInfo performOldGetterFromTarget:_SELF];
+//    }
     
     
     id                  value       = nil;

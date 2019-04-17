@@ -6,7 +6,6 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "APCClassPropertyMapperController.h"
 #import "APCTriggerGetterProperty.h"
 #import "APCScope.h"
 

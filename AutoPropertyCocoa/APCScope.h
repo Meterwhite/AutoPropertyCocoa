@@ -35,6 +35,9 @@
 
 #define APCThreadID ([NSThread currentThread])
 
+typedef Class       APCProxyClass;
+typedef NSObject    APCProxyInstance;
+
 #warning delete it
 FOUNDATION_EXPORT NSString *const APCClassSuffixForLazyLoad;
 FOUNDATION_EXPORT NSString *const APCClassSuffixForTrigger;

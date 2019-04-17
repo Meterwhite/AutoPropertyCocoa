@@ -6,7 +6,6 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "APCPropertyMapperkey.h"
 #import "APCScope.h"
 
 typedef NS_OPTIONS (NSUInteger,APCPropertyAccessOptions){
@@ -74,7 +73,7 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
 - (NSString* _Nonnull)proxyClassName;
 @end
 
-@interface APCProperty : NSObject <APCPropertyMapperKeyProtocol>
+@interface APCProperty : NSObject
 {
 @public
     
@@ -162,11 +161,5 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
  OriginalClass/TargetClass.UserProperty
  */
 - (NSUInteger)hash;
-
-#pragma mark - APCPropertyMapperKeyProtocol
-
-- (APCPropertyMapperkey* _Nonnull)classMapperkey;
-
-- (NSSet<APCPropertyMapperkey*>* _Nonnull)propertyMapperkeys;
 @end
 

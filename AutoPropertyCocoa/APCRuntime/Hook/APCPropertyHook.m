@@ -104,17 +104,18 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 //    AutoHookPropertyInfo* property = [_boundProperties firstObject];
     
     IMP newimp;
+    
     if(_propertyInfo.kindOfValue == APCPropertyValueKindOfBlock ||
        _propertyInfo.kindOfValue == APCPropertyValueKindOfObject){
-#warning <#message#>
-//        newimp = _propertyInfo.methodStyle==APCMethodGetterStyle
-//        ? (IMP)apc_propertyhook_getter
-//        : (IMP)apc_propertyhook_setter;
+
+        newimp = _propertyInfo.methodStyle==APCMethodGetterStyle
+        ? (IMP)apc_propertyhook_getter
+        : (IMP)apc_propertyhook_setter;
     }else{
         
-//        newimp = _propertyInfo.methodStyle==APCMethodGetterStyle
-//        ? (IMP)apc_propertyhook_getter_impimage(_propertyInfo.valueTypeEncoding)
-//        : (IMP)apc_propertyhook_setter_impimage(_propertyInfo.valueTypeEncoding);
+        newimp = _propertyInfo.methodStyle==APCMethodGetterStyle
+        ? (IMP)apc_propertyhook_getter_impimage(_propertyInfo.valueTypeEncoding)
+        : (IMP)apc_propertyhook_setter_impimage(_propertyInfo.valueTypeEncoding);
     }
     
     _new_implementation = newimp;

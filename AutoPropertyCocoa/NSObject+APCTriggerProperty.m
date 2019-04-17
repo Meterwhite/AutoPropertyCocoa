@@ -6,7 +6,6 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "APCInstancePropertyCacheManager.h"
 #import "NSObject+APCTriggerProperty.h"
 #import "APCTriggerGetterProperty.h"
 #import "APCTriggerSetterProperty.h"
@@ -201,8 +200,8 @@
 
 - (void)apc_unbindFrontOfPropertyGetter:(NSString*)property
 {
-    APCTriggerGetterProperty* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
-    [p getterUnbindFrontTrigger];
+//    APCTriggerGetterProperty* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+//    [p getterUnbindFrontTrigger];
 }
 
 - (void)apc_backOfPropertyGetter:(NSString *)property bindWithBlock:(void (^)(id _Nonnull, id _Nullable))block
@@ -215,8 +214,8 @@
 
 - (void)apc_unbindBackOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
-    [p getterUnbindPostTrigger];
+//    APCTriggerGetterProperty* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+//    [p getterUnbindPostTrigger];
 }
 
 - (void)apc_propertyGetter:(NSString *)property bindUserCondition:(BOOL (^)(id _Nonnull, id _Nullable))condition withBlock:(void (^)(id _Nonnull, id _Nullable))block
@@ -229,8 +228,8 @@
 
 - (void)apc_unbindUserConditionOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
-    [p getterUnbindUserTrigger];
+//    APCTriggerGetterProperty* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+//    [p getterUnbindUserTrigger];
 }
 
 - (void)apc_propertyGetter:(NSString *)property bindAccessCountCondition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition withBlock:(void (^)(id _Nonnull, id _Nullable))block
@@ -243,8 +242,8 @@
 
 - (void)apc_unbindAccessCountConditionOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
-    [p getterUnbindCountTrigger];
+//    APCTriggerGetterProperty* p = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property];
+//    [p getterUnbindCountTrigger];
 }
 
 - (void)apc_frontOfPropertySetter:(NSString *)property bindWithBlock:(void (^)(id _Nonnull))block
@@ -309,8 +308,8 @@
                               block:(id)block
 {
     if(option == APCPropertyNonTrigger) return;
-    
-    APCTriggerGetterProperty* propertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:propertyName];
+#warning <#message#>
+    APCTriggerGetterProperty* propertyInfo;
     
     if(propertyInfo == nil){
         

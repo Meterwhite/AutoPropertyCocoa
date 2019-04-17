@@ -12,7 +12,7 @@
 
 @implementation APCProperty
 {
-    APCAtomicUInteger _accessCount;
+    volatile APCAtomicUInteger _accessCount;
 }
 
 + (instancetype)instanceWithProperty:(NSString*)propertyName
@@ -437,18 +437,5 @@
                      hash];
     }
     return _hashcode;
-}
-
-#pragma mark - APCPropertyMapperKeyProtocol
-
-- (APCPropertyMapperkey *)classMapperkey
-{
-    return [APCPropertyMapperkey keyWithClass:_src_class];
-}
-
-- (NSSet<APCPropertyMapperkey *> *)propertyMapperkeys
-{
-    return [NSSet setWithObject:[APCPropertyMapperkey keyWithClass:_des_class
-                                                          property:_des_getter_name]];
 }
 @end
