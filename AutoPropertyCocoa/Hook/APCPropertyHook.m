@@ -170,13 +170,13 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
             
             ///Superclass and subclass used the same old implementation that is from superclass.
             
-#warning super 到哪里
-            APCPropertyHook* superhook
-            = apc_lookup_superPropertyhook(_propertyInfo->_des_class, _propertyInfo->_hooked_name);
-            
-            if(nil != superhook){
+            APCPropertyHook* sourcehook
+            = apc_lookup_propertyhook_range(class_getSuperclass(_propertyInfo->_des_class)
+                                            , _propertyInfo->_src_class
+                                            , _propertyInfo->_hooked_name);
+            if(nil != sourcehook){
                 
-                _old_implementation = superhook->_old_implementation;
+                _old_implementation = sourcehook->_old_implementation;
             }else{
                 
                 _old_implementation
@@ -205,10 +205,20 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
                             , _propertyInfo.methodTypeEncoding.UTF8String);
         if(nil == _old_implementation){
             
-            _old_implementation
-            =
-            class_getMethodImplementation(_propertyInfo->_des_class
-                                          , NSSelectorFromString(_propertyInfo->_hooked_name));
+            APCPropertyHook* sourcehook
+            = apc_lookup_propertyhook_range(class_getSuperclass(_propertyInfo->_des_class)
+                                            , _propertyInfo->_src_class
+                                            , _propertyInfo->_hooked_name);
+            if(nil != sourcehook){
+                
+                _old_implementation = sourcehook->_old_implementation;
+            }else{
+                
+                _old_implementation
+                =
+                class_getMethodImplementation(_propertyInfo->_src_class
+                                              , NSSelectorFromString(_propertyInfo->_hooked_name));
+            }
         }
     }
 }

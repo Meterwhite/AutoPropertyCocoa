@@ -2,6 +2,7 @@
 #define __APCScope__H__
 
 #import <Foundation/Foundation.h>
+#import <objc/NSObject.h>
 #import <objc/runtime.h>
 
 #if TARGET_OS_IPHONE || TARGET_OS_TV

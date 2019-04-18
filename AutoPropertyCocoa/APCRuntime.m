@@ -50,19 +50,38 @@ APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
     return apc_runtime_propertyhook(clazz, property);
 }
 
-APCPropertyHook* apc_lookup_superPropertyhook(Class clazz, NSString* property)
+APCPropertyHook* apc_lookup_propertyhook_range(Class from, Class to, NSString* property)
+{
+    if([from isSubclassOfClass:to]){
+        
+        APCPropertyHook* ret;
+        do {
+            
+            if(NULL != [apc_runtime_property_classmapper() objectForKey:from])
+                
+                if(NULL != (ret = apc_runtime_propertyhook(from, property)))
+                    
+                    return ret;
+            
+        } while (to != (from = class_getSuperclass(from)));
+    }
+    
+    return (APCPropertyHook*)0;
+}
+
+APCPropertyHook* apc_lookup_superPropertyhook(Class cls, NSString* property)
 {
     APCPropertyHook* ret;
-    while (nil != (clazz = class_getSuperclass(clazz))){
+    while (NULL != (cls = class_getSuperclass(cls))){
         
-        if(nil != [apc_runtime_property_classmapper() objectForKey:clazz])
+        if(NULL != [apc_runtime_property_classmapper() objectForKey:cls])
             
-            if(nil != (ret = apc_runtime_propertyhook(clazz, property)))
+            if(NULL != (ret = apc_runtime_propertyhook(cls, property)))
                 
                 return ret;
     }
     
-    return nil;
+    return (APCPropertyHook*)0;
 }
 
 APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
@@ -70,7 +89,7 @@ APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
     APCPropertyHook* root = hook;
     
     do {
-        if(root.superhook == nil){
+        if(root.superhook == NULL){
             
             break;
         }
@@ -91,11 +110,10 @@ void apc_registerProperty(APCHookProperty* p)
     APC_RUNTIME_LOCK;
     
     NSMutableDictionary*dictionary = [apc_runtime_property_classmapper() objectForKey:p->_des_class];
+    APCPropertyHook*    superhook;
     APCPropertyHook*    hook;
-    APCPropertyHook*    item;
-    NSEnumerator*       e;
     
-    if(dictionary == nil){
+    if(dictionary == NULL){
         
         dictionary = [NSMutableDictionary dictionary];
         [apc_runtime_property_classmapper() setObject:dictionary forKey:p->_des_class];
@@ -103,7 +121,7 @@ void apc_registerProperty(APCHookProperty* p)
     
     hook = dictionary[p->_hooked_name];
     
-    if(hook == nil){
+    if(hook == NULL){
         
         hook = [APCPropertyHook hookWithProperty:p];
         dictionary[p->_hooked_name] = hook;
@@ -111,20 +129,23 @@ void apc_registerProperty(APCHookProperty* p)
         
         [hook bindProperty:p];
     }
-    
-    ///Reset superhook
-    hook->_superhook
-    = apc_runtime_propertyhook(class_getSuperclass(p->_des_class), p->_hooked_name);
-    
-    e = apc_runtime_property_classmapper().objectEnumerator;
-    ///Reset subhook's superhook
-    while (nil != (item = e.nextObject)) {
+#warning <#message#>
+    ///Update superhook
+    superhook
+    = apc_lookup_superPropertyhook(p->_des_class, p->_hooked_name);
+    //apc_runtime_propertyhook
+    for (Class cls in apc_runtime_property_classmapper()) {
         
-        if(class_getSuperclass(item.hookclass) == p->_des_class){
+        if([cls isSubclassOfClass:p->_des_class]){
             
-            item->_superhook = hook;
+//            if((NULL != superhook && item.superhook == superhook)
+//               || (NULL == superhook && (item->_superhook == NULL))){
+//
+//                item->_superhook = hook;
+//            }
         }
     }
+    hook->_superhook = superhook;
     
     APC_RUNTIME_UNLOCK;
 }
@@ -141,7 +162,7 @@ void apc_disposeProperty(APCHookProperty* p)
         
         APCPropertyHook* item;
         NSEnumerator* e = apc_runtime_property_classmapper().objectEnumerator;
-        while (nil != (item = e.nextObject)) {
+        while (NULL != (item = e.nextObject)) {
             
             if(class_getSuperclass(item.hookclass) == p->_des_class){
                 
@@ -172,7 +193,7 @@ APCHookProperty* apc_property_getRootProperty(APCHookProperty* p)
             return item;
         }
     }
-    return nil;
+    return (APCHookProperty*)0;
 }
 
 APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
@@ -186,7 +207,7 @@ APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
             return item;
         }
     }
-    return nil;
+    return (APCHookProperty*)0;
 }
 
 NSArray<__kindof APCHookProperty*>*
@@ -215,11 +236,11 @@ static NSMapTable* apc_instanceBoundMapper(id instance)
 {
     NSMapTable*         mapper;
     
-    if(nil == (mapper = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
+    if(NULL == (mapper = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
         
         @synchronized (instance) {
             
-            if(nil == (mapper = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
+            if(NULL == (mapper = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
                 
                 mapper = [NSMapTable strongToStrongObjectsMapTable];
                 objc_setAssociatedObject(instance
@@ -248,11 +269,11 @@ void apc_instance_setAssociatedProperty(APCProxyInstance* instance, APCHookPrope
     
     APCPropertyHook* hook = [apc_instanceBoundMapper(instance) objectForKey:p->_hooked_name];
     
-    if(hook == nil){
+    if(hook == NULL){
         
         @synchronized (instance) {
             
-            if(nil == (hook = [apc_instanceBoundMapper(instance) objectForKey:p->_hooked_name])){
+            if(NULL == (hook = [apc_instanceBoundMapper(instance) objectForKey:p->_hooked_name])){
                 
                 hook = [APCPropertyHook hookWithProperty:p];
                 [apc_instanceBoundMapper(instance) setObject:hook forKey:p->_hooked_name];
@@ -278,7 +299,7 @@ NSArray<__kindof APCHookProperty*>* apc_instance_boundPropertyies(APCProxyInstan
 {
     if(NO == apc_class_conformsProxyClass(object_getClass(instance))){
         
-        return nil;
+        return (NSArray*)0;
     }
     
     return [apc_instance_propertyhook(instance,property) boundProperties];
@@ -321,13 +342,13 @@ BOOL apc_object_hookRecursive_testing(id instance, SEL _Nonnull _CMD)
 void apc_object_hookRecursive_loop(id instance, SEL _Nonnull _CMD)
 {
     NSMutableSet* loops;
-    if(nil == (loops = apc_object_hookRecursiveCurrentLoops(instance))){
+    if(NULL == (loops = apc_object_hookRecursiveCurrentLoops(instance))){
         
         @synchronized (instance) {
             
-            if(nil == (loops = apc_object_hookRecursiveCurrentLoops(instance))){
+            if(NULL == (loops = apc_object_hookRecursiveCurrentLoops(instance))){
                 
-                if(nil == apc_object_hookRecursiveCurrentMapper()){
+                if(NULL == apc_object_hookRecursiveCurrentMapper()){
                     
                     _apc_object_hookRecursiveMapper = [NSMapTable weakToStrongObjectsMapTable];
                     [_apc_object_hookRecursiveMapper setObject:instance forKey:APCThreadID];
@@ -402,11 +423,11 @@ APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
 {
     char*           name = apc_instanceProxyClassName(instance);
     APCProxyClass   cls  = objc_allocateClassPair(object_getClass(instance), name, 0);
-    if(cls != nil){
+    if(cls != NULL){
         
         objc_registerClassPair(cls);
         object_setClass(instance, cls);
-    }else if (nil == (cls = objc_getClass(name))){
+    }else if (NULL == (cls = objc_getClass(name))){
         
         fprintf(stderr, "APC: Can not register class '%s' at runtime.",name);
     }
@@ -419,7 +440,7 @@ APCProxyClass apc_instance_unhookFromProxyClass(APCProxyInstance* instance)
 {
     if(NO == apc_class_conformsProxyClass(object_getClass(instance))){
         
-        return nil;
+        return (APCProxyClass)0;
     }
     
     return (APCProxyClass)

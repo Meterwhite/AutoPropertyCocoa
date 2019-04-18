@@ -11,19 +11,25 @@
 
 #pragma mark - For hook
 OBJC_EXPORT APCPropertyHook* _Nullable
-apc_lookup_propertyhook(Class __unsafe_unretained _Nonnull clazz
+apc_lookup_propertyhook(Class __unsafe_unretained _Nonnull cls
                         , NSString* _Nonnull property);
 
 OBJC_EXPORT APCPropertyHook* _Nullable
-apc_lookup_superPropertyhook(Class __unsafe_unretained _Nonnull clazz
+apc_lookup_propertyhook_range(Class __unsafe_unretained _Nonnull from
+                              , Class __unsafe_unretained _Nonnull to
+                              , NSString* _Nonnull property);
+
+OBJC_EXPORT APCPropertyHook* _Nullable
+apc_lookup_instancePropertyhook(APCProxyInstance* _Nonnull instance
+                                , NSString* _Nonnull property);
+
+OBJC_EXPORT APCPropertyHook* _Nullable
+apc_lookup_superPropertyhook(Class __unsafe_unretained _Nonnull cls
                         , NSString* _Nonnull property);
 
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
 
-OBJC_EXPORT APCPropertyHook* _Nullable
-apc_lookup_instancePropertyhook(APCProxyInstance* _Nonnull instance
-                                , NSString* _Nonnull property);
 
 
 #pragma mark - For property
