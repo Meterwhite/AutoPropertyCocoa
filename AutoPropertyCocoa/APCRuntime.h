@@ -11,21 +11,37 @@
 
 #pragma mark - For hook
 OBJC_EXPORT APCPropertyHook* _Nullable
-apc_lookup_propertyhook(Class __unsafe_unretained _Nonnull clazz, NSString* _Nonnull property);
+apc_lookup_propertyhook(Class __unsafe_unretained _Nonnull clazz
+                        , NSString* _Nonnull property);
+
+OBJC_EXPORT APCPropertyHook* _Nullable
+apc_lookup_superPropertyhook(Class __unsafe_unretained _Nonnull clazz
+                        , NSString* _Nonnull property);
 
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
 
-#pragma mark - For class
+OBJC_EXPORT APCPropertyHook* _Nullable
+apc_lookup_instancePropertyhook(APCProxyInstance* _Nonnull instance
+                                , NSString* _Nonnull property);
 
-OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nonnull
-apc_classBoundProperties(Class _Nonnull __unsafe_unretained cls, NSString* _Nonnull property);
+
+#pragma mark - For property
+OBJC_EXPORT APCHookProperty* _Nullable
+apc_property_getRootProperty(APCHookProperty* _Nonnull p);
 
 OBJC_EXPORT APCHookProperty* _Nullable
 apc_property_getSuperProperty(APCHookProperty* _Nonnull p);
 
 OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nullable
 apc_property_getSuperPropertyList(APCHookProperty* _Nonnull p);
+
+
+
+#pragma mark - For class
+
+OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nonnull
+apc_classBoundProperties(Class _Nonnull __unsafe_unretained cls, NSString* _Nonnull property);
 
 OBJC_EXPORT void
 apc_registerProperty(APCHookProperty* _Nonnull p);

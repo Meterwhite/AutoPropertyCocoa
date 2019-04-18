@@ -65,14 +65,6 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
     APCPropertyHookKindOfIMP       =   3,
 };
 
-@protocol APCPropertyHookProxyClassNameProtocol <NSObject>
-
-@required
-+ (Class _Nullable)unproxyClass:(Class _Nonnull __unsafe_unretained)clazz;
-+ (BOOL)testingProxyClassInstance:(id _Nonnull)instance;
-- (NSString* _Nonnull)proxyClassName;
-@end
-
 @interface APCProperty : NSObject
 {
 @public

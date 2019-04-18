@@ -12,6 +12,10 @@
 
 @protocol APCMethodHookProtocol <NSObject>
 
+@required
+- (void)disposeRuntimeResource;
+
+
 @optional
 - (__kindof APCMethodHook* _Nullable)superhook;
 - (Class __unsafe_unretained _Nullable)hookclass;
@@ -24,6 +28,7 @@
     
     IMP         _new_implementation;
     IMP         _old_implementation;
+    Class       _source_class;
 }
 
 

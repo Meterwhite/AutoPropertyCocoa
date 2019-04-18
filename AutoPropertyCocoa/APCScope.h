@@ -38,10 +38,6 @@
 typedef Class       APCProxyClass;
 typedef NSObject    APCProxyInstance;
 
-#warning delete it
-FOUNDATION_EXPORT NSString *const APCClassSuffixForLazyLoad;
-FOUNDATION_EXPORT NSString *const APCClassSuffixForTrigger;
-
 FOUNDATION_EXPORT NSString *const APCProgramingType_point;
 FOUNDATION_EXPORT NSString *const APCProgramingType_chars;
 FOUNDATION_EXPORT NSString *const APCProgramingType_id;

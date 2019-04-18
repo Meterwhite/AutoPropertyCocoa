@@ -7,6 +7,8 @@
 //
 
 #import "APCHookProperty.h"
+#import "APCPropertyHook.h"
+#import "APCRuntime.h"
 
 @implementation APCHookProperty
 {
@@ -63,12 +65,31 @@
     _hook = hook;
 }
 
++ (instancetype)boundPropertyForClass:(__unsafe_unretained Class)cls property:(NSString *)property
+{
+    return [apc_lookup_propertyhook(cls, property) boundPropertyForPropertyKind:self];
+}
+
+- (instancetype)boundPropertyForClass:(__unsafe_unretained Class)cls property:(NSString *)property
+{
+    return [apc_lookup_instancePropertyhook(self, property) boundPropertyForPropertyKind:object_getClass(self)];
+}
+
+- (void)unhook
+{
+    if(_hook != nil){
+        
+        [_hook unbindProperty:self];
+    }
+}
+
 - (NSUInteger)hash
 {
     if(_hashcode == 0){
         
-        _hashcode = [[NSString stringWithFormat:@"%@.%@"
+        _hashcode = [[NSString stringWithFormat:@"%@.%@.%@"
                       , NSStringFromClass(_des_class)
+                      , object_getClass(self)
                       , _hooked_name]
                      
                      hash];
@@ -77,21 +98,6 @@
     return _hashcode;
 }
 
-- (void)dealloc
-{
-    if(self.kindOfOwner == APCPropertyOwnerKindOfInstance){
-        
-        [self disposeRuntimeResource];
-    }
-}
-
-- (void)disposeRuntimeResource
-{
-    if(nil != _proxyClass){
-        
-        objc_disposeClassPair(_proxyClass);
-    }
-}
 
 
 @end

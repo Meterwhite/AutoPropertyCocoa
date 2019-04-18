@@ -11,30 +11,50 @@
 @class APCHookProperty;
 
 #warning change to thread safe
+
+@protocol APCPropertyHookProtocol <NSObject>
+
+@optional
+- (id _Nullable)performOldGetterFromTarget:(_Nonnull id)target;
+
+- (void)performOldSetterFromTarget:(_Nonnull id)target
+                         withValue:(id _Nullable)value;
+@end
+
+
+
 /**
  统一管理类和实例的钩子
  类和方法名 唯一
  */
-@interface APCPropertyHook : APCMethodHook
+@interface APCPropertyHook : APCMethodHook<APCPropertyHookProtocol,NSFastEnumeration>
 {
 @public
     
     __kindof APCMethodHook* _superhook;
+    APCProxyClass           _proxyClass;
 }
 
 + (instancetype _Nullable)hookWithProperty:(APCHookProperty* _Nonnull)property;
 
-@property (nonatomic,strong,nullable) NSEnumerator<APCHookProperty*>* propertyEnumerator;
+//@property (nonatomic,strong,nullable) NSEnumerator<APCHookProperty*>* propertyEnumerator;
 @property (nonatomic,assign,readonly) BOOL        isEmpty;
-- (NSString* _Nullable)hookMethod;
+
+
+- (Class __unsafe_unretained _Nullable)sourceclass;
 - (Class __unsafe_unretained _Nullable)hookclass;
 - (__kindof APCPropertyHook* _Nullable)superhook;
+- (NSString* _Nullable)hookMethod;
 
+- (__kindof APCHookProperty* _Nullable)boundPropertyForPropertyKind:(Class _Nonnull __unsafe_unretained)propertyKind;
+- (NSArray<APCHookProperty*>* _Nonnull)boundProperties;
 - (void)unbindProperty:(APCHookProperty* _Nonnull)property;
 - (void)bindProperty:(APCHookProperty* _Nonnull)property;
-- (NSArray<APCHookProperty*>* _Nonnull)boundProperties;
 
+- (id _Nullable)performOldGetterFromTarget:(id _Nonnull)target;
 
+- (void)performOldSetterFromTarget:(_Nonnull id)target
+                         withValue:(id _Nullable)value;
 
 //p list
 //unhook property

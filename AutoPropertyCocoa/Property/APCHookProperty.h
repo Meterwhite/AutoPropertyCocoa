@@ -12,8 +12,16 @@
 @protocol APCHookPropertyProtocol <NSObject>
 
 @required
-- (void)disposeRuntimeResource;
+
++ (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
+                                       property:(NSString* _Nonnull)property;
+
+- (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
+                                        property:(NSString* _Nonnull)property;
+
+- (void)unhook;
 @optional
+
 
 - (id _Nullable)performOldSetterFromTarget:(_Nonnull id)target;
 
@@ -33,7 +41,6 @@
 @protected
 
     APCMethodStyle  _methodStyle;
-    Class           _proxyClass;
 }
 @property (nonatomic,copy,readonly,nullable)NSString*       methodTypeEncoding;
 @property (nonatomic,copy,readonly,nonnull) NSString*       hookedMethod;
@@ -42,11 +49,11 @@
 
 - (void)bindingToHook:(APCPropertyHook* _Nullable)hook;
 
-- (void)disposeRuntimeResource;
-
+- (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
+                                        property:(NSString* _Nonnull)property;
 
 /**
- Class.hooedMethod
+ Class.PropertyClass.hooedMethod
  */
 - (NSUInteger)hash;
 @end

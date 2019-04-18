@@ -39,7 +39,7 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyTriggerOption) {
                                         | APCPropertySetterCountTrigger
 };
 
-@interface APCTriggerGetterProperty : APCHookProperty<APCPropertyHookProxyClassNameProtocol>
+@interface APCTriggerGetterProperty : APCHookProperty
 
 @property (nonatomic,assign,readonly) APCPropertyTriggerOption triggerOption;
 

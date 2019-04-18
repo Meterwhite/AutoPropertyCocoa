@@ -6,7 +6,9 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 #import "NSObject+APCLazyLoad.h"
+#import "APCPropertyHook.h"
 #import "APCLazyProperty.h"
+#import "APCRuntime.h"
 #import "APCScope.h"
 
 
@@ -43,15 +45,9 @@
 
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-//    APCLazyProperty* p = [APCLazyProperty cachedTargetClass:self property:property];
-//
-//    [p unhook];
+    [[APCLazyProperty boundPropertyForClass:self property:property] unhook];
 }
 
-+ (void)apc_unbindLazyLoadAllProperties
-{
-//    [APCLazyProperty unhookClassAllProperties:self];
-}
 
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
 {
@@ -87,6 +83,7 @@
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
 //    [(APCLazyProperty*)[APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property] unhook];
+    [APCLazyProperty boundPropertyForClass:self property:property];
 }
 
 - (void)apc_unbindLazyLoadAllProperties
@@ -126,33 +123,33 @@
 }
 
 
-+ (void)apc_classSetLazyLoadProperty:(NSString*)propertyName
++ (void)apc_classSetLazyLoadProperty:(NSString*)property
                        hookWithBlock:(id)block
                          hookWithSEL:(SEL)aSelector
 {
-#warning <#message#>
-    APCLazyProperty* propertyInfo;
     
-    if(propertyInfo == nil){
+    APCLazyProperty* p = [apc_lookup_propertyhook(self, property) boundPropertyForPropertyKind:[APCLazyProperty class]];
+    
+    if(p == nil){
         
-        propertyInfo = [APCLazyProperty instanceWithProperty:propertyName aClass:self];
+        p = [APCLazyProperty instanceWithProperty:property aClass:self];
+        apc_registerProperty(p);
     }
     
-    
-    if(NO  == (propertyInfo.accessOption & APCPropertyGetValueEnable)
+    if(NO  == (p.accessOption & APCPropertyGetValueEnable)
        
        ||
        
-       NO  == (propertyInfo.accessOption & APCPropertySetValueEnable)){
+       NO  == (p.accessOption & APCPropertySetValueEnable)){
         return;
     }
     
     if(block){
     
-        [propertyInfo bindindUserBlock:block];
+        [p bindindUserBlock:block];
     }else{
         
-        [propertyInfo bindingUserSelector:aSelector];
+        [p bindingUserSelector:aSelector];
     }
 }
 
@@ -162,67 +159,67 @@
  */
 id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
 {
-    APCLazyProperty* lazyPropertyInfo;
+    APCLazyProperty* p;
     
-//    if(nil == (lazyPropertyInfo = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
+//    if(nil == (p = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
         
         //Get info from _SELF.
         //The info tell me where does it search from.
-//        if(nil == (lazyPropertyInfo = [APCLazyProperty cachedFromAClassByInstance:_SELF property:NSStringFromSelector(_CMD)]))
+//        if(nil == (p = [APCLazyProperty cachedFromAClassByInstance:_SELF property:NSStringFromSelector(_CMD)]))
         
             NSCAssert(NO, @"APC: Lose property info.");
         
     
-//    if(NO == lazyPropertyInfo.enable
+//    if(NO == p.enable
 //       || YES == [APCLazyloadOldLoopController testingIsInLoop:_SELF]){
 //
-//        return [lazyPropertyInfo performOldGetterFromTarget:_SELF];
+//        return [p performOldGetterFromTarget:_SELF];
 //    }
     
     
     id                  value       = nil;
     ///Get value.(All returned value are boxed)
-    if(lazyPropertyInfo.accessOption & APCPropertyComponentOfGetter){
+    if(p.accessOption & APCPropertyComponentOfGetter){
         
-        value = [lazyPropertyInfo performOldGetterFromTarget:_SELF];
+        value = [p performOldGetterFromTarget:_SELF];
     }else{
         
-        value = [lazyPropertyInfo getIvarValueFromTarget:_SELF];
+        value = [p getIvarValueFromTarget:_SELF];
     }
     
     APCMemoryBarrier;
     
-    NSUInteger   accessCount = lazyPropertyInfo.accessCount;
+    NSUInteger   accessCount = p.accessCount;
     if(value == nil
        
-       && (lazyPropertyInfo.kindOfValue == APCPropertyValueKindOfBlock ||
-           lazyPropertyInfo.kindOfValue == APCPropertyValueKindOfObject))
+       && (p.kindOfValue == APCPropertyValueKindOfBlock ||
+           p.kindOfValue == APCPropertyValueKindOfObject))
     {
         ///Create default value.
-        if(lazyPropertyInfo.kindOfUserHook == APCPropertyHookKindOfSelector){
+        if(p.kindOfUserHook == APCPropertyHookKindOfSelector){
             
-            value = [lazyPropertyInfo instancetypeNewObjectByUserSelector];
+            value = [p instancetypeNewObjectByUserSelector];
         }
         else{
             
-            value = [lazyPropertyInfo performUserBlock:_SELF];
+            value = [p performUserBlock:_SELF];
         }
-        [lazyPropertyInfo setValue:value toTarget:_SELF];
+        [p setValue:value toTarget:_SELF];
     }
     else if (accessCount == 0
              
-             && (lazyPropertyInfo.kindOfValue != APCPropertyValueKindOfBlock ||
-                 lazyPropertyInfo.kindOfValue != APCPropertyValueKindOfObject))
+             && (p.kindOfValue != APCPropertyValueKindOfBlock ||
+                 p.kindOfValue != APCPropertyValueKindOfObject))
     {
         
-        NSCAssert(lazyPropertyInfo.kindOfUserHook == APCPropertyHookKindOfBlock
+        NSCAssert(p.kindOfUserHook == APCPropertyHookKindOfBlock
                   , @"APC: Basic-value only supportted be initialized by 'userblock'.");
         
-        value = [lazyPropertyInfo performUserBlock:_SELF];
-        [lazyPropertyInfo setValue:value toTarget:_SELF];
+        value = [p performUserBlock:_SELF];
+        [p setValue:value toTarget:_SELF];
     }
     
-    [lazyPropertyInfo access];
+    [p access];
     
     return value;
 }

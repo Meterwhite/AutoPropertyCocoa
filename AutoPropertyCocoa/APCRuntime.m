@@ -11,6 +11,8 @@
 #import "APCRuntime.h"
 #import "APCScope.h"
 
+NS_INLINE APCPropertyHook* apc_instance_propertyhook(id instance, NSString* property);
+
 #pragma mark - For class - private
 
 #define APC_RUNTIME_LOCK \
@@ -23,7 +25,7 @@ dispatch_semaphore_signal(_apc_runtime_mapperlock)
 
 static dispatch_semaphore_t _apc_runtime_mapperlock;
 
-///class : key : hook : properties
+///Class : Property_key : Hook(:Properties)
 static NSMapTable*  _apc_runtime_property_classmapper;
 
 static NSMapTable* apc_runtime_property_classmapper()
@@ -48,6 +50,21 @@ APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
     return apc_runtime_propertyhook(clazz, property);
 }
 
+APCPropertyHook* apc_lookup_superPropertyhook(Class clazz, NSString* property)
+{
+    APCPropertyHook* ret;
+    while (nil != (clazz = class_getSuperclass(clazz))){
+        
+        if(nil != [apc_runtime_property_classmapper() objectForKey:clazz])
+            
+            if(nil != (ret = apc_runtime_propertyhook(clazz, property)))
+                
+                return ret;
+    }
+    
+    return nil;
+}
+
 APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
 {
     APCPropertyHook* root = hook;
@@ -61,6 +78,11 @@ APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
     } while (true);
     
     return root;
+}
+
+APCPropertyHook* apc_lookup_instancePropertyhook(APCProxyInstance* instance, NSString* property)
+{
+    return apc_instance_propertyhook(instance, property);
 }
 
 #pragma mark - For class - export
@@ -138,40 +160,50 @@ NSArray* apc_classBoundProperties(Class cls, NSString* property)
     return [apc_runtime_propertyhook(cls , property) boundProperties];
 }
 
-APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
+APCHookProperty* apc_property_getRootProperty(APCHookProperty* p)
 {
+    APCPropertyHook* hook
+    = apc_propertyhook_rootHook(apc_runtime_propertyhook(p->_des_class, p->_hooked_name));
     
-    NSEnumerator*   e = [[apc_runtime_propertyhook(p->_des_class, p->_hooked_name)
-                          superhook] propertyEnumerator];
-    APCHookProperty*item;
-    while (nil != (item = e.nextObject)) {
+    for (APCHookProperty* item in hook) {
         
         if(p.class == item.class){
             
-            return p;
+            return item;
         }
     }
-    
+    return nil;
+}
+
+APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
+{
+    APCPropertyHook* hook = [apc_runtime_propertyhook(p->_des_class, p->_hooked_name)
+                          superhook];
+    for (APCHookProperty* item in hook) {
+        
+        if(p.class == item.class){
+            
+            return item;
+        }
+    }
     return nil;
 }
 
 NSArray<__kindof APCHookProperty*>*
 apc_property_getSuperPropertyList(APCHookProperty* p)
 {
-    NSEnumerator*    e
-    = [[apc_runtime_propertyhook(p->_des_class, p->_hooked_name)
-                          superhook] propertyEnumerator];
+    APCPropertyHook* hook
+    = [apc_runtime_propertyhook(p->_des_class, p->_hooked_name)
+       superhook];
     NSMutableArray*  ret = [NSMutableArray array];
-    APCHookProperty* item;
-
-    while (nil != (item = e.nextObject)) {
+    
+    for (APCHookProperty* item in hook) {
         
         if(p.class == item.class){
             
-            [ret addObject:p];
+            [ret addObject:item];
         }
     }
-    
     return [ret copy];
 }
 
@@ -270,7 +302,7 @@ static NSMapTable* apc_object_hookRecursiveMapper()
 
 NS_INLINE NSMapTable* apc_object_hookRecursiveCurrentMapper()
 {
-    return [_apc_object_hookRecursiveMapper objectForKey:APCThreadID];
+    return [apc_object_hookRecursiveMapper() objectForKey:APCThreadID];
 }
 
 NS_INLINE NSMutableSet* apc_object_hookRecursiveCurrentLoops(id instance)

@@ -8,7 +8,7 @@
 
 #import "APCHookProperty.h"
 
-@interface APCLazyProperty : APCHookProperty <APCPropertyHookProxyClassNameProtocol>
+@interface APCLazyProperty : APCHookProperty
 {
 @public
     
@@ -32,8 +32,7 @@
 - (id _Nullable)performUserBlock:(id _Nonnull)_SELF;
 
 - (void)setValue:(_Nullable id)value toTarget:(_Nonnull id)target;
-
-#pragma mark - Cache for type of class.
+@end
 
 //+ (_Nullable instancetype)cachedTargetClass:(Class _Nonnull __unsafe_unretained)clazz
 //                                   property:(NSString* _Nonnull)property;
@@ -43,6 +42,3 @@
 //
 //+ (_Nullable instancetype)cachedFromAClass:(Class _Nonnull __unsafe_unretained)aClazz
 //                                  property:(NSString* _Nonnull)property;
-
-@end
-

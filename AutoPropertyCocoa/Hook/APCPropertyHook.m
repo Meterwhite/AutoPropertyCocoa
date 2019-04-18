@@ -7,12 +7,30 @@
 //
 
 #import "APCPropertyHook.h"
-#import "APCHookProperty.h"
+#import "APCLazyProperty.h"
 #import "APCRuntime.h"
 #import "APCScope.h"
 
 id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
 {
+    APCPropertyHook* hook;
+    
+    if(YES == apc_object_isProxyInstance(_SELF)){
+        
+        hook = apc_lookup_instancePropertyhook(_SELF, NSStringFromSelector(_CMD));
+    }else{
+        
+        if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), NSStringFromSelector(_CMD)))){
+            
+            NSCAssert(NO, @"APC: BAD ACCESS.");
+        }
+    }
+    
+    if(hook.isEmpty){
+        
+        return [apc_propertyhook_rootHook(hook) performOldGetterFromTarget:_SELF];
+    }
+    
     
     return nil;
 }
@@ -43,10 +61,21 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     if (self) {
         
         _propertyInfo       =   property;
+        _source_class       =   property->_des_class;
         _boundProperties    =   [NSMutableArray arrayWithObject:property];
         [self hook];
     }
     return self;
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer count:(NSUInteger)len
+{
+    return [_boundProperties countByEnumeratingWithState:state objects:buffer count:len];
+}
+
+- (Class)sourceclass
+{
+    return _source_class;
 }
 
 - (Class)hookclass
@@ -56,18 +85,13 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 
 - (NSString *)hookMethod
 {
-    return _propertyInfo->_des_getter_name;
-}
-
-- (NSEnumerator<APCHookProperty *> *)propertyEnumerator
-{
-    return _boundProperties.objectEnumerator;
+    return _propertyInfo->_hooked_name;
 }
 
 - (void)bindProperty:(APCHookProperty *)property
 {
     NSAssert((_propertyInfo->_des_class == property->_des_class)
-              && ([_propertyInfo->_des_getter_name isEqualToString:property->_des_getter_name]), @"APC: Class name and property name are one by one mapped.");
+              && ([_propertyInfo->_des_getter_name isEqualToString:property->_hooked_name]), @"APC: Class name and property name are one by one mapped.");
     
     [_boundProperties addObject:property];
     [property bindingToHook:self];
@@ -76,7 +100,7 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 - (void)unbindProperty:(APCHookProperty *)property
 {
     NSAssert((_propertyInfo->_des_class == property->_des_class)
-             && ([_propertyInfo->_des_getter_name isEqualToString:property->_des_getter_name]), @"APC: Class name and property name are one by one mapped.");
+             && ([_propertyInfo->_des_getter_name isEqualToString:property->_hooked_name]), @"APC: Class name and property name are one by one mapped.");
     
     [property invalid];
     
@@ -100,10 +124,20 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     return [_boundProperties copy];
 }
 
+- (APCHookProperty*)boundPropertyForPropertyKind:(Class)propertyKind
+{
+    for (APCHookProperty* item in _boundProperties) {
+        
+        if(propertyKind == object_getClass(item)){
+            
+            return item;
+        }
+    }
+    return nil;
+}
+
 - (void)hook
 {
-    //    AutoHookPropertyInfo* property = [_boundProperties firstObject];
-    
     IMP newimp;
     
     if(_propertyInfo.kindOfValue == APCPropertyValueKindOfBlock ||
@@ -136,13 +170,13 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
             
             ///Superclass and subclass used the same old implementation that is from superclass.
             
-#warning 搜索APCRuntime...
-            APCPropertyHook* rootHook
-            = apc_propertyhook_rootHook(apc_lookup_propertyhook(_propertyInfo->_des_class
-                                                                , _propertyInfo->_hooked_name));
-            if(nil != rootHook){
+#warning super 到哪里
+            APCPropertyHook* superhook
+            = apc_lookup_superPropertyhook(_propertyInfo->_des_class, _propertyInfo->_hooked_name);
+            
+            if(nil != superhook){
                 
-                _old_implementation = rootHook->_old_implementation;
+                _old_implementation = superhook->_old_implementation;
             }else{
                 
                 _old_implementation
@@ -155,18 +189,17 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
         }
     }else{
         
-        APCProxyClass proxyClass;
         if(NO == apc_object_isProxyInstance(_propertyInfo->_instance)){
             
-            proxyClass = apc_object_hookWithProxyClass(_propertyInfo->_instance);
+            _proxyClass = apc_object_hookWithProxyClass(_propertyInfo->_instance);
         }else{
             
-            proxyClass = object_getClass(_propertyInfo->_instance);
+            _proxyClass = object_getClass(_propertyInfo->_instance);
         }
         
         _old_implementation
         =
-        class_replaceMethod(proxyClass
+        class_replaceMethod(_proxyClass
                             , NSSelectorFromString(_propertyInfo->_hooked_name)
                             , _new_implementation
                             , _propertyInfo.methodTypeEncoding.UTF8String);
@@ -192,23 +225,45 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
         _new_implementation = nil;
         
         class_replaceMethod(_propertyInfo->_des_class
-                            , NSSelectorFromString(_propertyInfo->_des_getter_name)
+                            , NSSelectorFromString(_propertyInfo->_hooked_name)
                             , _old_implementation
-                            , [NSString stringWithFormat:@"%@@:",_propertyInfo.valueTypeEncoding].UTF8String);
+                            , _propertyInfo.methodTypeEncoding.UTF8String);
     }
     else
     {
-//        if(NO == [APCLazyProperty testingProxyClassInstance:_instance]){
-//            ///Instance has been unbound by other threads.
-//            return;
-//        }
-        
-//        [self unhookForInstance];
-//        [self removeFromInstanceCache];
+        if(YES == apc_object_isProxyInstance(_propertyInfo->_instance)){
+            
+            apc_class_disposeProxyClass(apc_instance_unhookFromProxyClass(_propertyInfo->_instance));
+        }
     }
     
     _propertyInfo = nil;
 }
 
+- (void)dealloc
+{
+    if(_propertyInfo.kindOfOwner == APCPropertyOwnerKindOfInstance){
+        
+        [self disposeRuntimeResource];
+    }
+}
+
+- (void)disposeRuntimeResource
+{
+    if(_proxyClass != nil){
+        
+        apc_class_disposeProxyClass(_proxyClass);
+    }
+}
+
+- (void)performOldSetterFromTarget:(id)target withValue:(id)value
+{
+    
+}
+
+- (id)performOldGetterFromTarget:(id)target
+{
+    return nil;
+}
 @end
 

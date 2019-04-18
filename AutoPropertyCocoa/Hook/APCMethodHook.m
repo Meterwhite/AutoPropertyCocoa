@@ -10,4 +10,14 @@
 
 @implementation APCMethodHook
 
+- (void)dealloc
+{
+    [self disposeRuntimeResource];
+}
+
+- (void)disposeRuntimeResource
+{
+    
+}
+
 @end

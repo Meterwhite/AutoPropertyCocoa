@@ -5,14 +5,11 @@
 //  Created by Novo on 2019/3/20.
 //  Copyright © 2019 Novo. All rights reserved.
 //
-#import "APCLazyProperty.h"
 #import "NSObject+APCLazyLoad.h"
+#import "APCLazyProperty.h"
+#import "APCPropertyHook.h"
+#import "APCRuntime.h"
 #import "APCScope.h"
-
-
-//id    _Nullable apc_lazy_property       (_Nullable id _self,SEL __cmd);
-//void* _Nullable apc_lazy_property_impimage(NSString* eType);
-
 
 #pragma mark - APCLazyProperty
 
@@ -26,13 +23,13 @@
         
         
         _methodStyle    =   APCMethodGetterStyle;
-        _hooked_name       =   _des_getter_name;
+        _hooked_name    =   _des_getter_name;
         if(self.kindOfOwner == APCPropertyOwnerKindOfClass){
             
             if(self.kindOfValue != APCPropertyValueKindOfObject
                && self.kindOfValue != APCPropertyValueKindOfBlock){
                 
-                NSAssert(NO, @"APC: Disable binding on basic-value type properties of class types.");
+                NSAssert(NO, @"APC: Disable binding on basic-value type properties for class types.");
             }
         }
     }
@@ -44,6 +41,174 @@
     _kindOfUserHook =   APCPropertyHookKindOfSelector;
     _userSelector   =   aSelector?:@selector(new);
     _userBlock      =   nil;
+}
+
+- (void)bindindUserBlock:(id)block
+{
+    _kindOfUserHook =   APCPropertyHookKindOfBlock;
+    _userBlock      =   [block copy];
+    _userSelector   =   nil;
+}
+
+
+- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target
+{
+    return nil;
+}
+
+- (id _Nullable)instancetypeNewObjectByUserSelector
+{
+    Class clzz = self.propertyClass;
+    NSMethodSignature *signature = [clzz methodSignatureForSelector:self.userSelector];
+    
+    NSAssert(signature, @"APC: Can not find %@ in class %@.",NSStringFromSelector(self.userSelector),NSStringFromClass(clzz));
+    
+    NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
+    invocation.target = clzz;
+    invocation.selector = self.userSelector;
+    [invocation invoke];
+    if (signature.methodReturnLength) {
+        
+        id __unsafe_unretained returnValue;
+        [invocation getReturnValue:&returnValue];
+        return returnValue;
+    }
+    return nil;
+}
+
+- (id)performUserBlock:(id)_SELF
+{
+    return _userBlock
+    
+    ? ((id(^)(id))_userBlock)(_SELF)
+    
+    : nil;
+}
+
+- (void)setValue:(id)value toTarget:(id)target
+{
+    NSAssert(self.accessOption & APCPropertySetValueEnable, @"APC: Object %@ must have setter or _ivar.",target);
+    
+    if((self.accessOption & APCPropertyAssociatedSetter)
+       || (self.accessOption & APCPropertyComponentOfSetter)){
+        
+        ///Set value by setter
+        IMP imp = class_getMethodImplementation([target class]
+                                                , self.propertySetter ?: self.associatedSetter);
+        NSAssert(imp
+                 , @"APC: Can not find implementation named %@ in %@"
+                 , NSStringFromSelector(self.propertySetter)
+                 , [target class]);
+        
+        apc_setterimp_boxinvok(target
+                               , self.propertySetter
+                               , imp
+                               , self.valueTypeEncoding.UTF8String
+                               , value);
+    }else{
+        
+        ///Set value to ivar
+        if(self.kindOfValue == APCPropertyValueKindOfBlock ||
+           self.kindOfValue == APCPropertyValueKindOfObject){
+            
+            object_setIvar(target, self.associatedIvar, value);
+        }else{
+            
+            [target setValue:value forKey:@(ivar_getName(self.associatedIvar))];
+        }
+    }
+}
+
+
+@end
+
+
+#pragma mark - Cache strategy
+
+//- (void)cacheToInstanceMapper
+//{
+//    [APCInstancePropertyCacheManager bindProperty:self
+//                                       toInstance:_instance
+//                                              cmd:_des_getter_name];
+//}
+//
+//- (void)removeFromInstanceCache
+//{
+//
+//    [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
+//                                                                 cmd:_des_getter_name];
+//
+//    if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
+//
+//        [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
+//    }
+//}
+//
+//static APCClassPropertyMapperController* _cacheForClass;
+//- (void)cacheToClassMapper
+//{
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//
+//        _cacheForClass     =   [APCClassPropertyMapperController cache];
+//    });
+//
+//    [_cacheForClass addProperty:self];
+//}
+//
+//- (void)removeFromClassCache
+//{
+//    [_cacheForClass removeProperty:self];
+//}
+//
+//+ (_Nullable instancetype)cachedTargetClass:(Class)clazz
+//                                   property:(NSString*)property
+//{
+//    clazz = [self unproxyClass:clazz];
+//
+//    return [_cacheForClass propertyForDesclass:clazz property:property];
+//}
+//
+//+ (instancetype)cachedFromAClassByInstance:(id)instance property:(NSString *)property
+//{
+//
+//    NSUInteger lenth = [APCLazyloadOldLoopController loopCount:instance];
+//
+//
+//    if(lenth == 0){
+//
+//        return [self cachedFromAClass:[instance class] property:property];
+//    }
+//
+//    APCLazyProperty*   p;
+//    Class                   clazz = [instance class];
+//    while (lenth) {
+//
+//        while ((clazz = [clazz superclass])) {
+//
+//            if(clazz == nil) return p;
+//
+//            if(nil != (p = [self cachedTargetClass:clazz property:property])){
+//
+//                --lenth;
+//                break;
+//            }
+//        }
+//    }
+//
+//    return p;
+//}
+//
+//+ (_Nullable instancetype)cachedFromAClass:(Class)aClazz
+//                                  property:(NSString*)property
+//{
+//    aClazz = [self unproxyClass:aClazz];
+//
+//    return [_cacheForClass searchFromTargetClass:aClazz property:property];
+//}
+
+
+
 //    IMP newimp      =   nil;
 //    if(self.kindOfValue == APCPropertyValueKindOfBlock ||
 //       self.kindOfValue == APCPropertyValueKindOfObject){
@@ -63,13 +228,6 @@
 //
 //        [self cacheToInstanceMapper];
 //    }
-}
-
-- (void)bindindUserBlock:(id)block
-{
-    _kindOfUserHook     =   APCPropertyHookKindOfBlock;
-    _userBlock      =   [block copy];
-    _userSelector   =   nil;
 //    IMP newimp      =   nil;
 //    if(self.kindOfValue == APCPropertyValueKindOfBlock ||
 //       self.kindOfValue == APCPropertyValueKindOfObject){
@@ -89,7 +247,6 @@
 //
 //        [self cacheToInstanceMapper];
 //    }
-}
 /** Important */
 //- (void)hookPropertyWithImplementation:(IMP)implementation option:(NSUInteger)option
 //{
@@ -232,9 +389,8 @@
 //    }
 //}
 
-- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target
-{
-    return nil;
+
+
 //    if(NO == (_new_getter_implementation && _old_getter_implementation)){
 //
 //        return nil;
@@ -252,182 +408,3 @@
 //    [APCLazyloadOldLoopController breakLoop:target];
 //
 //    return ret;
-}
-
-- (id _Nullable)instancetypeNewObjectByUserSelector
-{
-    Class clzz = self.propertyClass;
-    NSMethodSignature *signature = [clzz methodSignatureForSelector:self.userSelector];
-    
-    NSAssert(signature, @"APC: Can not find %@ in class %@.",NSStringFromSelector(self.userSelector),NSStringFromClass(clzz));
-    
-    NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
-    invocation.target = clzz;
-    invocation.selector = self.userSelector;
-    [invocation invoke];
-    if (signature.methodReturnLength) {
-        
-        id __unsafe_unretained returnValue;
-        [invocation getReturnValue:&returnValue];
-        return returnValue;
-    }
-    return nil;
-}
-
-- (id)performUserBlock:(id)_SELF
-{
-    return _userBlock
-    
-    ? ((id(^)(id))_userBlock)(_SELF)
-    
-    : nil;
-}
-
-- (void)setValue:(id)value toTarget:(id)target
-{
-    NSAssert(self.accessOption & APCPropertySetValueEnable, @"APC: Object %@ must have setter or _ivar.",target);
-    
-    if((self.accessOption & APCPropertyAssociatedSetter)
-       || (self.accessOption & APCPropertyComponentOfSetter)){
-        
-        ///Set value by setter
-        IMP imp = class_getMethodImplementation([target class]
-                                                , self.propertySetter ?: self.associatedSetter);
-        NSAssert(imp
-                 , @"APC: Can not find implementation named %@ in %@"
-                 , NSStringFromSelector(self.propertySetter)
-                 , [target class]);
-        
-        apc_setterimp_boxinvok(target
-                               , self.propertySetter
-                               , imp
-                               , self.valueTypeEncoding.UTF8String
-                               , value);
-    }else{
-        
-        ///Set value to ivar
-        if(self.kindOfValue == APCPropertyValueKindOfBlock ||
-           self.kindOfValue == APCPropertyValueKindOfObject){
-            
-            object_setIvar(target, self.associatedIvar, value);
-        }else{
-            
-            [target setValue:value forKey:@(ivar_getName(self.associatedIvar))];
-        }
-    }
-}
-
-#pragma mark - Cache strategy
-
-//- (void)cacheToInstanceMapper
-//{
-//    [APCInstancePropertyCacheManager bindProperty:self
-//                                       toInstance:_instance
-//                                              cmd:_des_getter_name];
-//}
-//
-//- (void)removeFromInstanceCache
-//{
-//
-//    [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
-//                                                                 cmd:_des_getter_name];
-//
-//    if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
-//
-//        [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
-//    }
-//}
-//
-//static APCClassPropertyMapperController* _cacheForClass;
-//- (void)cacheToClassMapper
-//{
-//    static dispatch_once_t onceToken;
-//    dispatch_once(&onceToken, ^{
-//
-//        _cacheForClass     =   [APCClassPropertyMapperController cache];
-//    });
-//
-//    [_cacheForClass addProperty:self];
-//}
-//
-//- (void)removeFromClassCache
-//{
-//    [_cacheForClass removeProperty:self];
-//}
-//
-//+ (_Nullable instancetype)cachedTargetClass:(Class)clazz
-//                                   property:(NSString*)property
-//{
-//    clazz = [self unproxyClass:clazz];
-//
-//    return [_cacheForClass propertyForDesclass:clazz property:property];
-//}
-//
-//+ (instancetype)cachedFromAClassByInstance:(id)instance property:(NSString *)property
-//{
-//
-//    NSUInteger lenth = [APCLazyloadOldLoopController loopCount:instance];
-//
-//
-//    if(lenth == 0){
-//
-//        return [self cachedFromAClass:[instance class] property:property];
-//    }
-//
-//    APCLazyProperty*   p;
-//    Class                   clazz = [instance class];
-//    while (lenth) {
-//
-//        while ((clazz = [clazz superclass])) {
-//
-//            if(clazz == nil) return p;
-//
-//            if(nil != (p = [self cachedTargetClass:clazz property:property])){
-//
-//                --lenth;
-//                break;
-//            }
-//        }
-//    }
-//
-//    return p;
-//}
-//
-//+ (_Nullable instancetype)cachedFromAClass:(Class)aClazz
-//                                  property:(NSString*)property
-//{
-//    aClazz = [self unproxyClass:aClazz];
-//
-//    return [_cacheForClass searchFromTargetClass:aClazz property:property];
-//}
-
-
-
-#pragma mark - APCPropertyHookProxyClassNameProtocol
-- (NSString*)proxyClassName
-{
-    //Class+APCProxyClass.hash
-    return [NSString stringWithFormat:@"%@%@.%lu"
-            , NSStringFromClass(_des_class)
-            , APCClassSuffixForLazyLoad
-            , (unsigned long)[_instance hash]];
-}
-+ (Class)unproxyClass:(Class)clazz
-{
-    NSString* className = NSStringFromClass(clazz);
-    
-    if([className containsString:APCClassSuffixForLazyLoad]){
-        
-        className = [className substringToIndex:[className rangeOfString:@"+"].location];
-        
-        clazz = NSClassFromString(className);
-    }
-    return clazz;
-}
-+ (BOOL)testingProxyClassInstance:(id)instance
-{
-    return [NSStringFromClass([instance class]) containsString:APCClassSuffixForLazyLoad];
-}
-@end
-
-

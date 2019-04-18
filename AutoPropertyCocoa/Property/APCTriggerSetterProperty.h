@@ -10,7 +10,7 @@
 
 
 
-@interface APCTriggerSetterProperty : APCHookProperty<APCPropertyHookProxyClassNameProtocol>
+@interface APCTriggerSetterProperty : APCHookProperty
 
 @property (nonatomic,assign,readonly) APCPropertyTriggerOption triggerOption;
 
