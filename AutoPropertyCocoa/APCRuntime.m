@@ -44,9 +44,57 @@ apc_runtime_propertyhook(Class __unsafe_unretained _Nonnull clazz, NSString* _No
     return [[apc_runtime_property_classmapper() objectForKey:clazz] objectForKey:property];
 }
 
+//[0]root -> subitem -> ... ...
+#error struct error
+static NSMutableArray*  _apc_runtimeInheritance_classInheritanceList;
+static NSMutableArray* apc_runtimeInheritance_classInheritanceList()
+{
+    ///Forest
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        
+        _apc_runtimeInheritance_classInheritanceList = [NSMutableArray arrayWithCapacity:23];
+    });
+    return _apc_runtimeInheritance_classInheritanceList;
+}
+
+static NSUInteger apc_runtimeInheritance_regiterClass(Class cls)
+{
+    NSMutableArray* list = apc_runtimeInheritance_classInheritanceList();
+    
+    if(list.count != 0){
+        
+        if([list containsObject:cls]){
+            
+            return [list indexOfObject:cls];
+        }
+        ///From rootclass to subclass
+        for (NSUInteger i = 0; i < list.count; i++) {
+            
+            if([list[i] isSubclassOfClass:cls]){
+                
+                [list insertObject:cls atIndex:i];
+                return i;
+            }
+        }
+    }
+    
+    [list addObject:cls];
+    return 0;
+}
+
+NS_INLINE void apc_runtimeInheritance_removeClass(Class cls)
+{
+    [_apc_runtimeInheritance_classInheritanceList removeObject:cls];
+}
+
 #pragma mark - For hook - export
 APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
 {
+    if(clazz == NULL){
+        
+        return (APCPropertyHook*)0;
+    }
     return apc_runtime_propertyhook(clazz, property);
 }
 
@@ -64,21 +112,6 @@ APCPropertyHook* apc_lookup_propertyhook_range(Class from, Class to, NSString* p
                     return ret;
             
         } while (to != (from = class_getSuperclass(from)));
-    }
-    
-    return (APCPropertyHook*)0;
-}
-
-APCPropertyHook* apc_lookup_superPropertyhook(Class cls, NSString* property)
-{
-    APCPropertyHook* ret;
-    while (NULL != (cls = class_getSuperclass(cls))){
-        
-        if(NULL != [apc_runtime_property_classmapper() objectForKey:cls])
-            
-            if(NULL != (ret = apc_runtime_propertyhook(cls, property)))
-                
-                return ret;
     }
     
     return (APCPropertyHook*)0;
@@ -105,47 +138,66 @@ APCPropertyHook* apc_lookup_instancePropertyhook(APCProxyInstance* instance, NSS
 }
 
 #pragma mark - For class - export
+
+Class apc_class_getSuperclass(Class cls)
+{
+    NSUInteger idx = [_apc_runtimeInheritance_classInheritanceList indexOfObject:cls];
+    
+    if(idx == NSNotFound || idx == 0){
+        
+        return nil;
+    }
+    
+    return _apc_runtimeInheritance_classInheritanceList[idx-1];
+}
+
+//static void __apc_propertyhook_update_superhook__(APCPropertyHook* hook)
+//{
+//
+//}
+
 void apc_registerProperty(APCHookProperty* p)
 {
     APC_RUNTIME_LOCK;
     
     NSMutableDictionary*dictionary = [apc_runtime_property_classmapper() objectForKey:p->_des_class];
-    APCPropertyHook*    superhook;
+    APCPropertyHook*    itHook;
     APCPropertyHook*    hook;
-    
     if(dictionary == NULL){
         
         dictionary = [NSMutableDictionary dictionary];
         [apc_runtime_property_classmapper() setObject:dictionary forKey:p->_des_class];
+        apc_runtimeInheritance_regiterClass(p->_des_class);
     }
     
     hook = dictionary[p->_hooked_name];
     
-    if(hook == NULL){
-        
-        hook = [APCPropertyHook hookWithProperty:p];
-        dictionary[p->_hooked_name] = hook;
-    }else{
+    if(hook != NULL){
         
         [hook bindProperty:p];
+        APC_RUNTIME_UNLOCK;
+        return;
     }
-#warning <#message#>
+    
+    ///New hook
+    hook = [APCPropertyHook hookWithProperty:p];
+    dictionary[p->_hooked_name] = hook;
+    
     ///Update superhook
-    superhook
-    = apc_lookup_superPropertyhook(p->_des_class, p->_hooked_name);
-    //apc_runtime_propertyhook
-    for (Class cls in apc_runtime_property_classmapper()) {
-        
-        if([cls isSubclassOfClass:p->_des_class]){
+    hook->_superhook = apc_lookup_propertyhook(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
+    
+    ///subhook
+    
+    for (Class itCls in apc_runtime_property_classmapper()) {
+
+        if(apc_class_getSuperclass(itCls) ==  p->_des_class){
             
-//            if((NULL != superhook && item.superhook == superhook)
-//               || (NULL == superhook && (item->_superhook == NULL))){
-//
-//                item->_superhook = hook;
-//            }
+            if(NULL != (itHook = apc_lookup_propertyhook(itCls, p->_hooked_name))){
+                
+                itHook->_superhook = hook;
+            }
         }
     }
-    hook->_superhook = superhook;
     
     APC_RUNTIME_UNLOCK;
 }
@@ -154,23 +206,31 @@ void apc_disposeProperty(APCHookProperty* p)
 {
     APC_RUNTIME_LOCK;
     
-    APCPropertyHook* hook = apc_runtime_propertyhook( p->_des_class, p->_hooked_name);
+    APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
     [hook unbindProperty:p];
     
     if(hook.isEmpty){
-        ///Reset subhook's superhook
         
-        APCPropertyHook* item;
-        NSEnumerator* e = apc_runtime_property_classmapper().objectEnumerator;
-        while (NULL != (item = e.nextObject)) {
+//        hook->_superhook = apc_lookup_propertyhook(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
+        
+//        APCPropertyHook* itHook;
+        
+        ///Update super hook
+        for (Class itCls in apc_runtime_property_classmapper()) {
             
-            if(class_getSuperclass(item.hookclass) == p->_des_class){
+            if(apc_class_getSuperclass(itCls) == hook.hookclass){
                 
-                item->_superhook = hook->_superhook;
+                ///key - hook
+                for (APCPropertyHook* itHook in [[apc_runtime_property_classmapper() objectForKey:itCls] objectEnumerator]) {
+#warning <#message#>
+                    itHook->_superhook = hook->_superhook;
+                }
             }
         }
         
-        [apc_runtime_property_classmapper() removeObjectForKey:p->_hooked_name];
+        [[apc_runtime_property_classmapper() objectForKey:hook.hookclass] removeObjectForKey:hook.hookMethod];
+        
+        ///Update classInheritenceList
     }
     
     APC_RUNTIME_UNLOCK;
