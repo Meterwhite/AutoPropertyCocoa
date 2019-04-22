@@ -49,7 +49,7 @@
                                               count:len];
 }
 
-- (NSArray<APCClassInheritanceNode*>*)topsOfYoungerBrother
+- (NSArray<APCClassInheritanceNode*>*)topNodesForYoungerBrother
 {
     if(self.isEmpty){
         
@@ -68,7 +68,7 @@
     return [ret copy];
 }
 
-- (NSArray<APCClassInheritanceNode *> *)topsOfChild
+- (NSArray<APCClassInheritanceNode *> *)topNodesForChild
 {
     if(self.isEmpty){
         

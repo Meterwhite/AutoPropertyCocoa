@@ -26,7 +26,7 @@
 
 - (void)clean;
 
-- (nullable NSArray<APCClassInheritanceNode*>*)topsOfYoungerBrother;
+- (nullable NSArray<APCClassInheritanceNode*>*)topNodesForYoungerBrother;
 
-- (nullable NSArray<APCClassInheritanceNode*>*)topsOfChild;
+- (nullable NSArray<APCClassInheritanceNode*>*)topNodesForChild;
 @end

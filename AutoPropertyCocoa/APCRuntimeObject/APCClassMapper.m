@@ -64,15 +64,15 @@
 //    NSArray<APCClassInheritanceNode*>* topsOfYoungerBrother = [_tree topsOfYoungerBrother];
     
     APCClassInheritanceNode* rootFather;
-    for (APCClassInheritanceNode* item in [_tree topsOfYoungerBrother]) {
+    for (APCClassInheritanceNode* item in [_tree topNodesForYoungerBrother]) {
         
-        NSArray<APCClassInheritanceNode*>* nodes = [item elderBrothersForSubclassOfClass:cls];
-        if(nodes.count > 1){
+        NSArray<APCClassInheritanceNode*>* nodes = [item elderBrothersThatIsSubclassToClass:cls];
+        if(nodes.count > 1) {
             
             ///Reset point
             
             return;
-        }else if (nodes.count == 1){
+        }else if (nodes.count == 1) {
             
             rootFather = item;
         }

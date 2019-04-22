@@ -38,9 +38,11 @@
 /**
  self within.
  */
-- (nonnull NSArray<APCClassInheritanceNode*>*)elderBrothersForSubclassOfClass:(nullable Class)cls;
+- (nonnull NSArray<APCClassInheritanceNode*>*)elderBrothersThatIsSubclassToClass:(nullable Class)cls;
 
-#error <#message#>
-- (nullable APCClassInheritanceNode*)directChildForSuperclassOfClass:(nullable Class)cls;
+/**
+ self within.
+ */
+- (nullable APCClassInheritanceNode*)firstDirectChildThatIsSuperclassToClass:(nullable Class)cls;
 @end
 

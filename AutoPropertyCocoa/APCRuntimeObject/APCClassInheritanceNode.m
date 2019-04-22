@@ -15,7 +15,7 @@
     return [[self alloc] init];
 }
 
-- (NSArray<APCClassInheritanceNode *> *)elderBrothersForSubclassOfClass:(Class)cls
+- (NSArray<APCClassInheritanceNode *> *)elderBrothersThatIsSubclassToClass:(Class)cls
 {
     NSMutableArray* ret = [NSMutableArray array];
     APCClassInheritanceNode* node = self;
@@ -31,8 +31,17 @@
     return [ret copy];
 }
 
-- (nullable APCClassInheritanceNode*)childrenForSuperclassOfClass:(nullable Class)cls
+- (APCClassInheritanceNode*)firstDirectChildThatIsSuperclassToClass:(Class)cls
 {
+    APCClassInheritanceNode* node = self;
+    while (nil != (node = node.elderBrother)) {
+        
+        if([cls isSubclassOfClass:node.value]){
+            
+            return node;
+        }
+    }
     
+    return nil;
 }
 @end
