@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		450AA494226A2CBE0005A745 /* APCClassMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 450AA493226A2CBE0005A745 /* APCClassMapper.m */; };
 		456FC471225DBFBF006CD604 /* Superman.m in Sources */ = {isa = PBXBuildFile; fileRef = 456FC470225DBFBF006CD604 /* Superman.m */; };
+		458142A4226D5F2600A5AA6B /* APCClassInheritanceTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 458142A3226D5F2600A5AA6B /* APCClassInheritanceTree.m */; };
+		458142A7226D5FA700A5AA6B /* APCClassInheritanceNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 458142A6226D5FA700A5AA6B /* APCClassInheritanceNode.m */; };
 		45B12F60225B2AF3002D825E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F5F225B2AF3002D825E /* AppDelegate.m */; };
 		45B12F63225B2AF3002D825E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F62225B2AF3002D825E /* ViewController.m */; };
 		45B12F68225B2AF6002D825E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F67225B2AF6002D825E /* Assets.xcassets */; };
@@ -32,8 +35,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		450AA492226A2CBE0005A745 /* APCClassMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassMapper.h; sourceTree = "<group>"; };
+		450AA493226A2CBE0005A745 /* APCClassMapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassMapper.m; sourceTree = "<group>"; };
 		456FC46F225DBFBE006CD604 /* Superman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Superman.h; sourceTree = "<group>"; };
 		456FC470225DBFBF006CD604 /* Superman.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Superman.m; sourceTree = "<group>"; };
+		458142A2226D5F2600A5AA6B /* APCClassInheritanceTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassInheritanceTree.h; sourceTree = "<group>"; };
+		458142A3226D5F2600A5AA6B /* APCClassInheritanceTree.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassInheritanceTree.m; sourceTree = "<group>"; };
+		458142A5226D5FA700A5AA6B /* APCClassInheritanceNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassInheritanceNode.h; sourceTree = "<group>"; };
+		458142A6226D5FA700A5AA6B /* APCClassInheritanceNode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassInheritanceNode.m; sourceTree = "<group>"; };
 		45B12F5B225B2AF3002D825E /* AutoPropertyCocoaiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoPropertyCocoaiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45B12F5E225B2AF3002D825E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		45B12F5F225B2AF3002D825E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -90,6 +99,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		458142A1226D5E4600A5AA6B /* APCRuntimeObject */ = {
+			isa = PBXGroup;
+			children = (
+				450AA492226A2CBE0005A745 /* APCClassMapper.h */,
+				450AA493226A2CBE0005A745 /* APCClassMapper.m */,
+				458142A2226D5F2600A5AA6B /* APCClassInheritanceTree.h */,
+				458142A3226D5F2600A5AA6B /* APCClassInheritanceTree.m */,
+				458142A5226D5FA700A5AA6B /* APCClassInheritanceNode.h */,
+				458142A6226D5FA700A5AA6B /* APCClassInheritanceNode.m */,
+			);
+			path = APCRuntimeObject;
+			sourceTree = "<group>";
+		};
 		45B12F52225B2AF3002D825E = {
 			isa = PBXGroup;
 			children = (
@@ -152,6 +174,7 @@
 				45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */,
 				45B12FAB225B2C5D002D825E /* NSObject+APCTriggerProperty.h */,
 				45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */,
+				458142A1226D5E4600A5AA6B /* APCRuntimeObject */,
 				45B12F9F225B2C5D002D825E /* Category */,
 				9FCF5DEA2264E0100059A876 /* Hook */,
 				45D44A5D226474CF005F1B2E /* Method */,
@@ -278,6 +301,7 @@
 			files = (
 				9FCF5DED2264E03D0059A876 /* APCMethodHook.m in Sources */,
 				45B12FB9225B2C5D002D825E /* APCHookProperty.m in Sources */,
+				458142A7226D5FA700A5AA6B /* APCClassInheritanceNode.m in Sources */,
 				45B12FF5225B31D3002D825E /* APCTest.m in Sources */,
 				45D44A6022647506005F1B2E /* APCMethod.m in Sources */,
 				45B12FB2225B2C5D002D825E /* Man.m in Sources */,
@@ -285,10 +309,12 @@
 				45B12FB3225B2C5D002D825E /* Person.m in Sources */,
 				45B12FBD225B2C5D002D825E /* NSObject+APCLazyLoad.m in Sources */,
 				45B12FBB225B2C5D002D825E /* APCProperty.m in Sources */,
+				450AA494226A2CBE0005A745 /* APCClassMapper.m in Sources */,
 				45B12FBE225B2C5D002D825E /* NSObject+APCTriggerProperty.m in Sources */,
 				456FC471225DBFBF006CD604 /* Superman.m in Sources */,
 				45B12FBC225B2C5D002D825E /* APCLazyProperty.m in Sources */,
 				9FCF5DE92264D93A0059A876 /* APCTriggerSetterProperty.m in Sources */,
+				458142A4226D5F2600A5AA6B /* APCClassInheritanceTree.m in Sources */,
 				45B12FBA225B2C5D002D825E /* APCTriggerGetterProperty.m in Sources */,
 				45B12FB8225B2C5D002D825E /* NSString+APCExtension.m in Sources */,
 				45B12FB4225B2C5D002D825E /* APCScope.m in Sources */,

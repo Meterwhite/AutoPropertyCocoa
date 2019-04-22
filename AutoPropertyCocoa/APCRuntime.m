@@ -6,8 +6,8 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "APCClassMapper.h"
 #import "APCPropertyHook.h"
-#import "APCMethodHook.h"
 #import "APCRuntime.h"
 #import "APCScope.h"
 
@@ -24,6 +24,15 @@ dispatch_semaphore_wait(_apc_runtime_mapperlock, DISPATCH_TIME_FOREVER)
 dispatch_semaphore_signal(_apc_runtime_mapperlock)
 
 static dispatch_semaphore_t _apc_runtime_mapperlock;
+
+#define APC_RUNTIME_INHERITANCE_LOCK \
+\
+dispatch_semaphore_wait(_apc_runtime_classInheritanceMapperlock, DISPATCH_TIME_FOREVER)
+
+#define APC_RUNTIME_INHERITANCE_UNLOCK \
+\
+dispatch_semaphore_signal(_apc_runtime_classInheritanceMapperlock)
+static dispatch_semaphore_t _apc_runtime_classInheritanceMapperlock;
 
 ///Class : Property_key : Hook(:Properties)
 static NSMapTable*  _apc_runtime_property_classmapper;
@@ -44,48 +53,50 @@ apc_runtime_propertyhook(Class __unsafe_unretained _Nonnull clazz, NSString* _No
     return [[apc_runtime_property_classmapper() objectForKey:clazz] objectForKey:property];
 }
 
-//[0]root -> subitem -> ... ...
-#error struct error
-static NSMutableArray*  _apc_runtimeInheritance_classInheritanceList;
-static NSMutableArray* apc_runtimeInheritance_classInheritanceList()
+///map(x, y) -> IndexPath(x, y) : class;
+///Faster search than 2DArray, but slower modifications.
+static APCClassMapper* _apc_runtime_classInheritance2DMap;
+static APCClassMapper* apc_runtime_classInheritance2DMap()
 {
     ///Forest
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-        _apc_runtimeInheritance_classInheritanceList = [NSMutableArray arrayWithCapacity:23];
+        _apc_runtime_classInheritance2DMap = [[APCClassMapper alloc] init];
     });
-    return _apc_runtimeInheritance_classInheritanceList;
+    return _apc_runtime_classInheritance2DMap;
 }
 
-static NSUInteger apc_runtimeInheritance_regiterClass(Class cls)
-{
-    NSMutableArray* list = apc_runtimeInheritance_classInheritanceList();
-    
-    if(list.count != 0){
-        
-        if([list containsObject:cls]){
-            
-            return [list indexOfObject:cls];
-        }
-        ///From rootclass to subclass
-        for (NSUInteger i = 0; i < list.count; i++) {
-            
-            if([list[i] isSubclassOfClass:cls]){
-                
-                [list insertObject:cls atIndex:i];
-                return i;
-            }
-        }
-    }
-    
-    [list addObject:cls];
-    return 0;
-}
 
-NS_INLINE void apc_runtimeInheritance_removeClass(Class cls)
+static NSIndexPath* apc_runtimeInheritance_regiterClass(Class cls)
 {
-    [_apc_runtimeInheritance_classInheritanceList removeObject:cls];
+    APC_RUNTIME_INHERITANCE_LOCK;
+    
+    APCClassMapper* map = apc_runtime_classInheritance2DMap();
+    NSIndexPath* ret;
+    
+    APC_RUNTIME_INHERITANCE_UNLOCK;
+    
+    return [NSIndexPath indexPathForItem:0 inSection:0];
+//    if(list.count != 0){
+//
+//        if([list containsObject:cls]){
+//
+////            return [list indexOfObject:cls];
+//        }
+//        ///From rootclass to subclass
+//        for (NSUInteger i = 0; i < list.count; i++) {
+//
+//            if([list[i] isSubclassOfClass:cls]){
+//
+//                [list insertObject:cls atIndex:i];
+////                return i;
+//            }
+//        }
+//    }
+//
+//    [list addObject:cls];
+    return nil;
 }
 
 #pragma mark - For hook - export
@@ -141,14 +152,15 @@ APCPropertyHook* apc_lookup_instancePropertyhook(APCProxyInstance* instance, NSS
 
 Class apc_class_getSuperclass(Class cls)
 {
-    NSUInteger idx = [_apc_runtimeInheritance_classInheritanceList indexOfObject:cls];
-    
-    if(idx == NSNotFound || idx == 0){
-        
-        return nil;
-    }
-    
-    return _apc_runtimeInheritance_classInheritanceList[idx-1];
+    return nil;
+//    NSUInteger idx = [_apc_runtimeInheritance_classInheritanceList indexOfObject:cls];
+//
+//    if(idx == NSNotFound || idx == 0){
+//
+//        return nil;
+//    }
+//
+//    return _apc_runtimeInheritance_classInheritanceList[idx-1];
 }
 
 //static void __apc_propertyhook_update_superhook__(APCPropertyHook* hook)
