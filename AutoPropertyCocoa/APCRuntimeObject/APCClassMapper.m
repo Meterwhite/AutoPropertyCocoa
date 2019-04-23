@@ -50,67 +50,91 @@
     
     ///Enumerate brother nodes
     
-    APCClassInheritanceNode* newNode = [APCClassInheritanceNode nodeWithClass:cls];
+    NSEnumerator<APCClassInheritanceNode*>*e;
+    APCClassInheritanceNode*            n_curr;
+    APCClassInheritanceNode*            n_next;
+    NSArray<APCClassInheritanceNode*>*  iNodes;
+    APCClassInheritanceNode*            iNode;
+    NSArray*                            others;
+    APCClassInheritanceNode*            newNode = [APCClassInheritanceNode nodeWithClass:cls];
     if(_tree.isEmpty){
         
         _tree.root = newNode;
-        return;
+        goto CALL_MAP_ADD;
     }
     
-    NSArray* others;
-    NSEnumerator<APCClassInheritanceNode*>*e;
-    APCClassInheritanceNode* n_curr;
-    APCClassInheritanceNode* n_next;
-    for (APCClassInheritanceNode* leaf in [_tree leafnodesInBrotherBranch]) {
-        
-        NSArray<APCClassInheritanceNode*>* nodes = [leaf brothersThatIsSubclassTo:cls
-                                                                           others:&others];
-        if(nodes.count > 0) {
-            
-            ///Reset point
-            
-            ///Connect new brothers
-            e = nodes.objectEnumerator;
-            n_curr = e.nextObject;
-            while (YES) {
-                
-                if(n_curr && (n_next = e.nextObject)){
+    for (APCClassInheritanceNode* leaf in [_tree leafnodesInBrotherBranch])
+    {
+        @autoreleasepool
+        {
+            iNodes = [leaf brothersThatIsSubclassTo:cls others:&others];
+            if(iNodes.count > 0)
+            {
+                ///Reset relasionship
+                ///Connect new brothers
+                e       = iNodes.objectEnumerator;
+                n_curr  = e.nextObject;
+                while (YES) {
                     
-                    n_curr.nextBrother = n_next;
-                    n_curr = n_next;
+                    if(n_curr && (n_next = e.nextObject)){
+                        
+                        n_curr.nextBrother  = n_next;
+                        n_curr              = n_next;
+                    }
+                    break;
                 }
-                break;
-            }
-            ///As new father to first brothers
-            newNode.child = nodes.firstObject;
-            
-            ///Reconnect the rest nodes as brother to the new one.
-            n_curr = newNode;
-            e = others.objectEnumerator;
-            while (nil != (n_next = e.nextObject)) {
+                ///As new father to first brothers
+                newNode.child = iNodes.firstObject;
                 
-                n_curr.nextBrother = n_next;
-                n_curr = n_next;
+                ///Reconnect the rest nodes as brother to the new one.
+                n_curr  = newNode;
+                e       = others.objectEnumerator;
+                while (nil != (n_next = e.nextObject)) {
+                    
+                    n_curr.nextBrother  = n_next;
+                    n_curr              = n_next;
+                }
+                
+                goto CALL_MAP_ADD;
             }
-            
-            return;
         }
     }
     
     ///Inserts the node forward.
     for (APCClassInheritanceNode* item in [_tree leafnodesInChildBranch]) {
         
-        APCClassInheritanceNode* node = [item firstFatherThatIsBaseclassTo:cls];
-        if(node != nil){
-            ///Reset point
+        iNode = [item firstFatherThatIsBaseclassTo:cls];
+        if(iNode != nil){
             
-            
+            ///Insert the new one bettwen superclass and its subclass.
+            newNode.child   = iNode.child;
+            newNode.father  = iNode;
+            goto CALL_MAP_ADD;
         }
     }
     
     ///New basic brother.
+    iNode = _tree.root;
+    while (YES) {
+        
+        if(nil == iNode.nextBrother){
+            
+            break;
+        }
+        iNode = iNode.nextBrother;
+    }
     
+    iNode.nextBrother = newNode;
     
+CALL_MAP_ADD:
+    {
+        [self mapAddNode:newNode];
+    }
+}
+
+- (void)mapAddNode:(APCClassInheritanceNode*)node
+{
+    [_map setObject:node forKey:node.value];
 }
 
 @end
