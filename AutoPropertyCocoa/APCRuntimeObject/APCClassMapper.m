@@ -50,42 +50,66 @@
     
     ///Enumerate brother nodes
     
+    APCClassInheritanceNode* newNode = [APCClassInheritanceNode nodeWithClass:cls];
     if(_tree.isEmpty){
         
-        _tree.root = [APCClassInheritanceNode node];
-        _tree.root.value = cls;
+        _tree.root = newNode;
         return;
     }
     
-//    APCClassInheritanceNode* node = _tree.root;
-    
-    
-    ///Reverse inserts a node.
-//    NSArray<APCClassInheritanceNode*>* topsOfYoungerBrother = [_tree topsOfYoungerBrother];
-    
-    APCClassInheritanceNode* rootFather;
-    for (APCClassInheritanceNode* item in [_tree topNodesForYoungerBrother]) {
+    NSArray* others;
+    NSEnumerator<APCClassInheritanceNode*>*e;
+    APCClassInheritanceNode* n_curr;
+    APCClassInheritanceNode* n_next;
+    for (APCClassInheritanceNode* leaf in [_tree leafnodesInBrotherBranch]) {
         
-        NSArray<APCClassInheritanceNode*>* nodes = [item elderBrothersThatIsSubclassToClass:cls];
-        if(nodes.count > 1) {
+        NSArray<APCClassInheritanceNode*>* nodes = [leaf brothersThatIsSubclassTo:cls
+                                                                           others:&others];
+        if(nodes.count > 0) {
             
             ///Reset point
             
-            return;
-        }else if (nodes.count == 1) {
+            ///Connect new brothers
+            e = nodes.objectEnumerator;
+            n_curr = e.nextObject;
+            while (YES) {
+                
+                if(n_curr && (n_next = e.nextObject)){
+                    
+                    n_curr.nextBrother = n_next;
+                    n_curr = n_next;
+                }
+                break;
+            }
+            ///As new father to first brothers
+            newNode.child = nodes.firstObject;
             
-            rootFather = item;
+            ///Reconnect the rest nodes as brother to the new one.
+            n_curr = newNode;
+            e = others.objectEnumerator;
+            while (nil != (n_next = e.nextObject)) {
+                
+                n_curr.nextBrother = n_next;
+                n_curr = n_next;
+            }
+            
+            return;
         }
     }
     
     ///Inserts the node forward.
-    if(nil != rootFather){
+    for (APCClassInheritanceNode* item in [_tree leafnodesInChildBranch]) {
         
-        
-    }else{
-        
-        
+        APCClassInheritanceNode* node = [item firstFatherThatIsBaseclassTo:cls];
+        if(node != nil){
+            ///Reset point
+            
+            
+        }
     }
+    
+    ///New basic brother.
+    
     
 }
 

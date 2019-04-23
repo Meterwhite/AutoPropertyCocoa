@@ -26,23 +26,36 @@
 
 + (nonnull instancetype)node;
 
++ (nonnull instancetype)nodeWithClass:(nonnull Class)cls;
+
 @property (nullable,nonatomic) Class value;
 
-@property (nullable,nonatomic,weak) APCClassInheritanceNode* father;
-@property (nullable,nonatomic,weak) APCClassInheritanceNode* youngerBrother;
-
-@property (nullable,nonatomic,strong) APCClassInheritanceNode* child;
-@property (nullable,nonatomic,strong) APCClassInheritanceNode* elderBrother;
-
 
 /**
- self within.
+ 'father' and 'child' will be set at the same time.
  */
-- (nonnull NSArray<APCClassInheritanceNode*>*)elderBrothersThatIsSubclassToClass:(nullable Class)cls;
+@property (nullable,nonatomic,weak)     APCClassInheritanceNode* father;
+@property (nullable,nonatomic,strong)   APCClassInheritanceNode* child;
 
 /**
- self within.
+ 'previousBrother' and 'nextBrother' will be set at the same time.
  */
-- (nullable APCClassInheritanceNode*)firstDirectChildThatIsSuperclassToClass:(nullable Class)cls;
+@property (nullable,nonatomic,weak)     APCClassInheritanceNode* previousBrother;
+@property (nullable,nonatomic,strong)   APCClassInheritanceNode* nextBrother;
+
+
+- (NSUInteger)brotherLevelFromRoot;
+
+- (NSComparisonResult)brotherLevelFromRootCompare:(nonnull APCClassInheritanceNode*)node;
+
+/**
+ Self within.
+ */
+- (nonnull NSArray<APCClassInheritanceNode*>*)brothersThatIsSubclassTo:(nonnull Class)cls others:(NSArray*_Nonnull*_Nonnull)others;
+
+/**
+ Self within.
+ */
+- (nullable APCClassInheritanceNode*)firstFatherThatIsBaseclassTo:(nullable Class)cls;
 @end
 

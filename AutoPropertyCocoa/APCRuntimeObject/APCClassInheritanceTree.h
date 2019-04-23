@@ -26,7 +26,13 @@
 
 - (void)clean;
 
-- (nullable NSArray<APCClassInheritanceNode*>*)topNodesForYoungerBrother;
 
-- (nullable NSArray<APCClassInheritanceNode*>*)topNodesForChild;
+/**
+ Sort according to the depth of the brother branch.
+ */
+- (nullable NSArray<APCClassInheritanceNode*>*)leafnodesInBrotherBranch;
+
+- (nullable NSArray<APCClassInheritanceNode*>*)leafnodesInChildBranch;
+
+
 @end

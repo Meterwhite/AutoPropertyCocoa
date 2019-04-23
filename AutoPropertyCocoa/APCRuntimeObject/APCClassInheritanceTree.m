@@ -49,7 +49,7 @@
                                               count:len];
 }
 
-- (NSArray<APCClassInheritanceNode*>*)topNodesForYoungerBrother
+- (NSArray<APCClassInheritanceNode*>*)leafnodesInBrotherBranch
 {
     if(self.isEmpty){
         
@@ -59,16 +59,18 @@
     NSMutableArray* ret = [NSMutableArray array];
     for (APCClassInheritanceNode* item in _references) {
         
-        if(nil == item.youngerBrother){
+        if(nil == item.nextBrother){
             
             [ret addObject:item];
         }
     }
     
+    [ret sortUsingSelector:@selector(brotherLevelFromRootCompare:)];
+    
     return [ret copy];
 }
 
-- (NSArray<APCClassInheritanceNode *> *)topNodesForChild
+- (NSArray<APCClassInheritanceNode *> *)leafnodesInChildBranch
 {
     if(self.isEmpty){
         
@@ -83,6 +85,8 @@
             [ret addObject:item];
         }
     }
+    
+//    [ret sortUsingSelector:@selector(brotherLevelFromRootCompare:)];
     
     return [ret copy];
 }
