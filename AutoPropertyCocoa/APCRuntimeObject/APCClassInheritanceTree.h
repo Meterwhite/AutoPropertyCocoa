@@ -30,13 +30,10 @@
 
 - (void)clean;
 
-
 /**
  Sort according to the depth of the brother branch.
+ The direction of depth on the binary tree : ↙
  */
 - (nullable NSArray<APCClassInheritanceNode*>*)leafnodesInBrotherBranch;
-
-- (nullable NSArray<APCClassInheritanceNode*>*)leafnodesInChildBranch;
-
 
 @end

@@ -126,9 +126,6 @@
             [ret addObject:item];
         }
     }
-    
-//    [ret sortUsingSelector:@selector(brotherLevelFromRootCompare:)];
-    
     return [ret copy];
 }
 

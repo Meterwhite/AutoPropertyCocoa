@@ -43,69 +43,63 @@
 
 - (void)addClass:(Class)cls
 {
-    ///Enumerate brother nodes
-    
-    NSEnumerator<APCClassInheritanceNode*>*e;
-    APCClassInheritanceNode*            n_curr;
-    APCClassInheritanceNode*            n_next;
-    NSArray<APCClassInheritanceNode*>*  iNodes;
-    APCClassInheritanceNode*            iNode;
-    NSArray*                            others;
-    APCClassInheritanceNode*            newNode = [APCClassInheritanceNode nodeWithClass:cls];
-    if(_tree.isEmpty){
+    @autoreleasepool {
         
-        _tree.root = newNode;
-        goto CALL_MAP_ADD;
-    }
-    
-    ///As superclass.
-    for (APCClassInheritanceNode* leaf in [_tree leafnodesInBrotherBranch])
-    {
-        iNodes = [leaf brothersThatIsSubclassTo:cls others:&others];
-        if(iNodes.count > 0)
-        {
-            ///As new root brother.
-            newNode.father = leaf.rootBrother.father;
+        NSEnumerator<APCClassInheritanceNode*>*e;
+        APCClassInheritanceNode*            n_curr;
+        APCClassInheritanceNode*            n_next;
+        NSArray<APCClassInheritanceNode*>*  iNodes;
+        APCClassInheritanceNode*            iNode;
+        NSArray*                            others;
+        APCClassInheritanceNode*            newNode = [APCClassInheritanceNode nodeWithClass:cls];
+        if(_tree.isEmpty){
             
-            ///Reset relasionship
-            ///Connect new brothers in iNodes.
-            e       = iNodes.objectEnumerator;
-            n_curr  = e.nextObject;
-            while (YES) {
-                
-                if(n_curr == nil)
-                    break;
-                
-                n_next              = e.nextObject;
-                n_curr.nextBrother  = n_next;
-                n_curr              = n_next;
-            }
-            ///As father to first brothers and connect to
-            newNode.child           = iNodes.firstObject;
-            
-            
-            ///Reconnect the rest nodes as brother to the new one.
-            n_curr  = newNode;
-            e       = others.objectEnumerator;
-            while (YES) {
-                
-                if(n_curr == nil)
-                    break;
-                
-                n_next              = e.nextObject;
-                n_curr.nextBrother  = n_next;
-                n_curr              = n_next;
-            }
-            
-            goto CALL_MAP_ADD;
+            _tree.root = newNode;
+            goto CALL_UPDATE_SMAP;
         }
-    }
-    
-    ///As subclass
-//    for (APCClassInheritanceNode* item in [_tree leafnodesInChildBranch])
-//    {
-    
-//        iNode = [item firstFatherThatIsBaseclassTo:cls];
+        
+        ///As superclass.
+        for (APCClassInheritanceNode* leaf in [_tree leafnodesInBrotherBranch])
+        {
+            iNodes = [leaf brothersThatIsSubclassTo:cls others:&others];
+            if(iNodes.count > 0)
+            {
+                ///As new root brother.
+                newNode.father = leaf.rootBrother.father;
+                
+                ///Connect new brothers in iNodes.
+                e       = iNodes.objectEnumerator;
+                n_curr  = e.nextObject;
+                while (YES) {
+                    
+                    if(n_curr == nil)
+                        break;
+                    
+                    n_next              = e.nextObject;
+                    n_curr.nextBrother  = n_next;
+                    n_curr              = n_next;
+                }
+                ///As father to first brothers and connect to
+                newNode.child           = iNodes.firstObject;
+                
+                
+                ///Reconnect the rest nodes as brother to the new one.
+                n_curr  = newNode;
+                e       = others.objectEnumerator;
+                while (YES) {
+                    
+                    if(n_curr == nil)
+                        break;
+                    
+                    n_next              = e.nextObject;
+                    n_curr.nextBrother  = n_next;
+                    n_curr              = n_next;
+                }
+                
+                goto CALL_UPDATE_SMAP;
+            }
+        }
+        
         if(nil != (iNode = [_tree deepestNodeThatIsSuperclassTo:cls])){
             
             if((nil == iNode.child) || [iNode.child.value isSubclassOfClass:cls]){
@@ -127,40 +121,66 @@
                 n_curr.nextBrother = newNode;
             }
             
-            goto CALL_MAP_ADD;
+            goto CALL_UPDATE_SMAP;
         }
-//    }
-    
-    ///New basic brother.
-    iNode = _tree.root;
-    while (YES) {
         
-        if(nil == iNode.nextBrother){
+        ///New basic brother.
+        iNode = _tree.root;
+        while (YES) {
             
-            break;
+            if(nil == iNode.nextBrother){
+                
+                break;
+            }
+            iNode = iNode.nextBrother;
         }
-        iNode = iNode.nextBrother;
-    }
-    
-    iNode.nextBrother = newNode;
-    
-CALL_MAP_ADD:
-    {
-        [self mapAddNode:newNode];
+        
+        iNode.nextBrother = newNode;
+        
+    CALL_UPDATE_SMAP:
+        {
+            [self updateSurfaceMappingWith:newNode];
+        }
     }
 }
 
-- (void)mapAddNode:(APCClassInheritanceNode*)node
+- (void)updateSurfaceMappingWith:(APCClassInheritanceNode*)node
 {
     [_map setObject:node forKey:node.value];
     [_tree fastEnumeratedNode:node];
     [_tree remapForRoot];
 }
 
+- (void)removeClass:(Class)cls
+{
+    APCClassInheritanceNode* n = [_map objectForKey:cls];
+    if(n == nil){
+        
+        return;
+    }
+    
+    if(nil != n.child){
+        
+        n.child.father = n.father;
+    }
+    
+    if(nil != n.nextBrother){
+        
+        n.nextBrother.previousBrother = n.child;
+    }
+    
+    if(nil != n.father){
+        
+        
+    }else if(nil != n.previousBrother){
+        
+    }
+}
+
 #ifdef DEBUG
 - (NSString *)description
 {
-    return [_tree debugDescription];
+    return [_tree description];
 }
 #endif
 

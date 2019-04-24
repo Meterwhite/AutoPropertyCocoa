@@ -160,20 +160,6 @@
     return [[ret reverseObjectEnumerator] allObjects];
 }
 
-- (APCClassInheritanceNode*)firstFatherThatIsBaseclassTo:(Class)cls
-{
-    APCClassInheritanceNode* iNode = self;
-    
-    do {
-        
-        if([cls isSubclassOfClass:iNode.value])
-            return iNode;
-        
-    } while (nil != (iNode = iNode.father ?: iNode.previousBrother));
-    
-    return nil;
-}
-
 - (APCClassInheritanceNode *)rootBrother
 {
     APCClassInheritanceNode * iNode = self;

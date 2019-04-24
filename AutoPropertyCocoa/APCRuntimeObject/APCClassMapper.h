@@ -14,9 +14,11 @@
 - (BOOL)containsClass:(nonnull Class)cls;
 
 /**
- Can not duplicate add class.
+ Can not duplicate.
  */
 - (void)addClass:(nonnull Class)cls;
+
+- (void)removeClass:(nonnull Class)cls;
 
 - (nullable Class)superclassOfClass:(nonnull Class)cls;
 

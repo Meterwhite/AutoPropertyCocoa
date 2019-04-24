@@ -56,11 +56,6 @@
  */
 - (nonnull NSArray<APCClassInheritanceNode*>*)brothersThatIsSubclassTo:(nonnull Class)cls others:(NSArray*_Nonnull*_Nonnull)others;
 
-/**
- Self within.
- */
-- (nullable APCClassInheritanceNode*)firstFatherThatIsBaseclassTo:(nullable Class)cls;
-
 - (nullable APCClassInheritanceNode*)rootBrother;
 @end
 
