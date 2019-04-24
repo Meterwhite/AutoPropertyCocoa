@@ -20,7 +20,7 @@
     
 //    [APCTest testDemoFrom:0 to:100];
 //    [APCTest testDemoFrom:2 to:10];
-    [APCTest testDemo:50];
+    [APCTest testDemo:9000];
 }
 
 

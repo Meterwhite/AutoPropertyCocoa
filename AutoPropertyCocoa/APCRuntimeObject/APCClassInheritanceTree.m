@@ -14,6 +14,20 @@
     NSHashTable*                _references;
 }
 
+#ifdef DEBUG
+- (NSString *)description
+{
+    NSMutableString* str = [NSMutableString string];
+    
+    for (APCClassInheritanceNode *item in _references) {
+        
+        [str appendFormat:@"%@\n",item];
+    }
+    
+    return [str copy];
+}
+#endif
+
 + (instancetype)tree
 {
     return [[self alloc] init];
@@ -29,6 +43,17 @@
 - (void)refenceNode:(APCClassInheritanceNode *)node
 {
     [_references addObject:node];
+}
+
+- (void)remapForRoot
+{
+    for (APCClassInheritanceNode* item in _references) {
+        
+        if(nil == item.father && nil == item.previousBrother){
+            
+            _root = item;
+        }
+    }
 }
 
 - (BOOL)isEmpty

@@ -7,8 +7,9 @@
 //
 
 #import "APCTriggerGetterProperty.h"
-#import "APCLazyProperty.h"
 #import "AutoPropertyCocoa.h"
+#import "APCLazyProperty.h"
+#import "APCClassMapper.h"
 #import <objc/runtime.h>
 #import "APCTest.h"
 #import "Superman.h"
@@ -395,5 +396,38 @@ apc_testfunc(testTriggerFrontNormalClass,101)
     NSUInteger age0 = p.age;
 }
 
+
+apc_testfunc(testUnbindDeadCycleMultThread,9000)
+{
+    while (0){
+        
+        APCClassMapper* mapper = [[APCClassMapper alloc] init];
+        [mapper addClass:[NSMutableString class]];
+        [mapper addClass:[NSMutableArray class]];
+        [mapper addClass:[NSMutableDictionary class]];
+        [mapper addClass:[NSString class]];
+        [mapper addClass:[NSArray class]];
+        [mapper addClass:[NSDictionary class]];
+        [mapper addClass:[NSObject class]];
+        
+        NSLog(@"%@",mapper);
+        break;
+    }
+    
+    while (1) {
+        
+        APCClassMapper* mapper = [[APCClassMapper alloc] init];
+        [mapper addClass:[NSObject class]];
+        [mapper addClass:[NSString class]];
+        [mapper addClass:[NSArray class]];
+        [mapper addClass:[NSDictionary class]];
+        [mapper addClass:[NSMutableString class]];
+        [mapper addClass:[NSMutableArray class]];
+        [mapper addClass:[NSMutableDictionary class]];
+        
+        NSLog(@"%@",mapper);
+        break;
+    }
+}
 
 @end

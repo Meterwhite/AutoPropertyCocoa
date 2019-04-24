@@ -57,5 +57,7 @@
  Self within.
  */
 - (nullable APCClassInheritanceNode*)firstFatherThatIsBaseclassTo:(nullable Class)cls;
+
+- (nullable APCClassInheritanceNode*)rootBrother;
 @end
 

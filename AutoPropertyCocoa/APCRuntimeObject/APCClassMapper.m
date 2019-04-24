@@ -63,44 +63,50 @@
         goto CALL_MAP_ADD;
     }
     
+    ///As superclass.
     for (APCClassInheritanceNode* leaf in [_tree leafnodesInBrotherBranch])
     {
-        @autoreleasepool
+        iNodes = [leaf brothersThatIsSubclassTo:cls others:&others];
+        if(iNodes.count > 0)
         {
-            iNodes = [leaf brothersThatIsSubclassTo:cls others:&others];
-            if(iNodes.count > 0)
-            {
-                ///Reset relasionship
-                ///Connect new brothers
-                e       = iNodes.objectEnumerator;
-                n_curr  = e.nextObject;
-                while (YES) {
-                    
-                    if(n_curr && (n_next = e.nextObject)){
-                        
-                        n_curr.nextBrother  = n_next;
-                        n_curr              = n_next;
-                    }
+            ///As new root brother.
+            newNode.father = leaf.rootBrother.father;
+            
+            ///Reset relasionship
+            ///Connect new brothers in iNodes.
+            e       = iNodes.objectEnumerator;
+            n_curr  = e.nextObject;
+            while (YES) {
+                
+                if(n_curr == nil)
                     break;
-                }
-                ///As new father to first brothers
-                newNode.child = iNodes.firstObject;
                 
-                ///Reconnect the rest nodes as brother to the new one.
-                n_curr  = newNode;
-                e       = others.objectEnumerator;
-                while (nil != (n_next = e.nextObject)) {
-                    
-                    n_curr.nextBrother  = n_next;
-                    n_curr              = n_next;
-                }
-                
-                goto CALL_MAP_ADD;
+                n_next              = e.nextObject;
+                n_curr.nextBrother  = n_next;
+                n_curr              = n_next;
             }
+            ///As father to first brothers and connect to
+            newNode.child           = iNodes.firstObject;
+            
+            
+            ///Reconnect the rest nodes as brother to the new one.
+            n_curr  = newNode;
+            e       = others.objectEnumerator;
+            while (YES) {
+                
+                if(n_curr == nil)
+                    break;
+                
+                n_next              = e.nextObject;
+                n_curr.nextBrother  = n_next;
+                n_curr              = n_next;
+            }
+            
+            goto CALL_MAP_ADD;
         }
     }
     
-    ///Inserts the node forward.
+    ///As subclass
     for (APCClassInheritanceNode* item in [_tree leafnodesInChildBranch]) {
         
         iNode = [item firstFatherThatIsBaseclassTo:cls];
@@ -108,7 +114,7 @@
             
             ///Insert the new one bettwen superclass and its subclass.
             newNode.child   = iNode.child;
-            newNode.father  = iNode;
+            iNode.child     = newNode;
             goto CALL_MAP_ADD;
         }
     }
@@ -135,6 +141,15 @@ CALL_MAP_ADD:
 - (void)mapAddNode:(APCClassInheritanceNode*)node
 {
     [_map setObject:node forKey:node.value];
+    [_tree refenceNode:node];
+    [_tree remapForRoot];
 }
+
+#ifdef DEBUG
+- (NSString *)description
+{
+    return [_tree debugDescription];
+}
+#endif
 
 @end

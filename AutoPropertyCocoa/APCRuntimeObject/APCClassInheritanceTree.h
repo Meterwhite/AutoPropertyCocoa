@@ -22,6 +22,8 @@
 
 - (void)refenceNode:(nonnull APCClassInheritanceNode*)node;
 
+- (void)remapForRoot;
+
 - (BOOL)isEmpty;
 
 - (void)clean;
