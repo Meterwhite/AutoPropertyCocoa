@@ -417,14 +417,14 @@ apc_testfunc(testUnbindDeadCycleMultThread,9000)
     while (1) {
         
         APCClassMapper* mapper = [[APCClassMapper alloc] init];
-        [mapper addClass:[NSObject class]];
+        [mapper addClass:[NSProxy class]];
+        [mapper addClass:[NSMutableArray class]];
         [mapper addClass:[NSString class]];
         [mapper addClass:[NSArray class]];
         [mapper addClass:[NSDictionary class]];
-        [mapper addClass:[NSMutableString class]];
-        [mapper addClass:[NSMutableArray class]];
+        [mapper addClass:[NSObject class]];
         [mapper addClass:[NSMutableDictionary class]];
-        
+        [mapper addClass:[NSMutableString class]];
         NSLog(@"%@",mapper);
         break;
     }

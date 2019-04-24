@@ -65,9 +65,7 @@
     NSUInteger                  lev = 0;    
     while (YES) {
         
-        if(nil == (iNode = iNode.father
-                   ? ((void)(++lev),iNode.father)
-                   : iNode.previousBrother)){
+        if(nil == (iNode = iNode.father ? ((void)(++lev),iNode.father) : iNode.previousBrother)){
             
             break;
         }
@@ -76,9 +74,30 @@
     return lev;
 }
 
+- (NSUInteger)depthToRoot
+{
+    APCClassInheritanceNode*    iNode = self;
+    NSUInteger                  lev = 0;
+    while (YES) {
+        
+        if(nil == (iNode = iNode.father ? iNode.father : iNode.previousBrother)){
+            
+            break;
+        }
+        ++lev;
+    }
+    
+    return lev;
+}
+
 - (NSComparisonResult)brotherLevelFromRootCompare:(nonnull APCClassInheritanceNode*)node
 {
     return self.brotherLevelFromRoot - node.brotherLevelFromRoot;
+}
+
+- (NSComparisonResult)depthToRootCompare:(APCClassInheritanceNode *)node
+{
+    return self.depthToRoot - node.depthToRoot;
 }
 
 - (void)setFather:(APCClassInheritanceNode *)father

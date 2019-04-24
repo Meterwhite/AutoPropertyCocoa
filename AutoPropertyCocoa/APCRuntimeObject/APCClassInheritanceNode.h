@@ -45,8 +45,11 @@
 
 
 - (NSUInteger)brotherLevelFromRoot;
+- (NSUInteger)depthToRoot;
 
 - (NSComparisonResult)brotherLevelFromRootCompare:(nonnull APCClassInheritanceNode*)node;
+
+- (NSComparisonResult)depthToRootCompare:(nonnull APCClassInheritanceNode*)node;
 
 /**
  Self within.

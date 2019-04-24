@@ -40,7 +40,23 @@
     [_references addObject:root];
 }
 
-- (void)refenceNode:(APCClassInheritanceNode *)node
+- (APCClassInheritanceNode *)deepestNodeThatIsSuperclassTo:(Class)cls
+{
+    NSMutableArray* nodes = [NSMutableArray array];
+    for (APCClassInheritanceNode *item in _references) {
+        
+        if([cls isSubclassOfClass:item.value]){
+            
+            [nodes addObject:item];
+        }
+    }
+    
+    [nodes sortUsingSelector:@selector(depthToRootCompare:)];
+    
+    return nodes.lastObject;
+}
+
+- (void)fastEnumeratedNode:(APCClassInheritanceNode *)node
 {
     [_references addObject:node];
 }

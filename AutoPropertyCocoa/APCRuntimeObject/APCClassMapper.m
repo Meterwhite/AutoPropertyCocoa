@@ -43,11 +43,6 @@
 
 - (void)addClass:(Class)cls
 {
-    if(YES == [self containsClass:cls]){
-        
-        return;
-    }
-    
     ///Enumerate brother nodes
     
     NSEnumerator<APCClassInheritanceNode*>*e;
@@ -107,17 +102,34 @@
     }
     
     ///As subclass
-    for (APCClassInheritanceNode* item in [_tree leafnodesInChildBranch]) {
-        
-        iNode = [item firstFatherThatIsBaseclassTo:cls];
-        if(iNode != nil){
+//    for (APCClassInheritanceNode* item in [_tree leafnodesInChildBranch])
+//    {
+    
+//        iNode = [item firstFatherThatIsBaseclassTo:cls];
+        if(nil != (iNode = [_tree deepestNodeThatIsSuperclassTo:cls])){
             
-            ///Insert the new one bettwen superclass and its subclass.
-            newNode.child   = iNode.child;
-            iNode.child     = newNode;
+            if((nil == iNode.child) || [iNode.child.value isSubclassOfClass:cls]){
+                
+                ///Insert the new one betwen superclass and its subclass.
+                newNode.child   = iNode.child;
+                iNode.child     = newNode;
+            }else{
+                
+                ///Inserted as the last brother node to its subclass.
+                n_curr = iNode.child;
+                while (YES) {
+                    
+                    if(nil == n_curr.nextBrother){
+                        break;
+                    }
+                    n_curr = n_curr.nextBrother;
+                }
+                n_curr.nextBrother = newNode;
+            }
+            
             goto CALL_MAP_ADD;
         }
-    }
+//    }
     
     ///New basic brother.
     iNode = _tree.root;
@@ -141,7 +153,7 @@ CALL_MAP_ADD:
 - (void)mapAddNode:(APCClassInheritanceNode*)node
 {
     [_map setObject:node forKey:node.value];
-    [_tree refenceNode:node];
+    [_tree fastEnumeratedNode:node];
     [_tree remapForRoot];
 }
 

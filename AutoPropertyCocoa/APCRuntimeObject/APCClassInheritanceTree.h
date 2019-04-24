@@ -20,7 +20,9 @@
 
 @property (nullable,nonatomic,strong) APCClassInheritanceNode* root;
 
-- (void)refenceNode:(nonnull APCClassInheritanceNode*)node;
+- (nullable APCClassInheritanceNode*)deepestNodeThatIsSuperclassTo:(nonnull Class)cls;
+
+- (void)fastEnumeratedNode:(nonnull APCClassInheritanceNode*)node;
 
 - (void)remapForRoot;
 
