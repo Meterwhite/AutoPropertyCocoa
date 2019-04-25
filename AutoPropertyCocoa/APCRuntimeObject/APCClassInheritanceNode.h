@@ -24,12 +24,9 @@
  */
 @interface APCClassInheritanceNode : NSObject
 
-+ (nonnull instancetype)node;
-
 + (nonnull instancetype)nodeWithClass:(nonnull Class)cls;
 
 @property (nullable,nonatomic) Class value;
-
 
 /**
  'father' and 'child' will be set at the same time.

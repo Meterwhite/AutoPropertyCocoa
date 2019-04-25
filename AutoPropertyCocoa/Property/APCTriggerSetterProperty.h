@@ -27,12 +27,12 @@
 - (void)setterUnbindUserTrigger;
 - (void)setterUnbindCountTrigger;
 
-- (void)performSetterFrontTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
-- (void)performSetterPostTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
-- (BOOL)performSetterUserConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
-- (void)performSetterUserTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
-- (BOOL)performSetterCountConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
-- (void)performSetterCountTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
+- (void)performSetterFrontTriggerBlock:(nonnull id)_SELF value:(nonnull id)value;
+- (void)performSetterPostTriggerBlock:(nonnull id)_SELF value:(nonnull id)value;
+- (BOOL)performSetterUserConditionBlock:(nonnull id)_SELF value:(nonnull id)value;
+- (void)performSetterUserTriggerBlock:(nonnull id)_SELF value:(nonnull id)value;
+- (BOOL)performSetterCountConditionBlock:(nonnull id)_SELF value:(nonnull id)value;
+- (void)performSetterCountTriggerBlock:(nonnull id)_SELF value:(nonnull id)value;
 @end
 
 

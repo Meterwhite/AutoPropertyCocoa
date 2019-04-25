@@ -22,7 +22,7 @@ typedef NS_OPTIONS (NSUInteger,APCMethodStyle){
 @protocol APCMethodProtocol <NSObject>
 
 @required
-@property (nonatomic,assign,readonly) APCMethodStyle methodStyle;
+@property (nonatomic,readonly) APCMethodStyle methodStyle;
 
 @end
 
@@ -30,7 +30,7 @@ typedef NS_OPTIONS (NSUInteger,APCMethodStyle){
 @interface APCMethod : NSObject<APCMethodProtocol>
 
 
-@property (nonatomic,assign,readonly) APCMethodStyle methodStyle;
+@property (nonatomic,readonly) APCMethodStyle methodStyle;
 
 @end
 

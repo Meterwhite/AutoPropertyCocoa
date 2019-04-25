@@ -17,9 +17,9 @@
 
 
 @optional
-- (__kindof APCMethodHook* _Nullable)superhook;
-- (Class __unsafe_unretained _Nullable)hookclass;
-- (NSString* _Nullable)hookMethod;
+- (nullable __kindof APCMethodHook*)superhook;
+- (nullable Class)hookclass;
+- (nullable NSString*)hookMethod;
 @end
 
 @interface APCMethodHook : NSObject<APCMethodHookProtocol>

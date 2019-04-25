@@ -56,12 +56,12 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyTriggerOption) {
 - (void)getterUnbindUserTrigger;
 - (void)getterUnbindCountTrigger;
 
-- (void)performGetterFrontTriggerBlock:(id _Nonnull)_SELF;
-- (void)performGetterPostTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
-- (BOOL)performGetterUserConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
-- (void)performGetterUserTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
-- (void)performGetterCountTriggerBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
-- (BOOL)performGetterCountConditionBlock:(id _Nonnull)_SELF value:(id _Nonnull)value;
+- (void)performGetterFrontTriggerBlock:(nonnull id)_SELF;
+- (void)performGetterPostTriggerBlock:(nonnull id)_SELF value:(nonnull id)value;
+- (BOOL)performGetterUserConditionBlock:(nonnull id)_SELF value:(nonnull id)value;
+- (void)performGetterUserTriggerBlock:(nonnull id)_SELF value:(nonnull id)value;
+- (void)performGetterCountTriggerBlock:(nonnull id)_SELF value:(nonnull id)value;
+- (BOOL)performGetterCountConditionBlock:(nonnull id)_SELF value:(nonnull id)value;
 
 #pragma mark - Hook
 //- (void)hook;
@@ -69,8 +69,8 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyTriggerOption) {
 //+ (void)unhookClassAllProperties:(Class _Nonnull __unsafe_unretained)clazz;
 
 #pragma mark - Old
-- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target;
-- (void)performOldSetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value;
+- (_Nullable id)performOldGetterFromTarget:(nonnull id)target;
+- (void)performOldSetterFromTarget:(nonnull id)target withValue:(nullable id)value;
 
 #pragma mark - Cache
 //+ (_Nullable instancetype)cachedTargetClass:(Class _Nonnull)clazz

@@ -39,11 +39,6 @@
 }
 #endif
 
-+ (nonnull instancetype)node
-{
-    return [[self alloc] init];
-}
-
 + (nonnull instancetype)nodeWithClass:(nonnull Class)cls
 {
     return [[self alloc] initWithClass:cls];

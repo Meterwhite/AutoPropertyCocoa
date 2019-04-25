@@ -9,15 +9,21 @@
 #import "APCScope.h"
 
 
+/**
+ Thread safe
+ */
 @interface APCClassMapper : NSObject<NSFastEnumeration>
 
 - (BOOL)containsClass:(nonnull Class)cls;
 
 /**
- Can not duplicate.
+ Must first check if the type exists.
  */
 - (void)addClass:(nonnull Class)cls;
 
+/**
+ Must first check if the type exists.
+ */
 - (void)removeClass:(nonnull Class)cls;
 
 - (nullable Class)superclassOfClass:(nonnull Class)cls;

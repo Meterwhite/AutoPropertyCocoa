@@ -171,7 +171,7 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
             ///Superclass and subclass used the same old implementation that is from superclass.
             
             APCPropertyHook* sourcehook
-            = apc_lookup_propertyhook_range(class_getSuperclass(_propertyInfo->_des_class)
+            = apc_lookup_firstPropertyhook_inRange(class_getSuperclass(_propertyInfo->_des_class)
                                             , _propertyInfo->_src_class
                                             , _propertyInfo->_hooked_name);
             if(nil != sourcehook){
@@ -206,7 +206,7 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
         if(nil == _old_implementation){
             
             APCPropertyHook* sourcehook
-            = apc_lookup_propertyhook_range(class_getSuperclass(_propertyInfo->_des_class)
+            = apc_lookup_firstPropertyhook_inRange(class_getSuperclass(_propertyInfo->_des_class)
                                             , _propertyInfo->_src_class
                                             , _propertyInfo->_hooked_name);
             if(nil != sourcehook){

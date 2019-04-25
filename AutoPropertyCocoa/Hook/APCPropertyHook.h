@@ -35,26 +35,26 @@
     APCProxyClass           _proxyClass;
 }
 
-+ (instancetype _Nullable)hookWithProperty:(APCHookProperty* _Nonnull)property;
++ (nullable instancetype)hookWithProperty:(nonnull APCHookProperty*)property;
 
 //@property (nonatomic,strong,nullable) NSEnumerator<APCHookProperty*>* propertyEnumerator;
 @property (nonatomic,assign,readonly) BOOL        isEmpty;
 
 
-- (Class __unsafe_unretained _Nullable)sourceclass;
-- (Class __unsafe_unretained _Nullable)hookclass;
-- (__kindof APCPropertyHook* _Nullable)superhook;
-- (NSString* _Nullable)hookMethod;
+- (nullable Class)sourceclass;
+- (nullable Class)hookclass;
+- (nullable __kindof APCPropertyHook*)superhook;
+- (nullable NSString*)hookMethod;
 
-- (__kindof APCHookProperty* _Nullable)boundPropertyForPropertyKind:(Class _Nonnull __unsafe_unretained)propertyKind;
-- (NSArray<APCHookProperty*>* _Nonnull)boundProperties;
-- (void)unbindProperty:(APCHookProperty* _Nonnull)property;
-- (void)bindProperty:(APCHookProperty* _Nonnull)property;
+- (nullable __kindof APCHookProperty*)boundPropertyForPropertyKind:(nonnull Class)propertyKind;
+- (nonnull NSArray<APCHookProperty*>*)boundProperties;
+- (void)unbindProperty:(nonnull APCHookProperty*)property;
+- (void)bindProperty:(nonnull APCHookProperty*)property;
 
-- (id _Nullable)performOldGetterFromTarget:(id _Nonnull)target;
+- (nullable id)performOldGetterFromTarget:(nonnull id)target;
 
-- (void)performOldSetterFromTarget:(_Nonnull id)target
-                         withValue:(id _Nullable)value;
+- (void)performOldSetterFromTarget:(nonnull id)target
+                         withValue:(nullable id)value;
 
 //p list
 //unhook property

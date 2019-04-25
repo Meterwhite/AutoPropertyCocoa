@@ -14,19 +14,19 @@
 #pragma mark - kvc search order
 ///https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/KeyValueCoding/SearchImplementation.html
 /** set<Key>: */
-- (NSString* _Nonnull)apc_kvcAssumedSetterName1;
+- (nonnull NSString*)apc_kvcAssumedSetterName1;
 /** _set<Key> */
-- (NSString* _Nonnull)apc_kvcAssumedSetterName2;
+- (nonnull NSString*)apc_kvcAssumedSetterName2;
 
 /** _<key> */
-- (NSString* _Nonnull)apc_kvcAssumedIvarName1;
+- (nonnull NSString*)apc_kvcAssumedIvarName1;
 /** _is<Key> */
-- (NSString* _Nonnull)apc_kvcAssumedIvarName2;
+- (nonnull NSString*)apc_kvcAssumedIvarName2;
 /**  <key> */
-- (NSString* _Nonnull)apc_kvcAssumedIvarName3;
+- (nonnull NSString*)apc_kvcAssumedIvarName3;
 /** is<Key> */
-- (NSString* _Nonnull)apc_kvcAssumedIvarName4;
+- (nonnull NSString*)apc_kvcAssumedIvarName4;
 
 
-- (NSString* _Nonnull)apc_firstCharUpper;
+- (nonnull NSString*)apc_firstCharUpper;
 @end

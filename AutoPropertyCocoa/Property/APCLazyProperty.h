@@ -16,29 +16,19 @@
     id                  _userBlock;
 }
 
-@property (nonatomic,assign,readonly,nullable)   SEL userSelector;
+@property (nullable,nonatomic,readonly)         SEL userSelector;
+@property (nullable,nonatomic,copy,readonly)    id  userBlock;
 
-@property (nonatomic,copy,readonly,nullable)     id  userBlock;
+- (void)bindindUserBlock:(nonnull id)block;
 
-- (void)bindindUserBlock:(_Nonnull id)block;
-
-- (void)bindingUserSelector:(_Nonnull SEL)aSelector;
+- (void)bindingUserSelector:(nonnull SEL)aSelector;
 
 
-- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target;
+- (nullable id)performOldGetterFromTarget:(nonnull id)target;
 
-- (id _Nullable)instancetypeNewObjectByUserSelector;
+- (nullable id)instancetypeNewObjectByUserSelector;
 
-- (id _Nullable)performUserBlock:(id _Nonnull)_SELF;
+- (nullable id)performUserBlock:(nonnull id)_SELF;
 
-- (void)setValue:(_Nullable id)value toTarget:(_Nonnull id)target;
+- (void)setValue:(nullable id)value toTarget:(nonnull id)target;
 @end
-
-//+ (_Nullable instancetype)cachedTargetClass:(Class _Nonnull __unsafe_unretained)clazz
-//                                   property:(NSString* _Nonnull)property;
-//
-//+ (_Nullable instancetype)cachedFromAClassByInstance:(id _Nonnull)instance
-//                                            property:(NSString* _Nonnull)property;
-//
-//+ (_Nullable instancetype)cachedFromAClass:(Class _Nonnull __unsafe_unretained)aClazz
-//                                  property:(NSString* _Nonnull)property;

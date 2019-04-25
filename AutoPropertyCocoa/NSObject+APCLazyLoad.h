@@ -12,29 +12,29 @@
 @interface NSObject(APCLazyLoad)
 
 #pragma mark - Lazy load for class.
-+ (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property;
++ (void)apc_lazyLoadForProperty:(nonnull NSString*)property;
 
-+ (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
++ (void)apc_lazyLoadForProperty:(nonnull NSString*)property
                      usingBlock:(id _Nullable(^ _Nonnull)(id _Nonnull instance))block;
 
-+ (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
-             initializeSelector:(_Nonnull SEL)selector;
++ (void)apc_lazyLoadForProperty:(nonnull NSString*)property
+             initializeSelector:(nonnull SEL)selector;
 
-+ (void)apc_lazyLoadForPropertyHooks:(NSDictionary<NSString*,id>* _Nonnull)propertyHooks;
++ (void)apc_lazyLoadForPropertyHooks:(nonnull NSDictionary<NSString*,id>*)propertyHooks;
 
-+ (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property;
++ (void)apc_unbindLazyLoadForProperty:(nonnull NSString*)property;
 
 
 #pragma mark - Lazy load for instance.
-- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property;
+- (void)apc_lazyLoadForProperty:(nonnull NSString*)property;
 
-- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
+- (void)apc_lazyLoadForProperty:(nonnull NSString*)property
                      usingBlock:(id _Nullable(^ _Nonnull)(id _Nonnull instance))block;
 
-- (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
-                       selector:(SEL _Nonnull)selector;
+- (void)apc_lazyLoadForProperty:(nonnull NSString*)property
+                       selector:(nonnull SEL)selector;
 
-- (void)apc_lazyLoadForPropertyHooks:(NSDictionary<NSString* ,id>* _Nonnull)propertyHooks;
+- (void)apc_lazyLoadForPropertyHooks:(nonnull NSDictionary<NSString* ,id>*)propertyHooks;
 
-- (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property;
+- (void)apc_unbindLazyLoadForProperty:(nonnull NSString*)property;
 @end

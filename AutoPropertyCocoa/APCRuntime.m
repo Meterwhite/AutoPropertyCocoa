@@ -17,31 +17,28 @@ NS_INLINE APCPropertyHook* apc_instance_propertyhook(id instance, NSString* prop
 
 #define APC_RUNTIME_LOCK \
 \
-dispatch_semaphore_wait(_apc_runtime_mapperlock, DISPATCH_TIME_FOREVER)
+dispatch_semaphore_wait(_apc_runtime_map_lock, DISPATCH_TIME_FOREVER)
 
 #define APC_RUNTIME_UNLOCK \
 \
-dispatch_semaphore_signal(_apc_runtime_mapperlock)
+dispatch_semaphore_signal(_apc_runtime_map_lock)
 
-static dispatch_semaphore_t _apc_runtime_mapperlock;
+/** Instance : Property : Hook */
+const static char           _keyForAPCInstanceBoundMapper = '\0';
+/** Class : Property_key : Hook(:Properties) */
+static NSMapTable*          _apc_runtime_property_classmapper;
+/** (weak)ThreadID : (weak)Instance : (strong)CMDs*/
+static NSMapTable*          _apc_object_hookRecursiveMapper;
+static APCClassMapper*      _apc_runtime_inherit_map;
+static dispatch_semaphore_t _apc_runtime_map_lock;
 
-#define APC_RUNTIME_INHERITANCE_LOCK \
-\
-dispatch_semaphore_wait(_apc_runtime_classInheritanceMapperlock, DISPATCH_TIME_FOREVER)
 
-#define APC_RUNTIME_INHERITANCE_UNLOCK \
-\
-dispatch_semaphore_signal(_apc_runtime_classInheritanceMapperlock)
-static dispatch_semaphore_t _apc_runtime_classInheritanceMapperlock;
-
-///Class : Property_key : Hook(:Properties)
-static NSMapTable*  _apc_runtime_property_classmapper;
 
 static NSMapTable* apc_runtime_property_classmapper()
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _apc_runtime_mapperlock = dispatch_semaphore_create(1);
+        _apc_runtime_map_lock = dispatch_semaphore_create(1);
         _apc_runtime_property_classmapper = [NSMapTable strongToStrongObjectsMapTable];
     });
     return _apc_runtime_property_classmapper;
@@ -53,76 +50,57 @@ apc_runtime_propertyhook(Class __unsafe_unretained _Nonnull clazz, NSString* _No
     return [[apc_runtime_property_classmapper() objectForKey:clazz] objectForKey:property];
 }
 
-///map(x, y) -> IndexPath(x, y) : class;
-///Faster search than 2DArray, but slower modifications.
-static APCClassMapper* _apc_runtime_classInheritance2DMap;
-static APCClassMapper* apc_runtime_classInheritance2DMap()
+static APCClassMapper* apc_runtime_inherit_map()
 {
     ///Forest
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-        _apc_runtime_classInheritance2DMap = [[APCClassMapper alloc] init];
+        _apc_runtime_inherit_map = [[APCClassMapper alloc] init];
     });
-    return _apc_runtime_classInheritance2DMap;
+    return _apc_runtime_inherit_map;
 }
 
-
-static NSIndexPath* apc_runtimeInheritance_regiterClass(Class cls)
+static void apc_runtime_inherit_register(Class cls)
 {
-    APC_RUNTIME_INHERITANCE_LOCK;
+    APCClassMapper* map = apc_runtime_inherit_map();
     
-    APCClassMapper* map = apc_runtime_classInheritance2DMap();
-    NSIndexPath* ret;
+    if(NO == [map containsClass:cls])
+        
+        [map addClass:cls];
+}
+
+static void apc_runtime_inherit_dispose(Class cls)
+{
+    APCClassMapper* map = apc_runtime_inherit_map();
     
-    APC_RUNTIME_INHERITANCE_UNLOCK;
-    
-    return [NSIndexPath indexPathForItem:0 inSection:0];
-//    if(list.count != 0){
-//
-//        if([list containsObject:cls]){
-//
-////            return [list indexOfObject:cls];
-//        }
-//        ///From rootclass to subclass
-//        for (NSUInteger i = 0; i < list.count; i++) {
-//
-//            if([list[i] isSubclassOfClass:cls]){
-//
-//                [list insertObject:cls atIndex:i];
-////                return i;
-//            }
-//        }
-//    }
-//
-//    [list addObject:cls];
-    return nil;
+    if(YES == [map containsClass:cls])
+        
+        [map removeClass:cls];
 }
 
 #pragma mark - For hook - export
 APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
 {
-    if(clazz == NULL){
+    if(clazz == nil){
         
         return (APCPropertyHook*)0;
     }
     return apc_runtime_propertyhook(clazz, property);
 }
 
-APCPropertyHook* apc_lookup_propertyhook_range(Class from, Class to, NSString* property)
+APCPropertyHook* apc_lookup_firstPropertyhook_inRange(Class from, Class to, NSString* property)
 {
     if([from isSubclassOfClass:to]){
         
-        APCPropertyHook* ret;
+        APCPropertyHook*ret;
         do {
             
-            if(NULL != [apc_runtime_property_classmapper() objectForKey:from])
-                
-                if(NULL != (ret = apc_runtime_propertyhook(from, property)))
+                if(nil != (ret = apc_runtime_propertyhook(from, property)))
                     
                     return ret;
             
-        } while (to != (from = class_getSuperclass(from)));
+        } while (YES == [(from = apc_class_getSuperclass(from)) isSubclassOfClass:to]);
     }
     
     return (APCPropertyHook*)0;
@@ -133,12 +111,12 @@ APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
     APCPropertyHook* root = hook;
     
     do {
-        if(root.superhook == NULL){
-            
+        
+        if(root.superhook == nil)
             break;
-        }
+        
         root = root.superhook;
-    } while (true);
+    } while (1);
     
     return root;
 }
@@ -152,15 +130,7 @@ APCPropertyHook* apc_lookup_instancePropertyhook(APCProxyInstance* instance, NSS
 
 Class apc_class_getSuperclass(Class cls)
 {
-    return nil;
-//    NSUInteger idx = [_apc_runtimeInheritance_classInheritanceList indexOfObject:cls];
-//
-//    if(idx == NSNotFound || idx == 0){
-//
-//        return nil;
-//    }
-//
-//    return _apc_runtimeInheritance_classInheritanceList[idx-1];
+    return [apc_runtime_inherit_map() superclassOfClass:cls];
 }
 
 //static void __apc_propertyhook_update_superhook__(APCPropertyHook* hook)
@@ -175,16 +145,16 @@ void apc_registerProperty(APCHookProperty* p)
     NSMutableDictionary*dictionary = [apc_runtime_property_classmapper() objectForKey:p->_des_class];
     APCPropertyHook*    itHook;
     APCPropertyHook*    hook;
-    if(dictionary == NULL){
+    if(dictionary == nil){
         
         dictionary = [NSMutableDictionary dictionary];
         [apc_runtime_property_classmapper() setObject:dictionary forKey:p->_des_class];
-        apc_runtimeInheritance_regiterClass(p->_des_class);
+        apc_runtime_inherit_register(p->_des_class);
     }
     
     hook = dictionary[p->_hooked_name];
     
-    if(hook != NULL){
+    if(hook != nil){
         
         [hook bindProperty:p];
         APC_RUNTIME_UNLOCK;
@@ -204,7 +174,7 @@ void apc_registerProperty(APCHookProperty* p)
 
         if(apc_class_getSuperclass(itCls) ==  p->_des_class){
             
-            if(NULL != (itHook = apc_lookup_propertyhook(itCls, p->_hooked_name))){
+            if(nil != (itHook = apc_lookup_propertyhook(itCls, p->_hooked_name))){
                 
                 itHook->_superhook = hook;
             }
@@ -218,33 +188,33 @@ void apc_disposeProperty(APCHookProperty* p)
 {
     APC_RUNTIME_LOCK;
     
-    APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
+    NSMapTable*     c_map   = apc_runtime_property_classmapper();
+    APCPropertyHook*hook    = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
     [hook unbindProperty:p];
     
     if(hook.isEmpty){
         
-//        hook->_superhook = apc_lookup_propertyhook(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
-        
-//        APCPropertyHook* itHook;
-        
         ///Update super hook
-        for (Class itCls in apc_runtime_property_classmapper()) {
+        for (Class iCls in c_map) {
             
-            if(apc_class_getSuperclass(itCls) == hook.hookclass){
+            if(apc_class_getSuperclass(iCls) == hook.hookclass){
                 
                 ///key - hook
-                for (APCPropertyHook* itHook in [[apc_runtime_property_classmapper() objectForKey:itCls] objectEnumerator]) {
-#warning <#message#>
-                    itHook->_superhook = hook->_superhook;
+                for (APCPropertyHook* iHook in [[c_map objectForKey:iCls] objectEnumerator]) {
+                    
+                    iHook->_superhook = hook->_superhook;
                 }
             }
         }
         
-        [[apc_runtime_property_classmapper() objectForKey:hook.hookclass] removeObjectForKey:hook.hookMethod];
+        [[c_map objectForKey:hook.hookclass] removeObjectForKey:hook.hookMethod];
         
         ///Update classInheritenceList
+        if(0 == [[c_map objectForKey:hook.hookclass] count]){
+            
+            apc_runtime_inherit_dispose(hook.hookclass);
+        }
     }
-    
     APC_RUNTIME_UNLOCK;
 }
 
@@ -255,64 +225,71 @@ NSArray* apc_classBoundProperties(Class cls, NSString* property)
 
 APCHookProperty* apc_property_getRootProperty(APCHookProperty* p)
 {
-    APCPropertyHook* hook
-    = apc_propertyhook_rootHook(apc_runtime_propertyhook(p->_des_class, p->_hooked_name));
-    
-    for (APCHookProperty* item in hook) {
+    NSMutableArray<APCHookProperty*>* matchs = [NSMutableArray array];
+    APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
+    do {
         
-        if(p.class == item.class){
+        for (APCHookProperty* item in hook) {
             
-            return item;
+            if(p.class == item.class){
+                
+                [matchs addObject:item];
+            }
         }
-    }
-    return (APCHookProperty*)0;
+    } while (nil != (hook = [hook superhook]));
+    
+    return matchs.lastObject;
 }
 
 APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 {
-    APCPropertyHook* hook = [apc_runtime_propertyhook(p->_des_class, p->_hooked_name)
-                          superhook];
-    for (APCHookProperty* item in hook) {
+    APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
+    
+    do {
         
-        if(p.class == item.class){
+        for (APCHookProperty* item in hook) {
             
-            return item;
+            if(p.class == item.class){
+                
+                return item;
+            }
         }
-    }
+    } while (nil != (hook = [hook superhook]));
+    
     return (APCHookProperty*)0;
 }
 
 NSArray<__kindof APCHookProperty*>*
 apc_property_getSuperPropertyList(APCHookProperty* p)
 {
-    APCPropertyHook* hook
-    = [apc_runtime_propertyhook(p->_des_class, p->_hooked_name)
-       superhook];
     NSMutableArray*  ret = [NSMutableArray array];
-    
-    for (APCHookProperty* item in hook) {
+    APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
+    do {
         
-        if(p.class == item.class){
+        for (APCHookProperty* item in hook) {
             
-            [ret addObject:item];
+            if(p.class == item.class){
+                
+                [ret addObject:item];
+            }
         }
-    }
-    return [ret copy];
+    } while (nil != (hook = [hook superhook]));
+    
+    return ret.copy;
 }
 
 
+
 #pragma mark - For instance - private
-/** Instance : Property : Hook */
-const static char _keyForAPCInstanceBoundMapper = '\0';
 static NSMapTable* apc_instanceBoundMapper(id instance)
 {
     NSMapTable*         mapper;
     
-    if(NULL == (mapper = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
+    if(nil == (mapper = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
         
         @synchronized (instance) {
             
-            if(NULL == (mapper = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
+            if(nil == (mapper = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
                 
                 mapper = [NSMapTable strongToStrongObjectsMapTable];
                 objc_setAssociatedObject(instance
@@ -341,11 +318,11 @@ void apc_instance_setAssociatedProperty(APCProxyInstance* instance, APCHookPrope
     
     APCPropertyHook* hook = [apc_instanceBoundMapper(instance) objectForKey:p->_hooked_name];
     
-    if(hook == NULL){
+    if(hook == nil){
         
         @synchronized (instance) {
             
-            if(NULL == (hook = [apc_instanceBoundMapper(instance) objectForKey:p->_hooked_name])){
+            if(nil == (hook = [apc_instanceBoundMapper(instance) objectForKey:p->_hooked_name])){
                 
                 hook = [APCPropertyHook hookWithProperty:p];
                 [apc_instanceBoundMapper(instance) setObject:hook forKey:p->_hooked_name];
@@ -378,11 +355,6 @@ NSArray<__kindof APCHookProperty*>* apc_instance_boundPropertyies(APCProxyInstan
 }
 
 #pragma mark - Recursive(For instance) private
-/**
- (weak)ThreadID : (weak)Instance : (strong)CMDs
- 
- */
-static NSMapTable* _apc_object_hookRecursiveMapper;
 static NSMapTable* apc_object_hookRecursiveMapper()
 {
     static dispatch_once_t onceToken;
@@ -414,13 +386,13 @@ BOOL apc_object_hookRecursive_testing(id instance, SEL _Nonnull _CMD)
 void apc_object_hookRecursive_loop(id instance, SEL _Nonnull _CMD)
 {
     NSMutableSet* loops;
-    if(NULL == (loops = apc_object_hookRecursiveCurrentLoops(instance))){
+    if(nil == (loops = apc_object_hookRecursiveCurrentLoops(instance))){
         
         @synchronized (instance) {
             
-            if(NULL == (loops = apc_object_hookRecursiveCurrentLoops(instance))){
+            if(nil == (loops = apc_object_hookRecursiveCurrentLoops(instance))){
                 
-                if(NULL == apc_object_hookRecursiveCurrentMapper()){
+                if(nil == apc_object_hookRecursiveCurrentMapper()){
                     
                     _apc_object_hookRecursiveMapper = [NSMapTable weakToStrongObjectsMapTable];
                     [_apc_object_hookRecursiveMapper setObject:instance forKey:APCThreadID];
@@ -495,11 +467,11 @@ APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
 {
     char*           name = apc_instanceProxyClassName(instance);
     APCProxyClass   cls  = objc_allocateClassPair(object_getClass(instance), name, 0);
-    if(cls != NULL){
+    if(cls != nil){
         
         objc_registerClassPair(cls);
         object_setClass(instance, cls);
-    }else if (NULL == (cls = objc_getClass(name))){
+    }else if (nil == (cls = objc_getClass(name))){
         
         fprintf(stderr, "APC: Can not register class '%s' at runtime.",name);
     }

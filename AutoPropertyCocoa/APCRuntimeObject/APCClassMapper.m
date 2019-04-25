@@ -66,7 +66,7 @@ dispatch_semaphore_signal(_lock);
         if(_tree.isEmpty){
             
             _tree.root = newNode;
-            goto CALL_UPDATE_SMAP;
+            goto CALL_UPDATE_NODE;
         }
         
         ///As superclass.
@@ -107,7 +107,7 @@ dispatch_semaphore_signal(_lock);
                     n_curr              = n_next;
                 }
                 
-                goto CALL_UPDATE_SMAP;
+                goto CALL_UPDATE_NODE;
             }
         }
         
@@ -132,7 +132,7 @@ dispatch_semaphore_signal(_lock);
                 n_curr.nextBrother = newNode;
             }
             
-            goto CALL_UPDATE_SMAP;
+            goto CALL_UPDATE_NODE;
         }
         
         ///New basic brother.
@@ -148,19 +148,14 @@ dispatch_semaphore_signal(_lock);
         
         iNode.nextBrother = newNode;
         
-    CALL_UPDATE_SMAP:
+    CALL_UPDATE_NODE:
         {
-            [self surfaceMapAddNode:newNode];
+            [_map setObject:newNode forKey:newNode.value];
+            [_tree fastEnumeratedNode:newNode];
+            [_tree remapForRoot];
         }
     }
     APC_CLASS_MAPPER_UNLOCK;
-}
-
-- (void)surfaceMapAddNode:(APCClassInheritanceNode*)node
-{
-    [_map setObject:node forKey:node.value];
-    [_tree fastEnumeratedNode:node];
-    [_tree remapForRoot];
 }
 
 - (void)removeClass:(Class)cls
@@ -202,17 +197,17 @@ dispatch_semaphore_signal(_lock);
             previous.nextBrother = nil;
         }
         
-        [self surfaceMapRemoveNode:oldNode];
+        [oldNode clean];
+        [_map removeObjectForKey:oldNode.value];
+        [_tree removeFastEnumeratedNode:oldNode];
+        [_tree remapForRoot];
     }
     APC_CLASS_MAPPER_UNLOCK;
 }
 
-- (void)surfaceMapRemoveNode:(APCClassInheritanceNode*)node
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id  _Nullable __unsafe_unretained [])buffer count:(NSUInteger)len
 {
-    [node clean];
-    [_map removeObjectForKey:node.value];
-    [_tree removeFastEnumeratedNode:node];
-    [_tree remapForRoot];
+    return [_map countByEnumeratingWithState:state objects:buffer count:len];
 }
 
 #ifdef DEBUG
