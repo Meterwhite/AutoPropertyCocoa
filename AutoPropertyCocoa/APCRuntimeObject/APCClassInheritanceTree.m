@@ -61,6 +61,11 @@
     [_references addObject:node];
 }
 
+- (void)removeFastEnumeratedNode:(APCClassInheritanceNode *)node
+{
+    [_references removeObject:node];
+}
+
 - (void)remapForRoot
 {
     for (APCClassInheritanceNode* item in _references) {

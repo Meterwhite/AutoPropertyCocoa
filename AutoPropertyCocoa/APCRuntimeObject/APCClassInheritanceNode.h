@@ -43,8 +43,15 @@
 @property (nullable,nonatomic,weak)     APCClassInheritanceNode* previousBrother;
 @property (nullable,nonatomic,strong)   APCClassInheritanceNode* nextBrother;
 
+- (BOOL)isRoot;
+- (BOOL)isLeaf;
+- (NSUInteger)degree;
+
+- (nullable APCClassInheritanceNode*)rootDirectBrother;
+- (nullable APCClassInheritanceNode*)leafDirectBrother;
 
 - (NSUInteger)brotherLevelFromRoot;
+
 - (NSUInteger)depthToRoot;
 
 - (NSComparisonResult)brotherLevelFromRootCompare:(nonnull APCClassInheritanceNode*)node;
@@ -56,6 +63,7 @@
  */
 - (nonnull NSArray<APCClassInheritanceNode*>*)brothersThatIsSubclassTo:(nonnull Class)cls others:(NSArray*_Nonnull*_Nonnull)others;
 
-- (nullable APCClassInheritanceNode*)rootBrother;
+- (void)clean;
+
 @end
 

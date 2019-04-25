@@ -396,7 +396,7 @@ apc_testfunc(testTriggerFrontNormalClass,101)
     NSUInteger age0 = p.age;
 }
 
-
+static APCClassMapper* _test_mapper;
 apc_testfunc(testUnbindDeadCycleMultThread,9000)
 {
     while (0){
@@ -416,16 +416,27 @@ apc_testfunc(testUnbindDeadCycleMultThread,9000)
     
     while (1) {
         
-        APCClassMapper* mapper = [[APCClassMapper alloc] init];
-        [mapper addClass:[NSProxy class]];
-        [mapper addClass:[NSMutableArray class]];
-        [mapper addClass:[NSString class]];
-        [mapper addClass:[NSArray class]];
-        [mapper addClass:[NSDictionary class]];
-        [mapper addClass:[NSObject class]];
-        [mapper addClass:[NSMutableDictionary class]];
-        [mapper addClass:[NSMutableString class]];
-        NSLog(@"%@",mapper);
+        _test_mapper = [[APCClassMapper alloc] init];
+        [_test_mapper addClass:[NSProxy class]];
+        [_test_mapper addClass:[NSMutableArray class]];
+        [_test_mapper addClass:[NSString class]];
+        [_test_mapper addClass:[NSArray class]];
+        [_test_mapper addClass:[NSDictionary class]];
+        [_test_mapper addClass:[NSObject class]];
+        [_test_mapper addClass:[NSMutableDictionary class]];
+        [_test_mapper addClass:[NSMutableString class]];
+//        NSLog(@"%@",mapper);
+        
+        [_test_mapper removeClass:[NSObject class]];
+        
+        NSLog(@"%@",_test_mapper);
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+
+            NSLog(@"%@",_test_mapper);
+        });
+        
+        
         break;
     }
 }

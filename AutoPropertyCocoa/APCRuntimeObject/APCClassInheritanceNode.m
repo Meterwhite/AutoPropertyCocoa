@@ -139,6 +139,27 @@
     }
 }
 
+- (BOOL)isRoot
+{
+    return !((BOOL)_father | (BOOL)_previousBrother);
+}
+
+- (BOOL)isLeaf
+{
+    return
+    
+    ((BOOL)_father | (BOOL)_previousBrother)
+    & !(BOOL)_child
+    & !(BOOL)_nextBrother;
+}
+
+- (NSUInteger)degree
+{
+    return
+    
+    (BOOL)_father + (BOOL)_previousBrother + (BOOL)_child + (BOOL)_nextBrother;
+}
+
 - (NSArray<APCClassInheritanceNode *> *)brothersThatIsSubclassTo:(Class)cls others:(NSArray**)others
 {
     NSMutableArray* ret = [NSMutableArray array];
@@ -160,7 +181,7 @@
     return [[ret reverseObjectEnumerator] allObjects];
 }
 
-- (APCClassInheritanceNode *)rootBrother
+- (APCClassInheritanceNode *)rootDirectBrother
 {
     APCClassInheritanceNode * iNode = self;
     
@@ -171,5 +192,27 @@
         iNode = iNode.previousBrother;
     }
     return iNode;
+}
+
+- (APCClassInheritanceNode *)leafDirectBrother
+{
+    APCClassInheritanceNode * iNode = self;
+    
+    while (YES){
+        
+        if(nil == iNode.nextBrother)
+            break;
+        iNode = iNode.nextBrother;
+    }
+    return iNode;
+}
+
+- (void)clean
+{
+    _value  = nil;
+    _child  = nil;
+    _father = nil;
+    _nextBrother        = nil;
+    _previousBrother    = nil;
 }
 @end

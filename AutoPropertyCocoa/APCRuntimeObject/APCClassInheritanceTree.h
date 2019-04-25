@@ -23,6 +23,7 @@
 - (nullable APCClassInheritanceNode*)deepestNodeThatIsSuperclassTo:(nonnull Class)cls;
 
 - (void)fastEnumeratedNode:(nonnull APCClassInheritanceNode*)node;
+- (void)removeFastEnumeratedNode:(nonnull APCClassInheritanceNode*)node;
 
 - (void)remapForRoot;
 

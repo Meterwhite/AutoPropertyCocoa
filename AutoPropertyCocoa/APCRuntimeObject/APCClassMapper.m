@@ -10,14 +10,23 @@
 #import "APCClassInheritanceNode.h"
 #import "APCClassMapper.h"
 
+#define APC_CLASS_MAPPER_LOCK \
+    \
+dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
+
+#define APC_CLASS_MAPPER_UNLOCK \
+    \
+dispatch_semaphore_signal(_lock);
+
 @interface APCClassMapper()
 
 @end
 
 @implementation APCClassMapper
 {
-    NSMapTable<Class, APCClassInheritanceNode*>* _map;
-    APCClassInheritanceTree*                     _tree;
+    NSMapTable<Class, APCClassInheritanceNode*>*_map;
+    APCClassInheritanceTree*                    _tree;
+    dispatch_semaphore_t                        _lock;
 }
 
 - (instancetype)init
@@ -27,6 +36,7 @@
         
         _tree = [APCClassInheritanceTree tree];
         _map  = [NSMapTable weakToWeakObjectsMapTable];
+        _lock = dispatch_semaphore_create(1);
     }
     return self;
 }
@@ -43,6 +53,7 @@
 
 - (void)addClass:(Class)cls
 {
+    APC_CLASS_MAPPER_LOCK;
     @autoreleasepool {
         
         NSEnumerator<APCClassInheritanceNode*>*e;
@@ -65,7 +76,7 @@
             if(iNodes.count > 0)
             {
                 ///As new root brother.
-                newNode.father = leaf.rootBrother.father;
+                newNode.father = leaf.rootDirectBrother.father;
                 
                 ///Connect new brothers in iNodes.
                 e       = iNodes.objectEnumerator;
@@ -139,12 +150,13 @@
         
     CALL_UPDATE_SMAP:
         {
-            [self updateSurfaceMappingWith:newNode];
+            [self surfaceMapAddNode:newNode];
         }
     }
+    APC_CLASS_MAPPER_UNLOCK;
 }
 
-- (void)updateSurfaceMappingWith:(APCClassInheritanceNode*)node
+- (void)surfaceMapAddNode:(APCClassInheritanceNode*)node
 {
     [_map setObject:node forKey:node.value];
     [_tree fastEnumeratedNode:node];
@@ -153,28 +165,54 @@
 
 - (void)removeClass:(Class)cls
 {
-    APCClassInheritanceNode* n = [_map objectForKey:cls];
-    if(n == nil){
-        
-        return;
-    }
+    APC_CLASS_MAPPER_LOCK;
+    @autoreleasepool {
     
-    if(nil != n.child){
+        APCClassInheritanceNode* oldNode    = [_map objectForKey:cls];
+        APCClassInheritanceNode* previous   = oldNode.father ?: oldNode.previousBrother;
+        APCClassInheritanceNode* newNode    = oldNode.child ?: oldNode.nextBrother;
         
-        n.child.father = n.father;
+        if(newNode != nil){
+            
+            ///Exchange ↑.
+            if(previous != nil){
+                
+                if(oldNode.father != nil){
+                    
+                    newNode.father = previous;
+                }else{
+                    
+                    newNode.previousBrother = previous;
+                }
+            }else{
+                
+                ///Root
+                newNode.father = nil;
+            }
+            ///Exchange ↓.
+            if(oldNode.child && oldNode.nextBrother){
+                
+                newNode.leafDirectBrother.nextBrother = oldNode.nextBrother;
+            }
+            
+        }else if (previous != nil) {
+            
+            ///Leaf
+            previous.child = nil;
+            previous.nextBrother = nil;
+        }
+        
+        [self surfaceMapRemoveNode:oldNode];
     }
-    
-    if(nil != n.nextBrother){
-        
-        n.nextBrother.previousBrother = n.child;
-    }
-    
-    if(nil != n.father){
-        
-        
-    }else if(nil != n.previousBrother){
-        
-    }
+    APC_CLASS_MAPPER_UNLOCK;
+}
+
+- (void)surfaceMapRemoveNode:(APCClassInheritanceNode*)node
+{
+    [node clean];
+    [_map removeObjectForKey:node.value];
+    [_tree removeFastEnumeratedNode:node];
+    [_tree remapForRoot];
 }
 
 #ifdef DEBUG
