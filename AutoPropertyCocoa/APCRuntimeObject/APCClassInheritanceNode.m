@@ -8,6 +8,26 @@
 
 #import "APCClassInheritanceNode.h"
 
+static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
+{
+    if(node == nil) {
+        
+        return;
+    }
+    
+    [result addObject:node];
+    
+    if (node.child != nil){
+        
+        apc_node_DLR(node.child, result);
+    }
+    
+    if(node.nextBrother != nil){
+        
+        apc_node_DLR(node.nextBrother, result);
+    }
+}
+
 @implementation APCClassInheritanceNode
 
 #ifdef DEBUG
@@ -17,7 +37,7 @@
     
     if(nil != _child){
         
-        [str appendFormat:@"%@←", NSStringFromClass(_child.value)];
+        [str appendFormat:@"%@⇤", NSStringFromClass(_child.value)];
     }
     
     [str appendFormat:@"⎨%@",NSStringFromClass(_value)];
@@ -32,7 +52,7 @@
     
     if(nil != _nextBrother){
         
-        [str appendFormat:@"→%@", NSStringFromClass(_nextBrother.value)];
+        [str appendFormat:@"⇢%@", NSStringFromClass(_nextBrother.value)];
     }
     
     return [str copy];
@@ -54,7 +74,7 @@
     return self;
 }
 
-- (NSUInteger)brotherLevelFromRoot
+- (NSUInteger)brotherLevelToRoot
 {
     APCClassInheritanceNode*    iNode = self;
     NSUInteger                  lev = 0;    
@@ -87,7 +107,7 @@
 
 - (NSComparisonResult)brotherLevelFromRootCompare:(nonnull APCClassInheritanceNode*)node
 {
-    return self.brotherLevelFromRoot - node.brotherLevelFromRoot;
+    return self.brotherLevelToRoot - node.brotherLevelToRoot;
 }
 
 - (NSComparisonResult)depthToRootCompare:(APCClassInheritanceNode *)node
@@ -176,6 +196,15 @@
     return [[ret reverseObjectEnumerator] allObjects];
 }
 
+- (NSArray<APCClassInheritanceNode *> *)allChild
+{
+    NSMutableArray* result = [NSMutableArray array];
+    
+    apc_node_DLR(self.child, result);
+    
+    return [result copy];
+}
+
 - (APCClassInheritanceNode *)rootDirectBrother
 {
     APCClassInheritanceNode * iNode = self;
@@ -204,7 +233,6 @@
 
 - (void)clean
 {
-    _value  = nil;
     _child  = nil;
     _father = nil;
     _nextBrother        = nil;

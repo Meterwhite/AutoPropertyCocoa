@@ -161,7 +161,7 @@ void apc_registerProperty(APCHookProperty* p)
         return;
     }
     
-    ///New hook
+    ///Creat new hook
     hook = [APCPropertyHook hookWithProperty:p];
     dictionary[p->_hooked_name] = hook;
     

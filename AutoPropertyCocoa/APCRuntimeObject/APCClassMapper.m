@@ -205,6 +205,58 @@ dispatch_semaphore_signal(_lock);
     APC_CLASS_MAPPER_UNLOCK;
 }
 
+- (void)removeKindOfClass:(Class)cls
+{
+    APC_CLASS_MAPPER_LOCK;
+    @autoreleasepool {
+        
+        APCClassInheritanceNode* oldNode    = [_map objectForKey:cls];
+        APCClassInheritanceNode* previous   = oldNode.father ?: oldNode.previousBrother;
+        APCClassInheritanceNode* insteadNode= oldNode.nextBrother ?: nil;
+        NSArray*                 allChild   = oldNode.allChild;
+        
+        if(insteadNode != nil){
+            
+            ///Exchange ↑.
+            if(previous != nil){
+                
+                if(oldNode.father != nil){
+                    
+                    insteadNode.father = previous;
+                }else{
+                    
+                    insteadNode.previousBrother = previous;
+                }
+            }else{
+                
+                ///Root
+                oldNode.nextBrother.father = nil;
+            }
+        }else if (previous != nil) {
+            
+            if(oldNode.father != nil){
+                
+                previous.child = nil;
+            }else{
+                
+                previous.nextBrother = nil;
+            }
+        }
+        
+        for (APCClassInheritanceNode* child in allChild) {
+
+            [child clean];
+            [_map removeObjectForKey:child.value];
+            [_tree removeFastEnumeratedNode:child];
+        }
+        [oldNode clean];
+        [_map removeObjectForKey:oldNode.value];
+        [_tree removeFastEnumeratedNode:oldNode];
+        [_tree remapForRoot];
+    }
+    APC_CLASS_MAPPER_UNLOCK;
+}
+
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id  _Nullable __unsafe_unretained [])buffer count:(NSUInteger)len
 {
     return [_map countByEnumeratingWithState:state objects:buffer count:len];

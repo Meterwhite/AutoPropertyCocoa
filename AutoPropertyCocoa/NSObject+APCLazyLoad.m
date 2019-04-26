@@ -128,7 +128,7 @@
                          hookWithSEL:(SEL)aSelector
 {
     
-    APCLazyProperty* p = [apc_lookup_propertyhook(self, property) boundPropertyForPropertyKind:[APCLazyProperty class]];
+    APCLazyProperty* p = [apc_lookup_propertyhook(self, property) boundPropertyForKind:[APCLazyProperty class]];
     
     if(p == nil){
         
@@ -140,7 +140,7 @@
        
        ||
        
-       NO  == (p.accessOption & APCPropertySetValueEnable)){
+       NO  == (p.accessOption & APCPropertySetValueEnable)) {
         return;
     }
     

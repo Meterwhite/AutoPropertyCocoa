@@ -30,9 +30,7 @@
 @end
 
 @class APCPropertyHook;
-/**
- 该类型没有具体实现
- */
+
 @interface APCHookProperty : APCProperty <APCHookPropertyProtocol,APCMethodProtocol>
 {
 @public
@@ -42,10 +40,11 @@
 
     APCMethodStyle  _methodStyle;
 }
-@property (nonatomic,copy,readonly,nullable)NSString*       methodTypeEncoding;
-@property (nonatomic,copy,readonly,nonnull) NSString*       hookedMethod;
-@property (nonatomic,assign,readonly)       APCMethodStyle  methodStyle;
-@property (nonatomic,weak,readonly,nullable)APCPropertyHook*hook;
+@property (nullable,nonatomic,copy,readonly)NSString*       methodTypeEncoding;
+@property (nonnull,nonatomic,copy,readonly) NSString*       hookedMethod;
+@property (nullable,nonatomic,weak,readonly)APCPropertyHook*hook;
+@property (nonatomic,readonly)APCMethodStyle                methodStyle;
+
 
 - (void)bindingToHook:(APCPropertyHook* _Nullable)hook;
 

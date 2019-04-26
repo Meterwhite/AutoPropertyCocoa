@@ -26,7 +26,7 @@
 
 + (nonnull instancetype)nodeWithClass:(nonnull Class)cls;
 
-@property (nullable,nonatomic) Class value;
+@property (nonnull,nonatomic,readonly) Class value;
 
 /**
  'father' and 'child' will be set at the same time.
@@ -40,16 +40,15 @@
 @property (nullable,nonatomic,weak)     APCClassInheritanceNode* previousBrother;
 @property (nullable,nonatomic,strong)   APCClassInheritanceNode* nextBrother;
 
-- (BOOL)isRoot;
-- (BOOL)isLeaf;
-- (NSUInteger)degree;
 
-- (nullable APCClassInheritanceNode*)rootDirectBrother;
-- (nullable APCClassInheritanceNode*)leafDirectBrother;
-
-- (NSUInteger)brotherLevelFromRoot;
-
-- (NSUInteger)depthToRoot;
+@property (nullable,nonatomic,strong,readonly) NSArray<APCClassInheritanceNode*>* allChild;
+@property (nullable,nonatomic,strong,readonly) APCClassInheritanceNode* rootDirectBrother;
+@property (nullable,nonatomic,strong,readonly) APCClassInheritanceNode* leafDirectBrother;
+@property (nonatomic,readonly) NSUInteger   brotherLevelToRoot;
+@property (nonatomic,readonly) NSUInteger   depthToRoot;
+@property (nonatomic,readonly) NSUInteger   degree;
+@property (nonatomic,readonly) BOOL         isRoot;
+@property (nonatomic,readonly) BOOL         isLeaf;
 
 - (NSComparisonResult)brotherLevelFromRootCompare:(nonnull APCClassInheritanceNode*)node;
 
@@ -59,6 +58,7 @@
  Self within.
  */
 - (nonnull NSArray<APCClassInheritanceNode*>*)brothersThatIsSubclassTo:(nonnull Class)cls others:(NSArray*_Nonnull*_Nonnull)others;
+
 
 - (void)clean;
 

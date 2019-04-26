@@ -26,6 +26,11 @@
  */
 - (void)removeClass:(nonnull Class)cls;
 
+/**
+ Itself and its subclasses
+ */
+- (void)removeKindOfClass:(nonnull Class)cls;
+
 - (nullable Class)superclassOfClass:(nonnull Class)cls;
 
 @end

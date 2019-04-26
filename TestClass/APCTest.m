@@ -426,8 +426,9 @@ apc_testfunc(testUnbindDeadCycleMultThread,9000)
         [_test_mapper addClass:[NSMutableDictionary class]];
         [_test_mapper addClass:[NSMutableString class]];
 //        NSLog(@"%@",mapper);
-        
         [_test_mapper removeClass:[NSObject class]];
+        
+//        [_test_mapper removeKindOfClass:[NSArray class]];
         
         NSLog(@"%@",_test_mapper);
         
@@ -441,4 +442,18 @@ apc_testfunc(testUnbindDeadCycleMultThread,9000)
     }
 }
 
+
+apc_testfunc(testClassInstanceLazyLoadSimple,911)
+{
+    APC_TEST_CLEANCLASS
+    
+    Man* m = [Man new];
+    
+    [Man apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id _Nonnull instance) {
+        
+        return @"FuckAStockMarket";
+    }];
+    
+    NSParameterAssert(m.name == nil);
+}
 @end

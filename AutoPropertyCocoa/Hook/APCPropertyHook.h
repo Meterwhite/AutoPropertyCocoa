@@ -46,7 +46,7 @@
 - (nullable __kindof APCPropertyHook*)superhook;
 - (nullable NSString*)hookMethod;
 
-- (nullable __kindof APCHookProperty*)boundPropertyForPropertyKind:(nonnull Class)propertyKind;
+- (nullable __kindof APCHookProperty*)boundPropertyForKind:(nonnull Class)cls;
 - (nonnull NSArray<APCHookProperty*>*)boundProperties;
 - (void)unbindProperty:(nonnull APCHookProperty*)property;
 - (void)bindProperty:(nonnull APCHookProperty*)property;

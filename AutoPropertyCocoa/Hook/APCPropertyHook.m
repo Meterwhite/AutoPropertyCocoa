@@ -6,6 +6,8 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "APCTriggerGetterProperty.h"
+#import "APCTriggerSetterProperty.h"
 #import "APCPropertyHook.h"
 #import "APCLazyProperty.h"
 #import "APCRuntime.h"
@@ -17,10 +19,12 @@ id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
     
     if(YES == apc_object_isProxyInstance(_SELF)){
         
-        hook = apc_lookup_instancePropertyhook(_SELF, NSStringFromSelector(_CMD));
+        hook = apc_lookup_instancePropertyhook(_SELF
+                                               , NSStringFromSelector(_CMD));
     }else{
         
-        if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), NSStringFromSelector(_CMD)))){
+        if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF)
+                                                  , NSStringFromSelector(_CMD)))){
             
             NSCAssert(NO, @"APC: BAD ACCESS.");
         }
@@ -30,6 +34,35 @@ id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
         
         return [apc_propertyhook_rootHook(hook) performOldGetterFromTarget:_SELF];
     }
+    
+    
+    ///保证一次old imp，一次new imp
+    APCTriggerGetterProperty* p_trigger;
+    APCLazyProperty* p_lazy;
+    for (id item in hook.boundProperties) {
+        
+        if([item class] == [APCTriggerGetterProperty class]){
+            
+            p_trigger = item;
+        }else{
+            
+            p_lazy = item;
+        }
+    }
+    
+    ///Future
+    if(p_trigger.triggerOption & APCPropertyGetterFrontTrigger){
+        
+        [p_trigger performGetterFrontTriggerBlock:_SELF];
+    }
+    
+    ///Old
+    [hook performOldGetterFromTarget:_SELF];
+    
+    ///Affect
+    p_lazy;
+    
+    ///Result
     
     
     return nil;
@@ -116,7 +149,7 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 
 - (BOOL)isEmpty
 {
-    return [_boundProperties count];
+    return [_boundProperties count] == 0;
 }
 
 - (NSArray<APCHookProperty *> *)boundProperties
@@ -124,11 +157,11 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     return [_boundProperties copy];
 }
 
-- (APCHookProperty*)boundPropertyForPropertyKind:(Class)propertyKind
+- (APCHookProperty*)boundPropertyForKind:(Class)cls
 {
     for (APCHookProperty* item in _boundProperties) {
         
-        if(propertyKind == object_getClass(item)){
+        if(cls == object_getClass(item)){
             
             return item;
         }

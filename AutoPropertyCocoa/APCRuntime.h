@@ -14,7 +14,7 @@ apc_lookup_propertyhook(Class  _Nullable cls
                         , NSString* _Nonnull property);
 
 
-/** Class for parameter 'to' is included. */
+/** The second parameter 'to' is include. */
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_lookup_firstPropertyhook_inRange(Class _Nonnull from
                               , Class  _Nonnull to
