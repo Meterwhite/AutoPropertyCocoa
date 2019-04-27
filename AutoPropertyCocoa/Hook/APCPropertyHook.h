@@ -44,9 +44,9 @@
 //@property (nonatomic,strong,nullable) NSEnumerator<APCHookProperty*>* propertyEnumerator;
 @property (nonatomic,readonly) BOOL        isEmpty;
 
-@property (nullable,nonatomic,strong) APCTriggerGetterProperty* getterTrigger;
-@property (nullable,nonatomic,strong) APCTriggerSetterProperty* setterTrigger;
-@property (nullable,nonatomic,strong) APCLazyProperty* lazyload;
+@property (nullable,atomic,strong) APCTriggerGetterProperty* getterTrigger;
+@property (nullable,atomic,strong) APCTriggerSetterProperty* setterTrigger;
+@property (nullable,atomic,strong) APCLazyProperty* lazyload;
 
 @property (nonnull,nonatomic,readonly) Class sourceclass;
 @property (nonnull,nonatomic,readonly) Class hookclass;

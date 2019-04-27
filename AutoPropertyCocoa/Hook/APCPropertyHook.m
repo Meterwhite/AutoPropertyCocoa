@@ -184,7 +184,7 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     while (YES) {
         
         void* expected = _getterTrigger;
-        if(atomic_compare_exchange_strong(&_getterTrigger, &expected, desired)){
+        if(atomic_compare_exchange_weak(&_getterTrigger, &expected, desired)){
             
             if(desired == nil){
                 
@@ -211,7 +211,7 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     while (YES) {
         
         void* expected = _setterTrigger;
-        if(atomic_compare_exchange_strong(&_setterTrigger, &expected, desired)){
+        if(atomic_compare_exchange_weak(&_setterTrigger, &expected, desired)){
             
             if(desired == nil){
                 
