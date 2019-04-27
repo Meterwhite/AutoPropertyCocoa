@@ -218,10 +218,10 @@ void apc_disposeProperty(APCHookProperty* p)
     APC_RUNTIME_UNLOCK;
 }
 
-NSArray* apc_classBoundProperties(Class cls, NSString* property)
-{
-    return [apc_runtime_propertyhook(cls , property) boundProperties];
-}
+//NSArray* apc_classBoundProperties(Class cls, NSString* property)
+//{
+//    return [apc_runtime_propertyhook(cls , property) boundProperties];
+//}
 
 APCHookProperty* apc_property_getRootProperty(APCHookProperty* p)
 {
@@ -344,15 +344,15 @@ void apc_instance_removeAssociatedProperty(APCProxyInstance* instance, APCHookPr
     [apc_instance_propertyhook(instance, p->_hooked_name) unbindProperty:p];
 }
 
-NSArray<__kindof APCHookProperty*>* apc_instance_boundPropertyies(APCProxyInstance* instance, NSString* property)
-{
-    if(NO == apc_class_conformsProxyClass(object_getClass(instance))){
-        
-        return (NSArray*)0;
-    }
-    
-    return [apc_instance_propertyhook(instance,property) boundProperties];
-}
+//NSArray<__kindof APCHookProperty*>* apc_instance_boundPropertyies(APCProxyInstance* instance, NSString* property)
+//{
+//    if(NO == apc_class_conformsProxyClass(object_getClass(instance))){
+//        
+//        return (NSArray*)0;
+//    }
+//    
+//    return [apc_instance_propertyhook(instance,property) boundProperties];
+//}
 
 #pragma mark - Recursive(For instance) private
 static NSMapTable* apc_object_hookRecursiveMapper()

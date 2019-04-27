@@ -23,16 +23,13 @@
 
 #endif
 
-#ifdef __STDC_NO_ATOMICS__
-#import <libkern/OSAtomic.h>
-#define APCAtomicUInteger   NSUInteger
-#define APCMemoryBarrier    OSMemoryBarrier()
-#else
-
+#ifndef __STDC_NO_ATOMICS__
 #import <stdatomic.h>
 #define APCAtomicUInteger   _Atomic(NSUInteger)
 #define APCMemoryBarrier    atomic_thread_fence(memory_order_seq_cst)
 #endif
+
+
 
 #define APCThreadID ([NSThread currentThread])
 

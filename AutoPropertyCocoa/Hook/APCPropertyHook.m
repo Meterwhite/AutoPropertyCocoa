@@ -35,37 +35,51 @@ id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
         return [apc_propertyhook_rootHook(hook) performOldGetterFromTarget:_SELF];
     }
     
+    APCTriggerGetterProperty* p_trigger = hook.getterTrigger;
+    APCLazyProperty* p_lazy = hook.lazyload;
     
-    ///保证一次old imp，一次new imp
-    APCTriggerGetterProperty* p_trigger;
-    APCLazyProperty* p_lazy;
-    for (id item in hook.boundProperties) {
-        
-        if([item class] == [APCTriggerGetterProperty class]){
-            
-            p_trigger = item;
-        }else{
-            
-            p_lazy = item;
-        }
-    }
-    
-    ///Future
+    /** ----------------Future----------------- */
     if(p_trigger.triggerOption & APCPropertyGetterFrontTrigger){
         
         [p_trigger performGetterFrontTriggerBlock:_SELF];
     }
     
-    ///Old
-    [hook performOldGetterFromTarget:_SELF];
-    
-    ///Affect
-    p_lazy;
-    
-    ///Result
+    /** ----------------Happen----------------- */
+    id val = [hook performOldGetterFromTarget:_SELF];
     
     
-    return nil;
+    /** ----------------Affect----------------- */
+    if(p_lazy != nil){
+        
+        val = [p_lazy performLazyloadForTarget:_SELF oldValue:val];
+    }
+    
+    /** ----------------Result----------------- */
+    if(p_trigger.triggerOption & APCPropertyGetterPostTrigger){
+        
+        [p_trigger performGetterPostTriggerBlock:_SELF value:val];
+    }
+    
+    if(p_trigger.triggerOption & APCPropertyGetterUserTrigger){
+        
+        if(YES == [p_trigger performGetterUserConditionBlock:_SELF value:val]){
+            
+            [p_trigger performGetterUserTriggerBlock:_SELF value:val];
+        }
+    }
+    
+    if(p_trigger.triggerOption & APCPropertyGetterCountTrigger){
+        
+        if(YES == [p_trigger performGetterCountConditionBlock:_SELF value:val]){
+            
+            [p_trigger performGetterCountTriggerBlock:_SELF value:val];
+        }
+    }
+    
+    //should move count to hook?
+    [p_trigger access];
+    
+    return val;
 }
 apc_def_vGHook_and_impimage(apc_propertyhook_getter)
 
@@ -79,8 +93,15 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 @implementation APCPropertyHook
 {
 #warning add lock
-    NSMutableArray<APCHookProperty *>* _boundProperties;
-    APCHookProperty*                   _propertyInfo;
+    NSString*               _valueTypeEncoding;
+    const char*             _methodTypeEncoding;
+    APCPropertyValueKind    _kindOfValue;
+    APCPropertyOwnerKind    _kindOfOwner;
+    APCMethodStyle          _methodStyle;
+    _Atomic(void*)          _getterTrigger;
+    _Atomic(void*)          _setterTrigger;
+    _Atomic(void*)          _lazyload;
+    __weak id               _instance;
 }
 
 + (instancetype)hookWithProperty:(APCHookProperty *)property
@@ -88,22 +109,41 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     return [[self alloc] initWithProperty:property];
 }
 
-- (instancetype)initWithProperty:(APCHookProperty *)property
+- (instancetype)initWithProperty:(__kindof APCHookProperty *)property
 {
     self = [super init];
     if (self) {
         
-        _propertyInfo       =   property;
-        _source_class       =   property->_des_class;
-        _boundProperties    =   [NSMutableArray arrayWithObject:property];
+        if([property isKindOfClass:[APCLazyProperty class]]){
+            
+            self.lazyload = property;
+        }else if([property isKindOfClass:[APCTriggerGetterProperty class]]){
+            
+            self.getterTrigger = property;
+        }else if([property isKindOfClass:[APCTriggerSetterProperty class]]){
+            
+            self.setterTrigger = property;
+        }else{
+            
+            NSAssert(NO, @"APC: Undefined behavior!");
+        }
+        _source_class   = property->_src_class;
+        _hookclass      = property->_des_class;
+        _hookMethod     = property->_hooked_name;
+        _kindOfValue    = property.kindOfValue;
+        _kindOfOwner    = property.kindOfOwner;
+        _methodStyle    = property.methodStyle;
+        _valueTypeEncoding  = property.valueTypeEncoding;
+        _methodTypeEncoding = property.methodTypeEncoding.UTF8String;
+        
+        if(_kindOfOwner == APCPropertyOwnerKindOfInstance){
+            
+            _instance = property->_instance;
+        }
+        
         [self hook];
     }
     return self;
-}
-
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer count:(NSUInteger)len
-{
-    return [_boundProperties countByEnumeratingWithState:state objects:buffer count:len];
 }
 
 - (Class)sourceclass
@@ -111,91 +151,169 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     return _source_class;
 }
 
-- (Class)hookclass
+- (void)setLazyload:(APCLazyProperty *)lazyload
 {
-    return _propertyInfo->_des_class;
+    void* desired = (void*)CFBridgingRetain(lazyload);
+    while (YES) {
+        
+        void* expected = _lazyload;
+        if(atomic_compare_exchange_weak(&_lazyload, &expected, desired)){
+            
+            if(desired == nil){
+                
+                CFRelease(expected);
+            }
+            break;
+        }
+    }
 }
 
-- (NSString *)hookMethod
+- (APCLazyProperty *)lazyload
 {
-    return _propertyInfo->_hooked_name;
+    APCLazyProperty *ret = CFBridgingRelease(atomic_load(&_lazyload));
+    if(ret.enable == NO){
+        
+        return nil;
+    }
+    return ret;
 }
 
-- (void)bindProperty:(APCHookProperty *)property
+- (void)setGetterTrigger:(APCTriggerGetterProperty *)getterTrigger
 {
-    NSAssert((_propertyInfo->_des_class == property->_des_class)
-              && ([_propertyInfo->_des_getter_name isEqualToString:property->_hooked_name]), @"APC: Class name and property name are one by one mapped.");
+    void* desired = (void*)CFBridgingRetain(getterTrigger);
+    while (YES) {
+        
+        void* expected = _getterTrigger;
+        if(atomic_compare_exchange_strong(&_getterTrigger, &expected, desired)){
+            
+            if(desired == nil){
+                
+                CFRelease(expected);
+            }
+            break;
+        }
+    }
+}
+
+- (APCTriggerGetterProperty *)getterTrigger
+{
+    APCTriggerGetterProperty *ret = CFBridgingRelease(atomic_load(&_getterTrigger));
+    if(ret.enable == NO){
+        
+        return nil;
+    }
+    return ret;
+}
+
+- (void)setSetterTrigger:(APCTriggerSetterProperty *)setterTrigger
+{
+    void* desired = (void*)CFBridgingRetain(setterTrigger);
+    while (YES) {
+        
+        void* expected = _setterTrigger;
+        if(atomic_compare_exchange_strong(&_setterTrigger, &expected, desired)){
+            
+            if(desired == nil){
+                
+                CFRelease(expected);
+            }
+            break;
+        }
+    }
+}
+
+- (APCTriggerSetterProperty *)setterTrigger
+{
+    APCTriggerSetterProperty * ret = CFBridgingRelease(atomic_load(&_setterTrigger));
+    if(ret.enable == NO){
+        
+        return nil;
+    }
+    return ret;
+}
+
+- (void)bindProperty:(__kindof APCHookProperty *)property
+{
+    NSAssert((_hookclass == property->_des_class)
+              && ([_hookMethod isEqualToString:property->_hooked_name]), @"APC: Class name and property name are one by one mapped.");
     
-    [_boundProperties addObject:property];
+    if([property isKindOfClass:[APCLazyProperty class]]){
+        
+        self.lazyload = property;
+    }else if([property isKindOfClass:[APCTriggerGetterProperty class]]){
+        
+        self.getterTrigger = property;
+    }else if([property isKindOfClass:[APCTriggerSetterProperty class]]){
+        
+        self.setterTrigger = property;
+    }else{
+        
+        NSAssert(NO, @"APC: Undefined behavior!");
+    }
+    
     [property bindingToHook:self];
 }
 
-- (void)unbindProperty:(APCHookProperty *)property
+- (void)unbindProperty:(__kindof APCHookProperty *)property
 {
-    NSAssert((_propertyInfo->_des_class == property->_des_class)
-             && ([_propertyInfo->_des_getter_name isEqualToString:property->_hooked_name]), @"APC: Class name and property name are one by one mapped.");
-    
-    [property invalid];
-    
-    [_boundProperties removeObject:property];
-    
-    [property bindingToHook:nil];
-    
-    if(self.isEmpty){
-        
-        [self unhook];
+    NSAssert((_hookclass == property->_des_class)
+             && ([_hookMethod isEqualToString:property->_hooked_name]), @"APC: Class name and property name are one by one mapped.");
+
+    @autoreleasepool {
+
+        if(property == _lazyload){
+            
+            self.lazyload = nil;
+        }else if (property == _getterTrigger){
+            
+            self.getterTrigger = nil;
+        }else if (property == _setterTrigger){
+            
+            self.setterTrigger = nil;
+        }else{
+            
+            NSAssert(NO, @"APC: Undefined behavior!");
+        }
+        [property invalid];
+        [property bindingToHook:nil];
+        if(self.isEmpty){
+
+            [self unhook];
+        }
     }
 }
 
 - (BOOL)isEmpty
 {
-    return [_boundProperties count] == 0;
-}
-
-- (NSArray<APCHookProperty *> *)boundProperties
-{
-    return [_boundProperties copy];
-}
-
-- (APCHookProperty*)boundPropertyForKind:(Class)cls
-{
-    for (APCHookProperty* item in _boundProperties) {
-        
-        if(cls == object_getClass(item)){
-            
-            return item;
-        }
-    }
-    return nil;
+    return (_lazyload || _getterTrigger || _setterTrigger);
 }
 
 - (void)hook
 {
     IMP newimp;
-    
-    if(_propertyInfo.kindOfValue == APCPropertyValueKindOfBlock ||
-       _propertyInfo.kindOfValue == APCPropertyValueKindOfObject){
+    if(_kindOfValue == APCPropertyValueKindOfBlock ||
+       _kindOfValue == APCPropertyValueKindOfObject){
         
-        newimp = (_propertyInfo.methodStyle == APCMethodGetterStyle)
+        newimp = (_methodStyle == APCMethodGetterStyle)
         ? (IMP)apc_propertyhook_getter
         : (IMP)apc_propertyhook_setter;
     }else{
         
-        newimp = (_propertyInfo.methodStyle == APCMethodGetterStyle)
-        ? (IMP)apc_propertyhook_getter_impimage(_propertyInfo.valueTypeEncoding)
-        : (IMP)apc_propertyhook_setter_impimage(_propertyInfo.valueTypeEncoding);
+        newimp = (_methodStyle == APCMethodGetterStyle)
+        ? (IMP)apc_propertyhook_getter_impimage(_valueTypeEncoding)
+        : (IMP)apc_propertyhook_setter_impimage(_valueTypeEncoding);
     }
     
     _new_implementation = newimp;
     
-    if(_propertyInfo.kindOfOwner == APCPropertyOwnerKindOfClass){
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
         _old_implementation
         =
-        class_replaceMethod(_propertyInfo->_des_class
-                            , NSSelectorFromString(_propertyInfo->_hooked_name)
+        class_replaceMethod(_hookclass
+                            , NSSelectorFromString(_hookMethod)
                             , _new_implementation
-                            , _propertyInfo.methodTypeEncoding.UTF8String);
+                            , _methodTypeEncoding);
         if(nil == _old_implementation){
             
             ///Overwrite super class property with new property.
@@ -204,9 +322,9 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
             ///Superclass and subclass used the same old implementation that is from superclass.
             
             APCPropertyHook* sourcehook
-            = apc_lookup_firstPropertyhook_inRange(class_getSuperclass(_propertyInfo->_des_class)
-                                            , _propertyInfo->_src_class
-                                            , _propertyInfo->_hooked_name);
+            = apc_lookup_firstPropertyhook_inRange(class_getSuperclass(_hookclass)
+                                            , _source_class
+                                            , _hookMethod);
             if(nil != sourcehook){
                 
                 _old_implementation = sourcehook->_old_implementation;
@@ -214,34 +332,34 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
                 
                 _old_implementation
                 =
-                class_getMethodImplementation(_propertyInfo->_src_class
-                                              , NSSelectorFromString(_propertyInfo->_hooked_name));
+                class_getMethodImplementation(_source_class
+                                              , NSSelectorFromString(_hookMethod));
             }
             
             NSAssert(_old_implementation, @"APC: Can not find original implementation.");
         }
     }else{
         
-        if(NO == apc_object_isProxyInstance(_propertyInfo->_instance)){
+        if(NO == apc_object_isProxyInstance(_instance)){
             
-            _proxyClass = apc_object_hookWithProxyClass(_propertyInfo->_instance);
+            _proxyClass = apc_object_hookWithProxyClass(_instance);
         }else{
             
-            _proxyClass = object_getClass(_propertyInfo->_instance);
+            _proxyClass = object_getClass(_instance);
         }
         
         _old_implementation
         =
         class_replaceMethod(_proxyClass
-                            , NSSelectorFromString(_propertyInfo->_hooked_name)
+                            , NSSelectorFromString(_hookMethod)
                             , _new_implementation
-                            , _propertyInfo.methodTypeEncoding.UTF8String);
+                            , _methodTypeEncoding);
         if(nil == _old_implementation){
             
             APCPropertyHook* sourcehook
-            = apc_lookup_firstPropertyhook_inRange(class_getSuperclass(_propertyInfo->_des_class)
-                                            , _propertyInfo->_src_class
-                                            , _propertyInfo->_hooked_name);
+            = apc_lookup_firstPropertyhook_inRange(class_getSuperclass(_hookclass)
+                                            , _source_class
+                                            , _hookMethod);
             if(nil != sourcehook){
                 
                 _old_implementation = sourcehook->_old_implementation;
@@ -249,8 +367,8 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
                 
                 _old_implementation
                 =
-                class_getMethodImplementation(_propertyInfo->_src_class
-                                              , NSSelectorFromString(_propertyInfo->_hooked_name));
+                class_getMethodImplementation(_source_class
+                                              , NSSelectorFromString(_hookMethod));
             }
         }
     }
@@ -263,29 +381,32 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
         return;
     }
     
-    if(_propertyInfo.kindOfOwner == APCPropertyOwnerKindOfClass)
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass)
     {
         _new_implementation = nil;
         
-        class_replaceMethod(_propertyInfo->_des_class
-                            , NSSelectorFromString(_propertyInfo->_hooked_name)
+        class_replaceMethod(_hookclass
+                            , NSSelectorFromString(_hookMethod)
                             , _old_implementation
-                            , _propertyInfo.methodTypeEncoding.UTF8String);
+                            , _methodTypeEncoding);
     }
     else
     {
-        if(YES == apc_object_isProxyInstance(_propertyInfo->_instance)){
+        if(YES == apc_object_isProxyInstance(_instance)){
             
-            apc_class_disposeProxyClass(apc_instance_unhookFromProxyClass(_propertyInfo->_instance));
+            apc_class_disposeProxyClass(apc_instance_unhookFromProxyClass(_instance));
         }
     }
-    
-    _propertyInfo = nil;
 }
 
 - (void)dealloc
 {
-    if(_propertyInfo.kindOfOwner == APCPropertyOwnerKindOfInstance){
+    _instance           = nil;
+    
+    if(_lazyload)       CFRelease(_lazyload);
+    if(_getterTrigger)  CFRelease(_getterTrigger);
+    if(_setterTrigger)  CFRelease(_setterTrigger);
+    if(_kindOfOwner == APCPropertyOwnerKindOfInstance){
         
         [self disposeRuntimeResource];
     }

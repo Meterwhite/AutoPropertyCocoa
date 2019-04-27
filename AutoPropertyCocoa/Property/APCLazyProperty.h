@@ -23,8 +23,7 @@
 
 - (void)bindingUserSelector:(nonnull SEL)aSelector;
 
-
-- (nullable id)performOldGetterFromTarget:(nonnull id)target;
+- (nullable id)performLazyloadForTarget:(nonnull id)tag oldValue:(nullable id)oldValue;///tag old
 
 - (nullable id)instancetypeNewObjectByUserSelector;
 

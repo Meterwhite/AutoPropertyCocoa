@@ -13,11 +13,11 @@
 
 @required
 
-+ (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
-                                       property:(NSString* _Nonnull)property;
-
-- (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
-                                        property:(NSString* _Nonnull)property;
+//+ (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
+//                                       property:(NSString* _Nonnull)property;
+//
+//- (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
+//                                        property:(NSString* _Nonnull)property;
 
 - (void)unhook;
 @optional
@@ -48,11 +48,11 @@
 
 - (void)bindingToHook:(APCPropertyHook* _Nullable)hook;
 
-- (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
-                                        property:(NSString* _Nonnull)property;
+//- (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
+//                                        property:(NSString* _Nonnull)property;
 
 /**
- Class.PropertyClass.hooedMethod
+ NSClass.APCClass.hooedMethod
  */
 - (NSUInteger)hash;
 @end

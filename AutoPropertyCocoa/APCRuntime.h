@@ -43,8 +43,8 @@ apc_property_getSuperPropertyList(APCHookProperty* _Nonnull p);
 
 #pragma mark - For class
 
-OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nonnull
-apc_classBoundProperties(Class _Nonnull cls, NSString* _Nonnull property);
+//OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nonnull
+//apc_classBoundProperties(Class _Nonnull cls, NSString* _Nonnull property);
 
 OBJC_EXPORT void
 apc_registerProperty(APCHookProperty* _Nonnull p);
@@ -58,9 +58,9 @@ apc_class_getSuperclass(Class _Nonnull cls);
 
 #pragma mark - For instance
 
-OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nullable
-apc_instance_boundPropertyies(APCProxyInstance* _Nonnull instance
-                              , NSString* _Nonnull property);
+//OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nullable
+//apc_instance_boundPropertyies(APCProxyInstance* _Nonnull instance
+//                              , NSString* _Nonnull property);
 
 OBJC_EXPORT void
 apc_instance_setAssociatedProperty(APCProxyInstance* _Nonnull instance

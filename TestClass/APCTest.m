@@ -8,6 +8,7 @@
 
 #import "APCTriggerGetterProperty.h"
 #import "AutoPropertyCocoa.h"
+#import "APCPropertyHook.h"
 #import "APCLazyProperty.h"
 #import "APCClassMapper.h"
 #import <objc/runtime.h>
@@ -455,5 +456,16 @@ apc_testfunc(testClassInstanceLazyLoadSimple,911)
     }];
     
     NSParameterAssert(m.name == nil);
+}
+
+apc_testfunc(testClassInstanceLazyLoadSimple,912)
+{
+    APCLazyProperty* p = [APCLazyProperty instanceWithProperty:@"name" aClass:[Person class]];
+    APCPropertyHook* hook = [APCPropertyHook hookWithProperty:p];
+    
+//    APCLazyProperty* p2 = [APCLazyProperty instanceWithProperty:@"name" aClass:[Person class]];
+//
+//    hook.lazyload = p2;
+    hook.lazyload = nil;
 }
 @end

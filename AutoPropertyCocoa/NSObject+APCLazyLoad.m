@@ -45,7 +45,7 @@
 
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-    [[APCLazyProperty boundPropertyForClass:self property:property] unhook];
+//    [[APCLazyProperty boundPropertyForClass:self property:property] unhook];
 }
 
 
@@ -83,7 +83,7 @@
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
 //    [(APCLazyProperty*)[APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property] unhook];
-    [APCLazyProperty boundPropertyForClass:self property:property];
+//    [APCLazyProperty boundPropertyForClass:self property:property];
 }
 
 - (void)apc_unbindLazyLoadAllProperties
@@ -128,7 +128,7 @@
                          hookWithSEL:(SEL)aSelector
 {
     
-    APCLazyProperty* p = [apc_lookup_propertyhook(self, property) boundPropertyForKind:[APCLazyProperty class]];
+    APCLazyProperty* p = apc_lookup_propertyhook(self, property).lazyload;
     
     if(p == nil){
         
@@ -167,8 +167,8 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
         //The info tell me where does it search from.
 //        if(nil == (p = [APCLazyProperty cachedFromAClassByInstance:_SELF property:NSStringFromSelector(_CMD)]))
         
-            NSCAssert(NO, @"APC: Lose property info.");
-        
+//            NSCAssert(NO, @"APC: Lose property info.");
+    
     
 //    if(NO == p.enable
 //       || YES == [APCLazyloadOldLoopController testingIsInLoop:_SELF]){
@@ -181,7 +181,7 @@ id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
     ///Get value.(All returned value are boxed)
     if(p.accessOption & APCPropertyComponentOfGetter){
         
-        value = [p performOldGetterFromTarget:_SELF];
+//        value = [p performOldGetterFromTarget:_SELF];
     }else{
         
         value = [p getIvarValueFromTarget:_SELF];

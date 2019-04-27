@@ -50,12 +50,6 @@
     _userSelector   =   nil;
 }
 
-
-- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target
-{
-    return nil;
-}
-
 - (id _Nullable)instancetypeNewObjectByUserSelector
 {
     Class clzz = self.propertyClass;
@@ -119,6 +113,10 @@
     }
 }
 
+- (void)dealloc
+{
+    NSLog(@"");
+}
 
 @end
 

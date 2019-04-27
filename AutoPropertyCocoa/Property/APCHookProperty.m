@@ -65,15 +65,15 @@
     _hook = hook;
 }
 
-+ (instancetype)boundPropertyForClass:(__unsafe_unretained Class)cls property:(NSString *)property
-{
-    return [apc_lookup_propertyhook(cls, property) boundPropertyForKind:self];
-}
-
-- (instancetype)boundPropertyForClass:(__unsafe_unretained Class)cls property:(NSString *)property
-{
-    return [apc_lookup_instancePropertyhook(self, property) boundPropertyForKind:object_getClass(self)];
-}
+//+ (instancetype)boundPropertyForClass:(__unsafe_unretained Class)cls property:(NSString *)property
+//{
+//    return [apc_lookup_propertyhook(cls, property) boundPropertyForKind:self];
+//}
+//
+//- (instancetype)boundPropertyForClass:(__unsafe_unretained Class)cls property:(NSString *)property
+//{
+//    return [apc_lookup_instancePropertyhook(self, property) boundPropertyForKind:object_getClass(self)];
+//}
 
 - (void)unhook
 {
