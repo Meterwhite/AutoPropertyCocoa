@@ -19,6 +19,8 @@
 //- (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
 //                                        property:(NSString* _Nonnull)property;
 
+- (nullable SEL)outlet;
+- (nullable SEL)inlet;
 - (void)unhook;
 @optional
 
@@ -40,16 +42,13 @@
 
     APCMethodStyle  _methodStyle;
 }
-@property (nullable,nonatomic,copy,readonly)NSString*       methodTypeEncoding;
-@property (nonnull,nonatomic,copy,readonly) NSString*       hookedMethod;
-@property (nullable,nonatomic,weak,readonly)APCPropertyHook*hook;
-@property (nonatomic,readonly)APCMethodStyle                methodStyle;
+@property (nullable,nonatomic,copy,readonly)NSString*   methodTypeEncoding;
+@property (nonnull,nonatomic,copy,readonly) NSString*   hookedMethod;
+@property (nullable,nonatomic,weak)APCPropertyHook*     associatedHook;
+@property (nonatomic,readonly)APCMethodStyle            methodStyle;
 
-
-- (void)bindingToHook:(APCPropertyHook* _Nullable)hook;
-
-//- (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
-//                                        property:(NSString* _Nonnull)property;
+- (nullable SEL)outlet;
+- (nullable SEL)inlet;
 
 /**
  NSClass.APCClass.hooedMethod

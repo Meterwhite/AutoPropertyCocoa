@@ -8,6 +8,7 @@
 
 #import "APCPropertyHook.h"
 #import "APCClassMapper.h"
+#import <objc/message.h>
 #import "APCRuntime.h"
 #import "APCScope.h"
 
@@ -223,7 +224,7 @@ void apc_disposeProperty(APCHookProperty* p)
 //    return [apc_runtime_propertyhook(cls , property) boundProperties];
 //}
 
-APCHookProperty* apc_property_getRootProperty(APCHookProperty* p)
+__kindof APCHookProperty* apc_property_getRootProperty(APCHookProperty* p)
 {
     NSMutableArray<APCHookProperty*>* matchs = [NSMutableArray array];
     APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
@@ -241,18 +242,15 @@ APCHookProperty* apc_property_getRootProperty(APCHookProperty* p)
     return matchs.lastObject;
 }
 
-APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
+__kindof APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 {
     APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
-    
+    APCHookProperty* item;
     do {
         
-        for (APCHookProperty* item in hook) {
+        if(nil != (item = ((id(*)(id,SEL))objc_msgSend)(hook, p.outlet))){
             
-            if(p.class == item.class){
-                
-                return item;
-            }
+            return item;
         }
     } while (nil != (hook = [hook superhook]));
     
@@ -262,20 +260,18 @@ APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 NSArray<__kindof APCHookProperty*>*
 apc_property_getSuperPropertyList(APCHookProperty* p)
 {
-    NSMutableArray*  ret = [NSMutableArray array];
     APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
+    NSMutableArray*  ret = [NSMutableArray array];
+    APCHookProperty* item;
     do {
         
-        for (APCHookProperty* item in hook) {
+        if(nil != (item = ((id(*)(id,SEL))objc_msgSend)(hook, p.outlet))){
             
-            if(p.class == item.class){
-                
-                [ret addObject:item];
-            }
+            [ret addObject:item];
         }
     } while (nil != (hook = [hook superhook]));
     
-    return ret.copy;
+    return [ret copy];
 }
 
 

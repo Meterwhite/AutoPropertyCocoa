@@ -185,7 +185,7 @@
 //        [propertyInfo setterBindCountTrigger:block condition:condition];
 //    }
     
-    [propertyInfo hook];
+    [propertyInfo associatedHook];
 }
 
 #pragma mark - Instance

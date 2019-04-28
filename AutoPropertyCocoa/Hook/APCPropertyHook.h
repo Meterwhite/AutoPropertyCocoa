@@ -34,16 +34,19 @@
 @interface APCPropertyHook : APCMethodHook<APCPropertyHookProtocol>
 {
 @public
-    
     __kindof APCMethodHook* _superhook;
     APCProxyClass           _proxyClass;
 }
 
 + (nullable instancetype)hookWithProperty:(nonnull __kindof APCHookProperty*)property;
-
++ (void)lockRead;
++ (void)lockWrite;
 //@property (nonatomic,strong,nullable) NSEnumerator<APCHookProperty*>* propertyEnumerator;
 @property (nonatomic,readonly) BOOL        isEmpty;
 
+/**
+ Result is a valid property.
+ */
 @property (nullable,atomic,strong) APCTriggerGetterProperty* getterTrigger;
 @property (nullable,atomic,strong) APCTriggerSetterProperty* setterTrigger;
 @property (nullable,atomic,strong) APCLazyProperty* lazyload;
@@ -53,10 +56,8 @@
 @property (nonnull,nonatomic,strong,readonly) __kindof APCPropertyHook* superhook;
 @property (nullable,nonatomic,copy,readonly) NSString* hookMethod;
 
-//- (nullable __kindof APCHookProperty*)boundPropertyForKind:(nonnull Class)cls;
-//- (nonnull NSArray<APCHookProperty*>*)boundProperties;
-- (void)unbindProperty:(nonnull __kindof APCHookProperty*)property;
 - (void)bindProperty:(nonnull __kindof APCHookProperty*)property;
+- (void)unbindProperty:(nonnull __kindof APCHookProperty*)property;
 
 - (nullable id)performOldGetterFromTarget:(nonnull id)target;
 

@@ -10,38 +10,38 @@
 #import "APCTriggerSetterProperty.h"
 #import "APCPropertyHook.h"
 #import "APCLazyProperty.h"
+#import <objc/message.h>
 #import "APCRuntime.h"
 #import "APCScope.h"
 
 id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
 {
     APCPropertyHook* hook;
-    
+    NSString*        _CMD_s = NSStringFromSelector(_CMD);
     if(YES == apc_object_isProxyInstance(_SELF)){
         
-        hook = apc_lookup_instancePropertyhook(_SELF
-                                               , NSStringFromSelector(_CMD));
-    }else{
+        hook = apc_lookup_instancePropertyhook(_SELF, _CMD_s);
+    }else if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), _CMD_s))){
         
-        if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF)
-                                                  , NSStringFromSelector(_CMD)))){
-            
-            NSCAssert(NO, @"APC: BAD ACCESS.");
-        }
+        NSCAssert(NO, @"APC: BAD ACCESS.APC has lost this valid property.");
     }
+    
     
     if(hook.isEmpty){
         
         return [apc_propertyhook_rootHook(hook) performOldGetterFromTarget:_SELF];
     }
     
-    APCTriggerGetterProperty* p_trigger = hook.getterTrigger;
-    APCLazyProperty* p_lazy = hook.lazyload;
+    APCTriggerGetterProperty*   p_trigger   = hook.getterTrigger;
+    APCLazyProperty*            p_lazy      = hook.lazyload;
     
     /** ----------------Future----------------- */
-    if(p_trigger.triggerOption & APCPropertyGetterFrontTrigger){
+    if(p_trigger != nil){
         
-        [p_trigger performGetterFrontTriggerBlock:_SELF];
+        if(p_trigger.triggerOption & APCPropertyGetterFrontTrigger) {
+            
+            [p_trigger performGetterFrontTriggerBlock:_SELF];
+        }
     }
     
     /** ----------------Happen----------------- */
@@ -52,32 +52,35 @@ id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
     if(p_lazy != nil){
         
         val = [p_lazy performLazyloadForTarget:_SELF oldValue:val];
+        [p_lazy access];
     }
     
     /** ----------------Result----------------- */
-    if(p_trigger.triggerOption & APCPropertyGetterPostTrigger){
+    if(p_trigger != nil){
         
-        [p_trigger performGetterPostTriggerBlock:_SELF value:val];
-    }
-    
-    if(p_trigger.triggerOption & APCPropertyGetterUserTrigger){
-        
-        if(YES == [p_trigger performGetterUserConditionBlock:_SELF value:val]){
+        if(p_trigger.triggerOption & APCPropertyGetterPostTrigger){
             
-            [p_trigger performGetterUserTriggerBlock:_SELF value:val];
+            [p_trigger performGetterPostTriggerBlock:_SELF value:val];
         }
-    }
-    
-    if(p_trigger.triggerOption & APCPropertyGetterCountTrigger){
         
-        if(YES == [p_trigger performGetterCountConditionBlock:_SELF value:val]){
+        if(p_trigger.triggerOption & APCPropertyGetterUserTrigger){
             
-            [p_trigger performGetterCountTriggerBlock:_SELF value:val];
+            if(YES == [p_trigger performGetterUserConditionBlock:_SELF value:val]){
+                
+                [p_trigger performGetterUserTriggerBlock:_SELF value:val];
+            }
         }
+        
+        if(p_trigger.triggerOption & APCPropertyGetterCountTrigger){
+            
+            if(YES == [p_trigger performGetterCountConditionBlock:_SELF value:val]){
+                
+                [p_trigger performGetterCountTriggerBlock:_SELF value:val];
+            }
+        }
+        
+        [p_trigger access];
     }
-    
-    //should move count to hook?
-    [p_trigger access];
     
     return val;
 }
@@ -93,8 +96,8 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 @implementation APCPropertyHook
 {
 #warning add lock
-    NSString*               _valueTypeEncoding;
     const char*             _methodTypeEncoding;
+    NSString*               _valueTypeEncoding;
     APCPropertyValueKind    _kindOfValue;
     APCPropertyOwnerKind    _kindOfOwner;
     APCMethodStyle          _methodStyle;
@@ -102,6 +105,9 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     _Atomic(void*)          _setterTrigger;
     _Atomic(void*)          _lazyload;
     __weak id               _instance;
+    dispatch_semaphore_t    _l_lock;
+    dispatch_semaphore_t    _r_lock;
+    dispatch_semaphore_t    _w_lock;
 }
 
 + (instancetype)hookWithProperty:(APCHookProperty *)property
@@ -114,19 +120,14 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     self = [super init];
     if (self) {
         
-        if([property isKindOfClass:[APCLazyProperty class]]){
-            
-            self.lazyload = property;
-        }else if([property isKindOfClass:[APCTriggerGetterProperty class]]){
-            
-            self.getterTrigger = property;
-        }else if([property isKindOfClass:[APCTriggerSetterProperty class]]){
-            
-            self.setterTrigger = property;
-        }else{
-            
-            NSAssert(NO, @"APC: Undefined behavior!");
-        }
+        NSAssert((_hookclass == property->_des_class) && ([_hookMethod isEqualToString:property->_hooked_name])
+                 , @"APC: Mismatched type or property.");
+        
+        NSAssert(property.inlet != nil, @"APC: Undefined behavior!");
+        
+        ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
+        
+        _l_lock         = dispatch_semaphore_create(1);
         _source_class   = property->_src_class;
         _hookclass      = property->_des_class;
         _hookMethod     = property->_hooked_name;
@@ -157,11 +158,15 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     while (YES) {
         
         void* expected = _lazyload;
-        if(atomic_compare_exchange_weak(&_lazyload, &expected, desired)){
+        if(atomic_compare_exchange_strong(&_lazyload, &expected, desired)){
             
             if(desired == nil){
                 
+                ((__bridge APCLazyProperty *)expected).associatedHook = self;
                 CFRelease(expected);
+            }else{
+                
+                lazyload.associatedHook = self;
             }
             break;
         }
@@ -170,12 +175,12 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 
 - (APCLazyProperty *)lazyload
 {
-    APCLazyProperty *ret = CFBridgingRelease(atomic_load(&_lazyload));
-    if(ret.enable == NO){
+    APCLazyProperty *p = CFBridgingRelease(&_lazyload);
+    if(p.enable == NO){
         
         return nil;
     }
-    return ret;
+    return p;
 }
 
 - (void)setGetterTrigger:(APCTriggerGetterProperty *)getterTrigger
@@ -184,11 +189,15 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     while (YES) {
         
         void* expected = _getterTrigger;
-        if(atomic_compare_exchange_weak(&_getterTrigger, &expected, desired)){
+        if(atomic_compare_exchange_strong(&_getterTrigger, &expected, desired)){
             
             if(desired == nil){
                 
+                ((__bridge APCTriggerGetterProperty *)expected).associatedHook = self;
                 CFRelease(expected);
+            }else{
+                
+                getterTrigger.associatedHook = self;
             }
             break;
         }
@@ -197,12 +206,12 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 
 - (APCTriggerGetterProperty *)getterTrigger
 {
-    APCTriggerGetterProperty *ret = CFBridgingRelease(atomic_load(&_getterTrigger));
-    if(ret.enable == NO){
+    APCTriggerGetterProperty *p = CFBridgingRelease(_getterTrigger);
+    if(p.enable == NO){
         
         return nil;
     }
-    return ret;
+    return p;
 }
 
 - (void)setSetterTrigger:(APCTriggerSetterProperty *)setterTrigger
@@ -211,11 +220,15 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     while (YES) {
         
         void* expected = _setterTrigger;
-        if(atomic_compare_exchange_weak(&_setterTrigger, &expected, desired)){
+        if(atomic_compare_exchange_strong(&_setterTrigger, &expected, desired)){
             
             if(desired == nil){
                 
+                ((__bridge APCTriggerSetterProperty *)expected).associatedHook = self;
                 CFRelease(expected);
+            }else{
+                
+                setterTrigger.associatedHook = self;
             }
             break;
         }
@@ -224,58 +237,38 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 
 - (APCTriggerSetterProperty *)setterTrigger
 {
-    APCTriggerSetterProperty * ret = CFBridgingRelease(atomic_load(&_setterTrigger));
-    if(ret.enable == NO){
+    APCTriggerSetterProperty * p = CFBridgingRelease(_setterTrigger);
+    if(p.enable == NO){
         
         return nil;
     }
-    return ret;
+    return p;
 }
 
 - (void)bindProperty:(__kindof APCHookProperty *)property
 {
-    NSAssert((_hookclass == property->_des_class)
-              && ([_hookMethod isEqualToString:property->_hooked_name]), @"APC: Class name and property name are one by one mapped.");
     
-    if([property isKindOfClass:[APCLazyProperty class]]){
-        
-        self.lazyload = property;
-    }else if([property isKindOfClass:[APCTriggerGetterProperty class]]){
-        
-        self.getterTrigger = property;
-    }else if([property isKindOfClass:[APCTriggerSetterProperty class]]){
-        
-        self.setterTrigger = property;
-    }else{
-        
-        NSAssert(NO, @"APC: Undefined behavior!");
-    }
+    NSAssert((_hookclass == property->_des_class) && ([_hookMethod isEqualToString:property->_hooked_name])
+             , @"APC: Mismatched type or property.");
     
-    [property bindingToHook:self];
+    NSAssert(property.inlet != nil, @"APC: Undefined behavior!");
+    
+    ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
+    
 }
 
 - (void)unbindProperty:(__kindof APCHookProperty *)property
 {
-    NSAssert((_hookclass == property->_des_class)
-             && ([_hookMethod isEqualToString:property->_hooked_name]), @"APC: Class name and property name are one by one mapped.");
+    NSAssert((_hookclass == property->_des_class) && ([_hookMethod isEqualToString:property->_hooked_name])
+             , @"APC: Mismatched type or property.");
+    
+    NSAssert(property.inlet != nil, @"APC: Undefined behavior!");
 
+    [property invalid];
+    
     @autoreleasepool {
-
-        if(property == _lazyload){
-            
-            self.lazyload = nil;
-        }else if (property == _getterTrigger){
-            
-            self.getterTrigger = nil;
-        }else if (property == _setterTrigger){
-            
-            self.setterTrigger = nil;
-        }else{
-            
-            NSAssert(NO, @"APC: Undefined behavior!");
-        }
-        [property invalid];
-        [property bindingToHook:nil];
+        
+        ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, nil);
         if(self.isEmpty){
 
             [self unhook];
@@ -403,9 +396,21 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 {
     _instance           = nil;
     
-    if(_lazyload)       CFRelease(_lazyload);
-    if(_getterTrigger)  CFRelease(_getterTrigger);
-    if(_setterTrigger)  CFRelease(_setterTrigger);
+    if(_lazyload != nil){
+        
+        CFRelease(_lazyload);
+    }
+    
+    if(_getterTrigger != nil){
+        
+        CFRelease(_getterTrigger);
+    }
+    
+    if(_setterTrigger != nil){
+        
+        CFRelease(_setterTrigger);
+    }
+    
     if(_kindOfOwner == APCPropertyOwnerKindOfInstance){
         
         [self disposeRuntimeResource];
@@ -422,12 +427,49 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 
 - (void)performOldSetterFromTarget:(id)target withValue:(id)value
 {
+    if(NO == (_new_implementation && _old_implementation)){
+        
+        return;
+    }
     
+    apc_setterimp_boxinvok(target
+                           , NSSelectorFromString(_hookMethod)
+                           , _old_implementation
+                           , _valueTypeEncoding.UTF8String
+                           , value);
 }
 
 - (id)performOldGetterFromTarget:(id)target
 {
-    return nil;
+    if(NO == (_new_implementation && _old_implementation)){
+        
+        return nil;
+    }
+    
+    return
+    
+    apc_getterimp_boxinvok(target
+                           , NSSelectorFromString(_hookMethod)
+                           , _old_implementation
+                           , _valueTypeEncoding.UTF8String);
 }
 @end
 
+// perform old
+//    if(NO == (_new_getter_implementation && _old_getter_implementation)){
+//
+//        return nil;
+//    }
+//
+//    [APCLazyloadOldLoopController joinLoop:target];
+//
+//    id ret
+//    =
+//    apc_getterimp_boxinvok(target
+//                           , NSSelectorFromString(_des_getter_name)
+//                           , _old_getter_implementation
+//                           , self.valueTypeEncoding.UTF8String);
+//
+//    [APCLazyloadOldLoopController breakLoop:target];
+//
+//    return ret;

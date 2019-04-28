@@ -7,6 +7,7 @@
 //
 
 #import "APCTriggerSetterProperty.h"
+#import "APCPropertyHook.h"
 
 @implementation APCTriggerSetterProperty
 {
@@ -135,5 +136,25 @@
     }
 }
 
+static SEL _outlet = 0;
+- (SEL)outlet
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _outlet = @selector(setterTrigger);
+    });
+    
+    return _outlet;
+}
 
+static SEL _inlet = 0;
+- (SEL)inlet
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _inlet = @selector(setGetterTrigger:);
+    });
+    
+    return _inlet;
+}
 @end

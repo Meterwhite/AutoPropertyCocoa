@@ -6,6 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 #import "APCTriggerGetterProperty.h"
+#import "APCPropertyHook.h"
 #import "APCScope.h"
 
 @implementation APCTriggerGetterProperty
@@ -132,6 +133,28 @@
         return _block_countcondition(_SELF, value, self.accessCount);
     }
     return NO;
+}
+
+static SEL _outlet = 0;
+- (SEL)outlet
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _outlet = @selector(getterTrigger);
+    });
+    
+    return _outlet;
+}
+
+static SEL _inlet = 0;
+- (SEL)inlet
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _inlet = @selector(setGetterTrigger:);
+    });
+    
+    return _inlet;
 }
 
 - (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target

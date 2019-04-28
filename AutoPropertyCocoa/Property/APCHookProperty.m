@@ -60,9 +60,19 @@
     return _hooked_name;
 }
 
--(void)bindingToHook:(APCPropertyHook *)hook
+//-(void)bindingToHook:(APCPropertyHook *)hook
+//{
+//    _hook = hook;
+//}
+
+- (SEL)outlet
 {
-    _hook = hook;
+    return (SEL)0;
+}
+
+- (SEL)inlet
+{
+    return (SEL)0;
 }
 
 //+ (instancetype)boundPropertyForClass:(__unsafe_unretained Class)cls property:(NSString *)property
@@ -77,9 +87,9 @@
 
 - (void)unhook
 {
-    if(_hook != nil){
+    if(_associatedHook != nil){
         
-        [_hook unbindProperty:self];
+        [_associatedHook unbindProperty:self];
     }
 }
 

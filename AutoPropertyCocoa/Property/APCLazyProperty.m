@@ -118,6 +118,42 @@
     NSLog(@"");
 }
 
+static SEL _outlet = 0;
+- (SEL)outlet
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _outlet = @selector(lazyload);
+    });
+    
+    return _outlet;
+}
+
+static SEL _inlet = 0;
+- (SEL)inlet
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _inlet = @selector(setLazyload:);
+    });
+    
+    return _inlet;
+}
+
+- (id)performLazyloadForTarget:(id)tag oldValue:(id)oldValue
+{
+    APCLazyProperty* p_super = apc_property_getSuperProperty(self);
+    
+    if(p_super != nil){
+        
+        oldValue = [p_super performLazyloadForTarget:tag oldValue:oldValue];
+    }
+    
+    
+    
+    return oldValue;
+}
+
 @end
 
 
@@ -388,21 +424,3 @@
 //}
 
 
-
-//    if(NO == (_new_getter_implementation && _old_getter_implementation)){
-//
-//        return nil;
-//    }
-//
-//    [APCLazyloadOldLoopController joinLoop:target];
-//
-//    id ret
-//    =
-//    apc_getterimp_boxinvok(target
-//                           , NSSelectorFromString(_des_getter_name)
-//                           , _old_getter_implementation
-//                           , self.valueTypeEncoding.UTF8String);
-//
-//    [APCLazyloadOldLoopController breakLoop:target];
-//
-//    return ret;

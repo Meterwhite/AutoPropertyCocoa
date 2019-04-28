@@ -30,10 +30,10 @@ apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
 
 
 #pragma mark - For property
-OBJC_EXPORT APCHookProperty* _Nullable
+OBJC_EXPORT __kindof APCHookProperty* _Nullable
 apc_property_getRootProperty(APCHookProperty* _Nonnull p);
 
-OBJC_EXPORT APCHookProperty* _Nullable
+OBJC_EXPORT __kindof APCHookProperty* _Nullable
 apc_property_getSuperProperty(APCHookProperty* _Nonnull p);
 
 OBJC_EXPORT NSArray<__kindof APCHookProperty*>* _Nullable

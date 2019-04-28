@@ -146,7 +146,7 @@ return;
         apc_invokS_rbox_by(NSRange)
     }
     ///enc-m
-    NSCAssert(NO, @"Types that are not supported.");
+    NSCAssert(NO, @"APC: This type is not supported.");
 }
 
 
@@ -239,7 +239,7 @@ return [NSValue valueWithBytes:&returnValue objCType:enc];
         apc_invokG_rbox_by(NSRange)
     }
     ///enc-m
-    NSCAssert(NO, @"Types that are not supported.");
+    NSCAssert(NO, @"APC: This type is not supported.");
     return nil;
 }
 
