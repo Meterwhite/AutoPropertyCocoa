@@ -450,12 +450,15 @@ apc_testfunc(testClassInstanceLazyLoadSimple,911)
     
     Man* m = [Man new];
     
-    [Man apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id _Nonnull instance) {
+    [m apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id _Nonnull instance) {
         
         return @"FuckAStockMarket";
     }];
     
-    NSParameterAssert(m.name == nil);
+    [m apc_unbindLazyLoadForProperty:@"name"];
+    
+    
+    NSParameterAssert([m.name isEqualToString:@"init _name"]);
 }
 
 apc_testfunc(testClassInstanceLazyLoadSimple,912)

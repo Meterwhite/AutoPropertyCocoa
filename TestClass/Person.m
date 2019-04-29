@@ -13,6 +13,17 @@
     NSString* _name_1;
     APCRect _rect_1;
 }
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        
+        _name = @"init _name";
+    }
+    return self;
+}
+
 - (void)mySetName1:(NSString *)name1
 {
     _name_1 = name1;

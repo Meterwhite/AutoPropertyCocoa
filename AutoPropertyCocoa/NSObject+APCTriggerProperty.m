@@ -422,9 +422,6 @@ id _Nullable apc_trigger_getter(id _Nonnull _SELF, SEL _Nonnull _CMD)
 //    return ret;
     return nil;
 }
-
-apc_def_vGHook_and_impimage(apc_trigger_getter)
-
 #pragma mark - hook of setter
 void apc_trigger_setter(id _Nonnull _SELF, SEL _Nonnull _CMD, id _Nullable value)
 {
@@ -466,5 +463,3 @@ void apc_trigger_setter(id _Nonnull _SELF, SEL _Nonnull _CMD, id _Nullable value
 //        }
 //    }
 }
-
-apc_def_vSHook_and_impimage(apc_trigger_setter)

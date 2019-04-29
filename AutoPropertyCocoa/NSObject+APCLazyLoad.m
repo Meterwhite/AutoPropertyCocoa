@@ -45,7 +45,7 @@
 
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-//    [[APCLazyProperty boundPropertyForClass:self property:property] unhook];
+    [apc_lookup_propertyhook(self, property) setLazyload:nil];
 }
 
 
@@ -82,43 +82,36 @@
 
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
-//    [(APCLazyProperty*)[APCInstancePropertyCacheManager boundPropertyFromInstance:self cmd:property] unhook];
-//    [APCLazyProperty boundPropertyForClass:self property:property];
+    [apc_lookup_instancePropertyhook(self, property) setLazyload:nil];
 }
 
-- (void)apc_unbindLazyLoadAllProperties
-{
-//    [[APCInstancePropertyCacheManager boundAllPropertiesForInstance:self]
-//     makeObjectsPerformSelector:@selector(unhook)];
-}
-
-
-- (void)apc_instanceSetLazyLoadProperty:(NSString*)propertyName
+- (void)apc_instanceSetLazyLoadProperty:(NSString*)property
                           hookWithBlock:(id)block
                             hookWithSEL:(SEL)aSelector
 {
-#warning <#message#>
-    APCLazyProperty* propertyInfo;
+    APCLazyProperty* p = apc_lookup_instancePropertyhook(self, property).lazyload;
     
-    if(propertyInfo == nil){
+    if(p == nil){
         
-        propertyInfo = [APCLazyProperty instanceWithProperty:propertyName aInstance:self];
+        p = [APCLazyProperty instanceWithProperty:property aInstance:self];
+        apc_object_hookWithProxyClass(self);
+        apc_instance_setAssociatedProperty(self, p);
     }
     
-    if(NO  == (propertyInfo.accessOption & APCPropertyGetValueEnable)
+    if(NO  == (p.accessOption & APCPropertyGetValueEnable)
        
        ||
        
-       NO  == (propertyInfo.accessOption & APCPropertySetValueEnable)){
+       NO  == (p.accessOption & APCPropertySetValueEnable)){
         return;
     }
     
     if(block){
         
-        [propertyInfo bindindUserBlock:block];
+        [p bindindUserBlock:block];
     }else{
         
-        [propertyInfo bindingUserSelector:aSelector];
+        [p bindingUserSelector:aSelector];
     }
 }
 
@@ -154,80 +147,3 @@
 }
 
 @end
-/**
- Destination.
- */
-id _Nullable apc_lazy_property(_Nullable id _SELF,SEL _CMD)
-{
-    APCLazyProperty* p;
-    
-//    if(nil == (p = [APCInstancePropertyCacheManager boundPropertyFromInstance:_SELF cmd:NSStringFromSelector(_CMD)]))
-        
-        //Get info from _SELF.
-        //The info tell me where does it search from.
-//        if(nil == (p = [APCLazyProperty cachedFromAClassByInstance:_SELF property:NSStringFromSelector(_CMD)]))
-        
-//            NSCAssert(NO, @"APC: Lose property info.");
-    
-    
-//    if(NO == p.enable
-//       || YES == [APCLazyloadOldLoopController testingIsInLoop:_SELF]){
-//
-//        return [p performOldGetterFromTarget:_SELF];
-//    }
-    
-    
-    id                  value       = nil;
-    ///Get value.(All returned value are boxed)
-    if(p.accessOption & APCPropertyComponentOfGetter){
-        
-//        value = [p performOldGetterFromTarget:_SELF];
-    }else{
-        
-        value = [p getIvarValueFromTarget:_SELF];
-    }
-    
-    APCMemoryBarrier;
-    
-    NSUInteger   accessCount = p.accessCount;
-    if(value == nil
-       
-       && (p.kindOfValue == APCPropertyValueKindOfBlock ||
-           p.kindOfValue == APCPropertyValueKindOfObject))
-    {
-        ///Create default value.
-        if(p.kindOfUserHook == APCPropertyHookKindOfSelector){
-            
-            value = [p instancetypeNewObjectByUserSelector];
-        }
-        else{
-            
-            value = [p performUserBlock:_SELF];
-        }
-        [p setValue:value toTarget:_SELF];
-    }
-    else if (accessCount == 0
-             
-             && (p.kindOfValue != APCPropertyValueKindOfBlock ||
-                 p.kindOfValue != APCPropertyValueKindOfObject))
-    {
-        
-        NSCAssert(p.kindOfUserHook == APCPropertyHookKindOfBlock
-                  , @"APC: Basic-value only supportted be initialized by 'userblock'.");
-        
-        value = [p performUserBlock:_SELF];
-        [p setValue:value toTarget:_SELF];
-    }
-    
-    [p access];
-    
-    return value;
-}
-
-/**
- defines
- :
- apc_lazy_property + _ + type encode
- apc_lazy_property + _ + impimage
- */
-apc_def_vGHook_and_impimage(apc_lazy_property)

@@ -5,14 +5,16 @@
 #import <objc/NSObject.h>
 #import <objc/runtime.h>
 
-#if TARGET_OS_IPHONE || TARGET_OS_TV
+
+
+
+#if TARGET_OS_IPHONE || TARGET_OS_TV || TARGET_OS_WATCH
 
 #import <UIKit/UIKit.h>
 #define APCRect             CGRect
 #define APCPoint            CGPoint
 #define APCSize             CGSize
 #define APCEdgeinsets       UIEdgeInsets
-
 #elif TARGET_OS_MAC
 
 #import <AppKit/AppKit.h>
@@ -20,21 +22,44 @@
 #define APCPoint            NSPoint
 #define APCSize             NSSize
 #define APCEdgeinsets       NSEdgeInsets
-
 #endif
 
+
+
+
 #ifndef __STDC_NO_ATOMICS__
+
 #import <stdatomic.h>
 #define APCAtomicUInteger   _Atomic(NSUInteger)
 #define APCMemoryBarrier    atomic_thread_fence(memory_order_seq_cst)
+#else
+#define APCAtomicUInteger NSUInteger
+#define APCMemoryBarrier
 #endif
-
-
 
 #define APCThreadID ([NSThread currentThread])
 
-typedef Class       APCProxyClass;
-typedef NSObject    APCProxyInstance;
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_10_0 \
+|| MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12 \
+|| __TV_OS_VERSION_MIN_REQUIRED >= __TVOS_10_0
+
+#import <os/lock.h>
+#define apc_spinlock_unlock os_unfair_lock_unlock
+#define apc_spinlock_lock os_unfair_lock_lock
+#define apc_spinlock_init OS_UNFAIR_LOCK_INIT
+#define apc_spinlock os_unfair_lock
+#else
+
+#import <libkern/OSAtomic.h>
+#define apc_spinlock_unlock OSSpinLockUnlock
+#define APC_SPINLOCK_INIT OS_SPINLOCK_INIT
+#define apc_spinlock_lock OSSpinLockLock
+#define apc_spinlock OSSpinLock
+#endif
+
+typedef NSObject        APCProxyInstance;
+typedef Class           APCProxyClass;
+typedef apc_spinlock    APCSpinLock;
 
 FOUNDATION_EXPORT NSString *const APCProgramingType_point;
 FOUNDATION_EXPORT NSString *const APCProgramingType_chars;

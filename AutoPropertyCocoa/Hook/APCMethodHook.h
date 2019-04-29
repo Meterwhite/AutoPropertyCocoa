@@ -26,7 +26,7 @@
 {
 @protected
     
-    IMP         _new_implementation;
+    _Atomic(IMP)_new_implementation;
     IMP         _old_implementation;
     Class       _source_class;
 }

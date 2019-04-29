@@ -24,10 +24,12 @@ typedef NS_OPTIONS (NSUInteger,APCPropertyAccessOptions){
     
     APCPropertySetValueEnable      =   APCPropertyComponentOfSetter
                                         | APCPropertyAssociatedSetter
-                                        | APCPropertyComponentOfIVar,
+                                        | APCPropertyComponentOfIVar
+                                        | APCPropertyAssociatedIVar,
     
     APCPropertyGetValueEnable      =   APCPropertyComponentOfGetter
-                                        | APCPropertyComponentOfIVar,
+                                        | APCPropertyComponentOfIVar
+                                        | APCPropertyAssociatedIVar,
 };
 
 typedef NS_OPTIONS(NSUInteger,APCPropertyValueKind){
@@ -72,9 +74,9 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
     NSUInteger              _hashcode;
     Class                   _des_class;
     Class                   _src_class;
-    NSString*               _ori_property_name;//user
-    NSString*               _des_getter_name;//property getter
-    NSString*               _des_setter_name;//property setter
+    NSString*               _ori_property_name;
+    NSString*               _des_getter_name;
+    NSString*               _des_setter_name;
     __weak id               _instance;
 @protected
     

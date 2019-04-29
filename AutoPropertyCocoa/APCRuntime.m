@@ -246,13 +246,13 @@ __kindof APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 {
     APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
     APCHookProperty* item;
-    do {
+    while (nil != (hook = [hook superhook])) {
         
         if(nil != (item = ((id(*)(id,SEL))objc_msgSend)(hook, p.outlet))){
             
             return item;
         }
-    } while (nil != (hook = [hook superhook]));
+    }
     
     return (APCHookProperty*)0;
 }
@@ -411,7 +411,7 @@ void apc_object_hookRecursive_break(id instance, SEL _Nonnull _CMD)
 #pragma mark - Proxy class - private
 static const char* _apcProxyClassID = ".APCProxyClass+";
 /** free! */
-static char* apc_instanceProxyClassName(id instance)
+NS_INLINE char* apc_instanceProxyClassName(id instance)
 {
     const char* cname = class_getName(object_getClass(instance));
     char h_str[2*sizeof(NSUInteger)] = {0};
