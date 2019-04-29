@@ -6,6 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "APCRuntime.h"
 #import "APCScope.h"
 
 @class APCMethodHook;
@@ -20,15 +21,19 @@
 - (nullable __kindof APCMethodHook*)superhook;
 - (nullable Class)hookclass;
 - (nullable NSString*)hookMethod;
+- (nonnull IMP)restoredImplementation;
+- (nonnull IMP)oldImplementation;
 @end
 
 @interface APCMethodHook : NSObject<APCMethodHookProtocol>
 {
+@public
+    
+    IMP             _old_implementation;
 @protected
     
-    _Atomic(IMP)_new_implementation;
-    IMP         _old_implementation;
-    Class       _source_class;
+    _Atomic(IMP)    _new_implementation;
+    Class           _source_class;
 }
 
 

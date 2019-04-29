@@ -132,7 +132,7 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
         _valueTypeEncoding  = property.valueTypeEncoding;
         _methodTypeEncoding = property.methodTypeEncoding.UTF8String;
         
-        if(_kindOfOwner == APCPropertyOwnerKindOfInstance){
+        if(_kindOfOwner == APCPropertyOwnerKindOfInstance) {
             
             _instance = property->_instance;
         }
@@ -302,25 +302,25 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
                             , NSSelectorFromString(_hookMethod)
                             , _new_implementation
                             , _methodTypeEncoding);
-        if(nil == _old_implementation){
-            
-            APCPropertyHook* sourcehook
-            = apc_lookup_firstPropertyhook_inRange(class_getSuperclass(_hookclass)
-                                            , _source_class
-                                            , _hookMethod);
-            if(nil != sourcehook){
-                
-                _old_implementation = sourcehook->_old_implementation;
-            }else{
-                
-                _old_implementation
-                =
-                class_getMethodImplementation(_source_class
-                                              , NSSelectorFromString(_hookMethod));
-            }
-            
-            NSAssert(_old_implementation, @"APC: Can not find original implementation.");
-        }
+//        if(nil == _old_implementation){
+//
+//            APCPropertyHook* sourcehook
+//            = apc_lookup_implementationPropertyhook_inRange(class_getSuperclass(_hookclass)
+//                                            , _source_class
+//                                            , _hookMethod);
+//            if(nil != sourcehook){
+//
+//                _old_implementation = sourcehook->_old_implementation;
+//            }else{
+//
+//                _old_implementation
+//                =
+//                class_getMethodImplementation(_source_class
+//                                              , NSSelectorFromString(_hookMethod));
+//            }
+//
+//            NSAssert(_old_implementation, @"APC: Can not find original implementation.");
+//        }
     }else{
         
         if(NO == apc_object_isProxyInstance(_instance)){
@@ -337,23 +337,23 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
                             , NSSelectorFromString(_hookMethod)
                             , _new_implementation
                             , _methodTypeEncoding);
-        if(nil == _old_implementation){
-            
-            APCPropertyHook* sourcehook
-            = apc_lookup_firstPropertyhook_inRange(class_getSuperclass(_hookclass)
-                                            , _source_class
-                                            , _hookMethod);
-            if(nil != sourcehook){
-                
-                _old_implementation = sourcehook->_old_implementation;
-            }else{
-                
-                _old_implementation
-                =
-                class_getMethodImplementation(_source_class
-                                              , NSSelectorFromString(_hookMethod));
-            }
-        }
+//        if(nil == _old_implementation){
+//
+//            APCPropertyHook* sourcehook
+//            = apc_lookup_implementationPropertyhook_inRange(class_getSuperclass(_hookclass)
+//                                            , _source_class
+//                                            , _hookMethod);
+//            if(nil != sourcehook){
+//
+//                _old_implementation = sourcehook->_old_implementation;
+//            }else{
+//
+//                _old_implementation
+//                =
+//                class_getMethodImplementation(_source_class
+//                                              , NSSelectorFromString(_hookMethod));
+//            }
+//        }
     }
 }
 
@@ -378,25 +378,10 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     {
         if(_kindOfOwner == APCPropertyOwnerKindOfClass)
         {
-            
-            
-            APCPropertyHook* sourcehook
-            = apc_lookup_firstPropertyhook_inRange(class_getSuperclass(_hookclass)
-                                                   , _source_class
-                                                   , _hookMethod);
-            if(sourcehook != nil){
-                
-                class_replaceMethod(_hookclass
-                                    , NSSelectorFromString(_hookMethod)
-                                    , sourcehook->_old_implementation
-                                    , _methodTypeEncoding);
-            }else{
-                
-                class_replaceMethod(_hookclass
-                                    , NSSelectorFromString(_hookMethod)
-                                    , _old_implementation
-                                    , _methodTypeEncoding);
-            }
+            class_replaceMethod(_hookclass
+                                , NSSelectorFromString(_hookMethod)
+                                , self.restoredImplementation
+                                , _methodTypeEncoding);
         }
         else
         {
@@ -407,6 +392,97 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
         }
     }
 }
+
+- (IMP)restoredImplementation
+{
+    /**
+     . Is APC inheritance?
+     . Self is source implementation?
+     . Can search a hook that is source implementation?
+     . Use source class implementation!
+     */
+    APCPropertyHook* hook
+    = apc_lookup_superPropertyhook_inRange(_hookclass
+                                           , _source_class
+                                           , _hookMethod);
+    if(hook != nil){
+        
+        return hook->_new_implementation;
+    }
+    
+    
+    if(_old_implementation){
+        
+        return _old_implementation;
+    }
+    
+    hook =
+    apc_lookup_implementationPropertyhook_inRange(apc_class_getSuperclass(_hookclass)
+                                                  , _source_class
+                                                  , _hookMethod);
+    if(hook != nil){
+        
+        return hook->_old_implementation;
+    }
+    
+    return
+    
+    class_getMethodImplementation(_source_class
+                                  , NSSelectorFromString(_hookMethod));
+}
+
+- (IMP)oldImplementation
+{
+    if(_old_implementation){
+        
+        return _old_implementation;
+    }
+    
+    APCPropertyHook* hook =
+    apc_lookup_implementationPropertyhook_inRange(apc_class_getSuperclass(_hookclass)
+                                                  , _source_class
+                                                  , _hookMethod);
+    if(hook != nil){
+        
+        return hook->_old_implementation;
+    }
+    
+    return
+    
+    class_getMethodImplementation(_source_class
+                                  , NSSelectorFromString(_hookMethod));
+}
+
+
+- (void)performOldSetterFromTarget:(id)target withValue:(id)value
+{
+    if(NO == (_new_implementation && _old_implementation)){
+        
+        return;
+    }
+    
+    apc_setterimp_boxinvok(target
+                           , NSSelectorFromString(_hookMethod)
+                           , self.oldImplementation
+                           , _valueTypeEncoding.UTF8String
+                           , value);
+}
+
+- (id)performOldGetterFromTarget:(id)target
+{
+    if(NO == (_new_implementation && _old_implementation)){
+        
+        return nil;
+    }
+    
+    return
+    
+    apc_getterimp_boxinvok(target
+                           , NSSelectorFromString(_hookMethod)
+                           , self.oldImplementation
+                           , _valueTypeEncoding.UTF8String);
+}
+
 
 - (void)dealloc
 {
@@ -440,34 +516,5 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
         apc_class_disposeProxyClass(_proxyClass);
         _proxyClass = nil;
     }
-}
-
-- (void)performOldSetterFromTarget:(id)target withValue:(id)value
-{
-    if(NO == (_new_implementation && _old_implementation)){
-        
-        return;
-    }
-    
-    apc_setterimp_boxinvok(target
-                           , NSSelectorFromString(_hookMethod)
-                           , _old_implementation
-                           , _valueTypeEncoding.UTF8String
-                           , value);
-}
-
-- (id)performOldGetterFromTarget:(id)target
-{
-    if(NO == (_new_implementation && _old_implementation)){
-        
-        return nil;
-    }
-    
-    return
-    
-    apc_getterimp_boxinvok(target
-                           , NSSelectorFromString(_hookMethod)
-                           , _old_implementation
-                           , _valueTypeEncoding.UTF8String);
 }
 @end

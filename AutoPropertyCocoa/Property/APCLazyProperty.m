@@ -27,7 +27,7 @@
             if(self.kindOfValue != APCPropertyValueKindOfObject
                && self.kindOfValue != APCPropertyValueKindOfBlock){
                 
-                NSAssert(NO, @"APC: Disable binding on basic-value type properties for class types.");
+                NSAssert(NO, @"APC: Disable binding on basic-value property for class object.");
             }
         }
     }
@@ -50,10 +50,12 @@
 
 - (id _Nullable)instancetypeNewObjectByUserSelector
 {
-    Class clzz = self.propertyClass;
-    NSMethodSignature *signature = [clzz methodSignatureForSelector:self.userSelector];
+    Class               clzz = self.propertyClass;
+    NSMethodSignature*  signature = [clzz methodSignatureForSelector:self.userSelector];
     
-    NSAssert(signature, @"APC: Can not find %@ in class %@.",NSStringFromSelector(self.userSelector),NSStringFromClass(clzz));
+    NSAssert(signature, @"APC: Can not find %@ in class %@."
+             , NSStringFromSelector(self.userSelector)
+             , NSStringFromClass(clzz));
     
     NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
     invocation.target = clzz;
@@ -141,13 +143,11 @@ static SEL _inlet = 0;
 
 - (id)performLazyloadForTarget:(id)target
 {
-    APCLazyProperty* p_super = apc_property_getSuperProperty(self);
+    /**
+     Lazy-load is a complete override method
+     , so super-propery should not be called here.
+     */
     id v;
-    if(p_super != nil){
-        
-        v = [p_super performLazyloadForTarget:target];
-    }
-    
     ///Safe
     if(self.accessOption & APCPropertyComponentOfGetter){
         
@@ -185,9 +185,6 @@ static SEL _inlet = 0;
         v = [self performUserBlock:target];
         [self setValue:v toTarget:target];
     }
-    
-    [self access];
-    
     return v;
 }
 

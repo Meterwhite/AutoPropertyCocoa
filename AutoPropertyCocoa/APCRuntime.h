@@ -16,9 +16,15 @@ apc_lookup_propertyhook(Class  _Nullable cls
 
 /** The second parameter 'to' is include. */
 OBJC_EXPORT APCPropertyHook* _Nullable
-apc_lookup_firstPropertyhook_inRange(Class _Nonnull from
-                              , Class  _Nonnull to
-                              , NSString* _Nonnull property);
+apc_lookup_superPropertyhook_inRange(Class _Nonnull from
+                                     , Class _Nonnull to
+                                     , NSString* _Nonnull property);
+
+/** The second parameter 'to' is include. */
+OBJC_EXPORT APCPropertyHook* _Nullable
+apc_lookup_implementationPropertyhook_inRange(Class _Nonnull from
+                                              , Class _Nonnull to
+                                              , NSString* _Nonnull property);
 
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_lookup_instancePropertyhook(APCProxyInstance* _Nonnull instance

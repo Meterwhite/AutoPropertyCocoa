@@ -64,9 +64,13 @@
 - (void)performOldSetterFromTarget:(nonnull id)target
                          withValue:(nullable id)value;
 
-//p list
-//unhook property
-//hook a proeprty
-//in .m auto unhook when no property be hooked
+/**
+ Implementation for restoring to a matching inheritance chain relationship.
+ */
+- (nonnull IMP)restoredImplementation;
 
+/**
+ Used to invoke the original implementation.
+ */
+- (nonnull IMP)oldImplementation;
 @end

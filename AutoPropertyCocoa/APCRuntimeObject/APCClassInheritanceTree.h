@@ -33,7 +33,16 @@
 
 /**
  Sort according to the depth of the brother branch.
- The direction of depth on the binary tree : ↙
+ The direction of depth on the binary tree : ↙ (Lower left)
+ -------------------------------
+ --ElderBrother---Father--------
+ -----------\------/------------
+ ------------\----/-------------
+ -------------Node--------------
+ ------------/----\-------------
+ -----------/------\------------
+ --------Child--YoungerBrother--
+ -------------------------------
  */
 - (nullable NSArray<APCClassInheritanceNode*>*)leafnodesInBrotherBranch;
 

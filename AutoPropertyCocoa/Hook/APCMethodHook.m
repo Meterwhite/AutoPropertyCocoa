@@ -12,12 +12,12 @@
 
 - (void)dealloc
 {
-    [self disposeRuntimeResource];
+    ///[self disposeRuntimeResource];
 }
 
 - (void)disposeRuntimeResource
 {
-    
+    ///...
 }
 
 @end

@@ -90,20 +90,31 @@ APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
     return apc_runtime_propertyhook(clazz, property);
 }
 
-APCPropertyHook* apc_lookup_firstPropertyhook_inRange(Class from, Class to, NSString* property)
+APCPropertyHook* apc_lookup_superPropertyhook_inRange(Class from, Class to, NSString* property)
 {
-    if([from isSubclassOfClass:to]){
+    APCPropertyHook* ret;
+    while (YES == [(from = apc_class_getSuperclass(from)) isSubclassOfClass:to]) {
+        
+        if(nil != (ret = apc_runtime_propertyhook(from, property)))
+            
+            return ret;
+    }
+    return (APCPropertyHook*)0;
+}
+
+APCPropertyHook* apc_lookup_implementationPropertyhook_inRange(Class from, Class to, NSString* property)
+{
+    if(YES == [from isSubclassOfClass:to]){
         
         APCPropertyHook*ret;
         do {
             
-                if(nil != (ret = apc_runtime_propertyhook(from, property)))
-                    
-                    return ret;
+            if(nil != ((void)(ret = apc_runtime_propertyhook(from, property)), ret->_old_implementation))
+                
+                return ret;
             
         } while (YES == [(from = apc_class_getSuperclass(from)) isSubclassOfClass:to]);
     }
-    
     return (APCPropertyHook*)0;
 }
 

@@ -56,6 +56,8 @@
 #define apc_spinlock_lock OSSpinLockLock
 #define apc_spinlock OSSpinLock
 #endif
+#warning <#message#>
+#define superproerty_apc
 
 typedef NSObject        APCProxyInstance;
 typedef Class           APCProxyClass;
