@@ -6,19 +6,13 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "APCMethod.h"
+#import "APCUserEnvironmentSupport.h"
 #import "APCProperty.h"
+#import "APCMethod.h"
 
 @protocol APCHookPropertyProtocol <NSObject>
 
 @required
-
-//+ (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
-//                                       property:(NSString* _Nonnull)property;
-//
-//- (instancetype _Nullable)boundPropertyForClass:(Class _Nonnull __unsafe_unretained)cls
-//                                        property:(NSString* _Nonnull)property;
-
 - (nullable SEL)outlet;
 - (nullable SEL)inlet;
 - (void)unhook;
@@ -33,7 +27,12 @@
 
 @class APCPropertyHook;
 
-@interface APCHookProperty : APCProperty <APCHookPropertyProtocol,APCMethodProtocol>
+@interface APCHookProperty : APCProperty
+<
+    APCHookPropertyProtocol
+    , APCMethodProtocol
+    , APCUserEnvironmentMessage
+>
 {
 @public
     

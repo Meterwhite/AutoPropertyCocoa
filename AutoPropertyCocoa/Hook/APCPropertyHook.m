@@ -302,27 +302,9 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
                             , NSSelectorFromString(_hookMethod)
                             , _new_implementation
                             , _methodTypeEncoding);
-//        if(nil == _old_implementation){
-//
-//            APCPropertyHook* sourcehook
-//            = apc_lookup_implementationPropertyhook_inRange(class_getSuperclass(_hookclass)
-//                                            , _source_class
-//                                            , _hookMethod);
-//            if(nil != sourcehook){
-//
-//                _old_implementation = sourcehook->_old_implementation;
-//            }else{
-//
-//                _old_implementation
-//                =
-//                class_getMethodImplementation(_source_class
-//                                              , NSSelectorFromString(_hookMethod));
-//            }
-//
-//            NSAssert(_old_implementation, @"APC: Can not find original implementation.");
-//        }
     }else{
         
+        ///APCPropertyOwnerKindOfInstance
         if(NO == apc_object_isProxyInstance(_instance)){
             
             _proxyClass = apc_object_hookWithProxyClass(_instance);
@@ -337,23 +319,6 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
                             , NSSelectorFromString(_hookMethod)
                             , _new_implementation
                             , _methodTypeEncoding);
-//        if(nil == _old_implementation){
-//
-//            APCPropertyHook* sourcehook
-//            = apc_lookup_implementationPropertyhook_inRange(class_getSuperclass(_hookclass)
-//                                            , _source_class
-//                                            , _hookMethod);
-//            if(nil != sourcehook){
-//
-//                _old_implementation = sourcehook->_old_implementation;
-//            }else{
-//
-//                _old_implementation
-//                =
-//                class_getMethodImplementation(_source_class
-//                                              , NSSelectorFromString(_hookMethod));
-//            }
-//        }
     }
 }
 
