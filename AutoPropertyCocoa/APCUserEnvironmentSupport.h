@@ -8,41 +8,43 @@
 
 #import <Foundation/Foundation.h>
 
-@class APCUserEnvironmentSupport;
-
-
-
 @protocol APCUserEnvironmentMessage <NSObject>
-- (nullable id)messageForSuper;
+- (nullable id<APCUserEnvironmentMessage>)superObject;
 @end
 
 @protocol APCUserEnvironmentSupport
-- (nonnull id)self;
-- (nonnull id)super_perform;
+- (nullable id)performSuperMessage_id;
+- (void)performSuperMessage_void;
+- (BOOL)performSuperMessage_BOOL;
 @end
 
 /**
  (result , enviroment , userHook)
  supermessage
  */
-@interface APCUserEnvironmentSupport<__covariant MessageType> : NSProxy <APCUserEnvironmentSupport>
+@interface APCUserEnvironmentSupport<MessageType> : NSProxy <APCUserEnvironmentSupport>
+typedef void(^APCUserEnvironmentAction)(APCUserEnvironmentSupport<MessageType>* uObject);
 
-typedef void(^APCUserEnvironmentAction)(APCUserEnvironmentSupport<MessageType>* iSupport);
+@property (nullable,nonatomic,copy,readonly) APCUserEnvironmentAction superMessagePerformerForAction;
+@property (nullable,nonatomic,strong) id returnedIDValue;
+@property (nonatomic,assign) BOOL returnedBOOLValue;
 
 - (nonnull instancetype)initWithObject:(nonnull NSObject*)object
                                message:(nonnull MessageType<APCUserEnvironmentMessage>)message;
+- (nonnull instancetype)setSuperMessagePerformerForAction:(nonnull APCUserEnvironmentAction)action;
 
-@property (nullable,nonatomic,copy,readonly) APCUserEnvironmentAction actionForPerformSuper;
-- (nonnull instancetype)setActionForPerformSuper:(APCUserEnvironmentAction)actionForPerformSuper;
 
-@property (nonatomic,assign) BOOL returned_bool;
-@property (nullable,nonatomic,strong) id returned_id;
 
-- (nonnull id)self;
 - (nullable MessageType)superMessage;
 
-- (void)performSuperMessage;
+/**
+ Overwrite <NSObject>.
+ Returns the object that actually responds to the message
+ */
+- (nonnull id)self;
+
+- (void)performSuperMessage_void;
+- (BOOL)performSuperMessage_BOOL;
 - (id)performSuperMessage_id;
-- (BOOL)performSuperMessage_b;
 @end
 

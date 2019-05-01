@@ -59,6 +59,20 @@
 #warning <#message#>
 #define superproerty_apc
 
+
+/**
+ Only one line of code completes the block call, checks, and returns the result.
+ AnyType ret = APCSafeBlock(object.block, args...);
+ */
+#define APCSafeBlockInvok(aBlockValue, args...) \
+(^(){\
+    \
+    typeof(aBlockValue) iblock = aBlockValue;\
+    \
+    return iblock ? iblock(args) : 0;\
+})()
+
+
 typedef NSObject        APCProxyInstance;
 typedef Class           APCProxyClass;
 typedef apc_spinlock    APCSpinLock;

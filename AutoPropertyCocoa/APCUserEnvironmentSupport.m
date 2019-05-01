@@ -17,7 +17,8 @@
 
 - (id)initWithObject:(NSObject *)object message:(id<APCUserEnvironmentMessage>)message
 {
-    NSAssert([message conformsToProtocol:@protocol(APCUserEnvironmentMessage)], @"APC: Object that is not supported.");
+    NSAssert([message conformsToProtocol:@protocol(APCUserEnvironmentMessage)]
+             , @"APC: Object that is not supported.");
     _instance = object;
     _message = message;
     return self;
@@ -27,31 +28,30 @@
 
 - (id)superMessage
 {
-    return [_message messageForSuper];
+    return [_message superObject];
 }
 
-- (id)setActionForPerformSuper:(APCUserEnvironmentAction)actionForPerformSuper
+- (id)setSuperMessagePerformerForAction:(APCUserEnvironmentAction)action
 {
-    _actionForPerformSuper = [actionForPerformSuper copy];
-    
+    _superMessagePerformerForAction = [action copy];
     return self;
 }
 
-- (void)performSuperMessage
+- (void)performSuperMessage_void
 {
-    _actionForPerformSuper(self);
+    APCSafeBlockInvok(self->_superMessagePerformerForAction, self);
 }
 
-- (BOOL)performSuperMessage_b
+- (BOOL)performSuperMessage_BOOL
 {
-    _actionForPerformSuper(self);
-    return _returned_bool;
+    APCSafeBlockInvok(self->_superMessagePerformerForAction, self);
+    return _returnedBOOLValue;
 }
 
 - (id)performSuperMessage_id
 {
-    _actionForPerformSuper(self);
-    return _returned_id;
+    APCSafeBlockInvok(self->_superMessagePerformerForAction, self);
+    return _returnedIDValue;
 }
 
 #pragma mark - Fast forwarding messages
@@ -73,8 +73,9 @@
 
 - (void)dealloc
 {
-    _instance   = nil;
-    _message    = nil;
+    _superMessagePerformerForAction = nil;
+    _instance                       = nil;
+    _message                        = nil;
 }
 
 #pragma mark - Overwrite <NSObject>

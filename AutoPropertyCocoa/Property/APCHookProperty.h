@@ -56,5 +56,5 @@
 - (NSUInteger)hash;
 
 #pragma mark - APCUserEnvironmentMessage
-- (nullable instancetype)messageForSuper;
+- (nullable instancetype)superObject;
 @end

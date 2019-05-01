@@ -109,7 +109,7 @@
 }
 
 
-- (instancetype)messageForSuper
+- (instancetype)superObject
 {
     return apc_property_getSuperProperty(self);
 }

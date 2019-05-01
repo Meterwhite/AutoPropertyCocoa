@@ -143,6 +143,15 @@ static SEL _inlet = 0;
 
 - (id)performLazyloadForTarget:(id)target
 {
+    APCUserEnvironmentSupport* userTarget
+    =
+    [[[APCUserEnvironmentSupport<APCLazyProperty*> alloc] initWithObject:target message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCLazyProperty *> *uObject) {
+        
+        uObject.returnedIDValue
+        =
+        [[uObject superMessage] performLazyloadForTarget:target];
+    }];
+    
     /**
      Lazy-load is a complete override method
      , so super-propery should not be called here.
@@ -157,32 +166,30 @@ static SEL _inlet = 0;
         v = [self getIvarValueFromTarget:target];
     }
     
-    if(v == nil
-       
-       && (self.kindOfValue == APCPropertyValueKindOfBlock ||
-           self.kindOfValue == APCPropertyValueKindOfObject))
+    if(v == nil &&
+       (self.kindOfValue == APCPropertyValueKindOfBlock ||
+        self.kindOfValue == APCPropertyValueKindOfObject))
     {
         ///Create default value.
-        if(self.kindOfUserHook == APCPropertyHookKindOfSelector){
-            
+        if(self.kindOfUserHook == APCPropertyHookKindOfSelector)
+        {
             v = [self instancetypeNewObjectByUserSelector];
         }
-        else{
-            
-            v = [self performUserBlock:target];
+        else
+        {
+            v = [self performUserBlock:userTarget];
         }
         [self setValue:v toTarget:target];
     }
-    else if (self.accessCount == 0
-             
-             && (self.kindOfValue != APCPropertyValueKindOfBlock ||
-                 self.kindOfValue != APCPropertyValueKindOfObject))
+    else if (self.accessCount == 0 &&
+             (self.kindOfValue != APCPropertyValueKindOfBlock ||
+              self.kindOfValue != APCPropertyValueKindOfObject))
     {
         
         NSCAssert(self.kindOfUserHook == APCPropertyHookKindOfBlock
                   , @"APC: Basic-value only supportted be initialized by 'userblock'.");
         
-        v = [self performUserBlock:target];
+        v = [self performUserBlock:userTarget];
         [self setValue:v toTarget:target];
     }
     return v;

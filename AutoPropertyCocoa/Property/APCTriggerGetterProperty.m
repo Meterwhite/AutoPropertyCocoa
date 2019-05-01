@@ -92,9 +92,9 @@
         
         _SELF
         =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
             
-            [iSupport superMessage]->_block_fronttrigger(_SELF);
+            [[uObject superMessage] performGetterFrontTriggerBlock:_SELF];
         }];
         
         _block_fronttrigger(_SELF);
@@ -107,9 +107,9 @@
         
         _SELF
         =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
             
-            [iSupport superMessage]->_block_posttrigger(_SELF, value);
+            [[uObject superMessage] performGetterPostTriggerBlock:_SELF value:value];
         }];
         _block_posttrigger(_SELF, value);
     }
@@ -121,9 +121,11 @@
         
         _SELF
         =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
             
-            iSupport.returned_bool = [iSupport superMessage]->_block_usercondition(_SELF, value);
+            uObject.returnedBOOLValue
+            =
+            [[uObject superMessage] performGetterUserConditionBlock:_SELF value:value];
         }];
         return _block_usercondition(_SELF, value);
     }
@@ -136,9 +138,9 @@
         
         _SELF
         =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
             
-            [iSupport superMessage]->_block_usertrigger(_SELF, value);
+            [[uObject superMessage] performGetterUserTriggerBlock:_SELF value:value];
         }];
         _block_usertrigger(_SELF,value);
     }
@@ -150,9 +152,9 @@
         
         _SELF
         =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
             
-            [iSupport superMessage]->_block_counttrigger(_SELF, value);
+            [[uObject superMessage] performGetterCountTriggerBlock:_SELF value:value];
         }];
         _block_counttrigger(_SELF,value);
     }
@@ -164,9 +166,11 @@
         
         _SELF
         =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
             
-            iSupport.returned_bool = [iSupport superMessage]->_block_countcondition(_SELF, value, self.accessCount);
+            uObject.returnedBOOLValue
+            =
+            [[uObject superMessage] performGetterCountConditionBlock:_SELF value:value];
         }];
         return _block_countcondition(_SELF, value, self.accessCount);
     }
