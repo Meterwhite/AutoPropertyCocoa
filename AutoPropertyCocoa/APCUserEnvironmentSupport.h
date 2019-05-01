@@ -8,34 +8,41 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol APCUserEnvironmentMessage <NSObject>
+@class APCUserEnvironmentSupport;
 
+
+
+@protocol APCUserEnvironmentMessage <NSObject>
+- (nullable id)messageForSuper;
 @end
 
+@protocol APCUserEnvironmentSupport
+- (nonnull id)self;
+- (nonnull id)super_perform;
+@end
 
 /**
- (instance, message, args)
- 
- result <- message -> block(↓↓↓)
- 
- Get key of block
+ (result , enviroment , userHook)
  supermessage
  */
-@interface APCUserEnvironmentSupport : NSProxy
+@interface APCUserEnvironmentSupport<__covariant MessageType> : NSProxy <APCUserEnvironmentSupport>
 
-- (nonnull id)initWithInstance:(nonnull NSObject*)object;
+typedef void(^APCUserEnvironmentAction)(APCUserEnvironmentSupport<MessageType>* iSupport);
 
-- (void)msg:(nonnull id<APCUserEnvironmentMessage>)message;
+- (nonnull instancetype)initWithObject:(nonnull NSObject*)object
+                               message:(nonnull MessageType<APCUserEnvironmentMessage>)message;
 
-/** block */
-- (void)act:(nonnull NSString*)ivar;
+@property (nullable,nonatomic,copy,readonly) APCUserEnvironmentAction actionForPerformSuper;
+- (nonnull instancetype)setActionForPerformSuper:(APCUserEnvironmentAction)actionForPerformSuper;
 
-- (void)value:(nonnull id)value;
+@property (nonatomic,assign) BOOL returned_bool;
+@property (nullable,nonatomic,strong) id returned_id;
 
-- (void)returnType;
+- (nonnull id)self;
+- (nullable MessageType)superMessage;
 
-
-- (nonnull id)SELF;
-- (nonnull id)SUPER_PERFORM;
+- (void)performSuperMessage;
+- (id)performSuperMessage_id;
+- (BOOL)performSuperMessage_b;
 @end
 

@@ -49,8 +49,12 @@
 - (nullable SEL)outlet;
 - (nullable SEL)inlet;
 
+
 /**
  NSClass.APCClass.hooedMethod
  */
 - (NSUInteger)hash;
+
+#pragma mark - APCUserEnvironmentMessage
+- (nullable instancetype)messageForSuper;
 @end

@@ -5,6 +5,7 @@
 //  Created by Novo on 2019/3/30.
 //  Copyright © 2019 Novo. All rights reserved.
 //
+#import "APCUserEnvironmentSupport.h"
 #import "APCTriggerGetterProperty.h"
 #import "APCPropertyHook.h"
 #import "APCScope.h"
@@ -89,6 +90,13 @@
 {
     if(_block_fronttrigger){
         
+        _SELF
+        =
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+            
+            [iSupport superMessage]->_block_fronttrigger(_SELF);
+        }];
+        
         _block_fronttrigger(_SELF);
     }
 }
@@ -97,6 +105,12 @@
 {
     if(_block_posttrigger){
         
+        _SELF
+        =
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+            
+            [iSupport superMessage]->_block_posttrigger(_SELF, value);
+        }];
         _block_posttrigger(_SELF, value);
     }
 }
@@ -105,6 +119,12 @@
 {
     if(_block_usercondition){
         
+        _SELF
+        =
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+            
+            iSupport.returned_bool = [iSupport superMessage]->_block_usercondition(_SELF, value);
+        }];
         return _block_usercondition(_SELF, value);
     }
     return NO;
@@ -114,6 +134,12 @@
 {
     if(_block_usertrigger){
         
+        _SELF
+        =
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+            
+            [iSupport superMessage]->_block_usertrigger(_SELF, value);
+        }];
         _block_usertrigger(_SELF,value);
     }
 }
@@ -122,6 +148,12 @@
 {
     if(_block_counttrigger){
         
+        _SELF
+        =
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+            
+            [iSupport superMessage]->_block_counttrigger(_SELF, value);
+        }];
         _block_counttrigger(_SELF,value);
     }
 }
@@ -130,6 +162,12 @@
 {
     if(_block_countcondition){
         
+        _SELF
+        =
+        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setActionForPerformSuper:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *iSupport) {
+            
+            iSupport.returned_bool = [iSupport superMessage]->_block_countcondition(_SELF, value, self.accessCount);
+        }];
         return _block_countcondition(_SELF, value, self.accessCount);
     }
     return NO;

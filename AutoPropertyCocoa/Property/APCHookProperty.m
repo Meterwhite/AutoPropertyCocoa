@@ -109,5 +109,8 @@
 }
 
 
-
+- (instancetype)messageForSuper
+{
+    return apc_property_getSuperProperty(self);
+}
 @end
