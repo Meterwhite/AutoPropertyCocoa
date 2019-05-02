@@ -90,13 +90,7 @@
 {
     if(_block_fronttrigger){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerSetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerSetterProperty *> *uObject) {
-            
-            [[uObject superMessage] performSetterFrontTriggerBlock:_SELF value:value];
-        }];
-        _block_fronttrigger(_SELF,value);
+        _block_fronttrigger(APCUserEnvironmentObject(_SELF, self), value);
     }
 }
 
@@ -104,13 +98,7 @@
 {
     if(_block_posttrigger){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerSetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerSetterProperty *> *uObject) {
-            
-            [[uObject superMessage] performSetterPostTriggerBlock:_SELF value:value];
-        }];
-        _block_posttrigger(_SELF, value);
+        _block_posttrigger(APCUserEnvironmentObject(_SELF, self), value);
     }
 }
 
@@ -118,15 +106,7 @@
 {
     if(_block_usercondition){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerSetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerSetterProperty *> *uObject) {
-            
-            uObject.returnedBOOLValue
-            =
-            [[uObject superMessage] performSetterUserConditionBlock:_SELF value:value];
-        }];
-        return _block_usercondition(_SELF, value);
+        return _block_usercondition(APCUserEnvironmentObject(_SELF, self), value);
     }
     return NO;
 }
@@ -135,13 +115,7 @@
 {
     if(_block_usertrigger){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerSetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerSetterProperty *> *uObject) {
-            
-            [[uObject superMessage] performSetterUserTriggerBlock:_SELF value:value];
-        }];
-        _block_usertrigger(_SELF,value);
+        _block_usertrigger(APCUserEnvironmentObject(_SELF, self),value);
     }
 }
 
@@ -149,13 +123,7 @@
 {
     if(_block_countcondition){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerSetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerSetterProperty *> *uObject) {
-            
-            [[uObject superMessage] performSetterCountConditionBlock:_SELF value:value];
-        }];
-        return _block_countcondition(_SELF, value, self.accessCount);
+        return _block_countcondition(APCUserEnvironmentObject(_SELF, self), value, self.accessCount);
     }
     return NO;
 }
@@ -164,13 +132,7 @@
 {
     if(_block_counttrigger){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerSetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerSetterProperty *> *uObject) {
-            
-            [[uObject superMessage] performSetterCountTriggerBlock:_SELF value:value];
-        }];
-        _block_counttrigger(_SELF,value);
+        _block_counttrigger(APCUserEnvironmentObject(_SELF, self),value);
     }
 }
 

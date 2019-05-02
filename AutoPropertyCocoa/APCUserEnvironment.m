@@ -1,0 +1,215 @@
+//
+//  APCUserEnvironment.m
+//  AutoPropertyCocoaiOS
+//
+//  Created by Novo on 2019/4/30.
+//  Copyright © 2019 Novo. All rights reserved.
+//
+
+#import "APCUserEnvironment.h"
+#import "APCScope.h"
+
+@implementation APCUserEnvironment
+{
+    id                              _instance;
+    id<APCUserEnvironmentMessage>   _message;
+    SEL                             _action;
+}
+
+- (id)initWithObject:(NSObject *)object message:(id<APCUserEnvironmentMessage>)message action:(SEL)action
+{
+    
+    NSAssert([message conformsToProtocol:@protocol(APCUserEnvironmentMessage)]
+             , @"APC: Object that is not supported.");
+    _instance = object;
+    _message = message;
+    _action = action;
+    return self;
+}
+
+- (SEL)action
+{
+    return _action;
+}
+
+#pragma mark - received message
+
+- (id)superMessage
+{
+    return [_message superObject];
+}
+
+- (void)performVoidWithObject:(id)object
+{
+    ((void(*)(id,SEL,id,id))objc_msgSend)([self superMessage]
+                                          , _action
+                                          , _instance
+                                          , object);
+}
+
+- (void)performVoidWithObject:(id)object withObject:(id)object2
+{
+    ((void(*)(id,SEL,id,id,id))objc_msgSend)([self superMessage]
+                                             , _action
+                                             , _instance
+                                             , object
+                                             , object2);
+}
+
+- (BOOL)performBOOLWithObject:(id)object withObject:(id)object2
+{
+    return ((BOOL(*)(id,SEL,id,id,id))objc_msgSend)([self superMessage]
+                                                    , _action
+                                                    , _instance
+                                                    , object
+                                                    , object2);
+}
+
+
+#pragma mark - Fast forwarding messages
+- (id)forwardingTargetForSelector:(SEL)aSelector
+{
+    return _instance;
+}
+
+#pragma mark - Overwrite NSProxy
+- (void)forwardInvocation:(NSInvocation *)invocation
+{
+    return [_instance forwardInvocation:invocation];
+}
+
+- (nullable NSMethodSignature *)methodSignatureForSelector:(SEL)sel
+{
+    return [_instance methodSignatureForSelector:sel];
+}
+
+- (void)dealloc
+{
+    _instance   =   nil;
+    _message    =   nil;
+    _action     =   nil;
+}
+
+#pragma mark - Overwrite <NSObject>
+
+- (BOOL)isEqual:(id)object
+{
+    return [_instance isEqual:object];
+}
+
+- (NSUInteger)hash
+{
+    return [_instance hash];
+}
+
+- (Class)superclass
+{
+    return [_instance superclass];
+}
+- (Class)class
+{
+    return [_instance class];
+}
+- (id)self
+{
+    return (id)_instance;
+}
+
+- (id)performSelector:(SEL)aSelector
+{
+    return (((id(*)(id, SEL))[_instance methodForSelector:aSelector])(_instance, aSelector));
+}
+- (id)performSelector:(SEL)aSelector withObject:(id)object
+{
+    return (((id(*)(id, SEL, id))[_instance methodForSelector:aSelector])(_instance, aSelector, object));
+}
+- (id)performSelector:(SEL)aSelector withObject:(id)object1 withObject:(id)object2
+{
+    return (((id(*)(id, SEL, id, id))[_instance methodForSelector:aSelector])(_instance, aSelector, object1, object2));
+}
+
+- (BOOL)isKindOfClass:(Class)aClass
+{
+    return [_instance isKindOfClass:aClass];
+}
+- (BOOL)isMemberOfClass:(Class)aClass
+{
+    return [_instance isMemberOfClass:aClass];
+}
+- (BOOL)conformsToProtocol:(Protocol *)aProtocol
+{
+    return [_instance conformsToProtocol:aProtocol];
+}
+
+- (BOOL)respondsToSelector:(SEL)aSelector
+{
+    return [_instance respondsToSelector:aSelector];
+}
+
+- (NSString *)description
+{
+    return [_instance description];
+}
+
+- (NSString *)debugDescription
+{
+    return [_instance debugDescription];
+}
+
+@end
+
+
+#pragma mark - debug working
+void apc_debug_super_method_void1(APCObject* instance)
+{
+    if([instance isProxy] == NO){
+        
+        return;
+    }
+    ((void(*)(id,SEL,id))objc_msgSend)([instance superMessage]
+                                       , [instance action]
+                                       , instance);
+}
+
+void apc_debug_super_method_void2(APCObject* instance, id object)
+{
+    if([instance isProxy] == NO){
+        
+        return;
+    }
+    ((void(*)(id,SEL,id,id))objc_msgSend)([instance superMessage]
+                                          , [instance action]
+                                          , instance
+                                          , object);
+}
+
+BOOL apc_debug_super_method_BOOL2(APCObject* instance, id object)
+{
+    if([instance isProxy] == NO){
+        
+        return NO;
+    }
+    
+    return
+    
+    ((BOOL(*)(id,SEL,id,id))objc_msgSend)([instance superMessage]
+                                          , [instance action]
+                                          , instance
+                                          , object);
+}
+
+id apc_debug_super_method_id1(APCObject* instance)
+{
+    if([instance isProxy] == NO){
+        
+        return nil;
+    }
+    
+    return
+    
+    ((id(*)(id,SEL,id))objc_msgSend)([instance superMessage]
+                                          , [instance action]
+                                          , instance);
+}
+
+

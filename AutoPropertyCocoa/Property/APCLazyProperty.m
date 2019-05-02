@@ -143,15 +143,6 @@ static SEL _inlet = 0;
 
 - (id)performLazyloadForTarget:(id)target
 {
-    APCUserEnvironmentSupport* userTarget
-    =
-    [[[APCUserEnvironmentSupport<APCLazyProperty*> alloc] initWithObject:target message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCLazyProperty *> *uObject) {
-        
-        uObject.returnedIDValue
-        =
-        [[uObject superMessage] performLazyloadForTarget:target];
-    }];
-    
     /**
      Lazy-load is a complete override method
      , so super-propery should not be called here.
@@ -177,7 +168,7 @@ static SEL _inlet = 0;
         }
         else
         {
-            v = [self performUserBlock:userTarget];
+            v = [self performUserBlock:APCUserEnvironmentObject(target, self)];
         }
         [self setValue:v toTarget:target];
     }
@@ -189,7 +180,7 @@ static SEL _inlet = 0;
         NSCAssert(self.kindOfUserHook == APCPropertyHookKindOfBlock
                   , @"APC: Basic-value only supportted be initialized by 'userblock'.");
         
-        v = [self performUserBlock:userTarget];
+        v = [self performUserBlock:APCUserEnvironmentObject(target, self)];
         [self setValue:v toTarget:target];
     }
     return v;

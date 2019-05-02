@@ -5,7 +5,7 @@
 //  Created by Novo on 2019/3/30.
 //  Copyright © 2019 Novo. All rights reserved.
 //
-#import "APCUserEnvironmentSupport.h"
+#import "APCUserEnvironment.h"
 #import "APCTriggerGetterProperty.h"
 #import "APCPropertyHook.h"
 #import "APCScope.h"
@@ -34,7 +34,7 @@
 }
 
 #pragma mark - getter
-- (void)getterBindFrontTrigger:(void (^)(id _Nonnull, id _Nullable))block
+- (void)getterBindFrontTrigger:(void (^)(id _Nonnull))block
 {
     _block_fronttrigger = [block copy];
     _triggerOption |= APCPropertyGetterFrontTrigger;
@@ -89,15 +89,8 @@
 - (void)performGetterFrontTriggerBlock:(id)_SELF
 {
     if(_block_fronttrigger){
-        
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
-            
-            [[uObject superMessage] performGetterFrontTriggerBlock:_SELF];
-        }];
-        
-        _block_fronttrigger(_SELF);
+
+        _block_fronttrigger(APCUserEnvironmentObject(_SELF, self));
     }
 }
 
@@ -105,13 +98,7 @@
 {
     if(_block_posttrigger){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
-            
-            [[uObject superMessage] performGetterPostTriggerBlock:_SELF value:value];
-        }];
-        _block_posttrigger(_SELF, value);
+        _block_posttrigger(APCUserEnvironmentObject(_SELF, self), value);
     }
 }
 
@@ -119,15 +106,7 @@
 {
     if(_block_usercondition){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
-            
-            uObject.returnedBOOLValue
-            =
-            [[uObject superMessage] performGetterUserConditionBlock:_SELF value:value];
-        }];
-        return _block_usercondition(_SELF, value);
+        return _block_usercondition(APCUserEnvironmentObject(_SELF, self), value);
     }
     return NO;
 }
@@ -136,13 +115,7 @@
 {
     if(_block_usertrigger){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
-            
-            [[uObject superMessage] performGetterUserTriggerBlock:_SELF value:value];
-        }];
-        _block_usertrigger(_SELF,value);
+        _block_usertrigger(APCUserEnvironmentObject(_SELF, self), value);
     }
 }
 
@@ -150,13 +123,7 @@
 {
     if(_block_counttrigger){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
-            
-            [[uObject superMessage] performGetterCountTriggerBlock:_SELF value:value];
-        }];
-        _block_counttrigger(_SELF,value);
+        _block_counttrigger(APCUserEnvironmentObject(_SELF, self), value);
     }
 }
 
@@ -164,15 +131,7 @@
 {
     if(_block_countcondition){
         
-        _SELF
-        =
-        [[[APCUserEnvironmentSupport<APCTriggerGetterProperty*> alloc] initWithObject:_SELF message:self] setSuperMessagePerformerForAction:^(APCUserEnvironmentSupport<APCTriggerGetterProperty *> *uObject) {
-            
-            uObject.returnedBOOLValue
-            =
-            [[uObject superMessage] performGetterCountConditionBlock:_SELF value:value];
-        }];
-        return _block_countcondition(_SELF, value, self.accessCount);
+        return _block_countcondition(APCUserEnvironmentObject(_SELF, self), value, self.accessCount);
     }
     return NO;
 }

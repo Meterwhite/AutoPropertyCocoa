@@ -44,7 +44,7 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyTriggerOption) {
 @property (nonatomic,assign,readonly) APCPropertyTriggerOption triggerOption;
 
 #pragma mark - getter trigger
-- (void)getterBindFrontTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block;
+- (void)getterBindFrontTrigger:(void(^ _Nonnull)(id _Nonnull instance))block;
 - (void)getterBindPostTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block;
 - (void)getterBindUserTrigger:(void(^ _Nonnull)(id _Nonnull instance,id _Nullable value))block
                     condition:(BOOL(^_Nonnull)(id _Nonnull instance,id _Nullable value))condition;

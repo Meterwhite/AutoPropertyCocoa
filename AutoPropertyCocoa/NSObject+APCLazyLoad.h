@@ -6,8 +6,8 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "APCUserEnvironment.h"
 #import <Foundation/Foundation.h>
-
 
 @interface NSObject(APCLazyLoad)
 
@@ -29,7 +29,7 @@
 - (void)apc_lazyLoadForProperty:(nonnull NSString*)property;
 
 - (void)apc_lazyLoadForProperty:(nonnull NSString*)property
-                     usingBlock:(id _Nullable(^ _Nonnull)(id _Nonnull instance))block;
+                     usingBlock:(id _Nullable(^ _Nonnull)(apc_id _Nonnull instance))block;
 
 - (void)apc_lazyLoadForProperty:(nonnull NSString*)property
                        selector:(nonnull SEL)selector;

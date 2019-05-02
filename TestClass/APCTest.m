@@ -466,9 +466,11 @@ apc_testfunc(testClassInstanceLazyLoadSimple,912)
     APCLazyProperty* p = [APCLazyProperty instanceWithProperty:@"name" aClass:[Person class]];
     APCPropertyHook* hook = [APCPropertyHook hookWithProperty:p];
     
-//    APCLazyProperty* p2 = [APCLazyProperty instanceWithProperty:@"name" aClass:[Person class]];
-//
-//    hook.lazyload = p2;
+    [p apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(apc_id  _Nonnull instance) {
+        
+        return apc_id_super_method(instance);
+    }];
+    
     hook.lazyload = nil;
 }
 @end
