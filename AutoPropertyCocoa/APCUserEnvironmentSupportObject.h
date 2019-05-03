@@ -1,5 +1,5 @@
 //
-//  APCUserEnvironment.h
+//  APCUserEnvironmentSupportObject.h
 //  AutoPropertyCocoaiOS
 //
 //  Created by Novo on 2019/4/30.
@@ -7,24 +7,20 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "NSObject+APCExtension.h"
 #import <objc/message.h>
 #import "APCScope.h"
 
-@class APCUserEnvironment;
-
-@protocol APCUserEnvironmentSupport <NSObject>
-- (nonnull id)self;
-@end
+@class APCUserEnvironmentSupportObject;
 
 @protocol APCUserEnvironmentMessage <NSObject>
 - (nullable id<APCUserEnvironmentMessage>)superObject;
 @end
 
 typedef id apc_id;
-typedef id<APCUserEnvironmentSupport> APCID;
-typedef APCUserEnvironment APCObject;
+typedef APCUserEnvironmentSupportObject APCObject;
 
-#ifdef DEBUG
+#ifndef DEBUG
 
 OBJC_EXPORT void
 apc_debug_super_method_void1(APCObject* _Nonnull instance);
@@ -39,13 +35,13 @@ OBJC_EXPORT id _Nullable
 apc_debug_super_method_id1(APCObject* _Nonnull instance);
 
 
-#define apc_void_super_method(...) \
+#define APCSuperMethod_void(...) \
 submacro_apc_concat(apc_debug_super_method_void, submacro_apc_argcount(__VA_ARGS__))(__VA_ARGS__)
 
-#define apc_bool_super_method(...) \
+#define APCSuperMethod_BOOL(...) \
 submacro_apc_concat(apc_debug_super_method_BOOL, submacro_apc_argcount(__VA_ARGS__))(__VA_ARGS__)
 
-#define apc_id_super_method(...) \
+#define APCSuperMethod_id(...) \
 submacro_apc_concat(apc_debug_super_method_id, submacro_apc_argcount(__VA_ARGS__))(__VA_ARGS__)
 
 #define apc_debug_super_method_void0 apc_debug_super_method_void1
@@ -70,66 +66,68 @@ submacro_apc_concat(apc_debug_super_method_id, submacro_apc_argcount(__VA_ARGS__
 
 #else
 
+#define APCSuperMethod APCSuperMethod_void
 
-#define apc_void_super_method(...) \
+#define APCSuperMethod_void(instance, ...) \
 \
-if(YES == [submacro_apc_head(__VA_ARGS__) isProxy]){\
+if(YES == [(id)instance isProxy]){         \
 \
-((void(*)(apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)   \
-    (\
-        [(APCObject*)submacro_apc_head(__VA_ARGS__) superMessage]\
-        , [(APCObject*)submacro_apc_head(__VA_ARGS__) action]   \
-        , __VA_ARGS__ \
+((void(*)(submacro_apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)\
+    (                                                   \
+        [(APCObject*)instance superMessage]             \
+        , [(APCObject*)instance action]                 \
+        , [(APCObject*)instance self]                   \
+        , ##__VA_ARGS__                                 \
     );\
 }
 
-#define apc_bool_super_method(...) \
+#define APCSuperMethod_BOOL(instance, ...) \
 \
-((YES == [submacro_apc_head(__VA_ARGS__) isProxy])\
-?\
-((BOOL(*)(apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)   \
-(\
-    [(APCObject*)submacro_apc_head(__VA_ARGS__) superMessage]\
-    , [(APCObject*)submacro_apc_head(__VA_ARGS__) action]   \
-    , __VA_ARGS__ \
+((YES == [(id)instance isProxy])\
+?                               \
+((BOOL(*)(submacro_apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)\
+(                                                       \
+    [(APCObject*)instance superMessage]                 \
+    , [(APCObject*)instance action]                     \
+    , [(APCObject*)instance self]                       \
+    , ##__VA_ARGS__                                     \
 ) : NO)
 
-#define apc_id_super_method(...) \
+#define APCSuperMethod_id(instance, ...) \
 \
-((YES == [submacro_apc_head(__VA_ARGS__) isProxy])\
-?\
-((id(*)(apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)   \
-(\
-    [(APCObject*)submacro_apc_head(__VA_ARGS__) superMessage]\
-    , [(APCObject*)submacro_apc_head(__VA_ARGS__) action]   \
-    , __VA_ARGS__ \
+((YES == [(APCObject*)instance isProxy])  \
+?                                                   \
+((id(*)(submacro_apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)  \
+(                                                       \
+    [(APCObject*)instance superMessage]                 \
+    , [(APCObject*)instance action]                     \
+    , [(APCObject*)instance self]                       \
+    , ##__VA_ARGS__                                     \
 ) : nil)
 
-#define apc_msgSend_t_list(...)\
+#define submacro_apc_msgSend_t_list(...)\
 \
-submacro_apc_concat(apc_t_list_ , submacro_apc_argcount(__VA_ARGS__))
+submacro_apc_concat(submacro_apc_t_list_ , submacro_apc_argcount(__VA_ARGS__))
 
-#define apc_t_list_6 id,SEL,id,id,id,id
-#define apc_t_list_5 id,SEL,id,id,id
-#define apc_t_list_4 id,SEL,id,id,id
-#define apc_t_list_3 id,SEL,id,id,id
-#define apc_t_list_2 id,SEL,id,id
-#define apc_t_list_1 id,SEL,id
-#define apc_t_list_0 apc_t_list_1
+#define submacro_apc_t_list_6 id,SEL,id,id,id,id
+#define submacro_apc_t_list_5 id,SEL,id,id,id
+#define submacro_apc_t_list_4 id,SEL,id,id,id
+#define submacro_apc_t_list_3 id,SEL,id,id,id
+#define submacro_apc_t_list_2 id,SEL,id,id
+#define submacro_apc_t_list_1 id,SEL,id
+#define submacro_apc_t_list_0 apc_t_list_1
 
 #endif
 
 
 #define APCUserEnvironmentObject(object, msg) \
 \
-([[APCUserEnvironment alloc] initWithObject:object message:msg action:_cmd])
-
-
+([[APCUserEnvironmentSupportObject alloc] initWithObject:object message:msg action:_cmd])
 
 /**
  The behavior of the proxy object is the same as that of the normal object.
  */
-@interface APCUserEnvironment<MessageType> : NSProxy <APCUserEnvironmentSupport>
+@interface APCUserEnvironmentSupportObject<MessageType> : NSProxy
 - (nonnull APCObject*)initWithObject:(nonnull NSObject*)object
                                message:(nonnull MessageType<APCUserEnvironmentMessage>)message
                                 action:(nonnull SEL)action;
@@ -143,8 +141,9 @@ submacro_apc_concat(apc_t_list_ , submacro_apc_argcount(__VA_ARGS__))
  */
 - (nonnull id)self;
 
-- (void)performVoidWithObject:(nullable id)object;
-- (void)performVoidWithObject:(nullable id)object withObject:(nullable id)object2;
-- (BOOL)performBOOLWithObject:(nullable id)object withObject:(nullable id)object2;
+- (void)apc_performUserSuperVoidWithObject:(nullable id)object ;
+- (void)apc_performUserSuperVoid;
+- (BOOL)apc_performUserSuperBOOLWithObject:(nullable id)object;
+- (nullable id)apc_performUserSuperID;
 @end
 

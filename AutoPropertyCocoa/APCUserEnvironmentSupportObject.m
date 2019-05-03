@@ -1,15 +1,15 @@
 //
-//  APCUserEnvironment.m
+//  APCUserEnvironmentSupportObject.m
 //  AutoPropertyCocoaiOS
 //
 //  Created by Novo on 2019/4/30.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "APCUserEnvironment.h"
+#import "APCUserEnvironmentSupportObject.h"
 #import "APCScope.h"
 
-@implementation APCUserEnvironment
+@implementation APCUserEnvironmentSupportObject
 {
     id                              _instance;
     id<APCUserEnvironmentMessage>   _message;
@@ -39,32 +39,37 @@
     return [_message superObject];
 }
 
-- (void)performVoidWithObject:(id)object
+- (void)apc_performUserSuperVoid
+{
+    ((void(*)(id,SEL,id))objc_msgSend)([self superMessage]
+                                          , _action
+                                          , _instance);
+}
+
+- (void)apc_performUserSuperVoidWithObject:(id)object
 {
     ((void(*)(id,SEL,id,id))objc_msgSend)([self superMessage]
-                                          , _action
-                                          , _instance
-                                          , object);
-}
-
-- (void)performVoidWithObject:(id)object withObject:(id)object2
-{
-    ((void(*)(id,SEL,id,id,id))objc_msgSend)([self superMessage]
                                              , _action
                                              , _instance
-                                             , object
-                                             , object2);
+                                             , object);
 }
 
-- (BOOL)performBOOLWithObject:(id)object withObject:(id)object2
+- (BOOL)apc_performUserSuperBOOLWithObject:(id)object
 {
-    return ((BOOL(*)(id,SEL,id,id,id))objc_msgSend)([self superMessage]
+    return ((BOOL(*)(id,SEL,id,id))objc_msgSend)([self superMessage]
                                                     , _action
                                                     , _instance
-                                                    , object
-                                                    , object2);
+                                                    , object);
 }
 
+- (id)apc_performUserSuperID
+{
+    return
+    
+    ((id(*)(id,SEL,id))objc_msgSend)([self superMessage]
+                                     , _action
+                                     , _instance);
+}
 
 #pragma mark - Fast forwarding messages
 - (id)forwardingTargetForSelector:(SEL)aSelector
@@ -168,7 +173,7 @@ void apc_debug_super_method_void1(APCObject* instance)
     }
     ((void(*)(id,SEL,id))objc_msgSend)([instance superMessage]
                                        , [instance action]
-                                       , instance);
+                                       , [instance self]);
 }
 
 void apc_debug_super_method_void2(APCObject* instance, id object)
@@ -179,7 +184,7 @@ void apc_debug_super_method_void2(APCObject* instance, id object)
     }
     ((void(*)(id,SEL,id,id))objc_msgSend)([instance superMessage]
                                           , [instance action]
-                                          , instance
+                                          , [instance self]
                                           , object);
 }
 
@@ -194,7 +199,7 @@ BOOL apc_debug_super_method_BOOL2(APCObject* instance, id object)
     
     ((BOOL(*)(id,SEL,id,id))objc_msgSend)([instance superMessage]
                                           , [instance action]
-                                          , instance
+                                          , [instance self]
                                           , object);
 }
 
@@ -209,7 +214,7 @@ id apc_debug_super_method_id1(APCObject* instance)
     
     ((id(*)(id,SEL,id))objc_msgSend)([instance superMessage]
                                           , [instance action]
-                                          , instance);
+                                          , [instance self]);
 }
 
 

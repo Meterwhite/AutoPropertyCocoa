@@ -55,7 +55,7 @@ id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
         val = [hook performOldGetterFromTarget:_SELF];
     }
     /** ----------------Affect----------------- */
-    //Nothing now...
+    //Nothing.
     
     /** ----------------Result----------------- */
     if(p_trigger != nil){
@@ -97,7 +97,6 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 
 @implementation APCPropertyHook
 {
-#warning add lock
     const char*             _methodTypeEncoding;
     NSString*               _valueTypeEncoding;
     APCPropertyValueKind    _kindOfValue;
@@ -332,12 +331,11 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
 
 - (void)unhook
 {
-    if(nil == _new_implementation) {
-        
+    if(nil == _new_implementation)
+    {
         return;
     }
     
-
     IMP newImp = _new_implementation;
     if(atomic_compare_exchange_strong(&_new_implementation, &newImp, nil))
     {
@@ -403,7 +401,8 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
         return _old_implementation;
     }
     
-    APCPropertyHook* hook =
+    APCPropertyHook* hook
+    =
     apc_lookup_implementationPropertyhook_inRange(apc_class_getSuperclass(_hookclass)
                                                   , _source_class
                                                   , _hookMethod);
@@ -417,7 +416,6 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     class_getMethodImplementation(_source_class
                                   , NSSelectorFromString(_hookMethod));
 }
-
 
 - (void)performOldSetterFromTarget:(id)target withValue:(id)value
 {

@@ -5,7 +5,7 @@
 //  Created by Novo on 2019/3/30.
 //  Copyright © 2019 Novo. All rights reserved.
 //
-#import "APCUserEnvironment.h"
+#import "APCUserEnvironmentSupportObject.h"
 #import "APCTriggerGetterProperty.h"
 #import "APCPropertyHook.h"
 #import "APCScope.h"
@@ -158,89 +158,4 @@ static SEL _inlet = 0;
     return _inlet;
 }
 
-- (_Nullable id)performOldGetterFromTarget:(_Nonnull id)target
-{
-    return nil;
-}
-
-- (void)performOldSetterFromTarget:(_Nonnull id)target withValue:(id _Nullable)value
-{
-
-}
-
 @end
-
-//- (void)cacheToInstanceMapper
-//{
-//    [APCInstancePropertyCacheManager bindProperty:self
-//                                       toInstance:_instance
-//                                              cmd:_des_getter_name];
-//
-//    if(self.triggerOption & APCPropertyTriggerOfSetter){
-//
-//        [APCInstancePropertyCacheManager bindProperty:self
-//                                           toInstance:_instance
-//                                                  cmd:_des_setter_name];
-//    }
-//}
-//
-//- (void)removeFromInstanceCache
-//{
-//    [APCInstancePropertyCacheManager boundPropertyRemoveFromInstance:_instance
-//                                                                 cmd:_des_getter_name];
-//
-//    if(NO == [APCInstancePropertyCacheManager boundContainsValidPropertyForInstance:_instance]){
-//
-//        [APCInstancePropertyCacheManager boundAllPropertiesRemoveFromInstance:_instance];
-//    }
-//}
-//
-//static APCClassPropertyMapperController* _cacheForClass;
-//- (void)cacheToClassMapper
-//{
-//    static dispatch_once_t onceToken;
-//    dispatch_once(&onceToken, ^{
-//
-//        _cacheForClass     =   [APCClassPropertyMapperController cache];
-//    });
-//
-//    [_cacheForClass addProperty:self];
-//}
-//
-//+ (_Nullable instancetype)cachedTargetClass:(Class)clazz
-//                                   property:(NSString*)property
-//{
-//    clazz = [APCTriggerGetterProperty unproxyClass:clazz];
-//
-//    return [_cacheForClass propertyForDesclass:clazz property:property];
-//}
-//
-//+ (instancetype)cachedFromAClass:(Class)aClazz
-//                        property:(NSString *)property
-//{
-//    aClazz = [APCTriggerGetterProperty unproxyClass:aClazz];
-//
-//    return [_cacheForClass searchFromTargetClass:aClazz property:property];
-//}
-//
-//- (void)removeFromClassCache
-//{
-//    [_cacheForClass removeProperty:self];
-//}
-
-#pragma mark - APCPropertyMapperKeyProtocol
-//- (NSSet<APCPropertyMapperkey *> *)propertyMapperkeys
-//{
-//    NSMutableSet* set = [NSMutableSet set];
-//
-//    [set addObject:[APCPropertyMapperkey keyWithClass:_des_class
-//                                             property:_des_getter_name]];
-//
-//    if(self.triggerOption & APCPropertyTriggerOfSetter){
-//
-//        [set addObject:[APCPropertyMapperkey keyWithClass:_des_class
-//                                                 property:_des_setter_name]];
-//    }
-//
-//    return set;
-//}

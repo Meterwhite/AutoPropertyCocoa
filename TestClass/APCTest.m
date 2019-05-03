@@ -463,14 +463,29 @@ apc_testfunc(testClassInstanceLazyLoadSimple,911)
 
 apc_testfunc(testClassInstanceLazyLoadSimple,912)
 {
-    APCLazyProperty* p = [APCLazyProperty instanceWithProperty:@"name" aClass:[Person class]];
-    APCPropertyHook* hook = [APCPropertyHook hookWithProperty:p];
+//    APCLazyProperty* p = [APCLazyProperty instanceWithProperty:@"name" aClass:[Person class]];
+//    APCPropertyHook* hook = [APCPropertyHook hookWithProperty:p];
+//
+//    [p apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(apc_id  _Nonnull instance) {
+//
+//        return APCSuperMethod_id(instance);
+//    }];
     
-    [p apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(apc_id  _Nonnull instance) {
+    [Person apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(apc_id  _Nonnull instance) {
         
-        return apc_id_super_method(instance);
+        id xx = APCSuperMethod_id(instance);
+        
+        [instance apc_performUserSuperID];
+        
+        return @"In Person";
     }];
     
-    hook.lazyload = nil;
+    [Man apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(apc_id  _Nonnull instance) {
+        
+        return APCSuperMethod_id(instance);
+    }];
+    
+    Man* m = [Man new];
+    id name = m.name;
 }
 @end

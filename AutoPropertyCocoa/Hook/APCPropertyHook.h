@@ -14,8 +14,6 @@
 @class APCLazyProperty;
 
 
-#warning change to thread safe
-
 @protocol APCPropertyHookProtocol <NSObject>
 
 @optional
@@ -27,10 +25,6 @@
 
 
 
-/**
- 统一管理类和实例的钩子
- 类和方法名 唯一
- */
 @interface APCPropertyHook : APCMethodHook<APCPropertyHookProtocol>
 {
 @public
@@ -39,9 +33,6 @@
 }
 
 + (nullable instancetype)hookWithProperty:(nonnull __kindof APCHookProperty*)property;
-+ (void)lockRead;
-+ (void)lockWrite;
-//@property (nonatomic,strong,nullable) NSEnumerator<APCHookProperty*>* propertyEnumerator;
 @property (nonatomic,readonly) BOOL        isEmpty;
 
 /**
