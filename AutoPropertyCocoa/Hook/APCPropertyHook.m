@@ -17,7 +17,7 @@
 id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
 {
     APCPropertyHook* hook;
-    NSString*        _CMD_s = NSStringFromSelector(_CMD);
+    NSString*        _CMD_s = @((const char*)(const void*)_CMD);
     if(YES == apc_object_isProxyInstance(_SELF)){
         
         hook = apc_lookup_instancePropertyhook(_SELF, _CMD_s);

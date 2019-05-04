@@ -1,6 +1,6 @@
 //
 //  APCUserEnvironmentSupportObject.h
-//  AutoPropertyCocoaiOS
+//  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/30.
 //  Copyright © 2019 Novo. All rights reserved.
@@ -17,22 +17,21 @@
 - (nullable id<APCUserEnvironmentMessage>)superObject;
 @end
 
-typedef id apc_id;
-typedef APCUserEnvironmentSupportObject APCObject;
+typedef id id_apc_t;
 
 #ifndef DEBUG
 
 OBJC_EXPORT void
-apc_debug_super_method_void1(APCObject* _Nonnull instance);
+apc_debug_super_method_void1(id_apc_t _Nonnull instance);
 
 OBJC_EXPORT void
-apc_debug_super_method_void2(APCObject* _Nonnull instance, id _Nullable object);
+apc_debug_super_method_void2(id_apc_t _Nonnull instance, id _Nullable object);
 
 OBJC_EXPORT BOOL
-apc_debug_super_method_BOOL2(APCObject* _Nonnull instance, id _Nullable object);
+apc_debug_super_method_BOOL2(id_apc_t _Nonnull instance, id _Nullable object);
 
 OBJC_EXPORT id _Nullable
-apc_debug_super_method_id1(APCObject* _Nonnull instance);
+apc_debug_super_method_id1(id_apc_t _Nonnull instance);
 
 
 #define APCSuperMethod_void(...) \
@@ -74,9 +73,9 @@ if(YES == [(id)instance isProxy]){         \
 \
 ((void(*)(submacro_apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)\
     (                                                   \
-        [(APCObject*)instance superMessage]             \
-        , [(APCObject*)instance action]                 \
-        , [(APCObject*)instance self]                   \
+        [(APCUserEnvironmentSupportObject*)instance superMessage]             \
+        , [(APCUserEnvironmentSupportObject*)instance action]                 \
+        , [(APCUserEnvironmentSupportObject*)instance self]                   \
         , ##__VA_ARGS__                                 \
     );\
 }
@@ -87,21 +86,21 @@ if(YES == [(id)instance isProxy]){         \
 ?                               \
 ((BOOL(*)(submacro_apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)\
 (                                                       \
-    [(APCObject*)instance superMessage]                 \
-    , [(APCObject*)instance action]                     \
-    , [(APCObject*)instance self]                       \
+    [(APCUserEnvironmentSupportObject*)instance superMessage]                 \
+    , [(APCUserEnvironmentSupportObject*)instance action]                     \
+    , [(APCUserEnvironmentSupportObject*)instance self]                       \
     , ##__VA_ARGS__                                     \
 ) : NO)
 
 #define APCSuperMethod_id(instance, ...) \
 \
-((YES == [(APCObject*)instance isProxy])  \
+((YES == [(APCUserEnvironmentSupportObject*)instance isProxy])  \
 ?                                                   \
 ((id(*)(submacro_apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)  \
 (                                                       \
-    [(APCObject*)instance superMessage]                 \
-    , [(APCObject*)instance action]                     \
-    , [(APCObject*)instance self]                       \
+    [(APCUserEnvironmentSupportObject*)instance superMessage]                 \
+    , [(APCUserEnvironmentSupportObject*)instance action]                     \
+    , [(APCUserEnvironmentSupportObject*)instance self]                       \
     , ##__VA_ARGS__                                     \
 ) : nil)
 
@@ -128,7 +127,7 @@ submacro_apc_concat(submacro_apc_t_list_ , submacro_apc_argcount(__VA_ARGS__))
  The behavior of the proxy object is the same as that of the normal object.
  */
 @interface APCUserEnvironmentSupportObject<MessageType> : NSProxy
-- (nonnull APCObject*)initWithObject:(nonnull NSObject*)object
+- (nonnull id_apc_t)initWithObject:(nonnull NSObject*)object
                                message:(nonnull MessageType<APCUserEnvironmentMessage>)message
                                 action:(nonnull SEL)action;
 - (nullable MessageType)superMessage;

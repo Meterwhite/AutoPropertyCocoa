@@ -76,18 +76,18 @@ OBJC_EXPORT void
 apc_instance_removeAssociatedProperty(APCProxyInstance* _Nonnull instance
                                       , APCHookProperty* _Nonnull p);
 
-#pragma mark - Recursive(For instance)
-OBJC_EXPORT BOOL
-apc_object_hookRecursive_testing(id _Nonnull instance
-                                 , SEL _Nonnull _CMD);
-
-OBJC_EXPORT void
-apc_object_hookRecursive_loop(id _Nonnull instance
-                              , SEL _Nonnull _CMD);
-
-OBJC_EXPORT void
-apc_object_hookRecursive_break(id _Nonnull instance
-                               , SEL _Nonnull _CMD);
+//#pragma mark - Recursive(For instance)
+//OBJC_EXPORT BOOL
+//apc_object_hookRecursive_testing(id _Nonnull instance
+//                                 , SEL _Nonnull _CMD);
+//
+//OBJC_EXPORT void
+//apc_object_hookRecursive_loop(id _Nonnull instance
+//                              , SEL _Nonnull _CMD);
+//
+//OBJC_EXPORT void
+//apc_object_hookRecursive_break(id _Nonnull instance
+//                               , SEL _Nonnull _CMD);
 
 
 #pragma mark - Proxy class(For instance)

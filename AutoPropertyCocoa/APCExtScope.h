@@ -1,1 +1,4 @@
-#define APCBoxSelector(sel) (NSStringFromSelector(@selector(sel)))
+
+
+#define APCBoxSelector(sel) @((const char*)(const void*)(@selector(sel)))
+

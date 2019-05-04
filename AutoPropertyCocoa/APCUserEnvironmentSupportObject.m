@@ -1,6 +1,6 @@
 //
 //  APCUserEnvironmentSupportObject.m
-//  AutoPropertyCocoaiOS
+//  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/30.
 //  Copyright © 2019 Novo. All rights reserved.
@@ -165,7 +165,7 @@
 
 
 #pragma mark - debug working
-void apc_debug_super_method_void1(APCObject* instance)
+void apc_debug_super_method_void1(APCUserEnvironmentSupportObject* instance)
 {
     if([instance isProxy] == NO){
         
@@ -176,7 +176,7 @@ void apc_debug_super_method_void1(APCObject* instance)
                                        , [instance self]);
 }
 
-void apc_debug_super_method_void2(APCObject* instance, id object)
+void apc_debug_super_method_void2(APCUserEnvironmentSupportObject* instance, id object)
 {
     if([instance isProxy] == NO){
         
@@ -188,7 +188,7 @@ void apc_debug_super_method_void2(APCObject* instance, id object)
                                           , object);
 }
 
-BOOL apc_debug_super_method_BOOL2(APCObject* instance, id object)
+BOOL apc_debug_super_method_BOOL2(APCUserEnvironmentSupportObject* instance, id object)
 {
     if([instance isProxy] == NO){
         
@@ -203,7 +203,7 @@ BOOL apc_debug_super_method_BOOL2(APCObject* instance, id object)
                                           , object);
 }
 
-id apc_debug_super_method_id1(APCObject* instance)
+id apc_debug_super_method_id1(APCUserEnvironmentSupportObject* instance)
 {
     if([instance isProxy] == NO){
         

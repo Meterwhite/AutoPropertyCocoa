@@ -466,12 +466,12 @@ apc_testfunc(testClassInstanceLazyLoadSimple,912)
 //    APCLazyProperty* p = [APCLazyProperty instanceWithProperty:@"name" aClass:[Person class]];
 //    APCPropertyHook* hook = [APCPropertyHook hookWithProperty:p];
 //
-//    [p apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(apc_id  _Nonnull instance) {
+//    [p apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
 //
 //        return APCSuperMethod_id(instance);
 //    }];
     
-    [Person apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(apc_id  _Nonnull instance) {
+    [Person apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
         
         id xx = APCSuperMethod_id(instance);
         
@@ -480,7 +480,7 @@ apc_testfunc(testClassInstanceLazyLoadSimple,912)
         return @"In Person";
     }];
     
-    [Man apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(apc_id  _Nonnull instance) {
+    [Man apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
         
         return APCSuperMethod_id(instance);
     }];
