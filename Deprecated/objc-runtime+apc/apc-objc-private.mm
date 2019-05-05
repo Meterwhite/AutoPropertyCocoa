@@ -214,18 +214,10 @@ struct apc_protocol_list_t {
     }
 };
 
-
-#if __OBJC2__
 typedef struct apc_method_t *APCMethod;
 typedef struct apc_ivar_t *APCIvar;
 typedef struct apc_category_t *APCCategory;
 typedef struct apc_property_t *apc_objc_property_t;
-#else
-typedef struct apc_old_method *APCMethod;
-typedef struct apc_old_ivar *APCIvar;
-typedef struct apc_old_category *APCCategory;
-typedef struct apc_old_property *apc_objc_property_t;
-#endif
 
 #if __LP64__
 typedef uint32_t apc_mask_t;  // x86_64 & arm64 asm are less efficient with 16-bits
@@ -235,20 +227,20 @@ typedef uint16_t apc_mask_t;
 
 typedef uintptr_t apc_cache_key_t;
 
-struct bucket_t {
+struct apc_bucket_t {
 private:
     apc_cache_key_t _key;
     IMP _imp;
 };
 
 struct apc_cache_t {
-    struct bucket_t *_buckets;
+    struct apc_bucket_t *_buckets;
     apc_mask_t _mask;
     apc_mask_t _occupied;
 };
 
 template <typename Element, typename List, uint32_t FlagMask>
-struct entsize_list_tt {
+struct apc_entsize_list_tt {
     uint32_t entsizeAndFlags;
     uint32_t count;
     Element first;
@@ -362,15 +354,15 @@ struct entsize_list_tt {
 };
 
 
-struct apc_ivar_list_t : entsize_list_tt<apc_ivar_t, apc_ivar_list_t, 0> {
+struct apc_ivar_list_t : apc_entsize_list_tt<apc_ivar_t, apc_ivar_list_t, 0> {
 };
 
-struct apc_property_list_t : entsize_list_tt<apc_property_t, apc_property_list_t, 0> {
+struct apc_property_list_t : apc_entsize_list_tt<apc_property_t, apc_property_list_t, 0> {
 };
 
 
 // Two bits of entsize are used for fixup markers.
-struct apc_method_list_t : entsize_list_tt<apc_method_t, apc_method_list_t, 0x3> {
+struct apc_method_list_t : apc_entsize_list_tt<apc_method_t, apc_method_list_t, 0x3> {
     bool isFixedUp() const;
     void setFixedUp();
     
@@ -382,7 +374,7 @@ struct apc_method_list_t : entsize_list_tt<apc_method_t, apc_method_list_t, 0x3>
     }
 };
 
-struct class_ro_t {
+struct apc_class_ro_t {
     uint32_t flags;
     uint32_t instanceStart;
     uint32_t instanceSize;
@@ -564,8 +556,35 @@ public:
         }
     }
     
-    void deleteAtIndex(uint32_t count) {
+    void deleteElement(Element* elm) {
         
+        array_t* a = array();
+        uint32_t idx = UINT32_MAX;
+        for (uint32_t i = 0; i < a->count; i++) {
+            
+            if(a->lists[i] == 0) {
+                
+                idx = i;
+                break;
+            }
+        }
+        if(idx == UINT32_MAX) {
+            
+            return;
+        }
+        
+        array_t *newArray = (array_t *)malloc(array_t::byteSize(a->count-1));
+        for (uint32_t i = 0 , j = i; i < a->count; i++) {
+            
+            if(idx == i) {
+                continue;
+            }
+            newArray->lists[j] = a->lists[i];
+            j++;
+        }
+        setArray(newArray);
+        array()->count = a->count - 1;
+        delete elm;
     }
     
     void tryFree() {
@@ -640,11 +659,11 @@ public:
 };
 
 
-struct class_rw_t {
+struct apc_class_rw_t {
     uint32_t flags;
     uint32_t version;
     
-    const class_ro_t *ro;
+    const apc_class_ro_t *ro;
     
     apc_method_array_t methods;
     apc_property_array_t properties;
@@ -684,7 +703,7 @@ struct apc_class_data_bits_t {
     uintptr_t bits;
 public:
     
-    class_rw_t* data() {
+    apc_class_rw_t* data() {
 #if !__LP64__
 #define FAST_DATA_MASK        0xfffffffcUL
 #elif 1
@@ -692,7 +711,7 @@ public:
 #else
 #define FAST_DATA_MASK          0x00007ffffffffff8UL
 #endif
-        return (class_rw_t *)(bits & FAST_DATA_MASK);
+        return (apc_class_rw_t *)(bits & FAST_DATA_MASK);
     }
 };
 
@@ -700,9 +719,9 @@ struct apc_objc_class : apc_objc_object {
     // Class ISA;
     APCClass superclass;
     apc_cache_t cache;             // formerly cache pointer and vtable
-    apc_class_data_bits_t bits;    // class_rw_t * plus custom rr/alloc flags
+    apc_class_data_bits_t bits;    // apc_class_rw_t * plus custom rr/alloc flags
     
-    class_rw_t *data() {
+    apc_class_rw_t *data() {
         return bits.data();
     }
     
@@ -744,3 +763,12 @@ struct apc_objc_class : apc_objc_object {
 #endif
 
 
+void xxxDel(Class cls, SEL name)
+{
+    APCClass clazz = (__bridge APCClass)cls;
+    Method ocmethod = class_getInstanceMethod(cls, name);
+    apc_method_t* method = (apc_method_t*)ocmethod;
+    clazz->data()->methods.deleteElement(method);
+    
+    _objc_flush_caches(cls);
+}

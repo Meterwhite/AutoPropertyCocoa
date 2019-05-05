@@ -9,6 +9,16 @@
 #ifndef apc_objc_private_hpp
 #define apc_objc_private_hpp
 
+#import <objc/runtime.h>
 
+#if defined __cplusplus
+extern "C" {
+#endif
+    
+void xxxDel(Class cls, SEL name);
+
+#if defined __cplusplus
+};
+#endif  
 
 #endif /* apc_objc_private_hpp */
