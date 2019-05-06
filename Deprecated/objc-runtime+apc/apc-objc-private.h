@@ -11,11 +11,12 @@
 
 #import <objc/runtime.h>
 
+
 #if defined __cplusplus
 extern "C" {
 #endif
-    
-void xxxDel(Class cls, SEL name);
+        
+void apc_objc_removeMethod(Class cls, SEL name);
 
 #if defined __cplusplus
 };

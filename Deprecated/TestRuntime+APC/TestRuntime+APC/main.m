@@ -20,7 +20,10 @@ int main(int argc, const char * argv[]) {
         
         Class m_cls = [Man class];
 
-        xxxDel(m_cls, @selector(name));
+        apc_objc_removeMethod(m_cls, @selector(name));
+        
+        Man* m = [Man new];
+        id name = m.name;
     }
     return 0;
 }

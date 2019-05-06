@@ -36,11 +36,13 @@ typedef id (*IMP)(id, SEL, ...);
  ---------------------------------
  */
 #pragma mark - objc-private.h
-#include <cstddef>
+#import <libkern/OSAtomic.h>
+#include <malloc/malloc.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <assert.h>
 #include <iterator>
-#import <libkern/OSAtomic.h>
+#include <cstddef>
 
 struct apc_objc_class;
 struct apc_objc_object;
@@ -245,6 +247,50 @@ struct apc_entsize_list_tt {
     uint32_t count;
     Element first;
     
+    void deleteElement(Element* elm) {
+        
+        Element* item;
+        uint32_t idx = UINT32_MAX;
+        for(uint32_t i = 0 ; i < count ; i++){
+            
+            item = (Element *)((uint8_t *)&first + i);
+            if(item == elm){
+                
+                idx = i;
+                break;
+            }
+        }
+        
+        if(idx == UINT32_MAX){
+            
+            return;
+        }
+        
+        char** pre  = NULL;
+        char** next = NULL;
+        size_t size = sizeof(Element);
+        for(uint32_t i = 0 , j = i ; i < count ; i++){
+            
+            if(i < idx) {
+                
+                continue;
+            }
+            
+            pre  = ((char**)&first);
+            if(idx == count -1) {
+                
+                memset(pre, 0, size);
+            }else{
+                
+                next = ((char**)&first + i*size);
+                memcpy(pre, next, sizeof(Element));
+            }
+            
+            j++;
+        }
+        count --;
+    }
+    
     uint32_t entsize() const {
         return entsizeAndFlags & ~FlagMask;
     }
@@ -374,6 +420,18 @@ struct apc_method_list_t : apc_entsize_list_tt<apc_method_t, apc_method_list_t, 
     }
 };
 
+static uint32_t apc_fixed_up_method_list = 3;
+
+bool apc_method_list_t::isFixedUp() const {
+    return flags() == apc_fixed_up_method_list;
+}
+
+void apc_method_list_t::setFixedUp() {
+//    runtimeLock.assertWriting();
+    assert(!isFixedUp());
+    entsizeAndFlags = entsize() | apc_fixed_up_method_list;
+}
+
 struct apc_class_ro_t {
     uint32_t flags;
     uint32_t instanceStart;
@@ -396,6 +454,11 @@ struct apc_class_ro_t {
         return baseMethodList;
     }
 };
+
+static void try_free(const void *p)
+{
+    if (p && malloc_size(p)) free((void *)p);
+}
 
 template <typename Element, typename List>
 class apc_list_array_tt {
@@ -558,33 +621,22 @@ public:
     
     void deleteElement(Element* elm) {
         
-        array_t* a = array();
-        uint32_t idx = UINT32_MAX;
-        for (uint32_t i = 0; i < a->count; i++) {
+        List* i_free = NULL;
+        if(hasArray()) {
             
-            if(a->lists[i] == 0) {
+            array_t* a = array();
+            for (uint32_t i = 0; i < a->count; i++) {
                 
-                idx = i;
-                break;
+                List* j_list = a->lists[i];//apc_method_list
+                for (uint32_t j = 0; j < j_list->count; j++) {
+                    
+                    j_list->deleteElement(elm);
+                }
             }
-        }
-        if(idx == UINT32_MAX) {
+        } else if (list) {
             
-            return;
+            list->deleteElement(elm);
         }
-        
-        array_t *newArray = (array_t *)malloc(array_t::byteSize(a->count-1));
-        for (uint32_t i = 0 , j = i; i < a->count; i++) {
-            
-            if(idx == i) {
-                continue;
-            }
-            newArray->lists[j] = a->lists[i];
-            j++;
-        }
-        setArray(newArray);
-        array()->count = a->count - 1;
-        delete elm;
     }
     
     void tryFree() {
@@ -762,13 +814,73 @@ struct apc_objc_class : apc_objc_object {
 
 #endif
 
+// Mix-in for classes that must not be copied.
+class nocopy_t {
+private:
+    nocopy_t(const nocopy_t&) = delete;
+    const nocopy_t& operator=(const nocopy_t&) = delete;
+protected:
+    nocopy_t() { }
+    ~nocopy_t() { }
+};
 
-void xxxDel(Class cls, SEL name)
-{
-    APCClass clazz = (__bridge APCClass)cls;
-    Method ocmethod = class_getInstanceMethod(cls, name);
-    apc_method_t* method = (apc_method_t*)ocmethod;
-    clazz->data()->methods.deleteElement(method);
+template <bool Debug>
+class rwlock_tt : nocopy_t {
+    pthread_rwlock_t mLock;
     
-    _objc_flush_caches(cls);
+public:
+    rwlock_tt() : mLock(PTHREAD_RWLOCK_INITIALIZER) { }
+
+    
+    void write()
+    {
+//        lockdebug_rwlock_write(this);
+//
+//        qosStartOverride();
+//        int err = pthread_rwlock_wrlock(&mLock);
+//        if (err) _objc_fatal("pthread_rwlock_wrlock failed (%d)", err);
+    }
+    
+    void unlockWrite()
+    {
+//        lockdebug_rwlock_unlock_write(this);
+//
+//        int err = pthread_rwlock_unlock(&mLock);
+//        if (err) _objc_fatal("pthread_rwlock_unlock failed (%d)", err);
+//        qosEndOverride();
+    }
+};
+using rwlock_t = rwlock_tt<DEBUG>;
+//#if __OBJC2__
+//extern rwlock_t runtimeLock;
+//#else
+//extern mutex_t classLock;
+//extern mutex_t methodListLock;
+//#endif
+
+class rwlock_writer_t : nocopy_t {
+    rwlock_t& lock;
+public:
+    rwlock_writer_t(rwlock_t& newLock) : lock(newLock) { lock.write(); }
+    ~rwlock_writer_t() { lock.unlockWrite(); }
+};
+
+
+void apc_objc_removeMethod(Class cls, SEL name)
+{
+//    rwlock_t* ise = &runtimeLock;
+    apc_objc_class* clazz = (__bridge apc_objc_class*)(cls);
+    
+    unsigned int count;
+    apc_method_t** methods = (apc_method_t**)(class_copyMethodList(cls, &count));
+    apc_method_t* method;
+    while (count--) {
+        
+        if(((method = (apc_method_t*)methods[count])->name) == name){
+            
+            clazz->data()->methods.deleteElement(method);
+            _objc_flush_caches(cls);
+            break;
+        }
+    }
 }
