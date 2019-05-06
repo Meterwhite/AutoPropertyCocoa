@@ -20,10 +20,13 @@ int main(int argc, const char * argv[]) {
         
         Class m_cls = [Man class];
 
-        apc_objc_removeMethod(m_cls, @selector(name));
+        class_removeMethod_APC_OBJC2_NONRUNTIMELOCK(m_cls, @selector(name2));
         
         Man* m = [Man new];
-        id name = m.name;
+        [m name0];
+        [m name1];
+        [m name];
+        [m name2];
     }
     return 0;
 }

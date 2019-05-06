@@ -12,6 +12,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Man : Person
 
+- (void)name0;
+- (void)name1;
+
+
 @end
+
+
+@interface Man(ManCategory)
+- (void)name2;
+@end
+
 
 NS_ASSUME_NONNULL_END
