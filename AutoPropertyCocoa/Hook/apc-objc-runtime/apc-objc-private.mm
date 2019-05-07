@@ -499,7 +499,6 @@ void class_removeMethod_APC_OBJC2_NONRUNTIMELOCK(Class cls, SEL name)
         if(((method = (apc_method_t*)methods[count])->name) == name){
             
             clazz->data()->methods.deleteElement(method);
-            //-Wdeprecated-declarations
             
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -510,4 +509,20 @@ void class_removeMethod_APC_OBJC2_NONRUNTIMELOCK(Class cls, SEL name)
     }
     
 #endif
+}
+
+
+IMP class_itMethodImplementation_APC(Class cls, SEL name)
+{
+    unsigned int    count;
+    apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
+    apc_method_t*   method;
+    while (count--) {
+        
+        if(((method = (apc_method_t*)methods[count])->name) == name){
+            
+            return method->imp;
+        }
+    }
+    return NULL;
 }

@@ -1,5 +1,5 @@
 //
-//  AutoghookPropertyInfo.h
+//  AutfuncnamePropertyInfo.h
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/23.

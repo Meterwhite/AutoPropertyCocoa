@@ -75,8 +75,8 @@ typedef NSObject        APCProxyInstance;
 typedef Class           APCProxyClass;
 typedef apc_spinlock    APCSpinLock;
 
-FOUNDATION_EXPORT NSString *const APCProgramingType_point;
-FOUNDATION_EXPORT NSString *const APCProgramingType_chars;
+FOUNDATION_EXPORT NSString *const APCProgramingType_ptr;
+FOUNDATION_EXPORT NSString *const APCProgramingType_charptr;
 FOUNDATION_EXPORT NSString *const APCProgramingType_id;
 FOUNDATION_EXPORT NSString *const APCProgramingType_NSBlock;
 FOUNDATION_EXPORT NSString *const APCProgramingType_SEL;
@@ -94,26 +94,22 @@ FOUNDATION_EXPORT NSString *const APCProgramingType_float;
 FOUNDATION_EXPORT NSString *const APCProgramingType_double;
 FOUNDATION_EXPORT NSString *const APCProgramingType_bool;
 
-#define APCIntEncode "i\0\0\0\0\0\0\0\0"
-
-
-static inline void apc_setterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* enc, id arg)
+static inline void apc_setterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* encode, id arg)
 {
-    NSCAssert(*enc != '\0', @"APC: Type encoding can not be nil.");
+    NSCAssert(*encode != '\0', @"APC: Type encoding can not be nil.");
     
-    if(enc[0] == _C_ID){
+    if(encode[0] == _C_ID){
     
-        ((void(*)(id,SEL,id))imp)(_SELF,_CMD,arg);
+        ((void(*)(id,SEL,id))imp)(_SELF, _CMD, arg);
         return;
     }
     
     ///Boxed basic-value.
     if(NO == [arg isKindOfClass:[NSValue class]]){
-        
-        ///@throw
+#warning @throw
     }
     
-    if(strcmp(enc, "c") == 0){
+    if(strcmp(encode, "c") == 0) {
         
 #define apc_Sinvok_rbox_by(type)\
     \
@@ -122,69 +118,69 @@ static inline void apc_setterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* 
         ((void(*)(id,SEL,type))imp)(_SELF,_CMD,value);\
         return;
 
+        apc_Sinvok_rbox_by(char)
+    }
+    else if(strcmp(encode, "i") == 0){
         apc_Sinvok_rbox_by(int)
     }
-    else if(strcmp(enc, "i") == 0){
-        apc_Sinvok_rbox_by(int)
-    }
-    else if(strcmp(enc, "s") == 0){
+    else if(strcmp(encode, "s") == 0){
         apc_Sinvok_rbox_by(short)
     }
-    else if(strcmp(enc, "l") == 0){
+    else if(strcmp(encode, "l") == 0){
         apc_Sinvok_rbox_by(long)
     }
-    else if(strcmp(enc, "q") == 0){
+    else if(strcmp(encode, "q") == 0){
         apc_Sinvok_rbox_by(long long)
     }
-    else if(strcmp(enc, "C") == 0){
+    else if(strcmp(encode, "C") == 0){
         apc_Sinvok_rbox_by(unsigned char)
     }
-    else if(strcmp(enc, "I") == 0){
+    else if(strcmp(encode, "I") == 0){
         apc_Sinvok_rbox_by(unsigned int)
     }
-    else if(strcmp(enc, "S") == 0){
+    else if(strcmp(encode, "S") == 0){
         apc_Sinvok_rbox_by(unsigned short)
     }
-    else if(strcmp(enc, "L") == 0){
+    else if(strcmp(encode, "L") == 0){
         apc_Sinvok_rbox_by(unsigned long)
     }
-    else if(strcmp(enc, "Q") == 0){
+    else if(strcmp(encode, "Q") == 0){
         apc_Sinvok_rbox_by(unsigned long long)
     }
-    else if(strcmp(enc, "f") == 0){
+    else if(strcmp(encode, "f") == 0){
         apc_Sinvok_rbox_by(float)
     }
-    else if(strcmp(enc, "d") == 0){
+    else if(strcmp(encode, "d") == 0){
         apc_Sinvok_rbox_by(double)
     }
-    else if(strcmp(enc, "B") == 0){
+    else if(strcmp(encode, "B") == 0){
         apc_Sinvok_rbox_by(bool)
     }
-    else if(strcmp(enc, "*") == 0){
+    else if(strcmp(encode, "*") == 0){
         apc_Sinvok_rbox_by(char *)
     }
-    else if(strcmp(enc, "#") == 0){
+    else if(strcmp(encode, "#") == 0){
         apc_Sinvok_rbox_by(Class)
     }
-    else if(strcmp(enc, ":") == 0){
+    else if(strcmp(encode, ":") == 0){
         apc_Sinvok_rbox_by(SEL)
     }
-    else if(enc[0] == _C_PTR){
+    else if(encode[0] == _C_PTR){
         apc_Sinvok_rbox_by(void*)
     }
-    else if(strcmp(enc, @encode(APCRect)) == 0){
+    else if(strcmp(encode, @encode(APCRect)) == 0){
         apc_Sinvok_rbox_by(APCRect)
     }
-    else if(strcmp(enc, @encode(APCPoint)) == 0){
+    else if(strcmp(encode, @encode(APCPoint)) == 0){
         apc_Sinvok_rbox_by(APCPoint)
     }
-    else if(strcmp(enc, @encode(APCSize)) == 0){
+    else if(strcmp(encode, @encode(APCSize)) == 0){
         apc_Sinvok_rbox_by(APCSize)
     }
-    else if(strcmp(enc, @encode(APCEdgeinsets)) == 0){
+    else if(strcmp(encode, @encode(APCEdgeinsets)) == 0){
         apc_Sinvok_rbox_by(APCEdgeinsets)
     }
-    else if(strcmp(enc, @encode(NSRange)) == 0){
+    else if(strcmp(encode, @encode(NSRange)) == 0){
         apc_Sinvok_rbox_by(NSRange)
     }
     ///enc-m
@@ -192,92 +188,92 @@ static inline void apc_setterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* 
 }
 
 
-static inline id apc_getterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* enc)
+static inline id apc_getterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* encode)
 {
-    NSCAssert(*enc != '\0', @"APC: Type encoding can not be nil.");
+    NSCAssert(*encode != '\0', @"APC: Type encoding can not be nil.");
     
-    if(enc[0] == _C_ID){
+    if(encode[0] == _C_ID){
         
         return ((id(*)(id,SEL))imp)(_SELF,_CMD);
     }
     
     
-    if(strcmp(enc, "c") == 0){
+    if(strcmp(encode, "c") == 0){
         
-#define apc_Ginvok_rbox_num_by(type,ftype)\
+#define apc_Ginvok_rbox_num_by(type,methodSuffix)\
 \
 type returnValue = ((type(*)(id,SEL))imp)(_SELF,_CMD);\
-return [NSNumber numberWith##ftype:returnValue];
+return [NSNumber numberWith##methodSuffix:returnValue];
         
         apc_Ginvok_rbox_num_by(char,Char)
     }
-    else if(strcmp(enc, "i") == 0){
+    else if(strcmp(encode, "i") == 0){
         apc_Ginvok_rbox_num_by(int,Int)
     }
-    else if(strcmp(enc, "s") == 0){
+    else if(strcmp(encode, "s") == 0){
         apc_Ginvok_rbox_num_by(short,Short)
     }
-    else if(strcmp(enc, "l") == 0){
+    else if(strcmp(encode, "l") == 0){
         apc_Ginvok_rbox_num_by(long,Long)
     }
-    else if(strcmp(enc, "q") == 0){
+    else if(strcmp(encode, "q") == 0){
         apc_Ginvok_rbox_num_by(long long,LongLong)
     }
-    else if(strcmp(enc, "C") == 0){
+    else if(strcmp(encode, "C") == 0){
         apc_Ginvok_rbox_num_by(unsigned char,UnsignedChar)
     }
-    else if(strcmp(enc, "I") == 0){
+    else if(strcmp(encode, "I") == 0){
         apc_Ginvok_rbox_num_by(unsigned int,UnsignedInt)
     }
-    else if(strcmp(enc, "S") == 0){
+    else if(strcmp(encode, "S") == 0){
         apc_Ginvok_rbox_num_by(unsigned short,UnsignedShort)
     }
-    else if(strcmp(enc, "L") == 0){
+    else if(strcmp(encode, "L") == 0){
         apc_Ginvok_rbox_num_by(unsigned long,UnsignedLong)
     }
-    else if(strcmp(enc, "Q") == 0){
+    else if(strcmp(encode, "Q") == 0){
         apc_Ginvok_rbox_num_by(unsigned long long,UnsignedLongLong)
     }
-    else if(strcmp(enc, "f") == 0){
+    else if(strcmp(encode, "f") == 0){
         apc_Ginvok_rbox_num_by(float,Float)
     }
-    else if(strcmp(enc, "d") == 0){
+    else if(strcmp(encode, "d") == 0){
         apc_Ginvok_rbox_num_by(double,Double)
     }
-    else if(strcmp(enc, "B") == 0){
+    else if(strcmp(encode, "B") == 0){
         apc_Ginvok_rbox_num_by(bool,Bool)
     }
-    else if(strcmp(enc, "*") == 0){
+    else if(strcmp(encode, "*") == 0){
         
 #define apc_Ginvok_rbox_value_by(type)\
 \
 type returnValue = ((type(*)(id,SEL))imp)(_SELF,_CMD);\
-return [NSValue valueWithBytes:&returnValue objCType:enc];
+return [NSValue valueWithBytes:&returnValue objCType:encode];
         
         apc_Ginvok_rbox_value_by(char *)
     }
-    else if(strcmp(enc, "#") == 0){
+    else if(strcmp(encode, "#") == 0){
         apc_Ginvok_rbox_value_by(Class)
     }
-    else if(strcmp(enc, ":") == 0){
+    else if(strcmp(encode, ":") == 0){
         apc_Ginvok_rbox_value_by(SEL)
     }
-    else if(enc[0] == _C_PTR){
+    else if(encode[0] == _C_PTR){
         apc_Ginvok_rbox_value_by(void*)
     }
-    else if(strcmp(enc, @encode(APCRect)) == 0){
+    else if(strcmp(encode, @encode(APCRect)) == 0){
         apc_Ginvok_rbox_value_by(APCRect)
     }
-    else if(strcmp(enc, @encode(APCPoint)) == 0){
+    else if(strcmp(encode, @encode(APCPoint)) == 0){
         apc_Ginvok_rbox_value_by(APCPoint)
     }
-    else if(strcmp(enc, @encode(APCSize)) == 0){
+    else if(strcmp(encode, @encode(APCSize)) == 0){
         apc_Ginvok_rbox_value_by(APCSize)
     }
-    else if(strcmp(enc, @encode(APCEdgeinsets)) == 0){
+    else if(strcmp(encode, @encode(APCEdgeinsets)) == 0){
         apc_Ginvok_rbox_value_by(APCEdgeinsets)
     }
-    else if(strcmp(enc, @encode(NSRange)) == 0){
+    else if(strcmp(encode, @encode(NSRange)) == 0){
         apc_Ginvok_rbox_value_by(NSRange)
     }
     ///enc-m
@@ -286,11 +282,11 @@ return [NSValue valueWithBytes:&returnValue objCType:enc];
 }
 
 
-#define apc_def_vGHook(enc,type,oghook)\
+#define APCTemplate_NSValue_HookOfGetter(encodename,type,funcname)\
 \
-type oghook##_##enc(_Nullable id _SELF,SEL _CMD)\
+type funcname##_##encodename(_Nullable id _SELF,SEL _CMD)\
 {\
-    NSValue* value = oghook(_SELF, _CMD);\
+    NSValue* value = funcname(_SELF, _CMD);\
     \
     type ret;\
     [value getValue:&ret];\
@@ -298,215 +294,221 @@ type oghook##_##enc(_Nullable id _SELF,SEL _CMD)\
     return ret;\
 }
 
-#define apc_def_vNGHook(enc,type,oghook,ftype)\
+#define APCTemplate_NSNumber_HookOfGetter(encodename,type,funcname,methodPrefix)\
 \
-type oghook##_##enc(_Nullable id _SELF,SEL _CMD)\
+type funcname##_##encodename(_Nullable id _SELF,SEL _CMD)\
 {\
-    return [((NSNumber*)oghook(_SELF, _CMD)) ftype##Value];\
+    return [((NSNumber*)funcname(_SELF, _CMD)) methodPrefix##Value];\
 }
 
 
-#define apc_def_vGHook_and_impimage(oghook)\
-    \
-apc_def_vNGHook(c,char,oghook,char)\
-apc_def_vNGHook(i,int,oghook,int)\
-apc_def_vNGHook(s,short,oghook,short)\
-apc_def_vNGHook(l,long,oghook,long)\
-apc_def_vNGHook(q,long long,oghook,longLong)\
-apc_def_vNGHook(C,unsigned char,oghook,unsignedChar)\
-apc_def_vNGHook(I,unsigned int,oghook,unsignedInt)\
-apc_def_vNGHook(S,unsigned short,oghook,unsignedShort)\
-apc_def_vNGHook(L,unsigned long,oghook,unsignedLong)\
-apc_def_vNGHook(Q,unsigned long long,oghook,unsignedLongLong)\
-apc_def_vNGHook(f,float,oghook,float)\
-apc_def_vNGHook(d,double,oghook,double)\
-apc_def_vNGHook(B,BOOL,oghook,bool)\
-apc_def_vGHook(chars,char*,oghook)\
-apc_def_vGHook(class,Class,oghook)\
-apc_def_vGHook(sel,SEL,oghook)\
-apc_def_vGHook(ptr,void*,oghook)\
-apc_def_vGHook(rect,APCRect,oghook)\
-apc_def_vGHook(point,APCPoint,oghook)\
-apc_def_vGHook(size,APCSize,oghook)\
-apc_def_vGHook(range,NSRange,oghook)\
+/**
+ Define A : BasicValue <Funcname>_<EncodeName>(...){...}
+ Define B : IMP  <Funcname>_HookIMPMapper(char* encode){...}
+ */
+#define APC_Define_BasicValueHookOfGetter_Define_HookIMPMapper_UsingTemplate\
+(NSNumberTemplate,NSValueTemplate,funcname) \
 \
-void* _Nullable oghook##_impimage(NSString* _Nonnull enc)\
+NSNumberTemplate(c,char,funcname,char)\
+NSNumberTemplate(i,int,funcname,int)\
+NSNumberTemplate(s,short,funcname,short)\
+NSNumberTemplate(l,long,funcname,long)\
+NSNumberTemplate(q,long long,funcname,longLong)\
+NSNumberTemplate(C,unsigned char,funcname,unsignedChar)\
+NSNumberTemplate(I,unsigned int,funcname,unsignedInt)\
+NSNumberTemplate(S,unsigned short,funcname,unsignedShort)\
+NSNumberTemplate(L,unsigned long,funcname,unsignedLong)\
+NSNumberTemplate(Q,unsigned long long,funcname,unsignedLongLong)\
+NSNumberTemplate(f,float,funcname,float)\
+NSNumberTemplate(d,double,funcname,double)\
+NSNumberTemplate(B,BOOL,funcname,bool)\
+NSValueTemplate(charptr,char*,funcname)\
+NSValueTemplate(class,Class,funcname)\
+NSValueTemplate(sel,SEL,funcname)\
+NSValueTemplate(ptr,void*,funcname)\
+NSValueTemplate(rect,APCRect,funcname)\
+NSValueTemplate(point,APCPoint,funcname)\
+NSValueTemplate(size,APCSize,funcname)\
+NSValueTemplate(range,NSRange,funcname)\
+\
+void* _Nullable funcname##_HookIMPMapper(NSString* _Nonnull encodeString)\
 {\
-    if([enc isEqualToString:@"c"]){\
-        return oghook##_c;\
+    if([encodeString isEqualToString:@"c"]){\
+        return funcname##_c;\
     }\
-    else if ([enc isEqualToString:@"i"]){\
-        return oghook##_i;\
+    else if ([encodeString isEqualToString:@"i"]){\
+        return funcname##_i;\
     }\
-    else if ([enc isEqualToString:@"s"]){\
-        return oghook##_s;\
+    else if ([encodeString isEqualToString:@"s"]){\
+        return funcname##_s;\
     }\
-    else if ([enc isEqualToString:@"l"]){\
-        return oghook##_l;\
+    else if ([encodeString isEqualToString:@"l"]){\
+        return funcname##_l;\
     }\
-    else if ([enc isEqualToString:@"q"]){\
-        return oghook##_q;\
+    else if ([encodeString isEqualToString:@"q"]){\
+        return funcname##_q;\
     }\
-    else if ([enc isEqualToString:@"C"]){\
-        return oghook##_C;\
+    else if ([encodeString isEqualToString:@"C"]){\
+        return funcname##_C;\
     }\
-    else if ([enc isEqualToString:@"I"]){\
-        return oghook##_I;\
+    else if ([encodeString isEqualToString:@"I"]){\
+        return funcname##_I;\
     }\
-    else if ([enc isEqualToString:@"S"]){\
-        return oghook##_S;\
+    else if ([encodeString isEqualToString:@"S"]){\
+        return funcname##_S;\
     }\
-    else if ([enc isEqualToString:@"L"]){\
-        return oghook##_L;\
+    else if ([encodeString isEqualToString:@"L"]){\
+        return funcname##_L;\
     }\
-    else if ([enc isEqualToString:@"Q"]){\
-        return oghook##_Q;\
+    else if ([encodeString isEqualToString:@"Q"]){\
+        return funcname##_Q;\
     }\
-    else if ([enc isEqualToString:@"f"]){\
-        return oghook##_f;\
+    else if ([encodeString isEqualToString:@"f"]){\
+        return funcname##_f;\
     }\
-    else if ([enc isEqualToString:@"d"]){\
-        return oghook##_d;\
+    else if ([encodeString isEqualToString:@"d"]){\
+        return funcname##_d;\
     }\
-    else if ([enc isEqualToString:@"B"]){\
-        return oghook##_B;\
+    else if ([encodeString isEqualToString:@"B"]){\
+        return funcname##_B;\
     }\
-    else if ([enc isEqualToString:@"*"]){\
-        return oghook##_chars;\
+    else if ([encodeString isEqualToString:@"*"]){\
+        return funcname##_charptr;\
     }\
-    else if ([enc isEqualToString:@"#"]){\
-        return oghook##_class;\
+    else if ([encodeString isEqualToString:@"#"]){\
+        return funcname##_class;\
     }\
-    else if ([enc isEqualToString:@":"]){\
-        return oghook##_sel;\
+    else if ([encodeString isEqualToString:@":"]){\
+        return funcname##_sel;\
     }\
-    else if ([enc characterAtIndex:0] == '^'){\
-        return oghook##_ptr;\
+    else if ([encodeString characterAtIndex:0] == '^'){\
+        return funcname##_ptr;\
     }\
-    else if ([enc isEqualToString:@(@encode(APCRect))]){\
-        return oghook##_rect;\
+    else if ([encodeString isEqualToString:@(@encode(APCRect))]){\
+        return funcname##_rect;\
     }\
-    else if ([enc isEqualToString:@(@encode(APCPoint))]){\
-        return oghook##_point;\
+    else if ([encodeString isEqualToString:@(@encode(APCPoint))]){\
+        return funcname##_point;\
     }\
-    else if ([enc isEqualToString:@(@encode(APCSize))]){\
-        return oghook##_size;\
+    else if ([encodeString isEqualToString:@(@encode(APCSize))]){\
+        return funcname##_size;\
     }\
-    else if ([enc isEqualToString:@(@encode(NSRange))]){\
-        return oghook##_range;\
+    else if ([encodeString isEqualToString:@(@encode(NSRange))]){\
+        return funcname##_range;\
     }\
     return nil;\
 }
 ///enc-m
 
-#define apc_def_vSHook(enc,type,oshook)\
+#define APCTemplate_NSValue_HookOfSetter(encodename,type,funcname)\
 \
-void oshook##_##enc(_Nullable id _SELF,SEL _CMD,type val)\
+void funcname##_##encodename(_Nullable id _SELF,SEL _CMD,type val)\
 {\
     \
-    oshook(_SELF, _CMD, [NSValue valueWithBytes:&val objCType:@encode(type)]);\
+    funcname(_SELF, _CMD, [NSValue valueWithBytes:&val objCType:@encode(type)]);\
 }
 
-#define apc_def_vNSHook(enc,type,oshook,ftype)\
+#define APCTemplate_NSNumber_HookOfSetter(encodename,type,funcname,ftype)\
 \
-void oshook##_##enc(_Nullable id _SELF,SEL _CMD,type val)\
+void funcname##_##encodename(_Nullable id _SELF,SEL _CMD,type val)\
 {\
     \
-    oshook(_SELF, _CMD, [NSNumber numberWith##ftype:val]);\
+    funcname(_SELF, _CMD, [NSNumber numberWith##ftype:val]);\
 }
 
-#define apc_def_vSHook_and_impimage(oshook)\
+#define APC_Define_BasicValueHookOfSetter_Define_HookIMPMapper_UsingTemplate(NSNumberTemplate,NSValueTemplate,funcname) \
 \
-apc_def_vNSHook(c,char,oshook,Char)\
-apc_def_vNSHook(i,int,oshook,Int)\
-apc_def_vNSHook(s,short,oshook,Short)\
-apc_def_vNSHook(l,long,oshook,Long)\
-apc_def_vNSHook(q,long long,oshook,LongLong)\
-apc_def_vNSHook(C,unsigned char,oshook,UnsignedChar)\
-apc_def_vNSHook(I,unsigned int,oshook,UnsignedInt)\
-apc_def_vNSHook(S,unsigned short,oshook,UnsignedShort)\
-apc_def_vNSHook(L,unsigned long,oshook,UnsignedLong)\
-apc_def_vNSHook(Q,unsigned long long,oshook,UnsignedLongLong)\
-apc_def_vNSHook(f,float,oshook,Float)\
-apc_def_vNSHook(d,double,oshook,Double)\
-apc_def_vNSHook(B,BOOL,oshook,Bool)\
-apc_def_vSHook(chars,char*,oshook)\
-apc_def_vSHook(class,Class,oshook)\
-apc_def_vSHook(sel,SEL,oshook)\
-apc_def_vSHook(ptr,void*,oshook)\
-apc_def_vSHook(rect,APCRect,oshook)\
-apc_def_vSHook(point,APCPoint,oshook)\
-apc_def_vSHook(size,APCSize,oshook)\
-apc_def_vSHook(range,NSRange,oshook)\
+NSNumberTemplate(c,char,funcname,Char)\
+NSNumberTemplate(i,int,funcname,Int)\
+NSNumberTemplate(s,short,funcname,Short)\
+NSNumberTemplate(l,long,funcname,Long)\
+NSNumberTemplate(q,long long,funcname,LongLong)\
+NSNumberTemplate(C,unsigned char,funcname,UnsignedChar)\
+NSNumberTemplate(I,unsigned int,funcname,UnsignedInt)\
+NSNumberTemplate(S,unsigned short,funcname,UnsignedShort)\
+NSNumberTemplate(L,unsigned long,funcname,UnsignedLong)\
+NSNumberTemplate(Q,unsigned long long,funcname,UnsignedLongLong)\
+NSNumberTemplate(f,float,funcname,Float)\
+NSNumberTemplate(d,double,funcname,Double)\
+NSNumberTemplate(B,BOOL,funcname,Bool)\
+NSValueTemplate(charptr,char*,funcname)\
+NSValueTemplate(class,Class,funcname)\
+NSValueTemplate(sel,SEL,funcname)\
+NSValueTemplate(ptr,void*,funcname)\
+NSValueTemplate(rect,APCRect,funcname)\
+NSValueTemplate(point,APCPoint,funcname)\
+NSValueTemplate(size,APCSize,funcname)\
+NSValueTemplate(range,NSRange,funcname)\
 \
-void* _Nullable oshook##_impimage(NSString* _Nonnull enc)\
+void* _Nullable funcname##_HookIMPMapper(NSString* _Nonnull encodeString)\
 {\
-if([enc isEqualToString:@"c"]){\
-    return oshook##_c;\
+    if([encodeString isEqualToString:@"c"]){\
+    return funcname##_c;\
 }\
-else if ([enc isEqualToString:@"i"]){\
-    return oshook##_i;\
+else if ([encodeString isEqualToString:@"i"]){\
+    return funcname##_i;\
 }\
-else if ([enc isEqualToString:@"s"]){\
-    return oshook##_s;\
+else if ([encodeString isEqualToString:@"s"]){\
+    return funcname##_s;\
 }\
-else if ([enc isEqualToString:@"l"]){\
-    return oshook##_l;\
+else if ([encodeString isEqualToString:@"l"]){\
+    return funcname##_l;\
 }\
-else if ([enc isEqualToString:@"q"]){\
-    return oshook##_q;\
+else if ([encodeString isEqualToString:@"q"]){\
+    return funcname##_q;\
 }\
-else if ([enc isEqualToString:@"C"]){\
-    return oshook##_C;\
+else if ([encodeString isEqualToString:@"C"]){\
+    return funcname##_C;\
 }\
-else if ([enc isEqualToString:@"I"]){\
-    return oshook##_I;\
+else if ([encodeString isEqualToString:@"I"]){\
+    return funcname##_I;\
 }\
-else if ([enc isEqualToString:@"S"]){\
-    return oshook##_S;\
+else if ([encodeString isEqualToString:@"S"]){\
+    return funcname##_S;\
 }\
-else if ([enc isEqualToString:@"L"]){\
-    return oshook##_L;\
+else if ([encodeString isEqualToString:@"L"]){\
+    return funcname##_L;\
 }\
-else if ([enc isEqualToString:@"Q"]){\
-    return oshook##_Q;\
+else if ([encodeString isEqualToString:@"Q"]){\
+    return funcname##_Q;\
 }\
-else if ([enc isEqualToString:@"f"]){\
-    return oshook##_f;\
+else if ([encodeString isEqualToString:@"f"]){\
+    return funcname##_f;\
 }\
-else if ([enc isEqualToString:@"d"]){\
-    return oshook##_d;\
+else if ([encodeString isEqualToString:@"d"]){\
+    return funcname##_d;\
 }\
-else if ([enc isEqualToString:@"B"]){\
-    return oshook##_B;\
+else if ([encodeString isEqualToString:@"B"]){\
+    return funcname##_B;\
 }\
-else if ([enc isEqualToString:@"*"]){\
-    return oshook##_chars;\
+else if ([encodeString isEqualToString:@"*"]){\
+    return funcname##_charptr;\
 }\
-else if ([enc isEqualToString:@"#"]){\
-    return oshook##_class;\
+else if ([encodeString isEqualToString:@"#"]){\
+    return funcname##_class;\
 }\
-else if ([enc isEqualToString:@":"]){\
-    return oshook##_sel;\
+else if ([encodeString isEqualToString:@":"]){\
+    return funcname##_sel;\
 }\
-else if ([enc characterAtIndex:0] == '^'){\
-    return oshook##_ptr;\
+else if ([encodeString characterAtIndex:0] == '^'){\
+    return funcname##_ptr;\
 }\
-else if ([enc isEqualToString:@(@encode(APCRect))]){\
-    return oshook##_rect;\
+else if ([encodeString isEqualToString:@(@encode(APCRect))]){\
+    return funcname##_rect;\
 }\
-else if ([enc isEqualToString:@(@encode(APCPoint))]){\
-    return oshook##_point;\
+else if ([encodeString isEqualToString:@(@encode(APCPoint))]){\
+    return funcname##_point;\
 }\
-else if ([enc isEqualToString:@(@encode(APCSize))]){\
-    return oshook##_size;\
+else if ([encodeString isEqualToString:@(@encode(APCSize))]){\
+    return funcname##_size;\
 }\
-else if ([enc isEqualToString:@(@encode(NSRange))]){\
-    return oshook##_range;\
+else if ([encodeString isEqualToString:@(@encode(NSRange))]){\
+    return funcname##_range;\
 }\
-    return nil;\
+return nil;\
 }
 ///enc-m
+
 
 #pragma mark - Fast
 
@@ -677,3 +679,200 @@ submacro_apc_concat(submacro_apc_if_eq0_, VALUE)
 #define submacro_apc_if_eq19(VALUE) submacro_apc_if_eq18(submacro_apc_dec(VALUE))
 #define submacro_apc_if_eq20(VALUE) submacro_apc_if_eq19(submacro_apc_dec(VALUE))
 #endif
+
+
+/**
+
+ #define APC_Define_BasicValueHookOfGetter_Define_HookIMPMapper(funcname)\
+ \
+ APCTemplate_NSNumber_HookOfGetter(c,char,funcname,char)\
+ APCTemplate_NSNumber_HookOfGetter(i,int,funcname,int)\
+ APCTemplate_NSNumber_HookOfGetter(s,short,funcname,short)\
+ APCTemplate_NSNumber_HookOfGetter(l,long,funcname,long)\
+ APCTemplate_NSNumber_HookOfGetter(q,long long,funcname,longLong)\
+ APCTemplate_NSNumber_HookOfGetter(C,unsigned char,funcname,unsignedChar)\
+ APCTemplate_NSNumber_HookOfGetter(I,unsigned int,funcname,unsignedInt)\
+ APCTemplate_NSNumber_HookOfGetter(S,unsigned short,funcname,unsignedShort)\
+ APCTemplate_NSNumber_HookOfGetter(L,unsigned long,funcname,unsignedLong)\
+ APCTemplate_NSNumber_HookOfGetter(Q,unsigned long long,funcname,unsignedLongLong)\
+ APCTemplate_NSNumber_HookOfGetter(f,float,funcname,float)\
+ APCTemplate_NSNumber_HookOfGetter(d,double,funcname,double)\
+ APCTemplate_NSNumber_HookOfGetter(B,BOOL,funcname,bool)\
+ APCTemplate_NSValue_HookOfGetter(charptr,char*,funcname)\
+ APCTemplate_NSValue_HookOfGetter(class,Class,funcname)\
+ APCTemplate_NSValue_HookOfGetter(sel,SEL,funcname)\
+ APCTemplate_NSValue_HookOfGetter(ptr,void*,funcname)\
+ APCTemplate_NSValue_HookOfGetter(rect,APCRect,funcname)\
+ APCTemplate_NSValue_HookOfGetter(point,APCPoint,funcname)\
+ APCTemplate_NSValue_HookOfGetter(size,APCSize,funcname)\
+ APCTemplate_NSValue_HookOfGetter(range,NSRange,funcname)\
+ \
+ void* _Nullable funcname##_HookIMPMapper(NSString* _Nonnull encodeString)\
+ {\
+ if([encodeString isEqualToString:@"c"]){\
+ return funcname##_c;\
+ }\
+ else if ([encodeString isEqualToString:@"i"]){\
+ return funcname##_i;\
+ }\
+ else if ([encodeString isEqualToString:@"s"]){\
+ return funcname##_s;\
+ }\
+ else if ([encodeString isEqualToString:@"l"]){\
+ return funcname##_l;\
+ }\
+ else if ([encodeString isEqualToString:@"q"]){\
+ return funcname##_q;\
+ }\
+ else if ([encodeString isEqualToString:@"C"]){\
+ return funcname##_C;\
+ }\
+ else if ([encodeString isEqualToString:@"I"]){\
+ return funcname##_I;\
+ }\
+ else if ([encodeString isEqualToString:@"S"]){\
+ return funcname##_S;\
+ }\
+ else if ([encodeString isEqualToString:@"L"]){\
+ return funcname##_L;\
+ }\
+ else if ([encodeString isEqualToString:@"Q"]){\
+ return funcname##_Q;\
+ }\
+ else if ([encodeString isEqualToString:@"f"]){\
+ return funcname##_f;\
+ }\
+ else if ([encodeString isEqualToString:@"d"]){\
+ return funcname##_d;\
+ }\
+ else if ([encodeString isEqualToString:@"B"]){\
+ return funcname##_B;\
+ }\
+ else if ([encodeString isEqualToString:@"*"]){\
+ return funcname##_charptr;\
+ }\
+ else if ([encodeString isEqualToString:@"#"]){\
+ return funcname##_class;\
+ }\
+ else if ([encodeString isEqualToString:@":"]){\
+ return funcname##_sel;\
+ }\
+ else if ([encodeString characterAtIndex:0] == '^'){\
+ return funcname##_ptr;\
+ }\
+ else if ([encodeString isEqualToString:@(@encode(APCRect))]){\
+ return funcname##_rect;\
+ }\
+ else if ([encodeString isEqualToString:@(@encode(APCPoint))]){\
+ return funcname##_point;\
+ }\
+ else if ([encodeString isEqualToString:@(@encode(APCSize))]){\
+ return funcname##_size;\
+ }\
+ else if ([encodeString isEqualToString:@(@encode(NSRange))]){\
+ return funcname##_range;\
+ }\
+ return nil;\
+ }
+ ///enc-m
+
+ */
+
+
+/**
+
+
+ #define APC_Define_BasicValueHookOfSetter_Define_HookIMPMapper(funcname)\
+ \
+ APCTemplate_NSNumber_HookOfSetter(c,char,funcname,Char)\
+ APCTemplate_NSNumber_HookOfSetter(i,int,funcname,Int)\
+ APCTemplate_NSNumber_HookOfSetter(s,short,funcname,Short)\
+ APCTemplate_NSNumber_HookOfSetter(l,long,funcname,Long)\
+ APCTemplate_NSNumber_HookOfSetter(q,long long,funcname,LongLong)\
+ APCTemplate_NSNumber_HookOfSetter(C,unsigned char,funcname,UnsignedChar)\
+ APCTemplate_NSNumber_HookOfSetter(I,unsigned int,funcname,UnsignedInt)\
+ APCTemplate_NSNumber_HookOfSetter(S,unsigned short,funcname,UnsignedShort)\
+ APCTemplate_NSNumber_HookOfSetter(L,unsigned long,funcname,UnsignedLong)\
+ APCTemplate_NSNumber_HookOfSetter(Q,unsigned long long,funcname,UnsignedLongLong)\
+ APCTemplate_NSNumber_HookOfSetter(f,float,funcname,Float)\
+ APCTemplate_NSNumber_HookOfSetter(d,double,funcname,Double)\
+ APCTemplate_NSNumber_HookOfSetter(B,BOOL,funcname,Bool)\
+ APCTemplate_NSValue_HookOfSetter(charptr,char*,funcname)\
+ APCTemplate_NSValue_HookOfSetter(class,Class,funcname)\
+ APCTemplate_NSValue_HookOfSetter(sel,SEL,funcname)\
+ APCTemplate_NSValue_HookOfSetter(ptr,void*,funcname)\
+ APCTemplate_NSValue_HookOfSetter(rect,APCRect,funcname)\
+ APCTemplate_NSValue_HookOfSetter(point,APCPoint,funcname)\
+ APCTemplate_NSValue_HookOfSetter(size,APCSize,funcname)\
+ APCTemplate_NSValue_HookOfSetter(range,NSRange,funcname)\
+ \
+ void* _Nullable funcname##_HookIMPMapper(NSString* _Nonnull encodeString)\
+ {\
+ if([encodeString isEqualToString:@"c"]){\
+ return funcname##_c;\
+ }\
+ else if ([encodeString isEqualToString:@"i"]){\
+ return funcname##_i;\
+ }\
+ else if ([encodeString isEqualToString:@"s"]){\
+ return funcname##_s;\
+ }\
+ else if ([encodeString isEqualToString:@"l"]){\
+ return funcname##_l;\
+ }\
+ else if ([encodeString isEqualToString:@"q"]){\
+ return funcname##_q;\
+ }\
+ else if ([encodeString isEqualToString:@"C"]){\
+ return funcname##_C;\
+ }\
+ else if ([encodeString isEqualToString:@"I"]){\
+ return funcname##_I;\
+ }\
+ else if ([encodeString isEqualToString:@"S"]){\
+ return funcname##_S;\
+ }\
+ else if ([encodeString isEqualToString:@"L"]){\
+ return funcname##_L;\
+ }\
+ else if ([encodeString isEqualToString:@"Q"]){\
+ return funcname##_Q;\
+ }\
+ else if ([encodeString isEqualToString:@"f"]){\
+ return funcname##_f;\
+ }\
+ else if ([encodeString isEqualToString:@"d"]){\
+ return funcname##_d;\
+ }\
+ else if ([encodeString isEqualToString:@"B"]){\
+ return funcname##_B;\
+ }\
+ else if ([encodeString isEqualToString:@"*"]){\
+ return funcname##_charptr;\
+ }\
+ else if ([encodeString isEqualToString:@"#"]){\
+ return funcname##_class;\
+ }\
+ else if ([encodeString isEqualToString:@":"]){\
+ return funcname##_sel;\
+ }\
+ else if ([encodeString characterAtIndex:0] == '^'){\
+ return funcname##_ptr;\
+ }\
+ else if ([encodeString isEqualToString:@(@encode(APCRect))]){\
+ return funcname##_rect;\
+ }\
+ else if ([encodeString isEqualToString:@(@encode(APCPoint))]){\
+ return funcname##_point;\
+ }\
+ else if ([encodeString isEqualToString:@(@encode(APCSize))]){\
+ return funcname##_size;\
+ }\
+ else if ([encodeString isEqualToString:@(@encode(NSRange))]){\
+ return funcname##_range;\
+ }\
+ return nil;\
+ }
+ ///enc-m
+
+ */

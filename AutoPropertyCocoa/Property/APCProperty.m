@@ -117,7 +117,7 @@
             _kindOfValue = APCPropertyValueKindOfObject;
         }else if ([code characterAtIndex:0] == '^'){
             //no more about detail info.
-            _programmingType = APCProgramingType_point;
+            _programmingType = APCProgramingType_ptr;
             _kindOfValue = APCPropertyValueKindOfPoint;
         }else if([code isEqualToString:@"@?"]){
             //NSBlock
@@ -125,8 +125,8 @@
             _kindOfValue = APCPropertyValueKindOfBlock;
         }else if([code isEqualToString:@"*"]){
             //point
-            _programmingType = APCProgramingType_chars;
-            _kindOfValue = APCPropertyValueKindOfChars;
+            _programmingType = APCProgramingType_charptr;
+            _kindOfValue = APCPropertyValueKindOfCharptr;
         }else if([code isEqualToString:@":"]){
             //SEL
             _programmingType = APCProgramingType_SEL;

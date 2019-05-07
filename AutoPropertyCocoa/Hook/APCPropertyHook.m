@@ -16,7 +16,28 @@
 #import "APCRuntime.h"
 #import "APCScope.h"
 
-id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
+id _Nullable apc_null_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
+{
+    Class cls = object_getClass(_SELF);
+    IMP imp;
+    do {
+        
+        if(nil != (imp = class_itMethodImplementation_APC(cls, _CMD)))
+            
+            if(imp != (IMP)apc_null_getter)
+                
+                break;
+    } while ((void)(imp = nil), nil != (cls = class_getSuperclass(cls)));
+    
+    if(nil != imp){
+        
+        return ((id(*)(id,SEL))imp)(_SELF, _CMD);
+    }
+    
+    return nil;
+}
+
+id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
 {
     APCPropertyHook* hook;
     NSString*        _CMD_s = @((const char*)(const void*)_CMD);
@@ -88,14 +109,39 @@ id _Nullable apc_propertyhook_getter(_Nullable id _SELF,SEL _Nonnull _CMD)
     
     return val;
 }
-apc_def_vGHook_and_impimage(apc_propertyhook_getter)
+
+APC_Define_BasicValueHookOfGetter_Define_HookIMPMapper_UsingTemplate
+(APCTemplate_NSNumber_HookOfGetter,APCTemplate_NSValue_HookOfGetter,
+ apc_propertyhook_getter
+)
+
+void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
+{
+    Class cls = object_getClass(_SELF);
+    IMP imp;
+    do {
+        
+        if(nil != (imp = class_itMethodImplementation_APC(cls, _CMD)))
+            
+            if(imp != (IMP)apc_null_setter)
+                
+                break;
+    } while ((void)(imp = nil), nil != (cls = class_getSuperclass(cls)));
+    
+    if(nil != imp){
+        
+        ((void(*)(id,SEL,id))imp)(_SELF, _CMD, value);
+    }
+}
 
 void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable value)
 {
     
 }
-apc_def_vSHook_and_impimage(apc_propertyhook_setter)
-
+APC_Define_BasicValueHookOfSetter_Define_HookIMPMapper_UsingTemplate
+(APCTemplate_NSNumber_HookOfSetter,APCTemplate_NSValue_HookOfSetter,
+ apc_propertyhook_setter
+ )
 
 @implementation APCPropertyHook
 {
@@ -289,8 +335,8 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     }else{
         
         newimp = (_methodStyle == APCMethodGetterStyle)
-        ? (IMP)apc_propertyhook_getter_impimage(_valueTypeEncoding)
-        : (IMP)apc_propertyhook_setter_impimage(_valueTypeEncoding);
+        ? (IMP)apc_propertyhook_getter_HookIMPMapper(_valueTypeEncoding)
+        : (IMP)apc_propertyhook_setter_HookIMPMapper(_valueTypeEncoding);
     }
     
     _new_implementation = newimp;

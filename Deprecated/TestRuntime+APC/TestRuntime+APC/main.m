@@ -12,13 +12,11 @@
 #import "Person.h"
 #import "Man.h"
 
-
-
 /**
  
  Encode/0/IMP
  */
-union apc_code_t {
+union apc_coder_t {
     
     char mask;
     char encode[sizeof(unsigned long)];
@@ -30,26 +28,28 @@ union apc_code_t {
     char alloc[2*sizeof(unsigned long) + 1];
 };
 
+typedef union apc_coder_t APCCoder;
 
-typedef union apc_code_t APCCode;
-
-APCCode APCMakeTypeEncodings(const char* encode)
+APCCoder APCMakeTypeEncodings(const char* encode)
 {
-    APCCode s = {0};
+    APCCoder s = {0};
     s.value = *(unsigned long*)encode;
     return s;
 }
 
-IMP APCTypeEncodingsGetIMP(APCCode enc)
+IMP APCCoderGetIMP(APCCoder enc)
 {
     return *(IMP*)(&enc + sizeof(sizeof(unsigned long) + 1));
 }
 
-void APCTypeEncodingsSetIMP(APCCode enc , IMP* imp)
+void APCTypeEncodingsSetIMP(APCCoder enc , IMP* imp)
 {
     void* des = (void*)(&enc + sizeof(sizeof(unsigned long) + 1));
     memcpy(des, imp, sizeof(uintptr_t));
 }
+
+
+static APCCoder apc_int_coder = {.encode = "i\0"};
 
 
 #define APCCharEnc      99//c
@@ -143,7 +143,6 @@ void apc_testingEncode()
     
 }
 
-static APCCode _code = {.encode = "iiiiiii\0"};
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
@@ -162,7 +161,6 @@ int main(int argc, const char * argv[]) {
 //        printf("%u\n",(uint32)APCRangeEnc);
 //        printf("%u\n",(uint32)5288747017773340027);
         
-        APCCode dd = _code;
         
         apc_testingEncode();
     }

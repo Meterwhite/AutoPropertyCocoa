@@ -44,7 +44,7 @@ typedef NS_OPTIONS(NSUInteger,APCPropertyValueKind){
     
     APCPropertyValueKindOfPoint         =   5,
     ///char*
-    APCPropertyValueKindOfChars         =   6,
+    APCPropertyValueKindOfCharptr       =   6,
     
     APCPropertyValueKindOfBlock         =   7,
 };

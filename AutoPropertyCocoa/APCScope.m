@@ -3,8 +3,8 @@
 
 #import <Foundation/Foundation.h>
 
-NSString *const  APCProgramingType_point             =   @"void*";
-NSString *const  APCProgramingType_chars             =   @"char*";
+NSString *const  APCProgramingType_ptr               =   @"void*";
+NSString *const  APCProgramingType_charptr           =   @"char*";
 NSString *const  APCProgramingType_id                =   @"id";
 NSString *const  APCProgramingType_NSBlock           =   @"NSBlock";
 NSString *const  APCProgramingType_SEL               =   @"SEL";
