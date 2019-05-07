@@ -9,9 +9,16 @@
 #import "Man.h"
 
 @implementation Man
+- (void)name0{}
+- (void)name1{}
 - (NSString *)name
 {
     NSLog(@"In Man!");
     return @"ABC";
 }
+@end
+
+
+@implementation Man(ManCategory)
+- (void)name2{}
 @end

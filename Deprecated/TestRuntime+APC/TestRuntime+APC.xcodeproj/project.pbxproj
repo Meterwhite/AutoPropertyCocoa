@@ -71,7 +71,7 @@
 		9FA4B9F5227F1BDF001EAE14 /* TestRuntime+APC */ = {
 			isa = PBXGroup;
 			children = (
-				9FA4BA0D227F3FD4001EAE14 /* objc-runtime+apc */,
+				9FA4BA0D227F3FD4001EAE14 /* apc-objc-runtime */,
 				9FA4BA08227F3700001EAE14 /* Testclass */,
 				9FA4B9F6227F1BDF001EAE14 /* main.m */,
 			);
@@ -97,15 +97,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		9FA4BA0D227F3FD4001EAE14 /* objc-runtime+apc */ = {
+		9FA4BA0D227F3FD4001EAE14 /* apc-objc-runtime */ = {
 			isa = PBXGroup;
 			children = (
 				9FA4BA0E227F3FD4001EAE14 /* apc-objc-config.h */,
 				9FA4BA10227F3FD4001EAE14 /* apc-objc-private.h */,
 				9FA4BA0F227F3FD4001EAE14 /* apc-objc-private.mm */,
 			);
-			name = "objc-runtime+apc";
-			path = "../../objc-runtime+apc";
+			name = "apc-objc-runtime";
+			path = "../../apc-objc-runtime";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

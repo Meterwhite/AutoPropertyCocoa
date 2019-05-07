@@ -9,50 +9,22 @@
 #include "apc-objc-private.h"
 #include "apc-objc-config.h"
 
-/// A pointer to the function of a method implementation.
-#if !OBJC_OLD_DISPATCH_PROTOTYPES
-typedef void (*IMP)(void /* id, SEL, ... */ );
-#else
-typedef id (*IMP)(id, SEL, ...);
-#endif
-
-#ifndef nil
-# if __has_feature(cxx_nullptr)
-#   define nil nullptr
-# else
-#   define nil __DARWIN_NULL
-# endif
-#endif
-
-#if !(__OBJC2__  &&  __LP64__)
-#   define SUPPORT_TAGGED_POINTERS 0
-#else
-#   define SUPPORT_TAGGED_POINTERS 1
-#endif
-
 /*
  ---------------------------------
  ---------------------------------
  ---------------------------------
  */
 #pragma mark - objc-private.h
-#import <libkern/OSAtomic.h>
-#include <malloc/malloc.h>
-#include <pthread.h>
-#include <stdint.h>
-#include <assert.h>
+//#include <stdint.h>
+//#include <assert.h>
 #include <iterator>
-#include <cstddef>
+//#include <cstddef>
 
 struct apc_objc_class;
 struct apc_objc_object;
 
 typedef struct apc_objc_class *APCClass;
 typedef struct apc_objc_object *id;
-
-namespace {
-    struct SideTable;
-};
 
 union apc_isa_t
 {
@@ -108,13 +80,7 @@ union apc_isa_t
 
 
 struct apc_objc_object {
-    
-private:
     apc_isa_t isa;
-    
-public:
-    
-    bool isTaggedPointer();
 };
 
 // Define SUPPORT_MSB_TAGGED_POINTERS to use the MSB
@@ -126,37 +92,11 @@ public:
 #   define SUPPORT_MSB_TAGGED_POINTERS 1
 #endif
 
-#if SUPPORT_MSB_TAGGED_POINTERS
-#   define TAG_MASK (1ULL<<63)
-//#   define TAG_SLOT_SHIFT 60
-//#   define TAG_PAYLOAD_LSHIFT 4
-//#   define TAG_PAYLOAD_RSHIFT 4
-#else
-#   define TAG_MASK 1
-//#   define TAG_SLOT_SHIFT 0
-//#   define TAG_PAYLOAD_LSHIFT 0
-//#   define TAG_PAYLOAD_RSHIFT 4
-#endif
-inline bool
-apc_objc_object::isTaggedPointer()
-{
-    return ((uintptr_t)this & TAG_MASK);
-}
-
 
 struct apc_method_t {
     SEL name;
     const char *types;
     IMP imp;
-    
-    struct SortBySELAddress :
-    public std::binary_function<const apc_method_t&,
-    const apc_method_t&, bool>
-    {
-        bool operator() (const apc_method_t& lhs,
-                         const apc_method_t& rhs)
-        { return lhs.name < rhs.name; }
-    };
 };
 
 struct apc_property_t {
@@ -191,14 +131,6 @@ struct apc_ivar_t {
     }
 };
 
-static inline void *
-memdup(const void *mem, size_t len)
-{
-    void *dup = malloc(len);
-    memcpy(dup, mem, len);
-    return dup;
-}
-
 typedef uintptr_t apc_protocol_ref_t;  // protocol_t *, but unremapped
 typedef apc_protocol_ref_t* iterator;
 typedef const apc_protocol_ref_t* const_iterator;
@@ -206,14 +138,6 @@ struct apc_protocol_list_t {
     // count is 64-bit by accident.
     uintptr_t count;
     apc_protocol_ref_t list[0]; // variable-size
-    
-    size_t byteSize() const {
-        return sizeof(*this) + count*sizeof(list[0]);
-    }
-    
-    apc_protocol_list_t *duplicate() const {
-        return (apc_protocol_list_t *)memdup(this, this->byteSize());
-    }
 };
 
 typedef struct apc_method_t *APCMethod;
@@ -250,10 +174,11 @@ struct apc_entsize_list_tt {
     void deleteElement(Element* elm) {
         
         Element* item;
+        size_t size = sizeof(Element);
         uint32_t idx = UINT32_MAX;
         for(uint32_t i = 0 ; i < count ; i++){
             
-            item = (Element *)((uint8_t *)&first + i);
+            item = (Element *)((char*)&first + i*size);
             if(item == elm){
                 
                 idx = i;
@@ -266,9 +191,8 @@ struct apc_entsize_list_tt {
             return;
         }
         
-        char** pre  = NULL;
-        char** next = NULL;
-        size_t size = sizeof(Element);
+        Element* pre  = NULL;
+        Element* next = NULL;
         for(uint32_t i = 0 , j = i ; i < count ; i++){
             
             if(i < idx) {
@@ -276,13 +200,13 @@ struct apc_entsize_list_tt {
                 continue;
             }
             
-            pre  = ((char**)&first);
-            if(idx == count -1) {
+            pre  = (Element*)((char*)&first + i*size);
+            if(i == count -1) {
                 
                 memset(pre, 0, size);
-            }else{
+            } else {
                 
-                next = ((char**)&first + i*size);
+                next = (Element*)((char*)&first + (i + 1)*size);
                 memcpy(pre, next, sizeof(Element));
             }
             
@@ -298,107 +222,17 @@ struct apc_entsize_list_tt {
         return entsizeAndFlags & FlagMask;
     }
     
-    Element& getOrEnd(uint32_t i) const {
-        assert(i <= count);
-        return *(Element *)((uint8_t *)&first + i*entsize());
-    }
-    Element& get(uint32_t i) const {
-        assert(i < count);
-        return getOrEnd(i);
-    }
-    
     size_t byteSize() const {
         return sizeof(*this) + (count-1)*entsize();
     }
     
-    List *duplicate() const {
-        return (List *)memdup(this, this->byteSize());
-    }
-    
     struct iterator;
-    const iterator begin() const {
-        return iterator(*static_cast<const List*>(this), 0);
-    }
-    iterator begin() {
-        return iterator(*static_cast<const List*>(this), 0);
-    }
-    const iterator end() const {
-        return iterator(*static_cast<const List*>(this), count);
-    }
-    iterator end() {
-        return iterator(*static_cast<const List*>(this), count);
-    }
-    
     struct iterator {
         uint32_t entsize;
         uint32_t index;  // keeping track of this saves a divide in operator-
         Element* element;
-
-        typedef std::random_access_iterator_tag iterator_category;
-        typedef Element value_type;
-        typedef ptrdiff_t difference_type;
-        typedef Element* pointer;
-        typedef Element& reference;
-        
-        iterator() { }
-        
-        iterator(const List& list, uint32_t start = 0)
-        : entsize(list.entsize())
-        , index(start)
-        , element(&list.getOrEnd(start))
-        { }
-        
-        const iterator& operator += (ptrdiff_t delta) {
-            element = (Element*)((uint8_t *)element + delta*entsize);
-            index += (int32_t)delta;
-            return *this;
-        }
-        const iterator& operator -= (ptrdiff_t delta) {
-            element = (Element*)((uint8_t *)element - delta*entsize);
-            index -= (int32_t)delta;
-            return *this;
-        }
-        const iterator operator + (ptrdiff_t delta) const {
-            return iterator(*this) += delta;
-        }
-        const iterator operator - (ptrdiff_t delta) const {
-            return iterator(*this) -= delta;
-        }
-        
-        iterator& operator ++ () { *this += 1; return *this; }
-        iterator& operator -- () { *this -= 1; return *this; }
-        iterator operator ++ (int) {
-            iterator result(*this); *this += 1; return result;
-        }
-        iterator operator -- (int) {
-            iterator result(*this); *this -= 1; return result;
-        }
-        
-        ptrdiff_t operator - (const iterator& rhs) const {
-            return (ptrdiff_t)this->index - (ptrdiff_t)rhs.index;
-        }
-        
-        Element& operator * () const { return *element; }
-        Element* operator -> () const { return element; }
-        
-        operator Element& () const { return *element; }
-        
-        bool operator == (const iterator& rhs) const {
-            return this->element == rhs.element;
-        }
-        bool operator != (const iterator& rhs) const {
-            return this->element != rhs.element;
-        }
-        
-        bool operator < (const iterator& rhs) const {
-            return this->element < rhs.element;
-        }
-        bool operator > (const iterator& rhs) const {
-            return this->element > rhs.element;
-        }
     };
 };
-
 
 struct apc_ivar_list_t : apc_entsize_list_tt<apc_ivar_t, apc_ivar_list_t, 0> {
 };
@@ -406,31 +240,8 @@ struct apc_ivar_list_t : apc_entsize_list_tt<apc_ivar_t, apc_ivar_list_t, 0> {
 struct apc_property_list_t : apc_entsize_list_tt<apc_property_t, apc_property_list_t, 0> {
 };
 
-
-// Two bits of entsize are used for fixup markers.
 struct apc_method_list_t : apc_entsize_list_tt<apc_method_t, apc_method_list_t, 0x3> {
-    bool isFixedUp() const;
-    void setFixedUp();
-    
-    uint32_t indexOfMethod(const apc_method_t *meth) const {
-        uint32_t i =
-        (uint32_t)(((uintptr_t)meth - (uintptr_t)this) / entsize());
-        assert(i < count);
-        return i;
-    }
 };
-
-static uint32_t apc_fixed_up_method_list = 3;
-
-bool apc_method_list_t::isFixedUp() const {
-    return flags() == apc_fixed_up_method_list;
-}
-
-void apc_method_list_t::setFixedUp() {
-//    runtimeLock.assertWriting();
-    assert(!isFixedUp());
-    entsizeAndFlags = entsize() | apc_fixed_up_method_list;
-}
 
 struct apc_class_ro_t {
     uint32_t flags;
@@ -449,16 +260,7 @@ struct apc_class_ro_t {
     
     const uint8_t * weakIvarLayout;
     apc_property_list_t *baseProperties;
-    
-    apc_method_list_t *baseMethods() const {
-        return baseMethodList;
-    }
 };
-
-static void try_free(const void *p)
-{
-    if (p && malloc_size(p)) free((void *)p);
-}
 
 template <typename Element, typename List>
 class apc_list_array_tt {
@@ -588,40 +390,9 @@ public:
         }
     }
     
-    void attachLists(List* const * addedLists, uint32_t addedCount) {
-        if (addedCount == 0) return;
-        
-        if (hasArray()) {
-            // many lists -> many lists
-            uint32_t oldCount = array()->count;
-            uint32_t newCount = oldCount + addedCount;
-            setArray((array_t *)realloc(array(), array_t::byteSize(newCount)));
-            array()->count = newCount;
-            memmove(array()->lists + addedCount, array()->lists,
-                    oldCount * sizeof(array()->lists[0]));
-            memcpy(array()->lists, addedLists,
-                   addedCount * sizeof(array()->lists[0]));
-        }
-        else if (!list  &&  addedCount == 1) {
-            // 0 lists -> 1 list
-            list = addedLists[0];
-        }
-        else {
-            // 1 list -> many lists
-            List* oldList = list;
-            uint32_t oldCount = oldList ? 1 : 0;
-            uint32_t newCount = oldCount + addedCount;
-            setArray((array_t *)malloc(array_t::byteSize(newCount)));
-            array()->count = newCount;
-            if (oldList) array()->lists[addedCount] = oldList;
-            memcpy(array()->lists, addedLists,
-                   addedCount * sizeof(array()->lists[0]));
-        }
-    }
     
     void deleteElement(Element* elm) {
         
-        List* i_free = NULL;
         if(hasArray()) {
             
             array_t* a = array();
@@ -638,37 +409,6 @@ public:
             list->deleteElement(elm);
         }
     }
-    
-    void tryFree() {
-        if (hasArray()) {
-            for (uint32_t i = 0; i < array()->count; i++) {
-                try_free(array()->lists[i]);
-            }
-            try_free(array());
-        }
-        else if (list) {
-            try_free(list);
-        }
-    }
-    
-    template<typename Result>
-    Result duplicate() {
-        Result result;
-        
-        if (hasArray()) {
-            array_t *a = array();
-            result.setArray((array_t *)memdup(a, a->byteSize()));
-            for (uint32_t i = 0; i < a->count; i++) {
-                result.array()->lists[i] = a->lists[i]->duplicate();
-            }
-        } else if (list) {
-            result.list = list->duplicate();
-        } else {
-            result.list = nil;
-        }
-        
-        return result;
-    }
 };
 
 class apc_method_array_t :
@@ -677,37 +417,19 @@ public apc_list_array_tt<apc_method_t, apc_method_list_t>
     typedef apc_list_array_tt<apc_method_t, apc_method_list_t> Super;
     
 public:
-    apc_method_list_t **beginCategoryMethodLists() {
-        return beginLists();
-    }
-    
     apc_method_list_t **endCategoryMethodLists(Class cls);
-    
-    apc_method_array_t duplicate() {
-        return Super::duplicate<apc_method_array_t>();
-    }
 };
 
 class apc_property_array_t :
 public apc_list_array_tt<apc_property_t, apc_property_list_t>
 {
     typedef apc_list_array_tt<apc_property_t, apc_property_list_t> Super;
-    
-public:
-    apc_property_array_t duplicate() {
-        return Super::duplicate<apc_property_array_t>();
-    }
 };
 
 class apc_protocol_array_t :
 public apc_list_array_tt<apc_protocol_ref_t, apc_protocol_list_t>
 {
     typedef apc_list_array_tt<apc_protocol_ref_t, apc_protocol_list_t> Super;
-    
-public:
-    apc_protocol_array_t duplicate() {
-        return Super::duplicate<apc_protocol_array_t>();
-    }
 };
 
 
@@ -725,28 +447,6 @@ struct apc_class_rw_t {
     Class nextSiblingClass;
     
     char *demangledName;
-    
-    void setFlags(uint32_t set)
-    {
-        OSAtomicOr32Barrier(set, &flags);
-    }
-    
-    void clearFlags(uint32_t clear)
-    {
-        OSAtomicXor32Barrier(clear, &flags);
-    }
-    
-    // set and clear must not overlap
-    void changeFlags(uint32_t set, uint32_t clear)
-    {
-        assert((set & clear) == 0);
-        
-        uint32_t oldf, newf;
-        do {
-            oldf = flags;
-            newf = (oldf | set) & ~clear;
-        } while (!OSAtomicCompareAndSwap32Barrier(oldf, newf, (volatile int32_t *)&flags));
-    }
 };
 
 struct apc_class_data_bits_t {
@@ -776,16 +476,7 @@ struct apc_objc_class : apc_objc_object {
     apc_class_rw_t *data() {
         return bits.data();
     }
-    
-    // Locking: To prevent concurrent realization, hold runtimeLock.
-    bool isRealized() {
-#define RW_REALIZED           (1<<31)
-        return data()->flags & RW_REALIZED;
-    }
 };
-
-
-
 
 /*
  ---------------------------------
@@ -794,93 +485,29 @@ struct apc_objc_class : apc_objc_object {
  */
 #pragma mark - objc-object.h
 
-
-#if SUPPORT_TAGGED_POINTERS
-
-#define TAG_COUNT 8
-#define TAG_SLOT_MASK 0xf
-
-#if SUPPORT_MSB_TAGGED_POINTERS
-#   define TAG_MASK (1ULL<<63)
-#   define TAG_SLOT_SHIFT 60
-#   define TAG_PAYLOAD_LSHIFT 4
-#   define TAG_PAYLOAD_RSHIFT 4
-#else
-#   define TAG_MASK 1
-#   define TAG_SLOT_SHIFT 0
-#   define TAG_PAYLOAD_LSHIFT 0
-#   define TAG_PAYLOAD_RSHIFT 4
-#endif
-
-#endif
-
-// Mix-in for classes that must not be copied.
-class nocopy_t {
-private:
-    nocopy_t(const nocopy_t&) = delete;
-    const nocopy_t& operator=(const nocopy_t&) = delete;
-protected:
-    nocopy_t() { }
-    ~nocopy_t() { }
-};
-
-template <bool Debug>
-class rwlock_tt : nocopy_t {
-    pthread_rwlock_t mLock;
-    
-public:
-    rwlock_tt() : mLock(PTHREAD_RWLOCK_INITIALIZER) { }
-
-    
-    void write()
-    {
-//        lockdebug_rwlock_write(this);
-//
-//        qosStartOverride();
-//        int err = pthread_rwlock_wrlock(&mLock);
-//        if (err) _objc_fatal("pthread_rwlock_wrlock failed (%d)", err);
-    }
-    
-    void unlockWrite()
-    {
-//        lockdebug_rwlock_unlock_write(this);
-//
-//        int err = pthread_rwlock_unlock(&mLock);
-//        if (err) _objc_fatal("pthread_rwlock_unlock failed (%d)", err);
-//        qosEndOverride();
-    }
-};
-using rwlock_t = rwlock_tt<DEBUG>;
-//#if __OBJC2__
-//extern rwlock_t runtimeLock;
-//#else
-//extern mutex_t classLock;
-//extern mutex_t methodListLock;
-//#endif
-
-class rwlock_writer_t : nocopy_t {
-    rwlock_t& lock;
-public:
-    rwlock_writer_t(rwlock_t& newLock) : lock(newLock) { lock.write(); }
-    ~rwlock_writer_t() { lock.unlockWrite(); }
-};
-
-
-void apc_objc_removeMethod(Class cls, SEL name)
+void class_removeMethod_APC_OBJC2_NONRUNTIMELOCK(Class cls, SEL name)
 {
-//    rwlock_t* ise = &runtimeLock;
-    apc_objc_class* clazz = (__bridge apc_objc_class*)(cls);
     
-    unsigned int count;
-    apc_method_t** methods = (apc_method_t**)(class_copyMethodList(cls, &count));
-    apc_method_t* method;
+#if __OBJC2__
+    
+    apc_objc_class* clazz = (__bridge apc_objc_class*)(cls);
+    unsigned int    count;
+    apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
+    apc_method_t*   method;
     while (count--) {
         
         if(((method = (apc_method_t*)methods[count])->name) == name){
             
             clazz->data()->methods.deleteElement(method);
+            //-Wdeprecated-declarations
+            
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             _objc_flush_caches(cls);
+#pragma clang diagnostic pop
             break;
         }
     }
+    
+#endif
 }
