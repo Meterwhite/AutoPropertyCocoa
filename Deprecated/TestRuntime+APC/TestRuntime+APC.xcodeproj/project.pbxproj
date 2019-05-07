@@ -11,7 +11,6 @@
 		9FA4BA04227F3686001EAE14 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FA4BA03227F3686001EAE14 /* Person.m */; };
 		9FA4BA07227F3692001EAE14 /* Man.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FA4BA06227F3692001EAE14 /* Man.m */; };
 		9FA4BA0B227F3E92001EAE14 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FA4BA0A227F3E92001EAE14 /* Foundation.framework */; };
-		9FA4BA11227F3FD4001EAE14 /* apc-objc-private.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9FA4BA0F227F3FD4001EAE14 /* apc-objc-private.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,9 +33,6 @@
 		9FA4BA05227F3692001EAE14 /* Man.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Man.h; sourceTree = "<group>"; };
 		9FA4BA06227F3692001EAE14 /* Man.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Man.m; sourceTree = "<group>"; };
 		9FA4BA0A227F3E92001EAE14 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		9FA4BA0E227F3FD4001EAE14 /* apc-objc-config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-config.h"; sourceTree = "<group>"; };
-		9FA4BA0F227F3FD4001EAE14 /* apc-objc-private.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "apc-objc-private.mm"; sourceTree = "<group>"; };
-		9FA4BA10227F3FD4001EAE14 /* apc-objc-private.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; path = "apc-objc-private.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,7 +67,6 @@
 		9FA4B9F5227F1BDF001EAE14 /* TestRuntime+APC */ = {
 			isa = PBXGroup;
 			children = (
-				9FA4BA0D227F3FD4001EAE14 /* apc-objc-runtime */,
 				9FA4BA08227F3700001EAE14 /* Testclass */,
 				9FA4B9F6227F1BDF001EAE14 /* main.m */,
 			);
@@ -95,17 +90,6 @@
 				9FA4BA0A227F3E92001EAE14 /* Foundation.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		9FA4BA0D227F3FD4001EAE14 /* apc-objc-runtime */ = {
-			isa = PBXGroup;
-			children = (
-				9FA4BA0E227F3FD4001EAE14 /* apc-objc-config.h */,
-				9FA4BA10227F3FD4001EAE14 /* apc-objc-private.h */,
-				9FA4BA0F227F3FD4001EAE14 /* apc-objc-private.mm */,
-			);
-			name = "apc-objc-runtime";
-			path = "../../apc-objc-runtime";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -166,7 +150,6 @@
 			files = (
 				9FA4BA07227F3692001EAE14 /* Man.m in Sources */,
 				9FA4BA04227F3686001EAE14 /* Person.m in Sources */,
-				9FA4BA11227F3FD4001EAE14 /* apc-objc-private.mm in Sources */,
 				9FA4B9F7227F1BDF001EAE14 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

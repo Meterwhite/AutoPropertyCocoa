@@ -12,6 +12,7 @@
 #import "APCPropertyHook.h"
 #import "APCLazyProperty.h"
 #import <objc/message.h>
+#import "APCExtScope.h"
 #import "APCRuntime.h"
 #import "APCScope.h"
 
@@ -342,14 +343,22 @@ apc_def_vSHook_and_impimage(apc_propertyhook_setter)
     {
         if(_kindOfOwner == APCPropertyOwnerKindOfClass)
         {
-#error <#message#>
-            class_replaceMethod(_hookclass
-                                , NSSelectorFromString(_hookMethod)
-                                , self.restoredImplementation
-                                , _methodTypeEncoding);
+
+//            class_replaceMethod(_hookclass
+//                                , NSSelectorFromString(_hookMethod)
+//                                , self.restoredImplementation
+//                                , _methodTypeEncoding);
+            
+#if APCRealUnbindButNoRuntimelock
             
             class_removeMethod_APC_OBJC2_NONRUNTIMELOCK
-            (_hookclass, NSSelectorFromString(_hookMethod));
+            (_hookclass
+             , NSSelectorFromString(_hookMethod));
+#else
+            
+            
+#endif
+            
         }
         else
         {

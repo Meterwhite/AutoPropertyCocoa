@@ -94,6 +94,9 @@ FOUNDATION_EXPORT NSString *const APCProgramingType_float;
 FOUNDATION_EXPORT NSString *const APCProgramingType_double;
 FOUNDATION_EXPORT NSString *const APCProgramingType_bool;
 
+#define APCIntEncode "i\0\0\0\0\0\0\0\0"
+
+
 static inline void apc_setterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* enc, id arg)
 {
     NSCAssert(*enc != '\0', @"APC: Type encoding can not be nil.");
@@ -112,77 +115,77 @@ static inline void apc_setterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* 
     
     if(strcmp(enc, "c") == 0){
         
-#define apc_invokS_rbox_by(type)\
+#define apc_Sinvok_rbox_by(type)\
     \
-type value;\
-[arg getValue:&value];\
-((void(*)(id,SEL,type))imp)(_SELF,_CMD,value);\
-return;
+        type value;\
+        [arg getValue:&value];\
+        ((void(*)(id,SEL,type))imp)(_SELF,_CMD,value);\
+        return;
 
-        apc_invokS_rbox_by(int)
+        apc_Sinvok_rbox_by(int)
     }
     else if(strcmp(enc, "i") == 0){
-        apc_invokS_rbox_by(int)
+        apc_Sinvok_rbox_by(int)
     }
     else if(strcmp(enc, "s") == 0){
-        apc_invokS_rbox_by(short)
+        apc_Sinvok_rbox_by(short)
     }
     else if(strcmp(enc, "l") == 0){
-        apc_invokS_rbox_by(long)
+        apc_Sinvok_rbox_by(long)
     }
     else if(strcmp(enc, "q") == 0){
-        apc_invokS_rbox_by(long long)
+        apc_Sinvok_rbox_by(long long)
     }
     else if(strcmp(enc, "C") == 0){
-        apc_invokS_rbox_by(unsigned char)
+        apc_Sinvok_rbox_by(unsigned char)
     }
     else if(strcmp(enc, "I") == 0){
-        apc_invokS_rbox_by(unsigned int)
+        apc_Sinvok_rbox_by(unsigned int)
     }
     else if(strcmp(enc, "S") == 0){
-        apc_invokS_rbox_by(unsigned short)
+        apc_Sinvok_rbox_by(unsigned short)
     }
     else if(strcmp(enc, "L") == 0){
-        apc_invokS_rbox_by(unsigned long)
+        apc_Sinvok_rbox_by(unsigned long)
     }
     else if(strcmp(enc, "Q") == 0){
-        apc_invokS_rbox_by(unsigned long long)
+        apc_Sinvok_rbox_by(unsigned long long)
     }
     else if(strcmp(enc, "f") == 0){
-        apc_invokS_rbox_by(float)
+        apc_Sinvok_rbox_by(float)
     }
     else if(strcmp(enc, "d") == 0){
-        apc_invokS_rbox_by(double)
+        apc_Sinvok_rbox_by(double)
     }
     else if(strcmp(enc, "B") == 0){
-        apc_invokS_rbox_by(bool)
+        apc_Sinvok_rbox_by(bool)
     }
     else if(strcmp(enc, "*") == 0){
-        apc_invokS_rbox_by(char *)
+        apc_Sinvok_rbox_by(char *)
     }
     else if(strcmp(enc, "#") == 0){
-        apc_invokS_rbox_by(Class)
+        apc_Sinvok_rbox_by(Class)
     }
     else if(strcmp(enc, ":") == 0){
-        apc_invokS_rbox_by(SEL)
+        apc_Sinvok_rbox_by(SEL)
     }
     else if(enc[0] == _C_PTR){
-        apc_invokS_rbox_by(void*)
+        apc_Sinvok_rbox_by(void*)
     }
     else if(strcmp(enc, @encode(APCRect)) == 0){
-        apc_invokS_rbox_by(APCRect)
+        apc_Sinvok_rbox_by(APCRect)
     }
     else if(strcmp(enc, @encode(APCPoint)) == 0){
-        apc_invokS_rbox_by(APCPoint)
+        apc_Sinvok_rbox_by(APCPoint)
     }
     else if(strcmp(enc, @encode(APCSize)) == 0){
-        apc_invokS_rbox_by(APCSize)
+        apc_Sinvok_rbox_by(APCSize)
     }
     else if(strcmp(enc, @encode(APCEdgeinsets)) == 0){
-        apc_invokS_rbox_by(APCEdgeinsets)
+        apc_Sinvok_rbox_by(APCEdgeinsets)
     }
     else if(strcmp(enc, @encode(NSRange)) == 0){
-        apc_invokS_rbox_by(NSRange)
+        apc_Sinvok_rbox_by(NSRange)
     }
     ///enc-m
     NSCAssert(NO, @"APC: This type is not supported.");
@@ -201,81 +204,81 @@ static inline id apc_getterimp_boxinvok(id _SELF,SEL _CMD,IMP imp,const char* en
     
     if(strcmp(enc, "c") == 0){
         
-#define apc_invokNG_rbox_by(type,ftype)\
+#define apc_Ginvok_rbox_num_by(type,ftype)\
 \
 type returnValue = ((type(*)(id,SEL))imp)(_SELF,_CMD);\
 return [NSNumber numberWith##ftype:returnValue];
         
-        apc_invokNG_rbox_by(char,Char)
+        apc_Ginvok_rbox_num_by(char,Char)
     }
     else if(strcmp(enc, "i") == 0){
-        apc_invokNG_rbox_by(int,Int)
+        apc_Ginvok_rbox_num_by(int,Int)
     }
     else if(strcmp(enc, "s") == 0){
-        apc_invokNG_rbox_by(short,Short)
+        apc_Ginvok_rbox_num_by(short,Short)
     }
     else if(strcmp(enc, "l") == 0){
-        apc_invokNG_rbox_by(long,Long)
+        apc_Ginvok_rbox_num_by(long,Long)
     }
     else if(strcmp(enc, "q") == 0){
-        apc_invokNG_rbox_by(long long,LongLong)
+        apc_Ginvok_rbox_num_by(long long,LongLong)
     }
     else if(strcmp(enc, "C") == 0){
-        apc_invokNG_rbox_by(unsigned char,UnsignedChar)
+        apc_Ginvok_rbox_num_by(unsigned char,UnsignedChar)
     }
     else if(strcmp(enc, "I") == 0){
-        apc_invokNG_rbox_by(unsigned int,UnsignedInt)
+        apc_Ginvok_rbox_num_by(unsigned int,UnsignedInt)
     }
     else if(strcmp(enc, "S") == 0){
-        apc_invokNG_rbox_by(unsigned short,UnsignedShort)
+        apc_Ginvok_rbox_num_by(unsigned short,UnsignedShort)
     }
     else if(strcmp(enc, "L") == 0){
-        apc_invokNG_rbox_by(unsigned long,UnsignedLong)
+        apc_Ginvok_rbox_num_by(unsigned long,UnsignedLong)
     }
     else if(strcmp(enc, "Q") == 0){
-        apc_invokNG_rbox_by(unsigned long long,UnsignedLongLong)
+        apc_Ginvok_rbox_num_by(unsigned long long,UnsignedLongLong)
     }
     else if(strcmp(enc, "f") == 0){
-        apc_invokNG_rbox_by(float,Float)
+        apc_Ginvok_rbox_num_by(float,Float)
     }
     else if(strcmp(enc, "d") == 0){
-        apc_invokNG_rbox_by(double,Double)
+        apc_Ginvok_rbox_num_by(double,Double)
     }
     else if(strcmp(enc, "B") == 0){
-        apc_invokNG_rbox_by(bool,Bool)
+        apc_Ginvok_rbox_num_by(bool,Bool)
     }
     else if(strcmp(enc, "*") == 0){
         
-#define apc_invokG_rbox_by(type)\
+#define apc_Ginvok_rbox_value_by(type)\
 \
 type returnValue = ((type(*)(id,SEL))imp)(_SELF,_CMD);\
 return [NSValue valueWithBytes:&returnValue objCType:enc];
         
-        apc_invokG_rbox_by(char *)
+        apc_Ginvok_rbox_value_by(char *)
     }
     else if(strcmp(enc, "#") == 0){
-        apc_invokG_rbox_by(Class)
+        apc_Ginvok_rbox_value_by(Class)
     }
     else if(strcmp(enc, ":") == 0){
-        apc_invokG_rbox_by(SEL)
+        apc_Ginvok_rbox_value_by(SEL)
     }
     else if(enc[0] == _C_PTR){
-        apc_invokG_rbox_by(void*)
+        apc_Ginvok_rbox_value_by(void*)
     }
     else if(strcmp(enc, @encode(APCRect)) == 0){
-        apc_invokG_rbox_by(APCRect)
+        apc_Ginvok_rbox_value_by(APCRect)
     }
     else if(strcmp(enc, @encode(APCPoint)) == 0){
-        apc_invokG_rbox_by(APCPoint)
+        apc_Ginvok_rbox_value_by(APCPoint)
     }
     else if(strcmp(enc, @encode(APCSize)) == 0){
-        apc_invokG_rbox_by(APCSize)
+        apc_Ginvok_rbox_value_by(APCSize)
     }
     else if(strcmp(enc, @encode(APCEdgeinsets)) == 0){
-        apc_invokG_rbox_by(APCEdgeinsets)
+        apc_Ginvok_rbox_value_by(APCEdgeinsets)
     }
     else if(strcmp(enc, @encode(NSRange)) == 0){
-        apc_invokG_rbox_by(NSRange)
+        apc_Ginvok_rbox_value_by(NSRange)
     }
     ///enc-m
     NSCAssert(NO, @"APC: This type is not supported.");
@@ -394,7 +397,7 @@ void* _Nullable oghook##_impimage(NSString* _Nonnull enc)\
     }\
     return nil;\
 }
-
+///enc-m
 
 #define apc_def_vSHook(enc,type,oshook)\
 \
