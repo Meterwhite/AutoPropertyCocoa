@@ -13,17 +13,50 @@
 #import "Person.h"
 #import "Man.h"
 
+NS_INLINE int apc_func0()
+{
+    return 0;
+}
+
+void apc_func1(int a)
+{
+    
+}
+
+NSString* apc_func2()
+{
+    return @"";
+}
+
+
+union apc_imp_t {
+    char c;
+    CGRect imp;
+};
+
+typedef union apc_imp_t APCIMP;
+
+
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         // insert code here...
-        NSLog(@"Hello, World!");
         
-        Class m_cls = [Man class];
-
-        apc_objc_removeMethod(m_cls, @selector(name));
+        uintptr_t a = (uintptr_t)&apc_func0;
+        uintptr_t b = (uintptr_t)&apc_func1;
+        uintptr_t c = (uintptr_t)&apc_func2;
         
-        Man* m = [Man new];
-        id name = m.name;
+        APCIMP aimp;
+        aimp.c = 'A';
+        
+        
+        NSLog(@"%lX / %lX / %lX",a,b,c);
+        
+//        Class m_cls = [Man class];
+//
+//        apc_objc_removeMethod(m_cls, @selector(name));
+//
+//        Man* m = [Man new];
+//        id name = m.name;
     }
     return 0;
 }
