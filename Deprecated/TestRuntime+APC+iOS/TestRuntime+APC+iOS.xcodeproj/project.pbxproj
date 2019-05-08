@@ -14,7 +14,6 @@
 		45AF78CF22802AFE009935C5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 45AF78CD22802AFE009935C5 /* LaunchScreen.storyboard */; };
 		45AF78D222802AFE009935C5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 45AF78D122802AFE009935C5 /* main.m */; };
 		45AF78DB22802B2F009935C5 /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = 45AF78D922802B2F009935C5 /* fishhook.c */; };
-		45AF78E022802B3F009935C5 /* apc-objc-private.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45AF78DE22802B3F009935C5 /* apc-objc-private.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,9 +29,6 @@
 		45AF78D122802AFE009935C5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		45AF78D922802B2F009935C5 /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fishhook.c; sourceTree = "<group>"; };
 		45AF78DA22802B2F009935C5 /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fishhook.h; sourceTree = "<group>"; };
-		45AF78DD22802B3F009935C5 /* apc-objc-config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-config.h"; sourceTree = "<group>"; };
-		45AF78DE22802B3F009935C5 /* apc-objc-private.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "apc-objc-private.mm"; sourceTree = "<group>"; };
-		45AF78DF22802B3F009935C5 /* apc-objc-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-private.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +61,6 @@
 		45AF78C122802AFA009935C5 /* TestRuntime+APC+iOS */ = {
 			isa = PBXGroup;
 			children = (
-				45AF78DC22802B3F009935C5 /* objc-runtime+apc */,
 				45AF78D822802B2F009935C5 /* fishhook */,
 				45AF78C222802AFA009935C5 /* AppDelegate.h */,
 				45AF78C322802AFA009935C5 /* AppDelegate.m */,
@@ -88,17 +83,6 @@
 			);
 			name = fishhook;
 			path = ../../fishhook;
-			sourceTree = "<group>";
-		};
-		45AF78DC22802B3F009935C5 /* objc-runtime+apc */ = {
-			isa = PBXGroup;
-			children = (
-				45AF78DD22802B3F009935C5 /* apc-objc-config.h */,
-				45AF78DE22802B3F009935C5 /* apc-objc-private.mm */,
-				45AF78DF22802B3F009935C5 /* apc-objc-private.h */,
-			);
-			name = "objc-runtime+apc";
-			path = "../../objc-runtime+apc";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -175,7 +159,6 @@
 				45AF78D222802AFE009935C5 /* main.m in Sources */,
 				45AF78DB22802B2F009935C5 /* fishhook.c in Sources */,
 				45AF78C422802AFA009935C5 /* AppDelegate.m in Sources */,
-				45AF78E022802B3F009935C5 /* apc-objc-private.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

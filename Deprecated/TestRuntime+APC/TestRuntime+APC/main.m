@@ -7,51 +7,71 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "APCTypeEncodings.h"
-#import "apc-objc-private.h"
 #import <objc/runtime.h>
-#import <objc/message.h>
+#import "fishhook.h"
 #import "Person.h"
 #import "Man.h"
 
+static char *(*ptr0)(const char *str);
 
-#define print_encdoe(type) \
-{\
-    char* enc = (char*)@encode(type);\
-    char newEnc[9] = {0};\
-    \
-    strncpy(newEnc, enc, 8);\
-    newEnc[8] = '\0';\
-    \
-    printf("%luUL<---" #type "--->%s" "\n", *(unsigned long*)newEnc, enc);\
-    \
+char * apc_strdupIfMutable(const char *str)
+{
+    return ptr0(str);
 }
 
+static Class(*ptr1)(Class _Nullable superclass, const char * _Nonnull name,
+                    size_t extraBytes);
 
+Class _Nullable
+apc_objc_allocateClassPair(Class _Nullable superclass, const char * _Nonnull name,
+                           size_t extraBytes)
+{
+    return ptr1(superclass,  name, extraBytes);
+}
+
+static void(*ptr3)(size_t __count, size_t __size);
+void apc_calloc(size_t __count, size_t __size)
+{
+    return ptr3(__count,__size);
+}
 
 int main(int argc, const char * argv[]) {
-    @autoreleasepool {
-        // insert code here...
-        
-//        APCCode code = {0};
-//        strncpy(code.encode, @encode(CGRect), 8);
-//        unsigned long v = code.value;
-//        uint32 v32 = code.value32;
-        
-        
-//        printf("%u\n",(uint32)APCRectEnc);
-//        printf("%u\n",(uint32)APCPointEnc);
-//        printf("%u\n",(uint32)APCSizeEnc);
-//        printf("%u\n",(uint32)APCEdgeInsetsEnc);
-//        printf("%u\n",(uint32)APCRangeEnc);
-//        printf("%u\n",(uint32)5288747017773340027);
-        
-        class_removeMethod_APC_OBJC2_NONRUNTIMELOCK([Person class], @selector(name));
-        
-        if(APCCoderEqualMask(@encode(CGRect), APCStructCoderMaskValue)){
-            
-            printf("1");
-        }
-    }
+    
+    
+    struct rebinding rbd3
+    =
+    {
+        .name = "calloc",
+        .replacement = apc_calloc,
+        .replaced = (void*)&ptr3
+    };
+//    open();
+    rebind_symbols((struct rebinding[1]){rbd3} , 1);
+    
+    objc_allocateProtocol("15620540095");
+    
+//    objc_allocateClassPair([NSObject class],"15620540095",0);
+//    Protocol* protocol = objc_allocateProtocol("15620540095");
+//    objc_registerProtocol(protocol);
+//    objc_registerClassPair([NSObject class]);
+    
+//    class_setSuperclass([Man class],[Person class]);
+    
     return 0;
 }
+
+/**
+
+ 
+ struct rebinding rbd
+ =
+ {
+ .name = "strdupIfMutable",
+ .replacement = apc_strdupIfMutable,
+ .replaced = (void*)&ptr0
+ };
+
+
+
+
+ */
