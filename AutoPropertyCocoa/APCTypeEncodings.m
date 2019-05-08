@@ -1,10 +1,6 @@
-//
-//  APCTypeEncodings.m
-//  AutoPropertyCocoa
-//
-//  Created by Novo on 2019/5/7.
-//  Copyright © 2019 Novo. All rights reserved.
-//
-
-#import "APCTypeEncodings.h"
-
+//#define submacro_apc_codername_fromvalue(value) \
+//#ifdef submacro_apc_codername_##value\
+//\
+//#else\
+//\
+//#endif

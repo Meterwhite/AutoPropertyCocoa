@@ -8,67 +8,78 @@
 
 #import <Foundation/Foundation.h>
 
-#define APCCharCodeValue      99//c
-#define APCIntCodeValue       105//i
-#define APCShortCodeValue     115//s
-#define APCLonglCodeValue     108//l
-#define APCLongLongCodeValue  113//q
-#define APCUCharCodeValue     67//C
-#define APCUIntCodeValue      73//I
-#define APCUShortCodeValue    83//S
-#define APCULongCodeValue     76//L
-#define APCULongLongCodeValue 81//Q
-#define APCFloatCodeValue     102//f
-#define APCDoubleCodeValue    100//d
-#define APC_BoolCodeValue     66//B
-#define APCVoidCodeValue      118//v
-#define APCCharPtrCodeValue   42//*
-#define APCObjectCodeValue    64//@
-#define APCClassCodeValue     35//#
-#define APCSELCodeValue       58//:
-#define APCPtrCodeValue       94//^
-#define APCVoidPtrCodeValue   30302//^v
-#define APCOtherCodeValue     63//?
+#define APCCharCoderValue       99//c
+#define APCIntCoderValue        105//i
+#define APCShortCoderValue      115//s
+#define APCLonglCoderValue      108//l
+#define APCLongLongCoderValue   113//q
+#define APCUCharCoderValue      67//C
+#define APCUIntCoderValue       73//I
+#define APCUShortCoderValue     83//S
+#define APCULongCoderValue      76//L
+#define APCULongLongCoderValue  81//Q
+#define APCFloatCoderValue      102//f
+#define APCDoubleCoderValue     100//d
+#define APC_BoolCoderValue      66//B
+#define APCVoidCoderValue       118//v
+#define APCCharPtrCoderValue    42//*
+#define APCObjectCoderValue     64//@
+#define APCClassCoderValue      35//#
+#define APCSELCoderValue        58//:
+#define APCVoidPtrCoderValue    30302//^v
+#define APCOtherCoderValue      63//?
+
+#define APCPtrCoderMaskValue    94//^
+#define APCArrayCoderMaskValue  91//[
+#define APCStructCoderMaskValue 123//{
+#define APCUnionCoderMaskValue  40//(
 
 #if __LP64__
-#define APCRectCodeValue      4428273620435288955//{CGRect=
-#define APCPointCodeValue     8389759082646946683//{CGPoint
-#define APCSizeCodeValue      4424076801748714363//{CGSize=
+#define APCRectCoderValue       4428273620435288955//{CGRect=
+#define APCPointCoderValue      8389759082646946683//{CGPoint
+#define APCSizeCoderValue       4424076801748714363//{CGSize=
 
 #if TARGET_OS_MAC
-#define APCEdgeInsetsCodeValue        5288747017773993595//{NSEdgeI
+#define APCEdgeInsetsCoderValue 5288747017773993595//{NSEdg
 #else
-#define APCEdgeInsetsCodeValue        5288747017773340027//{UIEdgeI
+#define APCEdgeInsetsCoderValue 5288747017773340027//{UIEdgeI
 #endif
 
-#define APCRangeCodeValue      7453001439557607291//{_NSRang
+#define APCRangeCoderValue      7453001439557607291//{_NSRang
 
-#else
-#define APCRectCodeValue      1380402043//{CGRect=
-#define APCPointCodeValue     1346847611//{CGPoint
-#define APCSizeCodeValue      1397179259//{CGSize=
+#else ///LP32
+
+#define APCRectCoderValue       1380402043//{CGR
+#define APCPointCoderValue      1346847611//{CGP
+#define APCSizeCoderValue       1397179259//{CGS
 
 #if TARGET_OS_MAC
-#define APCEdgeInsetsCodeValue        1163087483//{NSEdgeI
+#define APCEdgeInsetsCoderValue  1163087483//{NSE
 #else
-#define APCEdgeInsetsCodeValue        1162433915//{UIEdgeI
+#define APCEdgeInsetsCoderValue  1162433915//{UIE
 #endif
 
-#define APCRangeCodeValue      1397645179//{_NSRang
+#define APCRangeCoderValue      1397645179//{_NS
 
 #endif
 
 
-#define APCMTypesFunction(funcBody, APCCodeValue) funcBody##APCCodeValue
+#define APCMTypesFunction(funcBody, APCCoderValue) funcBody##APCCoderValue
 
-
-
-
+#define APCCoderValue(type) (*((unsigned long*)@encode(type)))
 
 /**
- 
- Encode/0/IMP
+ APCCoderEqualMask(@encode(CGRect), APCStructCoderMaskValue)
  */
+#define APCCoderEqualMask(encstring , mask) \
+\
+(mask == ((*((unsigned long*)encstring)) & mask))
+
+#define APCCoderCompare(encstring, codevalue) (*((unsigned long*)encstring) == codevalue)
+
+#define if_APCCoderCompare(encstring, codevalue) if(APCCoderCompare(encstring, codevalue))
+
+
 union apc_coder_t {
     
     char mask;
@@ -83,23 +94,20 @@ union apc_coder_t {
 
 typedef union apc_coder_t APCCoder;
 
-APCCoder APCMakeTypeEncodings(const char* encode)
-{
-    APCCoder s = {0};
-    s.value = *(unsigned long*)encode;
-    return s;
-}
-
-IMP APCCoderGetIMP(APCCoder enc)
-{
-    return *(IMP*)(&enc + sizeof(sizeof(unsigned long) + 1));
-}
-
-void APCTypeEncodingsSetIMP(APCCoder enc , IMP* imp)
-{
-    void* des = (void*)(&enc + sizeof(sizeof(unsigned long) + 1));
-    memcpy(des, imp, sizeof(uintptr_t));
-}
-
-
-static APCCoder apc_int_coder = {.encode = "i\0"};
+//APCCoder APCMakeTypeEncodings(const char* encode)
+//{
+//    APCCoder s = {0};
+//    s.value = *(unsigned long*)encode;
+//    return s;
+//}
+//
+//IMP APCCoderGetIMP(APCCoder enc)
+//{
+//    return *(IMP*)(&enc + sizeof(sizeof(unsigned long) + 1));
+//}
+//
+//void APCTypeEncodingsSetIMP(APCCoder enc , IMP* imp)
+//{
+//    void* des = (void*)(&enc + sizeof(sizeof(unsigned long) + 1));
+//    memcpy(des, imp, sizeof(uintptr_t));
+//}

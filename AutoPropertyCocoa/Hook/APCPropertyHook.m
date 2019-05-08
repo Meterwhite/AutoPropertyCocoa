@@ -16,35 +16,15 @@
 #import "APCRuntime.h"
 #import "APCScope.h"
 
-id _Nullable apc_null_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
-{
-    Class cls = object_getClass(_SELF);
-    IMP imp;
-    do {
-        
-        if(nil != (imp = class_itMethodImplementation_APC(cls, _CMD)))
-            
-            if(imp != (IMP)apc_null_getter)
-                
-                break;
-    } while ((void)(imp = nil), nil != (cls = class_getSuperclass(cls)));
-    
-    if(nil != imp){
-        
-        return ((id(*)(id,SEL))imp)(_SELF, _CMD);
-    }
-    
-    return nil;
-}
 
 id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
 {
-    APCPropertyHook* hook;
-    NSString*        _CMD_s = @((const char*)(const void*)_CMD);
+    APCPropertyHook*    hook    =   nil;
+    NSString*           cmdstr  =   @((const char*)(const void*)_CMD);
     if(YES == apc_object_isProxyInstance(_SELF)){
         
-        hook = apc_lookup_instancePropertyhook(_SELF, _CMD_s);
-    }else if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), _CMD_s))){
+        hook = apc_lookup_instancePropertyhook(_SELF, cmdstr);
+    }else if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
         
         NSCAssert(NO, @"APC: BAD ACCESS.APC has lost this valid property.");
     }
@@ -108,12 +88,98 @@ id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
     }
     
     return val;
-}
+}APCDefBasicValueGetterVersionAndHookIMPMapper(APCTemplate_NSNumber_HookOfGetter,
+                                               APCTemplate_NSValue_HookOfGetter,
+                                               apc_propertyhook_getter)
 
-APC_Define_BasicValueHookOfGetter_Define_HookIMPMapper_UsingTemplate
-(APCTemplate_NSNumber_HookOfGetter,APCTemplate_NSValue_HookOfGetter,
- apc_propertyhook_getter
-)
+void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable value)
+{
+    APCPropertyHook*    hook    =   nil;
+    NSString*           cmdstr  =   @((const char*)(const void*)_CMD);
+    if(YES == apc_object_isProxyInstance(_SELF)){
+        
+        hook = apc_lookup_instancePropertyhook(_SELF, cmdstr);
+    }else if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
+        
+        NSCAssert(NO, @"APC: BAD ACCESS.APC has lost this valid property.");
+    }
+    
+    
+    if(hook.isEmpty){
+        
+        return [apc_propertyhook_rootHook(hook) performOldSetterFromTarget:_SELF withValue:value];
+    }
+    
+    APCTriggerSetterProperty*   p_trigger   = hook.setterTrigger;
+    
+    /** ----------------Future----------------- */
+    if(p_trigger != nil){
+        
+        if(p_trigger.triggerOption & APCPropertyGetterFrontTrigger) {
+            
+            [p_trigger performSetterFrontTriggerBlock:_SELF value:value];
+        }
+    }
+    
+    /** ----------------Happen----------------- */
+    [hook performOldSetterFromTarget:_SELF withValue:value];
+    
+    /** ----------------Affect----------------- */
+    //Nothing.
+    
+    /** ----------------Result----------------- */
+    if(p_trigger != nil){
+        
+        if(p_trigger.triggerOption & APCPropertyGetterPostTrigger){
+            
+            [p_trigger performSetterPostTriggerBlock:_SELF value:value];
+        }
+        
+        if(p_trigger.triggerOption & APCPropertyGetterUserTrigger){
+            
+            if(YES == [p_trigger performSetterUserConditionBlock:_SELF value:value]){
+                
+                [p_trigger performSetterUserTriggerBlock:_SELF value:value];
+            }
+        }
+        
+        if(p_trigger.triggerOption & APCPropertyGetterCountTrigger){
+            
+            if(YES == [p_trigger performSetterCountConditionBlock:_SELF value:value]){
+                
+                [p_trigger performSetterCountTriggerBlock:_SELF value:value];
+            }
+        }
+        
+        [p_trigger access];
+    }
+}APCDefBasicValueSetterVersionAndHookIMPMapper(APCTemplate_NSNumber_HookOfSetter,
+                                               APCTemplate_NSValue_HookOfSetter,
+                                               apc_propertyhook_setter)
+
+
+id _Nullable apc_null_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
+{
+    Class cls = object_getClass(_SELF);
+    IMP imp;
+    do {
+        
+        if(nil != (imp = class_itMethodImplementation_APC(cls, _CMD)))
+            
+            if(imp != (IMP)apc_null_getter)
+                
+                break;
+    } while ((void)(imp = nil), nil != (cls = class_getSuperclass(cls)));
+    
+    if(nil != imp){
+        
+        return ((id(*)(id,SEL))imp)(_SELF, _CMD);
+    }
+    
+    return (id)0;
+}APCDefBasicValueGetterVersionAndHookIMPMapper(APCTemplate_NSNumber_NullGetter,
+                                               APCTemplate_NSValue_NullGetter,
+                                               apc_null_getter)
 
 void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 {
@@ -132,16 +198,10 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         
         ((void(*)(id,SEL,id))imp)(_SELF, _CMD, value);
     }
-}
+}APCDefBasicValueGetterVersionAndHookIMPMapper(APCTemplate_NSNumber_NullSetter,
+                                               APCTemplate_NSValue_NullSetter,
+                                               apc_null_setter)
 
-void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable value)
-{
-    
-}
-APC_Define_BasicValueHookOfSetter_Define_HookIMPMapper_UsingTemplate
-(APCTemplate_NSNumber_HookOfSetter,APCTemplate_NSValue_HookOfSetter,
- apc_propertyhook_setter
- )
 
 @implementation APCPropertyHook
 {
@@ -367,6 +427,18 @@ APC_Define_BasicValueHookOfSetter_Define_HookIMPMapper_UsingTemplate
                             , _new_implementation
                             , _methodTypeEncoding);
     }
+    
+#if !APCRealUnbindButNoRuntimelock
+    
+    IMP cmp = (_methodStyle == APCMethodGetterStyle)
+    ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
+    : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);
+    
+    if(_old_implementation == cmp){
+        
+        _old_implementation = nil;
+    }
+#endif
 }
 
 - (void)tryUnhook
@@ -389,20 +461,20 @@ APC_Define_BasicValueHookOfSetter_Define_HookIMPMapper_UsingTemplate
     {
         if(_kindOfOwner == APCPropertyOwnerKindOfClass)
         {
-
-//            class_replaceMethod(_hookclass
-//                                , NSSelectorFromString(_hookMethod)
-//                                , self.restoredImplementation
-//                                , _methodTypeEncoding);
             
 #if APCRealUnbindButNoRuntimelock
             
             class_removeMethod_APC_OBJC2_NONRUNTIMELOCK
             (_hookclass
              , NSSelectorFromString(_hookMethod));
+            
+            
 #else
             
-            
+            class_replaceMethod(_hookclass
+                                , NSSelectorFromString(_hookMethod)
+                                , self.restoredImplementation
+                                , _methodTypeEncoding);
 #endif
             
         }
@@ -418,40 +490,14 @@ APC_Define_BasicValueHookOfSetter_Define_HookIMPMapper_UsingTemplate
 
 - (IMP)restoredImplementation
 {
-    /**
-     . Is APC inheritance?
-     . Self is source implementation?
-     . Can search a hook that is source implementation?
-     . Use source class implementation!
-     */
-    APCPropertyHook* hook
-    = apc_lookup_superPropertyhook_inRange(_hookclass
-                                           , _source_class
-                                           , _hookMethod);
-    if(hook != nil){
-        
-        return hook->_new_implementation;
-    }
-    
-    
     if(_old_implementation){
         
         return _old_implementation;
     }
     
-    hook =
-    apc_lookup_implementationPropertyhook_inRange(apc_class_getSuperclass(_hookclass)
-                                                  , _source_class
-                                                  , _hookMethod);
-    if(hook != nil){
-        
-        return hook->_old_implementation;
-    }
-    
-    return
-    
-    class_getMethodImplementation(_source_class
-                                  , NSSelectorFromString(_hookMethod));
+    return (_methodStyle == APCMethodGetterStyle)
+    ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
+    : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);
 }
 
 - (IMP)oldImplementation
@@ -484,7 +530,7 @@ APC_Define_BasicValueHookOfSetter_Define_HookIMPMapper_UsingTemplate
         return;
     }
     
-    apc_setterimp_boxinvok(target
+    APCBoxedInvokeBasicValueSetterIMP(target
                            , NSSelectorFromString(_hookMethod)
                            , self.oldImplementation
                            , _valueTypeEncoding.UTF8String
@@ -500,7 +546,7 @@ APC_Define_BasicValueHookOfSetter_Define_HookIMPMapper_UsingTemplate
     
     return
     
-    apc_getterimp_boxinvok(target
+    APCBoxedInvokeBasicValueGetterIMP(target
                            , NSSelectorFromString(_hookMethod)
                            , self.oldImplementation
                            , _valueTypeEncoding.UTF8String);
@@ -541,3 +587,38 @@ APC_Define_BasicValueHookOfSetter_Define_HookIMPMapper_UsingTemplate
     }
 }
 @end
+
+
+/**
+
+ //    APCPropertyHook* hook
+ //    = apc_lookup_superPropertyhook_inRange(_hookclass
+ //                                           , _source_class
+ //                                           , _hookMethod);
+ //    if(hook != nil){
+ //
+ //        return hook->_new_implementation;
+ //    }
+ //
+ //
+ //    if(_old_implementation){
+ //
+ //        return _old_implementation;
+ //    }
+ //
+ //    hook =
+ //    apc_lookup_implementationPropertyhook_inRange(apc_class_getSuperclass(_hookclass)
+ //                                                  , _source_class
+ //                                                  , _hookMethod);
+ //    if(hook != nil){
+ //
+ //        return hook->_old_implementation;
+ //    }
+ //
+ //    return
+ //
+ //    class_getMethodImplementation(_source_class
+ //                                  , NSSelectorFromString(_hookMethod));
+
+
+ */

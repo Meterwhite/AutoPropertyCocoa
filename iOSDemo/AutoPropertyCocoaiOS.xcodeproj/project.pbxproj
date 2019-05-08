@@ -43,6 +43,7 @@
 		450AA493226A2CBE0005A745 /* APCClassMapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassMapper.m; sourceTree = "<group>"; };
 		456FC46F225DBFBE006CD604 /* Superman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Superman.h; sourceTree = "<group>"; };
 		456FC470225DBFBF006CD604 /* Superman.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Superman.m; sourceTree = "<group>"; };
+		457118A22282C9480062F406 /* APCBasicValueVersionScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCBasicValueVersionScope.h; sourceTree = "<group>"; };
 		458142A2226D5F2600A5AA6B /* APCClassInheritanceTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassInheritanceTree.h; sourceTree = "<group>"; };
 		458142A3226D5F2600A5AA6B /* APCClassInheritanceTree.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassInheritanceTree.m; sourceTree = "<group>"; };
 		458142A5226D5FA700A5AA6B /* APCClassInheritanceNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassInheritanceNode.h; sourceTree = "<group>"; };
@@ -189,6 +190,7 @@
 				45AF78E52281820D009935C5 /* APCTypeEncodings.m */,
 				458143BB2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.h */,
 				458143BC2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.m */,
+				457118A22282C9480062F406 /* APCBasicValueVersionScope.h */,
 				45B12FAF225B2C5D002D825E /* NSObject+APCLazyLoad.h */,
 				45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */,
 				45B12FAB225B2C5D002D825E /* NSObject+APCTriggerProperty.h */,

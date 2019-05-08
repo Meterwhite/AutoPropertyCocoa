@@ -94,7 +94,7 @@
                  , NSStringFromSelector(self.propertySetter)
                  , [target class]);
         
-        apc_setterimp_boxinvok(target
+        APCBoxedInvokeBasicValueSetterIMP(target
                                , self.propertySetter
                                , imp
                                , self.valueTypeEncoding.UTF8String

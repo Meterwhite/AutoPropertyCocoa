@@ -7,100 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "APCTypeEncodings.h"
+#import "apc-objc-private.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import "Person.h"
 #import "Man.h"
 
-/**
- 
- Encode/0/IMP
- */
-union apc_coder_t {
-    
-    char mask;
-    char encode[sizeof(unsigned long)];
-#if __LP64__
-    unsigned long value;
-#else
-    uint32 value;
-#endif
-    char alloc[2*sizeof(unsigned long) + 1];
-};
-
-typedef union apc_coder_t APCCoder;
-
-APCCoder APCMakeTypeEncodings(const char* encode)
-{
-    APCCoder s = {0};
-    s.value = *(unsigned long*)encode;
-    return s;
-}
-
-IMP APCCoderGetIMP(APCCoder enc)
-{
-    return *(IMP*)(&enc + sizeof(sizeof(unsigned long) + 1));
-}
-
-void APCTypeEncodingsSetIMP(APCCoder enc , IMP* imp)
-{
-    void* des = (void*)(&enc + sizeof(sizeof(unsigned long) + 1));
-    memcpy(des, imp, sizeof(uintptr_t));
-}
-
-
-static APCCoder apc_int_coder = {.encode = "i\0"};
-
-
-#define APCCharEnc      99//c
-#define APCIntEnc       105//i
-#define APCShortEnc     115//s
-#define APCLonglEnc     108//l
-#define APCLongLongEnc  113//q
-#define APCUCharEnc     67//C
-#define APCUIntEnc      73//I
-#define APCUShortEnc    83//S
-#define APCULongEnc     76//L
-#define APCULongLongEnc 81//Q
-#define APCFloatEnc     102//f
-#define APCDoubleEnc    100//d
-#define APC_BoolEnc     66//B
-#define APCVoidEnc      118//v
-#define APCCharPtrEnc   42//*
-#define APCObjectEnc    64//@
-#define APCClassEnc     35//#
-#define APCSELEnc       58//:
-#define APCPtrEnc       94//^
-#define APCVoidPtrEnc   30302//^v
-#define APCOtherEnc     63//?
-
-#if __LP64__
-#define APCRectEnc      4428273620435288955//{CGRect=
-#define APCPointEnc     8389759082646946683//{CGPoint
-#define APCSizeEnc      4424076801748714363//{CGSize=
-
-#if TARGET_OS_MAC
-#define APCEdgeInsetsEnc        5288747017773993595//{NSEdgeI
-#else
-#define APCEdgeInsetsEnc        5288747017773340027//{UIEdgeI
-#endif
-
-#define APCRangeEnc      7453001439557607291//{_NSRang
-
-#else
-#define APCRectEnc      1380402043//{CGRect=
-#define APCPointEnc     1346847611//{CGPoint
-#define APCSizeEnc      1397179259//{CGSize=
-
-#if TARGET_OS_MAC
-#define APCEdgeInsetsEnc        1163087483//{NSEdgeI
-#else
-#define APCEdgeInsetsEnc        1162433915//{UIEdgeI
-#endif
-
-#define APCRangeEnc      1397645179//{_NSRang
-
-#endif
 
 #define print_encdoe(type) \
 {\
@@ -114,34 +27,6 @@ static APCCoder apc_int_coder = {.encode = "i\0"};
     \
 }
 
-void apc_testingEncode()
-{
-    print_encdoe(char);
-    print_encdoe(int);
-    print_encdoe(short);
-    print_encdoe(long);
-    print_encdoe(long long);
-    print_encdoe(unsigned char);
-    print_encdoe(unsigned int);
-    print_encdoe(unsigned short);
-    print_encdoe(unsigned long);
-    print_encdoe(unsigned long long);
-    print_encdoe(float);
-    print_encdoe(double);
-    print_encdoe(_Bool);
-    print_encdoe(char *);
-    print_encdoe(id);
-    print_encdoe(Class);
-    print_encdoe(SEL);
-    print_encdoe(void*);
-    
-    print_encdoe(CGRect);
-    print_encdoe(CGPoint);
-    print_encdoe(CGSize);
-    print_encdoe(NSEdgeInsets);
-    print_encdoe(NSRange);
-    
-}
 
 
 int main(int argc, const char * argv[]) {
@@ -161,8 +46,12 @@ int main(int argc, const char * argv[]) {
 //        printf("%u\n",(uint32)APCRangeEnc);
 //        printf("%u\n",(uint32)5288747017773340027);
         
+        class_removeMethod_APC_OBJC2_NONRUNTIMELOCK([Person class], @selector(name));
         
-        apc_testingEncode();
+        if(APCCoderEqualMask(@encode(CGRect), APCStructCoderMaskValue)){
+            
+            printf("1");
+        }
     }
     return 0;
 }
