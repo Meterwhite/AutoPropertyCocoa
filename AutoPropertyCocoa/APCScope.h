@@ -296,6 +296,13 @@ submacro_apc_concat(submacro_apc_plist_,submacro_apc_argcount(__VA_ARGS__))(__VA
 
 #pragma mark - submacros
 
+#if DEBUG
+#define submacro_apc_keywordify                 autoreleasepool {}
+#define submacro_apc_keywordify_inner(...)      autoreleasepool {__VA_ARGS__}
+#else
+#define submacro_apc_keywordify                 try {} @catch (...) {}
+#endif
+
 
 #define submacro_apc_plist_2(OBJ, P1)\
 ((void)(NO && ((void)OBJ.P1, NO)), @# P1)

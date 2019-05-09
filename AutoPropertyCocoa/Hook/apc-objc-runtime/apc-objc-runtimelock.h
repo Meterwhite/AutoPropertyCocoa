@@ -14,6 +14,20 @@
 //
 //@end
 #import <objc/runtime.h>
+#import "APCScope.h"
+
+typedef void(^apc_action_t)(void);
+
+
+/**
+ @Runtimelock(
+    ...
+ );
+ */
+#define Runtimelock(...)\
+\
+submacro_apc_keywordify apc_runtimelock_lock(^(){__VA_ARGS__})
+
 
 #if defined __cplusplus
 extern "C"
@@ -22,7 +36,7 @@ extern "C"
     
     
     
-    void acp_runtimelock_lock(void(^block)(void));
+    void apc_runtimelock_lock(void(^block)(void));
     
     
     
