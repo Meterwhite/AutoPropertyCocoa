@@ -8,7 +8,7 @@
 
 #import "APCTriggerGetterProperty.h"
 #import "APCTriggerSetterProperty.h"
-#import "apc-objc-private.h"
+#import "apc-objc-extension.h"
 #import "APCPropertyHook.h"
 #import "APCLazyProperty.h"
 #import <objc/message.h>
@@ -428,15 +428,17 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
                             , _methodTypeEncoding);
     }
     
-#if !APCRealUnbindButNoRuntimelock
-    
-    IMP cmp = (_methodStyle == APCMethodGetterStyle)
-    ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
-    : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);
-    
-    if(_old_implementation == cmp){
+#if !APCForceUnbindClassWithoutRuntimelock
+    if(!apc_contains_runtimelock()){
         
-        _old_implementation = nil;
+        IMP cmp = (_methodStyle == APCMethodGetterStyle)
+        ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
+        : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);
+        
+        if(_old_implementation == cmp){
+            
+            _old_implementation = nil;
+        }
     }
 #endif
 }
@@ -462,21 +464,27 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         if(_kindOfOwner == APCPropertyOwnerKindOfClass)
         {
             
-#if APCRealUnbindButNoRuntimelock
+#if APCForceUnbindClassWithoutRuntimelock
             
-            class_removeMethod_APC_OBJC2_NONRUNTIMELOCK
-            (_hookclass
-             , NSSelectorFromString(_hookMethod));
-            
-            
-#else
-            
-            class_replaceMethod(_hookclass
-                                , NSSelectorFromString(_hookMethod)
-                                , self.restoredImplementation
-                                , _methodTypeEncoding);
+            if(apc_contains_runtimelock()){
 #endif
-            
+                
+                @Runtimelock({
+                    
+                    class_removeMethod_APC_OBJC2_NONRUNTIMELOCK
+                    (self->_hookclass
+                     , NSSelectorFromString(self->_hookMethod));
+                });
+                
+#if APCForceUnbindClassWithoutRuntimelock
+            }else{
+                
+                class_replaceMethod(_hookclass
+                                    , NSSelectorFromString(_hookMethod)
+                                    , self.restoredImplementation
+                                    , _methodTypeEncoding);
+            }
+#endif
         }
         else
         {

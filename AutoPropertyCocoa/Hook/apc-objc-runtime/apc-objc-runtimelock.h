@@ -8,25 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-
-
-//@interface APCOBJC2Runtimelock : NSObject
-//
-//@end
-#import <objc/runtime.h>
-#import "APCScope.h"
-
-typedef void(^apc_action_t)(void);
-
-
 /**
- @Runtimelock(
+ @Runtimelock({
     ...
- );
+ });
  */
 #define Runtimelock(...)\
 \
-submacro_apc_keywordify apc_runtimelock_lock(^(){__VA_ARGS__})
+submacro_apc_keywordify apc_runtimelock_lock(^()__VA_ARGS__)
 
 
 #if defined __cplusplus
@@ -35,9 +24,14 @@ extern "C"
 #endif
     
     
+    /**
+     <#Description#>
+     */
+    void apc_main_hook(void);
+        
+    _Bool apc_contains_runtimelock(void);
     
-    void apc_runtimelock_lock(void(^block)(void));
-    
+    void apc_runtimelock_lock(void(^userblock)(void));
     
     
 #if defined __cplusplus

@@ -3,10 +3,10 @@
 
 #import "APCBasicValueVersionScope.h"
 #import <Foundation/Foundation.h>
+#import "apc-objc-runtimelock.h"
 #import "APCTypeEncodings.h"
 #import <objc/NSObject.h>
 #import <objc/runtime.h>
-
 
 
 #if TARGET_OS_IPHONE || TARGET_OS_TV || TARGET_OS_WATCH

@@ -4,5 +4,5 @@
 \
 @((const char*)(const void*)(@selector(sel)))
 
-#define APCRealUnbindButNoRuntimelock (1 & __OBJC2__)
+#define APCForceUnbindClassWithoutRuntimelock 1
 

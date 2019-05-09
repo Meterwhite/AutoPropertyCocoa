@@ -6,7 +6,7 @@
 //  Copyright © 2019 MDLK. All rights reserved.
 //
 
-#include "apc-objc-private.h"
+#include "apc-objc-extension.h"
 #include "apc-objc-config.h"
 
 /*
@@ -17,8 +17,8 @@
 #pragma mark - objc-private.h
 //#include <stdint.h>
 //#include <assert.h>
-#include <iterator>
 //#include <cstddef>
+#include <iterator>
 
 struct apc_objc_class;
 struct apc_objc_object;
@@ -82,16 +82,6 @@ union apc_isa_t
 struct apc_objc_object {
     apc_isa_t isa;
 };
-
-// Define SUPPORT_MSB_TAGGED_POINTERS to use the MSB
-// as the tagged pointer marker instead of the LSB.
-// Be sure to edit tagged pointer SPI in objc-internal.h as well.
-#if !SUPPORT_TAGGED_POINTERS  ||  !TARGET_OS_IPHONE
-#   define SUPPORT_MSB_TAGGED_POINTERS 0
-#else
-#   define SUPPORT_MSB_TAGGED_POINTERS 1
-#endif
-
 
 struct apc_method_t {
     SEL name;
@@ -457,7 +447,7 @@ public:
     
     apc_class_rw_t* data() {
 #if !__LP64__
-#define FAST_DATA_MASK        0xfffffffcUL
+#define FAST_DATA_MASK          0xfffffffcUL
 #elif 1
 #define FAST_DATA_MASK          0x00007ffffffffff8UL
 #else
