@@ -8,8 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		457118A12282A5D00062F406 /* apc-objc-private.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4571189F2282A5D00062F406 /* apc-objc-private.mm */; };
+		457118AB2283CFD50062F406 /* apc-objc-runtimelock.mm in Sources */ = {isa = PBXBuildFile; fileRef = 457118A92283CFCD0062F406 /* apc-objc-runtimelock.mm */; };
+		457118B02283D4D60062F406 /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = 457118AE2283D4D60062F406 /* fishhook.c */; };
 		45AF78E922826BEA009935C5 /* APCTypeEncodings.m in Sources */ = {isa = PBXBuildFile; fileRef = 45AF78E722826BEA009935C5 /* APCTypeEncodings.m */; };
-		9F4692C2228315FD003C393F /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = 9F4692C0228315FC003C393F /* fishhook.c */; };
 		9FA4B9F7227F1BDF001EAE14 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FA4B9F6227F1BDF001EAE14 /* main.m */; };
 		9FA4BA04227F3686001EAE14 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FA4BA03227F3686001EAE14 /* Person.m */; };
 		9FA4BA07227F3692001EAE14 /* Man.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FA4BA06227F3692001EAE14 /* Man.m */; };
@@ -32,10 +33,13 @@
 		4571189E2282A5D00062F406 /* apc-objc-config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-config.h"; sourceTree = "<group>"; };
 		4571189F2282A5D00062F406 /* apc-objc-private.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "apc-objc-private.mm"; sourceTree = "<group>"; };
 		457118A02282A5D00062F406 /* apc-objc-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-private.h"; sourceTree = "<group>"; };
+		457118A92283CFCD0062F406 /* apc-objc-runtimelock.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "apc-objc-runtimelock.mm"; sourceTree = "<group>"; };
+		457118AA2283CFD50062F406 /* apc-objc-runtimelock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-runtimelock.h"; sourceTree = "<group>"; };
+		457118AC2283D4A20062F406 /* APCScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APCScope.h; path = ../../../AutoPropertyCocoa/APCScope.h; sourceTree = "<group>"; };
+		457118AE2283D4D60062F406 /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fishhook.c; sourceTree = "<group>"; };
+		457118AF2283D4D60062F406 /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fishhook.h; sourceTree = "<group>"; };
 		45AF78E722826BEA009935C5 /* APCTypeEncodings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APCTypeEncodings.m; path = ../../../AutoPropertyCocoa/APCTypeEncodings.m; sourceTree = "<group>"; };
 		45AF78E822826BEA009935C5 /* APCTypeEncodings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APCTypeEncodings.h; path = ../../../AutoPropertyCocoa/APCTypeEncodings.h; sourceTree = "<group>"; };
-		9F4692C0228315FC003C393F /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fishhook.c; sourceTree = "<group>"; };
-		9F4692C1228315FC003C393F /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fishhook.h; sourceTree = "<group>"; };
 		9FA4B9F3227F1BDF001EAE14 /* TestRuntime+APC */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "TestRuntime+APC"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FA4B9F6227F1BDF001EAE14 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9FA4BA02227F3686001EAE14 /* Person.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
@@ -60,6 +64,8 @@
 		4571189D2282A5D00062F406 /* apc-objc-runtime */ = {
 			isa = PBXGroup;
 			children = (
+				457118AA2283CFD50062F406 /* apc-objc-runtimelock.h */,
+				457118A92283CFCD0062F406 /* apc-objc-runtimelock.mm */,
 				4571189E2282A5D00062F406 /* apc-objc-config.h */,
 				4571189F2282A5D00062F406 /* apc-objc-private.mm */,
 				457118A02282A5D00062F406 /* apc-objc-private.h */,
@@ -68,11 +74,11 @@
 			path = "../../../AutoPropertyCocoa/Hook/apc-objc-runtime";
 			sourceTree = "<group>";
 		};
-		9F4692BF228315FC003C393F /* fishhook */ = {
+		457118AD2283D4D60062F406 /* fishhook */ = {
 			isa = PBXGroup;
 			children = (
-				9F4692C0228315FC003C393F /* fishhook.c */,
-				9F4692C1228315FC003C393F /* fishhook.h */,
+				457118AE2283D4D60062F406 /* fishhook.c */,
+				457118AF2283D4D60062F406 /* fishhook.h */,
 			);
 			name = fishhook;
 			path = ../../fishhook;
@@ -98,7 +104,8 @@
 		9FA4B9F5227F1BDF001EAE14 /* TestRuntime+APC */ = {
 			isa = PBXGroup;
 			children = (
-				9F4692BF228315FC003C393F /* fishhook */,
+				457118AD2283D4D60062F406 /* fishhook */,
+				457118AC2283D4A20062F406 /* APCScope.h */,
 				4571189D2282A5D00062F406 /* apc-objc-runtime */,
 				45AF78E822826BEA009935C5 /* APCTypeEncodings.h */,
 				45AF78E722826BEA009935C5 /* APCTypeEncodings.m */,
@@ -184,10 +191,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				9FA4BA07227F3692001EAE14 /* Man.m in Sources */,
+				457118B02283D4D60062F406 /* fishhook.c in Sources */,
 				45AF78E922826BEA009935C5 /* APCTypeEncodings.m in Sources */,
+				457118AB2283CFD50062F406 /* apc-objc-runtimelock.mm in Sources */,
 				9FA4BA04227F3686001EAE14 /* Person.m in Sources */,
 				9FA4B9F7227F1BDF001EAE14 /* main.m in Sources */,
-				9F4692C2228315FD003C393F /* fishhook.c in Sources */,
 				457118A12282A5D00062F406 /* apc-objc-private.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

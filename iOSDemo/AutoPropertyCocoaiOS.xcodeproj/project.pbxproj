@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		450AA494226A2CBE0005A745 /* APCClassMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 450AA493226A2CBE0005A745 /* APCClassMapper.m */; };
 		456FC471225DBFBF006CD604 /* Superman.m in Sources */ = {isa = PBXBuildFile; fileRef = 456FC470225DBFBF006CD604 /* Superman.m */; };
+		457118A82283C65E0062F406 /* apc-objc-runtimelock.mm in Sources */ = {isa = PBXBuildFile; fileRef = 457118A72283C65E0062F406 /* apc-objc-runtimelock.mm */; };
 		458142A4226D5F2600A5AA6B /* APCClassInheritanceTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 458142A3226D5F2600A5AA6B /* APCClassInheritanceTree.m */; };
 		458142A7226D5FA700A5AA6B /* APCClassInheritanceNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 458142A6226D5FA700A5AA6B /* APCClassInheritanceNode.m */; };
 		458143BD2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 458143BC2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.m */; };
@@ -44,6 +45,8 @@
 		456FC46F225DBFBE006CD604 /* Superman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Superman.h; sourceTree = "<group>"; };
 		456FC470225DBFBF006CD604 /* Superman.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Superman.m; sourceTree = "<group>"; };
 		457118A22282C9480062F406 /* APCBasicValueVersionScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCBasicValueVersionScope.h; sourceTree = "<group>"; };
+		457118A62283C65E0062F406 /* apc-objc-runtimelock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "apc-objc-runtimelock.h"; sourceTree = "<group>"; };
+		457118A72283C65E0062F406 /* apc-objc-runtimelock.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "apc-objc-runtimelock.mm"; sourceTree = "<group>"; };
 		458142A2226D5F2600A5AA6B /* APCClassInheritanceTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassInheritanceTree.h; sourceTree = "<group>"; };
 		458142A3226D5F2600A5AA6B /* APCClassInheritanceTree.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassInheritanceTree.m; sourceTree = "<group>"; };
 		458142A5226D5FA700A5AA6B /* APCClassInheritanceNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassInheritanceNode.h; sourceTree = "<group>"; };
@@ -245,6 +248,8 @@
 		9F737C3422808F05007FEB7E /* apc-objc-runtime */ = {
 			isa = PBXGroup;
 			children = (
+				457118A62283C65E0062F406 /* apc-objc-runtimelock.h */,
+				457118A72283C65E0062F406 /* apc-objc-runtimelock.mm */,
 				9F737C3722808F05007FEB7E /* apc-objc-private.h */,
 				9F737C3622808F05007FEB7E /* apc-objc-private.mm */,
 				9F737C3522808F05007FEB7E /* apc-objc-config.h */,
@@ -350,6 +355,7 @@
 				456FC471225DBFBF006CD604 /* Superman.m in Sources */,
 				9F737C3822808F05007FEB7E /* apc-objc-private.mm in Sources */,
 				45B12FBC225B2C5D002D825E /* APCLazyProperty.m in Sources */,
+				457118A82283C65E0062F406 /* apc-objc-runtimelock.mm in Sources */,
 				9FCF5DE92264D93A0059A876 /* APCTriggerSetterProperty.m in Sources */,
 				458142A4226D5F2600A5AA6B /* APCClassInheritanceTree.m in Sources */,
 				45B12FBA225B2C5D002D825E /* APCTriggerGetterProperty.m in Sources */,

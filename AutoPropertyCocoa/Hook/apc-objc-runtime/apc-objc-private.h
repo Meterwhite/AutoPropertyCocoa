@@ -27,7 +27,7 @@ IMP _Nullable class_itMethodImplementation_APC(Class _Nonnull cls, SEL _Nonnull 
     
 #if defined __cplusplus
 };
-#endif  
+#endif
 
 #endif /* APC_OBJC_PRIVATE */
 
