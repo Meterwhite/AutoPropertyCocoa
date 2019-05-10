@@ -13,6 +13,9 @@ OBJC_EXPORT APCPropertyHook* _Nullable
 apc_lookup_propertyhook(Class  _Nullable cls
                         , NSString* _Nonnull property);
 
+OBJC_EXPORT APCPropertyHook* _Nullable
+apc_getPropertyhook(Class  _Nullable cls
+                        , NSString* _Nonnull property);
 
 /** The second parameter 'to' is include. */
 OBJC_EXPORT APCPropertyHook* _Nullable
@@ -33,7 +36,8 @@ apc_lookup_instancePropertyhook(APCProxyInstance* _Nonnull instance
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
 
-
+OBJC_EXPORT void
+apc_propertyhook_delete(APCPropertyHook* _Nonnull hook);
 
 #pragma mark - For property
 OBJC_EXPORT __kindof APCHookProperty* _Nullable

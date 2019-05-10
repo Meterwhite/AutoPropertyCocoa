@@ -428,8 +428,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
                             , _methodTypeEncoding);
     }
     
-#if !APCForceUnbindClassWithoutRuntimelock
-    if(!apc_contains_runtimelock()){
+    if(!apc_contains_objcruntimelock()){
         
         IMP cmp = (_methodStyle == APCMethodGetterStyle)
         ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
@@ -440,7 +439,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
             _old_implementation = nil;
         }
     }
-#endif
 }
 
 - (void)tryUnhook
@@ -464,19 +462,11 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         if(_kindOfOwner == APCPropertyOwnerKindOfClass)
         {
             
-#if APCForceUnbindClassWithoutRuntimelock
-            
-            if(apc_contains_runtimelock()){
-#endif
+            if(apc_contains_objcruntimelock()){
                 
-                @Runtimelock({
-                    
-                    class_removeMethod_APC_OBJC2_NONRUNTIMELOCK
-                    (self->_hookclass
-                     , NSSelectorFromString(self->_hookMethod));
-                });
-                
-#if APCForceUnbindClassWithoutRuntimelock
+                class_removeMethod_APC_OBJC2
+                (self->_hookclass
+                 , NSSelectorFromString(self->_hookMethod));
             }else{
                 
                 class_replaceMethod(_hookclass
@@ -484,7 +474,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
                                     , self.restoredImplementation
                                     , _methodTypeEncoding);
             }
-#endif
         }
         else
         {
@@ -494,6 +483,8 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
             }
         }
     }
+    
+    apc_propertyhook_delete(self);
 }
 
 - (IMP)restoredImplementation
@@ -503,9 +494,17 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         return _old_implementation;
     }
     
-    return (_methodStyle == APCMethodGetterStyle)
-    ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
-    : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);
+    if(_kindOfValue == APCPropertyValueKindOfObject ||
+       _kindOfValue == APCPropertyValueKindOfBlock) {
+        
+        return (_methodStyle == APCMethodGetterStyle)
+        ? (IMP)apc_null_getter : (IMP)apc_null_setter;
+    }else{
+        
+        return  (_methodStyle == APCMethodGetterStyle)
+        ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
+        : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);
+    }
 }
 
 - (IMP)oldImplementation
@@ -595,38 +594,3 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     }
 }
 @end
-
-
-/**
-
- //    APCPropertyHook* hook
- //    = apc_lookup_superPropertyhook_inRange(_hookclass
- //                                           , _source_class
- //                                           , _hookMethod);
- //    if(hook != nil){
- //
- //        return hook->_new_implementation;
- //    }
- //
- //
- //    if(_old_implementation){
- //
- //        return _old_implementation;
- //    }
- //
- //    hook =
- //    apc_lookup_implementationPropertyhook_inRange(apc_class_getSuperclass(_hookclass)
- //                                                  , _source_class
- //                                                  , _hookMethod);
- //    if(hook != nil){
- //
- //        return hook->_old_implementation;
- //    }
- //
- //    return
- //
- //    class_getMethodImplementation(_source_class
- //                                  , NSSelectorFromString(_hookMethod));
-
-
- */

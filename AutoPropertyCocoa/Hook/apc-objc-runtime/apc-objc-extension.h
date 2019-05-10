@@ -21,7 +21,7 @@ extern "C"
      The runtimelock is not locked when the function is called.
      So avoid the write behavior of other threads to the method_list of that Class when the function is called.
      */
-    void class_removeMethod_APC_OBJC2_NONRUNTIMELOCK(Class _Nonnull cls, SEL _Nonnull name);
+    void class_removeMethod_APC_OBJC2(Class _Nonnull cls, SEL _Nonnull name);
     
     IMP _Nullable class_itMethodImplementation_APC(Class _Nonnull cls, SEL _Nonnull name);
     

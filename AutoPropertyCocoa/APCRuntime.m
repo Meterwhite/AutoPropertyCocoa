@@ -96,6 +96,24 @@ APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
         
         return (APCPropertyHook*)0;
     }
+    
+    APCPropertyHook* ret = nil;
+    do {
+        
+        if(nil != (ret = apc_runtime_propertyhook(clazz, property)))
+            
+            break;
+    } while (nil != (clazz = apc_class_getSuperclass(clazz)));
+    
+    return ret;
+}
+
+APCPropertyHook* apc_getPropertyhook(Class clazz, NSString* property)
+{
+    if(clazz == nil){
+        
+        return (APCPropertyHook*)0;
+    }
     return apc_runtime_propertyhook(clazz, property);
 }
 
@@ -142,6 +160,15 @@ APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
     return root;
 }
 
+void apc_propertyhook_delete(APCPropertyHook* hook)
+{
+    [[apc_runtime_property_classmapper()
+      
+      objectForKey:hook.hookclass]
+     
+     removeObjectForKey:hook.hookMethod];
+}
+
 APCPropertyHook* apc_lookup_instancePropertyhook(APCProxyInstance* instance, NSString* property)
 {
     return apc_instance_propertyhook(instance, property);
@@ -154,11 +181,6 @@ Class apc_class_getSuperclass(Class cls)
     return [apc_runtime_inherit_map() superclassOfClass:cls];
 }
 
-//static void __apc_propertyhook_update_superhook__(APCPropertyHook* hook)
-//{
-//
-//}
-
 void apc_registerProperty(APCHookProperty* p)
 {
     APC_RUNTIME_LOCK;
@@ -166,7 +188,7 @@ void apc_registerProperty(APCHookProperty* p)
     NSMutableDictionary*dictionary = [apc_runtime_property_classmapper() objectForKey:p->_des_class];
     APCPropertyHook*    itHook;
     APCPropertyHook*    hook;
-    if(dictionary == nil){
+    if(dictionary == nil) {
         
         dictionary = [NSMutableDictionary dictionary];
         [apc_runtime_property_classmapper() setObject:dictionary forKey:p->_des_class];
@@ -187,7 +209,7 @@ void apc_registerProperty(APCHookProperty* p)
     dictionary[p->_hooked_name] = hook;
     
     ///Update superhook
-    hook->_superhook = apc_lookup_propertyhook(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
+    hook->_superhook = apc_getPropertyhook(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
     
     ///subhook
     
@@ -195,7 +217,7 @@ void apc_registerProperty(APCHookProperty* p)
 
         if(apc_class_getSuperclass(itCls) ==  p->_des_class){
             
-            if(nil != (itHook = apc_lookup_propertyhook(itCls, p->_hooked_name))){
+            if(nil != (itHook = apc_getPropertyhook(itCls, p->_hooked_name))){
                 
                 itHook->_superhook = hook;
             }

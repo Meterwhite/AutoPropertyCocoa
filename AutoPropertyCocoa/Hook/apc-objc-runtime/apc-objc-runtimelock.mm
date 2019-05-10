@@ -7,21 +7,31 @@
 //
 
 #import "apc-objc-runtimelock.h"
-#import "APCScope.h"
 #import "fishhook.h"
 #import <pthread.h>
 
 
 class APCOBJCRuntimelocker;
 
-static APCOBJCRuntimelocker*    apc_runtime_locker;
+//static pthread_mutex_t              pthread_mutex_null  = {0};
+static pthread_mutex_t              apc_objcruntimelock = PTHREAD_MUTEX_INITIALIZER;
 
-_Bool apc_contains_runtimelock(void)
+_Bool apc_contains_objcruntimelock(void)
 {
-    return (_Bool)apc_runtime_locker;
+#warning <#message#>
+    unsigned int i = sizeof(pthread_mutex_t);
+    --i;
+    while (i -= sizeof(long)) {
+        
+        if(*(long*)(&apc_objcruntimelock + i) != (long)0){
+            
+            return false;
+        }
+    }
+    return true;
 }
 
-static pthread_mutex_t*         apc_objc_runtimelock;
+static APCOBJCRuntimelocker*        apc_objcruntimelocker;
 
 
 class apc_nocopy_t {
@@ -47,25 +57,25 @@ public:
     APCOBJCRuntimelocker(pthread_mutex_t* newlock) : lock(newlock)
     {
         pthread_mutex_lock(lock);
-        thread_id               = pthread_self();
         runtime_locked_success  = dispatch_semaphore_create(0);
         need_unlock_runtime     = dispatch_semaphore_create(0);
         
         APCMemoryBarrier;
         
-        apc_runtime_locker      = this;
+        apc_objcruntimelocker   = this;
         triggerObjcRuntimelockAsync();
         wait_runtimeLockedSuccess();
     }
     
+    
     ~APCOBJCRuntimelocker()
     {
         signal_unlockRuntime();
-        apc_runtime_locker = nil;
+        apc_objcruntimelocker = nil;
         pthread_mutex_unlock(lock);
     }
     
-    _Bool equalToCurrentThreadID()
+    _Bool testingThreadID()
     {
         return pthread_equal(thread_id, pthread_self());
     }
@@ -82,7 +92,7 @@ public:
     
     void wait_unlockRuntime()
     {
-        dispatch_semaphore_wait(apc_runtime_locker->need_unlock_runtime, DISPATCH_TIME_FOREVER);
+        dispatch_semaphore_wait(apc_objcruntimelocker->need_unlock_runtime, DISPATCH_TIME_FOREVER);
     }
     
     void signal_unlockRuntime()
@@ -92,20 +102,25 @@ public:
     
     void triggerObjcRuntimelockAsync()
     {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        dispatch_queue_t q
+        =
+        dispatch_queue_create("APC_OBJC_Runtimelock_lock", DISPATCH_QUEUE_CONCURRENT);
+        
+        dispatch_async(q, ^{
             
             /**
              The runtimelock will be locked in the function objc_allocateProtocol() and then 'calloc' will be called.
              Use fishhook to hook the 'calloc' function, then block 'calloc' to know that we can unlock the thread after completing our work.
              */
+            thread_id = pthread_self();
             objc_allocateProtocol("CN198964");
         });
     }
 };
 
-void apc_runtimelock_lock(void(^userblock)(void))
+void apc_objcruntimelock_lock(void(NS_NOESCAPE^userblock)(void))
 {
-    APCOBJCRuntimelocker locker(apc_objc_runtimelock);
+    APCOBJCRuntimelocker locker(&apc_objcruntimelock);
     userblock();
 }
 
@@ -115,26 +130,26 @@ static void*(*apc_calloc_ptr)(size_t __count, size_t __size);
 void* apc_calloc(size_t __count, size_t __size)
 {
     
-    if(apc_runtime_locker != NULL){
+    if(apc_objcruntimelocker != NULL){
         
-        if(apc_runtime_locker->equalToCurrentThreadID()){
+        if(apc_objcruntimelocker->testingThreadID()){
             
             /**
              objc_allocateProtocol(...) ---> [here] ---> calloc(...) ---> userblock(...)
              */
-            apc_runtime_locker->signal_runtimeLockedSuccess();
+            apc_objcruntimelocker->signal_runtimeLockedSuccess();
             
             /**
              userblock(...) ---> [here] ---> No longer blocking the thread.
              */
-            apc_runtime_locker->wait_unlockRuntime();
+            apc_objcruntimelocker->wait_unlockRuntime();
         }
     }
     
     return apc_calloc_ptr(__count, __size);
 }
 
-void apc_main_hook(void)
+void apc_in_main(void)
 {
     struct rebinding
     rebindInfo
@@ -147,6 +162,12 @@ void apc_main_hook(void)
     
     rebind_symbols((struct rebinding[1]){rebindInfo} , 1);
     
-    const int result __attribute__((unused)) = pthread_mutex_init(apc_objc_runtimelock, NULL);
-    NSCAssert(0 == result, @"Failed to initialize mutex with error %d.", result);
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        
+        const int result __attribute__((unused))
+        =
+        pthread_mutex_init(&apc_objcruntimelock, NULL);
+        NSCAssert(0 == result, @"Failed to initialize mutex with error %d.", result);
+    });
 }

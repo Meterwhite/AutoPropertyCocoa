@@ -6,6 +6,7 @@
 //  Copyright © 2019 MDLK. All rights reserved.
 //
 
+#import "apc-objc-runtimelock.h"
 #include "apc-objc-extension.h"
 #include "apc-objc-config.h"
 
@@ -475,29 +476,32 @@ struct apc_objc_class : apc_objc_object {
  */
 #pragma mark - objc-object.h
 
-void class_removeMethod_APC_OBJC2_NONRUNTIMELOCK(Class cls, SEL name)
+void class_removeMethod_APC_OBJC2(Class cls, SEL name)
 {
     
 #if __OBJC2__
     
-    apc_objc_class* clazz = (__bridge apc_objc_class*)(cls);
-    unsigned int    count;
-    apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
-    apc_method_t*   method;
-    while (count--) {
-        
-        if(((method = (apc_method_t*)methods[count])->name) == name){
-            
-            clazz->data()->methods.deleteElement(method);
-            
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            _objc_flush_caches(cls);
-#pragma clang diagnostic pop
-            break;
-        }
-    }
     
+    @Runtimelock({
+        
+        apc_objc_class* clazz = (__bridge apc_objc_class*)(cls);
+        unsigned int    count;
+        apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
+        apc_method_t*   method;
+        while (count--) {
+            
+            if(((method = (apc_method_t*)methods[count])->name) == name){
+                
+                clazz->data()->methods.deleteElement(method);
+                
+                _objc_flush_caches(cls);
+                break;
+            }
+        }
+    });
+#pragma clang diagnostic pop
 #endif
 }
 
