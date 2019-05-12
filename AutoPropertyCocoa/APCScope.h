@@ -106,9 +106,9 @@ static inline void APCBoxedInvokeBasicValueSetterIMP(id _SELF,SEL _CMD,IMP imp,c
     }
     
     ///Boxed basic-value.
-    if(NO == [arg isKindOfClass:[NSValue class]]){
-#warning @throw
-    }
+    NSCAssert([arg isKindOfClass:[NSValue class]]
+              , @"APC: Unexpected type!");
+    
     
     if_APCCoderCompare(encode, APCCharCoderValue) {
         
@@ -201,10 +201,11 @@ static inline id APCBoxedInvokeBasicValueGetterIMP(id _SELF,SEL _CMD,IMP imp,con
     
     if_APCCoderCompare(encode,APCCharCoderValue){
         
-#define apc_Ginvok_rbox_num_by(type,methodSuffix)\
-\
-type returnValue = ((type(*)(id,SEL))imp)(_SELF,_CMD);\
-return [NSNumber numberWith##methodSuffix:returnValue];
+        #define apc_Ginvok_rbox_num_by(type,methodSuffix)\
+        \
+        type returnValue = ((type(*)(id,SEL))imp)(_SELF,_CMD);\
+        \
+        return [NSNumber numberWith##methodSuffix:returnValue];
         
         apc_Ginvok_rbox_num_by(char,Char)
     }

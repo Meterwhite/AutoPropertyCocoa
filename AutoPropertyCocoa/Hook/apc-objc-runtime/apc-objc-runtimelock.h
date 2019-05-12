@@ -10,13 +10,15 @@
 #import "APCScope.h"
 
 /**
- @Runtimelock({
+ @lockruntime({
     ...
  });
  */
-#define Runtimelock(...)\
+#define lockruntime(...)\
 \
-submacro_apc_keywordify apc_objcruntimelock_lock(^()__VA_ARGS__)
+submacro_apc_keywordify \
+\
+apc_objcruntimelock_lock(^()__VA_ARGS__)
 
 
 #if defined __cplusplus

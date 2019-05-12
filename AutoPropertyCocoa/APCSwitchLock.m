@@ -7,6 +7,7 @@
 //
 
 #import "APCSwitchLock.h"
+#import <pthread.h>
 #import "APCScope.h"
 
 static bool _apc_true   = true;
@@ -14,67 +15,79 @@ static bool _apc_false  = false;
 
 @implementation APCSwitchLock
 {
-    APCSpinLock         _self_lock;
-    APCSpinLock         _lock;
-    atomic_bool         _state;
+    APCSpinLock                 _mutex;
+    dispatch_semaphore_t        _order;
+    dispatch_semaphore_t        _task;
+    bool                        _state;
+    pthread_rwlock_t            _lock;
 }
 
 - (instancetype)init
 {
     if (self = [super init]) {
         
-        _self_lock  = APC_SPINLOCK_INIT;
-        _lock       = APC_SPINLOCK_INIT;
-        _state      = false;
+        _mutex  = APC_SPINLOCK_INIT;
+        _order  = dispatch_semaphore_create(1);
+        _task   = dispatch_semaphore_create(1);
+        _state  = true;
+        
+        _lock   = PTHREAD_RWLOCK_INITIALIZER;
     }
     return self;
 }
 
 - (BOOL)visit
 {
+    apc_spinlock_lock(&_mutex);
+    apc_spinlock_unlock(&_mutex);
+    
     if(_state == true) {
         
-        apc_spinlock_lock(&_lock);
-        apc_spinlock_unlock(&_lock);
+        dispatch_semaphore_wait(_task, DISPATCH_TIME_FOREVER);
+        dispatch_semaphore_signal(_task);
     }
     return true;
 }
 
-- (void)off
+- (void)close
 {
-    if(atomic_compare_exchange_strong(&_state, &_apc_true, _apc_false)){
-        
-        apc_spinlock_lock(&_lock);
-    }
+    apc_spinlock_lock(&_mutex);
+    dispatch_semaphore_wait(_task, DISPATCH_TIME_FOREVER);
+    _state = false;
+    apc_spinlock_unlock(&_mutex);
 }
 
-- (void)on
+- (void)open
 {
-    if(atomic_compare_exchange_strong(&_state, &_apc_false, _apc_true)){
-        
-        apc_spinlock_unlock(&_lock);
-    }
+    apc_spinlock_lock(&_mutex);
+    dispatch_semaphore_signal(_task);
+    _state = true;
+    apc_spinlock_unlock(&_mutex);
 }
 
-- (void)waitingOff
+- (void)closing
 {
-    apc_spinlock_lock(&_self_lock);
+    dispatch_semaphore_wait(_order, DISPATCH_TIME_FOREVER);
     
-    if(atomic_compare_exchange_strong(&_state, &_apc_true, _apc_false)){
-        
-        apc_spinlock_lock(&_lock);
-        return;
+    apc_spinlock_lock(&_mutex);
+    {
+        dispatch_semaphore_wait(_task, DISPATCH_TIME_FOREVER);
+        _state = false;
     }
-    
+    apc_spinlock_unlock(&_mutex);
 }
 
-- (void)waitingOn
+- (void)opening
 {
-    if(atomic_compare_exchange_strong(&_state, &_apc_false, _apc_true)){
+    apc_spinlock_lock(&_mutex);
+    {
         
-        apc_spinlock_unlock(&_lock);
+        dispatch_semaphore_signal(_task);
+        _state = true;
     }
-    apc_spinlock_unlock(&_self_lock);
+    apc_spinlock_unlock(&_mutex);
+    
+    dispatch_semaphore_wait(_order, DISPATCH_TIME_FOREVER);
 }
 
 @end

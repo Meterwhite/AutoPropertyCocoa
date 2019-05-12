@@ -113,32 +113,23 @@
     }
 }
 
+#if DEBUG
 - (void)dealloc
 {
-#warning debug
-    NSLog(@"");
+    NSLog(@"%s",__func__);
 }
+#endif
 
-static SEL _outlet = 0;
 - (SEL)outlet
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _outlet = @selector(lazyload);
-    });
-    
-    return _outlet;
+    static char _outlet[] = "lazyload";
+    return (SEL)(const void*)_outlet;
 }
 
-static SEL _inlet = 0;
 - (SEL)inlet
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _inlet = @selector(setLazyload:);
-    });
-    
-    return _inlet;
+    static char _inlet[] = "setLazyload:";
+    return (SEL)(const void*)_inlet;
 }
 
 - (id)performLazyloadForTarget:(id)target

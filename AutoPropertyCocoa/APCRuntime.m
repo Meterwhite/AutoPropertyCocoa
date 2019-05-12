@@ -90,7 +90,7 @@ static NSHashTable* apc_runtime_proxyinstances()
 }
 
 #pragma mark - For hook - export
-APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
+APCPropertyHook* apc_lookups_propertyhook(Class clazz, NSString* property)
 {
     if(clazz == nil){
         
@@ -108,7 +108,7 @@ APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
     return ret;
 }
 
-APCPropertyHook* apc_getPropertyhook(Class clazz, NSString* property)
+APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
 {
     if(clazz == nil){
         
@@ -162,11 +162,15 @@ APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
 
 void apc_propertyhook_delete(APCPropertyHook* hook)
 {
+    APC_RUNTIME_LOCK;
+    
     [[apc_runtime_property_classmapper()
       
       objectForKey:hook.hookclass]
      
      removeObjectForKey:hook.hookMethod];
+    
+    APC_RUNTIME_UNLOCK;
 }
 
 APCPropertyHook* apc_lookup_instancePropertyhook(APCProxyInstance* instance, NSString* property)
@@ -209,7 +213,7 @@ void apc_registerProperty(APCHookProperty* p)
     dictionary[p->_hooked_name] = hook;
     
     ///Update superhook
-    hook->_superhook = apc_getPropertyhook(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
+    hook->_superhook = apc_lookup_propertyhook(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
     
     ///subhook
     
@@ -217,7 +221,7 @@ void apc_registerProperty(APCHookProperty* p)
 
         if(apc_class_getSuperclass(itCls) ==  p->_des_class){
             
-            if(nil != (itHook = apc_getPropertyhook(itCls, p->_hooked_name))){
+            if(nil != (itHook = apc_lookup_propertyhook(itCls, p->_hooked_name))){
                 
                 itHook->_superhook = hook;
             }
@@ -261,28 +265,6 @@ void apc_disposeProperty(APCHookProperty* p)
     APC_RUNTIME_UNLOCK;
 }
 
-//NSArray* apc_classBoundProperties(Class cls, NSString* property)
-//{
-//    return [apc_runtime_propertyhook(cls , property) boundProperties];
-//}
-
-__kindof APCHookProperty* apc_property_getRootProperty(APCHookProperty* p)
-{
-    NSMutableArray<APCHookProperty*>* matchs = [NSMutableArray array];
-    APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
-    do {
-        
-        for (APCHookProperty* item in hook) {
-            
-            if(p.class == item.class){
-                
-                [matchs addObject:item];
-            }
-        }
-    } while (nil != (hook = [hook superhook]));
-    
-    return matchs.lastObject;
-}
 
 __kindof APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 {
@@ -303,7 +285,7 @@ NSArray<__kindof APCHookProperty*>*
 apc_property_getSuperPropertyList(APCHookProperty* p)
 {
     APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
-    NSMutableArray*  ret = [NSMutableArray array];
+    NSMutableArray*  ret  = [NSMutableArray array];
     APCHookProperty* item;
     do {
         
@@ -315,8 +297,6 @@ apc_property_getSuperPropertyList(APCHookProperty* p)
     
     return [ret copy];
 }
-
-
 
 #pragma mark - For instance - private
 static NSMapTable* apc_instanceBoundMapper(id instance)
@@ -382,71 +362,13 @@ void apc_instance_removeAssociatedProperty(APCProxyInstance* instance, APCHookPr
     [apc_instance_propertyhook(instance, p->_hooked_name) unbindProperty:p];
 }
 
-//#pragma mark - Recursive(For instance) private
-//static NSMapTable* apc_object_hookRecursiveMapper()
-//{
-//    static dispatch_once_t onceToken;
-//    dispatch_once(&onceToken, ^{
-//        
-//        _apc_object_hookRecursiveMapper = [NSMapTable weakToWeakObjectsMapTable];
-//    });
-//    return _apc_object_hookRecursiveMapper;
-//}
-//
-//NS_INLINE NSMapTable* apc_object_hookRecursiveCurrentMapper()
-//{
-//    return [apc_object_hookRecursiveMapper() objectForKey:APCThreadID];
-//}
-//
-//NS_INLINE NSMutableSet* apc_object_hookRecursiveCurrentLoops(id instance)
-//{
-//    return [apc_object_hookRecursiveCurrentMapper() objectForKey:instance];
-//}
-
-//#pragma mark - Recursive(For instance) export
-//BOOL apc_object_hookRecursive_testing(id instance, SEL _Nonnull _CMD)
-//{
-//    return
-//
-//    [apc_object_hookRecursiveCurrentLoops(instance) containsObject:NSStringFromSelector(_CMD)];
-//}
-//
-//void apc_object_hookRecursive_loop(id instance, SEL _Nonnull _CMD)
-//{
-//    NSMutableSet* loops;
-//    if(nil == (loops = apc_object_hookRecursiveCurrentLoops(instance))){
-//
-//        @synchronized (instance) {
-//
-//            if(nil == (loops = apc_object_hookRecursiveCurrentLoops(instance))){
-//
-//                if(nil == apc_object_hookRecursiveCurrentMapper()){
-//
-//                    _apc_object_hookRecursiveMapper = [NSMapTable weakToStrongObjectsMapTable];
-//                    [_apc_object_hookRecursiveMapper setObject:instance forKey:APCThreadID];
-//                }
-//                loops = [NSMutableSet set];
-//                [loops addObject:NSStringFromSelector(_CMD)];
-//                [apc_object_hookRecursiveCurrentMapper() setObject:loops forKey:instance];
-//            }
-//        }
-//        return;
-//    }
-//    [loops addObject:NSStringFromSelector(_CMD)];
-//}
-//
-//void apc_object_hookRecursive_break(id instance, SEL _Nonnull _CMD)
-//{
-//    [apc_object_hookRecursiveCurrentLoops(instance) removeObject:NSStringFromSelector(_CMD)];
-//}
-
 #pragma mark - Proxy class - private
 static const char* _apcProxyClassID = ".APCProxyClass+";
 /** free! */
 NS_INLINE char* apc_instanceProxyClassName(id instance)
 {
     const char* cname = class_getName(object_getClass(instance));
-    char h_str[2*sizeof(NSUInteger)] = {0};
+    char h_str[2*sizeof(uintptr_t)] = {0};
     sprintf(h_str,"%lX",[instance hash]);
     char* buf = malloc(strlen(cname) + strlen(_apcProxyClassID) + strlen(h_str) + 1);
     buf[0] = '\0';
@@ -489,6 +411,14 @@ void apc_class_disposeProxyClass(APCProxyClass cls)
 BOOL apc_object_isProxyInstance(id instance)
 {
     return [apc_runtime_proxyinstances() containsObject:instance];
+}
+
+APCProxyClass apc_instance_getProxyClass(APCProxyInstance* instance)
+{
+    char* name = apc_instanceProxyClassName(instance);
+    Class cls = objc_getClass(name);
+    free(name);
+    return cls;
 }
 
 APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)

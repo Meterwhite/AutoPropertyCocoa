@@ -18,17 +18,15 @@ static pthread_mutex_t              apc_objcruntimelock = PTHREAD_MUTEX_INITIALI
 
 _Bool apc_contains_objcruntimelock(void)
 {
-#warning <#message#>
     unsigned int i = sizeof(pthread_mutex_t);
-    --i;
     while (i -= sizeof(long)) {
         
-        if(*(long*)(&apc_objcruntimelock + i) != (long)0){
+        if(*((long*)((UInt8*)&apc_objcruntimelock + i)) != (long)0){
             
-            return false;
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 static APCOBJCRuntimelocker*        apc_objcruntimelocker;
@@ -92,7 +90,7 @@ public:
     
     void wait_unlockRuntime()
     {
-        dispatch_semaphore_wait(apc_objcruntimelocker->need_unlock_runtime, DISPATCH_TIME_FOREVER);
+        dispatch_semaphore_wait(need_unlock_runtime, DISPATCH_TIME_FOREVER);
     }
     
     void signal_unlockRuntime()

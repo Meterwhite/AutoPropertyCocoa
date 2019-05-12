@@ -484,7 +484,7 @@ apc_testfunc(testClassInstanceLazyLoadSimple,912)
 
         return APCSuperMethod_id(instance);
     }];
-
+    
     [Man apc_unbindLazyLoadForProperty:@"name"];
     
     

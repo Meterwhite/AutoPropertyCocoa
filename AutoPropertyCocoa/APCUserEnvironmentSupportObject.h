@@ -136,7 +136,7 @@ submacro_apc_concat(submacro_apc_t_list_ , submacro_apc_argcount(__VA_ARGS__))
 
 /**
  Overwrite <NSObject>.
- Returns the object that actually responds to the message
+ Returns the object that actually responds to the objc message.
  */
 - (nonnull id)self;
 

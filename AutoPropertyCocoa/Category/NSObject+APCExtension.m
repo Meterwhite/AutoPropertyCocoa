@@ -7,9 +7,21 @@
 //
 
 #import "NSObject+APCExtension.h"
+#import "APCRuntime.h"
 #import "APCScope.h"
 
 @implementation NSObject(APCExtension)
+
+- (nonnull Class)apc_originalClass
+{
+    if(apc_object_isProxyInstance(self)){
+        
+        return apc_class_unproxyClass([self class]);
+    }
+    
+    return [self class];
+}
+
 - (void)apc_performUserSuperVoid
 {
     

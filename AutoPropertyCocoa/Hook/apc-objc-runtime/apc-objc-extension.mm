@@ -19,6 +19,7 @@
 //#include <stdint.h>
 //#include <assert.h>
 //#include <cstddef>
+#include <pthread.h>
 #include <iterator>
 
 struct apc_objc_class;
@@ -475,7 +476,7 @@ struct apc_objc_class : apc_objc_object {
  ---------------------------------
  */
 #pragma mark - objc-object.h
-
+static pthread_mutex_t _apc_class_removeMethod_APC_OBJC2_lock;
 void class_removeMethod_APC_OBJC2(Class cls, SEL name)
 {
     
@@ -484,23 +485,34 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     
-    @Runtimelock({
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         
-        apc_objc_class* clazz = (__bridge apc_objc_class*)(cls);
-        unsigned int    count;
-        apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
-        apc_method_t*   method;
-        while (count--) {
+        _apc_class_removeMethod_APC_OBJC2_lock
+        =
+        PTHREAD_MUTEX_INITIALIZER;
+    });
+    
+    pthread_mutex_lock(&_apc_class_removeMethod_APC_OBJC2_lock);
+    
+    apc_objc_class* clazz = (__bridge apc_objc_class*)(cls);
+    unsigned int    count;
+    apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
+    apc_method_t*   method;
+    while (count--) {
+        
+        if(((method = (apc_method_t*)methods[count])->name) == name){
             
-            if(((method = (apc_method_t*)methods[count])->name) == name){
+            @lockruntime({
                 
                 clazz->data()->methods.deleteElement(method);
-                
-                _objc_flush_caches(cls);
-                break;
-            }
+            });
+            _objc_flush_caches(cls);
+            break;
         }
-    });
+    }
+    
+    pthread_mutex_unlock(&_apc_class_removeMethod_APC_OBJC2_lock);
 #pragma clang diagnostic pop
 #endif
 }

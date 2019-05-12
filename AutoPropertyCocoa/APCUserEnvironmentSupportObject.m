@@ -18,9 +18,8 @@
 
 - (id)initWithObject:(NSObject *)object message:(id<APCUserEnvironmentMessage>)message action:(SEL)action
 {
-    
     NSAssert([message conformsToProtocol:@protocol(APCUserEnvironmentMessage)]
-             , @"APC: Object that is not supported.");
+             , @"APC: Need conforms to APCUserEnvironmentMessage.");
     _instance = object;
     _message = message;
     _action = action;

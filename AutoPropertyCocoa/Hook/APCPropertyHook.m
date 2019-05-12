@@ -24,15 +24,19 @@ id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
     if(YES == apc_object_isProxyInstance(_SELF)){
         
         hook = apc_lookup_instancePropertyhook(_SELF, cmdstr);
-    }else if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
+    }else if(nil == (hook = apc_lookups_propertyhook(object_getClass(_SELF), cmdstr))){
         
-        NSCAssert(NO, @"APC: BAD ACCESS.APC has lost this valid property.");
+        @throw
+        
+        [NSException exceptionWithName:NSGenericException
+                                reason:@"APC can not find any infomation about this  property."
+                              userInfo:nil];
     }
     
     
     if(hook.isEmpty){
-        
-        return [apc_propertyhook_rootHook(hook) performOldGetterFromTarget:_SELF];
+        ///If unbind in other threads.
+        return [hook performOldGetterFromTarget:_SELF];
     }
     
     APCTriggerGetterProperty*   p_trigger   = hook.getterTrigger;
@@ -99,9 +103,13 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
     if(YES == apc_object_isProxyInstance(_SELF)){
         
         hook = apc_lookup_instancePropertyhook(_SELF, cmdstr);
-    }else if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
+    }else if(nil == (hook = apc_lookups_propertyhook(object_getClass(_SELF), cmdstr))){
         
-        NSCAssert(NO, @"APC: BAD ACCESS.APC has lost this valid property.");
+        @throw
+        
+        [NSException exceptionWithName:NSGenericException
+                                reason:@"APC can not find any infomation about this  property."
+                              userInfo:nil];
     }
     
     
@@ -451,10 +459,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)unhook
 {
-    if(nil == _new_implementation)
-    {
-        return;
-    }
+    NSAssert(_new_implementation != nil, @"APC: Lost infomation.");
     
     IMP newImp = _new_implementation;
     if(atomic_compare_exchange_strong(&_new_implementation, &newImp, nil))
@@ -558,7 +563,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
                            , self.oldImplementation
                            , _valueTypeEncoding.UTF8String);
 }
-
 
 - (void)dealloc
 {

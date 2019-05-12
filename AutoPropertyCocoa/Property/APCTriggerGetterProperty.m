@@ -136,26 +136,16 @@
     return NO;
 }
 
-static SEL _outlet = 0;
 - (SEL)outlet
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _outlet = @selector(getterTrigger);
-    });
-    
-    return _outlet;
+    static char _outlet[] = "getterTrigger";
+    return (SEL)(const void*)_outlet;
 }
 
-static SEL _inlet = 0;
 - (SEL)inlet
 {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _inlet = @selector(setGetterTrigger:);
-    });
-    
-    return _inlet;
+    static char _inlet[] = "setGetterTrigger:";
+    return (SEL)(const void*)_inlet;
 }
 
 @end

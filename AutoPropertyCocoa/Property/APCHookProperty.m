@@ -60,11 +60,6 @@
     return _hooked_name;
 }
 
-//-(void)bindingToHook:(APCPropertyHook *)hook
-//{
-//    _hook = hook;
-//}
-
 - (SEL)outlet
 {
     return (SEL)0;
@@ -74,16 +69,6 @@
 {
     return (SEL)0;
 }
-
-//+ (instancetype)boundPropertyForClass:(__unsafe_unretained Class)cls property:(NSString *)property
-//{
-//    return [apc_lookup_propertyhook(cls, property) boundPropertyForKind:self];
-//}
-//
-//- (instancetype)boundPropertyForClass:(__unsafe_unretained Class)cls property:(NSString *)property
-//{
-//    return [apc_lookup_instancePropertyhook(self, property) boundPropertyForKind:object_getClass(self)];
-//}
 
 - (void)unhook
 {

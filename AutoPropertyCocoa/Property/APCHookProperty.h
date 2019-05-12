@@ -29,9 +29,9 @@
 
 @interface APCHookProperty : APCProperty
 <
-    APCHookPropertyProtocol
-    , APCMethodProtocol
-    , APCUserEnvironmentMessage
+    APCHookPropertyProtocol,
+    APCMethodProtocol,
+    APCUserEnvironmentMessage
 >
 {
 @public

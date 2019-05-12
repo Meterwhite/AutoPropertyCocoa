@@ -11,7 +11,7 @@
 /**
  Blocking lock.
  
- ///off : ⟳; on : ↓;
+ ///close : ⟳; open : ↓;
  if([APCSwitchLock* visit]){
  
     ///...
@@ -21,9 +21,9 @@
 
 - (BOOL)visit;
 
-- (void)on;
-- (void)off;
+- (void)open;
+- (void)close;
 
-- (void)waitingOff;
-- (void)waitingOn;
+- (void)closing;
+- (void)opening;
 @end
