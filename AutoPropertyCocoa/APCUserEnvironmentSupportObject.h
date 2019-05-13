@@ -18,7 +18,7 @@
 @end
 
 typedef id id_apc_t;
-
+#warning restore
 #ifndef DEBUG
 
 OBJC_EXPORT void
@@ -34,13 +34,13 @@ OBJC_EXPORT id _Nullable
 apc_debug_super_method_id1(id_apc_t _Nonnull instance);
 
 
-#define APCSuperMethod_void(...) \
+#define APCSuperPerformedAsVoid(...) \
 submacro_apc_concat(apc_debug_super_method_void, submacro_apc_argcount(__VA_ARGS__))(__VA_ARGS__)
 
-#define APCSuperMethod_BOOL(...) \
+#define APCSuperPerformedAsBOOL(...) \
 submacro_apc_concat(apc_debug_super_method_BOOL, submacro_apc_argcount(__VA_ARGS__))(__VA_ARGS__)
 
-#define APCSuperMethod_id(...) \
+#define APCSuperPerformedAsId(...) \
 submacro_apc_concat(apc_debug_super_method_id, submacro_apc_argcount(__VA_ARGS__))(__VA_ARGS__)
 
 #define apc_debug_super_method_void0 apc_debug_super_method_void1
@@ -65,9 +65,9 @@ submacro_apc_concat(apc_debug_super_method_id, submacro_apc_argcount(__VA_ARGS__
 
 #else
 
-#define APCSuperMethod APCSuperMethod_void
+#define APCSuperMethod APCSuperPerformedAsVoid
 
-#define APCSuperMethod_void(instance, ...) \
+#define APCSuperPerformedAsVoid(instance, ...) \
 \
 if(YES == [(id)instance isProxy]){         \
 \
@@ -80,7 +80,7 @@ if(YES == [(id)instance isProxy]){         \
     );\
 }
 
-#define APCSuperMethod_BOOL(instance, ...) \
+#define APCSuperPerformedAsBOOL(instance, ...) \
 \
 ((YES == [(id)instance isProxy])\
 ?                               \
@@ -92,7 +92,7 @@ if(YES == [(id)instance isProxy]){         \
     , ##__VA_ARGS__                                     \
 ) : NO)
 
-#define APCSuperMethod_id(instance, ...) \
+#define APCSuperPerformedAsId(instance, ...) \
 \
 ((YES == [(APCUserEnvironmentSupportObject*)instance isProxy])  \
 ?                                                   \
@@ -140,9 +140,9 @@ submacro_apc_concat(submacro_apc_t_list_ , submacro_apc_argcount(__VA_ARGS__))
  */
 - (nonnull id)self;
 
-- (void)apc_performUserSuperVoidWithObject:(nullable id)object ;
-- (void)apc_performUserSuperVoid;
-- (BOOL)apc_performUserSuperBOOLWithObject:(nullable id)object;
-- (nullable id)apc_performUserSuperID;
+- (void)apc_performUserSuperAsVoidWithObject:(nullable id)object ;
+- (void)apc_performUserSuperAsVoid;
+- (BOOL)apc_performUserSuperAsBOOLWithObject:(nullable id)object;
+- (nullable id)apc_performUserSuperAsId;
 @end
 

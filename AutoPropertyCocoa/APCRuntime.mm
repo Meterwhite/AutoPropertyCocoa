@@ -17,49 +17,7 @@
 
 #pragma mark - For lock - private
 
-static pthread_rwlock_t apc_runtimelock = PTHREAD_RWLOCK_INITIALIZER;
-
-class apc_runtimelock_reader_t : apc_nocopy_t {
-    pthread_rwlock_t& lock;
-public:
-    apc_runtimelock_reader_t(pthread_rwlock_t& newLock) : lock(newLock)
-    {
-        const int err __attribute__((unused))
-        =
-        pthread_rwlock_rdlock(&lock);
-        
-        NSCAssert(err == 0, @"pthread_rwlock_rdlock failed (%d)", err);
-    }
-    ~apc_runtimelock_reader_t()
-    {
-        const int err __attribute__((unused))
-        =
-        pthread_rwlock_unlock(&lock);
-        
-        NSCAssert(err == 0, @"pthread_rwlock_unlock failed (%d)", err);
-    }
-};
-
-class apc_runtimelock_writer_t : apc_nocopy_t {
-    pthread_rwlock_t& lock;
-public:
-    apc_runtimelock_writer_t(pthread_rwlock_t& newLock) : lock(newLock)
-    {
-        const int err __attribute__((unused))
-        =
-        pthread_rwlock_wrlock(&lock);
-        
-        NSCAssert(err == 0, @"pthread_rwlock_wrlock failed (%d)", err);
-    }
-    ~apc_runtimelock_writer_t()
-    {
-        const int err __attribute__((unused))
-        =
-        pthread_rwlock_unlock(&lock);
-        
-        NSCAssert(err == 0, @"pthread_rwlock_unlock failed (%d)", err);
-    }
-};
+pthread_rwlock_t apc_runtimelock = PTHREAD_RWLOCK_INITIALIZER;
 
 #pragma mark - For lock - public
 void apc_runtimelock_writing(void(NS_NOESCAPE^block)(void))
@@ -138,6 +96,16 @@ static NSHashTable* apc_runtime_proxyinstances()
         _apc_runtime_proxyinstances = [NSHashTable weakObjectsHashTable];
     });
     return _apc_runtime_proxyinstances;
+}
+
+
+APCPropertyHook* apc_lookup_propertyhook_nolock(Class clazz, NSString* property)
+{
+    if(clazz == nil){
+        
+        return (APCPropertyHook*)0;
+    }
+    return apc_runtime_propertyhook(clazz, property);
 }
 
 #pragma mark - For hook - public
@@ -277,25 +245,23 @@ void apc_registerProperty(APCHookProperty* p)
     
     if(hook != nil){
         
-#warning Dead cycle
-        [hook bindProperty:p];
+        ((void(*)(id,SEL,id))objc_msgSend)(hook, p.inlet, p);
         return;
     }
     
     ///Creat new hook
-    #warning Dead cycle
     hook = [APCPropertyHook hookWithProperty:p];
     dictionary[p->_hooked_name] = hook;
     
     ///Update superhook
-    hook->_superhook = apc_lookup_propertyhook(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
+    hook->_superhook = apc_lookup_propertyhook_nolock(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
     
     ///Subhook
     for (Class itCls in apc_runtime_property_classmapper()) {
 
         if(apc_class_getSuperclass(itCls) ==  p->_des_class){
             
-            if(nil != (itHook = apc_lookup_propertyhook(itCls, p->_hooked_name))){
+            if(nil != (itHook = apc_lookup_propertyhook_nolock(itCls, p->_hooked_name))){
                 
                 itHook->_superhook = hook;
             }

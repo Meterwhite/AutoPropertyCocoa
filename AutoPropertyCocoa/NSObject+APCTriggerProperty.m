@@ -31,7 +31,7 @@
     [p getterUnbindFrontTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -50,7 +50,7 @@
     [p getterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -69,7 +69,7 @@
     [p getterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -88,7 +88,7 @@
     [p getterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -107,7 +107,7 @@
     [p setterUnbindFrontTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.setterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -126,7 +126,7 @@
     [p setterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.setterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -145,7 +145,7 @@
     [p setterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.setterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -164,10 +164,9 @@
     [p setterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.setterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
-
 
 + (void)apc_classSetTriggerProperty:(NSString*)property
                              option:(APCPropertyTriggerOption)option
@@ -241,7 +240,7 @@
     [p getterUnbindFrontTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -260,7 +259,7 @@
     [p getterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -279,7 +278,7 @@
     [p getterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -298,7 +297,7 @@
     [p getterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -317,7 +316,7 @@
     [p setterUnbindFrontTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -336,7 +335,7 @@
     [p setterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -355,7 +354,7 @@
     [p setterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 
@@ -374,7 +373,7 @@
     [p setterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        hook.getterTrigger = nil;
+        [hook unbindProperty:p];
     }
 }
 

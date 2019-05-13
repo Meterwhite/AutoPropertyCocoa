@@ -50,67 +50,67 @@ NSValueTemplate(range,NSRange,funcname)\
 void* _Nullable funcname##_HookIMPMapper(NSString* _Nonnull encodeString)\
 {\
 if([encodeString isEqualToString:@"c"]){\
-    return funcname##_c;\
+    return (void*)funcname##_c;\
 }\
 else if ([encodeString isEqualToString:@"i"]){\
-    return funcname##_i;\
+    return (void*)funcname##_i;\
 }\
 else if ([encodeString isEqualToString:@"s"]){\
-    return funcname##_s;\
+    return (void*)funcname##_s;\
 }\
 else if ([encodeString isEqualToString:@"l"]){\
-    return funcname##_l;\
+    return (void*)funcname##_l;\
 }\
 else if ([encodeString isEqualToString:@"q"]){\
-    return funcname##_q;\
+    return (void*)funcname##_q;\
 }\
 else if ([encodeString isEqualToString:@"C"]){\
-    return funcname##_C;\
+    return (void*)funcname##_C;\
 }\
 else if ([encodeString isEqualToString:@"I"]){\
-    return funcname##_I;\
+    return (void*)funcname##_I;\
 }\
 else if ([encodeString isEqualToString:@"S"]){\
-    return funcname##_S;\
+    return (void*)funcname##_S;\
 }\
 else if ([encodeString isEqualToString:@"L"]){\
-    return funcname##_L;\
+    return (void*)funcname##_L;\
 }\
 else if ([encodeString isEqualToString:@"Q"]){\
-    return funcname##_Q;\
+    return (void*)funcname##_Q;\
 }\
 else if ([encodeString isEqualToString:@"f"]){\
-    return funcname##_f;\
+    return (void*)funcname##_f;\
 }\
 else if ([encodeString isEqualToString:@"d"]){\
-    return funcname##_d;\
+    return (void*)funcname##_d;\
 }\
 else if ([encodeString isEqualToString:@"B"]){\
-    return funcname##_B;\
+    return (void*)funcname##_B;\
 }\
 else if ([encodeString isEqualToString:@"*"]){\
-    return funcname##_charptr;\
+    return (void*)funcname##_charptr;\
 }\
 else if ([encodeString isEqualToString:@"#"]){\
-    return funcname##_class;\
+    return (void*)funcname##_class;\
 }\
 else if ([encodeString isEqualToString:@":"]){\
-    return funcname##_sel;\
+    return (void*)funcname##_sel;\
 }\
 else if ([encodeString characterAtIndex:0] == '^'){\
-    return funcname##_ptr;\
+    return (void*)funcname##_ptr;\
 }\
 else if ([encodeString isEqualToString:@(@encode(APCRect))]){\
-    return funcname##_rect;\
+    return (void*)funcname##_rect;\
 }\
 else if ([encodeString isEqualToString:@(@encode(APCPoint))]){\
-    return funcname##_point;\
+    return (void*)funcname##_point;\
 }\
 else if ([encodeString isEqualToString:@(@encode(APCSize))]){\
-    return funcname##_size;\
+    return (void*)funcname##_size;\
 }\
 else if ([encodeString isEqualToString:@(@encode(NSRange))]){\
-    return funcname##_range;\
+    return (void*)funcname##_range;\
 }\
     return nil;\
 }
@@ -160,67 +160,67 @@ NSValueTemplate(range,NSRange,funcname)\
 void* _Nullable funcname##_HookIMPMapper(NSString* _Nonnull encodeString)\
 {\
     if([encodeString isEqualToString:@"c"]){\
-        return funcname##_c;\
+        return (void*)funcname##_c;\
     }\
     else if ([encodeString isEqualToString:@"i"]){\
-        return funcname##_i;\
+        return (void*)funcname##_i;\
     }\
     else if ([encodeString isEqualToString:@"s"]){\
-        return funcname##_s;\
+        return (void*)funcname##_s;\
     }\
     else if ([encodeString isEqualToString:@"l"]){\
-        return funcname##_l;\
+        return (void*)funcname##_l;\
     }\
     else if ([encodeString isEqualToString:@"q"]){\
-        return funcname##_q;\
+        return (void*)funcname##_q;\
     }\
     else if ([encodeString isEqualToString:@"C"]){\
-        return funcname##_C;\
+        return (void*)funcname##_C;\
     }\
     else if ([encodeString isEqualToString:@"I"]){\
-        return funcname##_I;\
+        return (void*)funcname##_I;\
     }\
     else if ([encodeString isEqualToString:@"S"]){\
-        return funcname##_S;\
+        return (void*)funcname##_S;\
     }\
     else if ([encodeString isEqualToString:@"L"]){\
-        return funcname##_L;\
+        return (void*)funcname##_L;\
     }\
     else if ([encodeString isEqualToString:@"Q"]){\
-        return funcname##_Q;\
+        return (void*)funcname##_Q;\
     }\
     else if ([encodeString isEqualToString:@"f"]){\
-        return funcname##_f;\
+        return (void*)funcname##_f;\
     }\
     else if ([encodeString isEqualToString:@"d"]){\
-        return funcname##_d;\
+        return (void*)funcname##_d;\
     }\
     else if ([encodeString isEqualToString:@"B"]){\
-        return funcname##_B;\
+        return (void*)funcname##_B;\
     }\
     else if ([encodeString isEqualToString:@"*"]){\
-        return funcname##_charptr;\
+        return (void*)funcname##_charptr;\
     }\
     else if ([encodeString isEqualToString:@"#"]){\
-        return funcname##_class;\
+        return (void*)funcname##_class;\
     }\
     else if ([encodeString isEqualToString:@":"]){\
-        return funcname##_sel;\
+        return (void*)funcname##_sel;\
     }\
     else if ([encodeString characterAtIndex:0] == '^'){\
-        return funcname##_ptr;\
+        return (void*)funcname##_ptr;\
     }\
     else if ([encodeString isEqualToString:@(@encode(APCRect))]){\
-        return funcname##_rect;\
+        return (void*)funcname##_rect;\
     }\
     else if ([encodeString isEqualToString:@(@encode(APCPoint))]){\
-        return funcname##_point;\
+        return (void*)funcname##_point;\
     }\
     else if ([encodeString isEqualToString:@(@encode(APCSize))]){\
-        return funcname##_size;\
+        return (void*)funcname##_size;\
     }\
     else if ([encodeString isEqualToString:@(@encode(NSRange))]){\
-        return funcname##_range;\
+        return (void*)funcname##_range;\
     }\
 return nil;\
 }

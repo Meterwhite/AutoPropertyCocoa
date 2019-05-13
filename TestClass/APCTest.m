@@ -468,21 +468,20 @@ apc_testfunc(testClassInstanceLazyLoadSimple,912)
 //
 //    [p apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
 //
-//        return APCSuperMethod_id(instance);
+//        return APCSuperPerformedAsId(instance);
 //    }];
     
     [Person apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
         
-        id xx = APCSuperMethod_id(instance);
-        
-        [instance apc_performUserSuperID];
+        id xx = APCSuperPerformedAsId(instance);
+        [instance apc_performUserSuperAsId];
         
         return @"In Person";
     }];
     
     [Man apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
 
-        return APCSuperMethod_id(instance);
+        return APCSuperPerformedAsId(instance);
     }];
     
     [Man apc_unbindLazyLoadForProperty:@"name"];

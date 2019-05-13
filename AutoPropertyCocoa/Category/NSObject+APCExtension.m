@@ -22,22 +22,22 @@
     return [self class];
 }
 
-- (void)apc_performUserSuperVoid
+- (void)apc_performUserSuperAsVoid
 {
     
 }
 
-- (void)apc_performUserSuperVoidWithObject:(id)object
+- (void)apc_performUserSuperAsVoidWithObject:(id)object
 {
     
 }
 
-- (BOOL)apc_performUserSuperBOOLWithObject:(id)object
+- (BOOL)apc_performUserSuperAsBOOLWithObject:(id)object
 {
     return NO;
 }
 
-- (nullable id)apc_performUserSuperID
+- (nullable id)apc_performUserSuperAsId
 {
     return nil;
 }

@@ -12,6 +12,7 @@
 #import "APCPropertyHook.h"
 #import "APCLazyProperty.h"
 #import <objc/message.h>
+#import "apc-objc-os.h"
 #import "APCExtScope.h"
 #import "APCRuntime.h"
 #import "APCScope.h"
@@ -92,7 +93,8 @@ id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
     }
     
     return val;
-}APCDefBasicValueGetterVersionAndHookIMPMapper(APCTemplate_NSNumber_HookOfGetter,
+}
+APCDefBasicValueGetterVersionAndHookIMPMapper(APCTemplate_NSNumber_HookOfGetter,
                                                APCTemplate_NSValue_HookOfGetter,
                                                apc_propertyhook_getter)
 
@@ -108,7 +110,7 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
         @throw
         
         [NSException exceptionWithName:NSGenericException
-                                reason:@"APC can not find any infomation about this  property."
+                                reason:@"APC can not find any infomation about this property."
                               userInfo:nil];
     }
     
@@ -262,28 +264,47 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     return _source_class;
 }
 
-- (void)setLazyload:(APCLazyProperty *)lazyload
+- (__kindof APCPropertyHook *)superhook
 {
-    ///Use mutex when kind of class
-    void* desired = (void*)CFBridgingRetain(lazyload);
+    return _superhook;
+}
+
+- (void)bindProperty:(__kindof APCHookProperty *)property
+{
+    
+    NSAssert((_hookclass == property->_des_class) && ([_hookMethod isEqualToString:property->_hooked_name])
+             , @"APC: Mismatched type or property.");
+    
+    NSAssert(property.inlet != nil, @"APC: Undefined behavior!");
+    
     if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
-        @apc_lockruntime_writing({
-            
-            if(desired == nil){
-                
-                CFRelease(self->_lazyload);
-                [self tryUnhook];
-            }else{
-                
-                lazyload.associatedHook = self;
-            }
-        });
-        
-        return;
+        apc_runtimelock_writer_t writing(apc_runtimelock);
     }
     
-    ///Use atomic when kind of class.Fast.
+    ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
+}
+
+- (void)unbindProperty:(__kindof APCHookProperty *)property
+{
+    @autoreleasepool {
+        
+        NSAssert((_hookclass == property->_des_class) && ([_hookMethod isEqualToString:property->_hooked_name])
+                 , @"APC: Mismatched type or property.");
+        
+        NSAssert(property.inlet != nil, @"APC: Undefined behavior!");
+        
+        if(_kindOfOwner == APCPropertyOwnerKindOfClass){
+            
+            apc_runtimelock_writer_t writing(apc_runtimelock);
+        }
+        ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
+    }
+}
+
+- (void)setLazyload:(APCLazyProperty *)lazyload
+{
+    void* desired = (void*)CFBridgingRetain(lazyload);
     while (YES) {
         
         void* expected = _lazyload;
@@ -304,35 +325,16 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (APCLazyProperty *)lazyload
 {
-    APCLazyProperty *p = (__bridge APCLazyProperty *)(_lazyload);
-    if(p.enable == NO){
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
-        return nil;
+        apc_runtimelock_reader_t reading(apc_runtimelock);
     }
-    return p;
+    return (__bridge APCLazyProperty *)(_lazyload);
 }
 
 - (void)setGetterTrigger:(APCTriggerGetterProperty *)getterTrigger
 {
     void* desired = (void*)CFBridgingRetain(getterTrigger);
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-        
-        @apc_lockruntime_writing({
-            
-            self->_getterTrigger = desired;
-            if(desired == nil){
-                
-                CFRelease(self->_getterTrigger);
-                [self tryUnhook];
-            }else{
-                
-                getterTrigger.associatedHook = self;
-            }
-        });
-        
-        return;
-    }
-    
     while (YES) {
         
         void* expected = _getterTrigger;
@@ -353,35 +355,16 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (APCTriggerGetterProperty *)getterTrigger
 {
-    APCTriggerGetterProperty *p = (__bridge APCTriggerGetterProperty *)(_getterTrigger);
-    if(p.enable == NO){
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
-        return nil;
+        apc_runtimelock_reader_t reading(apc_runtimelock);
     }
-    return p;
+    return (__bridge APCTriggerGetterProperty *)(_getterTrigger);
 }
 
 - (void)setSetterTrigger:(APCTriggerSetterProperty *)setterTrigger
 {
     void* desired = (void*)CFBridgingRetain(setterTrigger);
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-        
-        @apc_lockruntime_writing({
-            
-            self->_setterTrigger = desired;
-            if(desired == nil){
-                
-                CFRelease(self->_setterTrigger);
-                [self tryUnhook];
-            }else{
-                
-                setterTrigger.associatedHook = self;
-            }
-        });
-        
-        return;
-    }
-    
     while (YES) {
         
         void* expected = _setterTrigger;
@@ -402,39 +385,11 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (APCTriggerSetterProperty *)setterTrigger
 {
-    APCTriggerSetterProperty * p = (__bridge APCTriggerSetterProperty *)(_setterTrigger);
-    if(p.enable == NO){
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
-        return nil;
+        apc_runtimelock_reader_t reading(apc_runtimelock);
     }
-    return p;
-}
-
-- (void)bindProperty:(__kindof APCHookProperty *)property
-{
-    
-    NSAssert((_hookclass == property->_des_class) && ([_hookMethod isEqualToString:property->_hooked_name])
-             , @"APC: Mismatched type or property.");
-    
-    NSAssert(property.inlet != nil, @"APC: Undefined behavior!");
-    
-    ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
-    
-}
-
-- (void)unbindProperty:(__kindof APCHookProperty *)property
-{
-    NSAssert((_hookclass == property->_des_class) && ([_hookMethod isEqualToString:property->_hooked_name])
-             , @"APC: Mismatched type or property.");
-    
-    NSAssert(property.inlet != nil, @"APC: Undefined behavior!");
-
-    [property invalid];
-    
-    @autoreleasepool {
-        
-        ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, nil);
-    }
+    return (__bridge APCTriggerSetterProperty *)(_setterTrigger);
 }
 
 - (BOOL)isEmpty
@@ -643,8 +598,8 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 {
     if(_proxyClass != nil){
         
-        apc_class_disposeProxyClass(_proxyClass);
         _proxyClass = nil;
+        apc_class_disposeProxyClass(_proxyClass);
     }
 }
 @end

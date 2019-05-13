@@ -38,14 +38,14 @@
     return [_message superObject];
 }
 
-- (void)apc_performUserSuperVoid
+- (void)apc_performUserSuperAsVoid
 {
     ((void(*)(id,SEL,id))objc_msgSend)([self superMessage]
                                           , _action
                                           , _instance);
 }
 
-- (void)apc_performUserSuperVoidWithObject:(id)object
+- (void)apc_performUserSuperAsVoidWithObject:(id)object
 {
     ((void(*)(id,SEL,id,id))objc_msgSend)([self superMessage]
                                              , _action
@@ -53,7 +53,7 @@
                                              , object);
 }
 
-- (BOOL)apc_performUserSuperBOOLWithObject:(id)object
+- (BOOL)apc_performUserSuperAsBOOLWithObject:(id)object
 {
     return ((BOOL(*)(id,SEL,id,id))objc_msgSend)([self superMessage]
                                                     , _action
@@ -61,7 +61,7 @@
                                                     , object);
 }
 
-- (id)apc_performUserSuperID
+- (id)apc_performUserSuperAsId
 {
     return
     

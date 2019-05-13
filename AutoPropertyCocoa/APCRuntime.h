@@ -36,6 +36,9 @@ apc_runtimelock_reading(^()__VA_ARGS__)
 
 
 #pragma mark - For runtime lock
+
+OBJC_EXTERN pthread_rwlock_t apc_runtimelock;
+
 OBJC_EXPORT void
 apc_runtimelock_writing(void(NS_NOESCAPE^ _Nonnull block)(void));
 

@@ -45,7 +45,8 @@
 
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-    [apc_lookup_propertyhook(self, property) setLazyload:nil];
+    APCPropertyHook* hook = apc_lookup_propertyhook(self, property);
+    [hook unbindProperty:hook.lazyload];
 }
 
 
@@ -82,7 +83,8 @@
 
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
-    [apc_lookup_instancePropertyhook(self, property) setLazyload:nil];
+    APCPropertyHook* hook = apc_lookup_instancePropertyhook(self, property);
+    [hook unbindProperty:hook.lazyload];
 }
 
 - (void)apc_instanceSetLazyLoadProperty:(NSString*)property

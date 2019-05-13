@@ -16,8 +16,8 @@
  */
 - (nonnull Class)apc_originalClass;
 
-- (BOOL)apc_performUserSuperBOOLWithObject:(nullable id)object;
-- (void)apc_performUserSuperVoidWithObject:(nullable id)object;
-- (void)apc_performUserSuperVoid;
-- (nullable id)apc_performUserSuperID;
+- (BOOL)apc_performUserSuperAsBOOLWithObject:(nullable id)object;
+- (void)apc_performUserSuperAsVoidWithObject:(nullable id)object;
+- (void)apc_performUserSuperAsVoid;
+- (nullable id)apc_performUserSuperAsId;
 @end
