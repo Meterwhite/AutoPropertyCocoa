@@ -40,6 +40,8 @@
 @protected
 
     APCMethodStyle  _methodStyle;
+    SEL             _outlet;
+    SEL             _inlet;
 }
 @property (nullable,nonatomic,copy,readonly)NSString*   methodTypeEncoding;
 @property (nonnull,nonatomic,copy,readonly) NSString*   hookedMethod;

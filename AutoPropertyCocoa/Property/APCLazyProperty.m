@@ -13,14 +13,15 @@
 
 @implementation APCLazyProperty
 
-
 - (instancetype)initWithPropertyName:(NSString *)propertyName
                               aClass:(__unsafe_unretained Class)aClass
 {
     if(self = [super initWithPropertyName:propertyName
                                    aClass:aClass]){
         
+        _inlet          =   @selector(setLazyload:);
         _methodStyle    =   APCMethodGetterStyle;
+        _outlet         =   @selector(lazyload);
         _hooked_name    =   _des_getter_name;
         if(self.kindOfOwner == APCPropertyOwnerKindOfClass){
             
@@ -119,18 +120,6 @@
     NSLog(@"%s",__func__);
 }
 #endif
-
-- (SEL)outlet
-{
-    static char _outlet[] = "lazyload";
-    return (SEL)(const void*)_outlet;
-}
-
-- (SEL)inlet
-{
-    static char _inlet[] = "setLazyload:";
-    return (SEL)(const void*)_inlet;
-}
 
 - (id)performLazyloadForTarget:(id)target
 {

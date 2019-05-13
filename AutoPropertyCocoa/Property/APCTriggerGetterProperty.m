@@ -25,7 +25,9 @@
 {
     if(self = [super initWithPropertyName:propertyName aClass:aClass]){
         
+        _inlet          = @selector(setGetterTrigger:);
         _kindOfUserHook = APCPropertyHookKindOfIMP;
+        _outlet         = @selector(getterTrigger);
         _triggerOption  = APCPropertyNonTrigger;
         _methodStyle    = APCMethodGetterStyle;
         _hooked_name    = _des_getter_name;
@@ -134,18 +136,6 @@
         return _block_countcondition(APCUserEnvironmentObject(_SELF, self), value, self.accessCount);
     }
     return NO;
-}
-
-- (SEL)outlet
-{
-    static char _outlet[] = "getterTrigger";
-    return (SEL)(const void*)_outlet;
-}
-
-- (SEL)inlet
-{
-    static char _inlet[] = "setGetterTrigger:";
-    return (SEL)(const void*)_inlet;
 }
 
 @end

@@ -24,10 +24,12 @@
 {
     if(self = [super initWithPropertyName:propertyName aClass:aClass]){
         
-        _kindOfUserHook     = APCPropertyHookKindOfIMP;
+        _inlet          = @selector(setSetterTrigger:);
+        _outlet         = @selector(setterTrigger);
+        _kindOfUserHook = APCPropertyHookKindOfIMP;
         _triggerOption  = APCPropertyNonTrigger;
         _methodStyle    = APCMethodSetterStyle;
-        _hooked_name       = _des_setter_name;
+        _hooked_name    = _des_setter_name;
     }
     return self;
 }
@@ -136,15 +138,4 @@
     }
 }
 
-- (SEL)outlet
-{
-    static char _outlet[] = "setterTrigger";
-    return (SEL)(const void*)_outlet;
-}
-
-- (SEL)inlet
-{
-    static char _inlet[] = "setSetterTrigger:";
-    return (SEL)(const void*)_inlet;
-}
 @end

@@ -62,12 +62,12 @@
 
 - (SEL)outlet
 {
-    return (SEL)0;
+    return _outlet;
 }
 
 - (SEL)inlet
 {
-    return (SEL)0;
+    return _inlet;
 }
 
 - (void)unhook

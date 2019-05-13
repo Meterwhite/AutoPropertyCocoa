@@ -6,9 +6,10 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-#import "apc-objc-runtimelock.h"
-#import "fishhook.h"
-#import <pthread.h>
+#include "apc-objc-runtimelock.h"
+#include "apc-objc-os.h"
+#include "fishhook.h"
+#include <pthread.h>
 
 
 class APCOBJCRuntimelocker;
@@ -32,14 +33,6 @@ _Bool apc_contains_objcruntimelock(void)
 static APCOBJCRuntimelocker*        apc_objcruntimelocker;
 
 
-class apc_nocopy_t {
-private:
-    apc_nocopy_t(const apc_nocopy_t&) = delete;
-    const apc_nocopy_t& operator=(const apc_nocopy_t&) = delete;
-protected:
-    apc_nocopy_t() { }
-    ~apc_nocopy_t() { }
-};
 
 
 class APCOBJCRuntimelocker : apc_nocopy_t{

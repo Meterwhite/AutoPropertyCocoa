@@ -264,7 +264,26 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)setLazyload:(APCLazyProperty *)lazyload
 {
+    ///Use mutex when kind of class
     void* desired = (void*)CFBridgingRetain(lazyload);
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
+        
+        @apc_lockruntime_writing({
+            
+            if(desired == nil){
+                
+                CFRelease(self->_lazyload);
+                [self tryUnhook];
+            }else{
+                
+                lazyload.associatedHook = self;
+            }
+        });
+        
+        return;
+    }
+    
+    ///Use atomic when kind of class.Fast.
     while (YES) {
         
         void* expected = _lazyload;
@@ -272,7 +291,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
             
             if(desired == nil){
                 
-                ((__bridge APCLazyProperty *)expected).associatedHook = self;
                 CFRelease(expected);
                 [self tryUnhook];
             }else{
@@ -297,6 +315,24 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 - (void)setGetterTrigger:(APCTriggerGetterProperty *)getterTrigger
 {
     void* desired = (void*)CFBridgingRetain(getterTrigger);
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
+        
+        @apc_lockruntime_writing({
+            
+            self->_getterTrigger = desired;
+            if(desired == nil){
+                
+                CFRelease(self->_getterTrigger);
+                [self tryUnhook];
+            }else{
+                
+                getterTrigger.associatedHook = self;
+            }
+        });
+        
+        return;
+    }
+    
     while (YES) {
         
         void* expected = _getterTrigger;
@@ -304,7 +340,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
             
             if(desired == nil){
                 
-                ((__bridge APCTriggerGetterProperty *)expected).associatedHook = self;
                 CFRelease(expected);
                 [self tryUnhook];
             }else{
@@ -329,6 +364,24 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 - (void)setSetterTrigger:(APCTriggerSetterProperty *)setterTrigger
 {
     void* desired = (void*)CFBridgingRetain(setterTrigger);
+    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
+        
+        @apc_lockruntime_writing({
+            
+            self->_setterTrigger = desired;
+            if(desired == nil){
+                
+                CFRelease(self->_setterTrigger);
+                [self tryUnhook];
+            }else{
+                
+                setterTrigger.associatedHook = self;
+            }
+        });
+        
+        return;
+    }
+    
     while (YES) {
         
         void* expected = _setterTrigger;
@@ -336,7 +389,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
             
             if(desired == nil){
                 
-                ((__bridge APCTriggerSetterProperty *)expected).associatedHook = self;
                 CFRelease(expected);
                 [self tryUnhook];
             }else{
@@ -383,7 +435,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         
         ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, nil);
     }
-    [self tryUnhook];
 }
 
 - (BOOL)isEmpty
@@ -459,7 +510,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)unhook
 {
-    NSAssert(_new_implementation != nil, @"APC: Lost infomation.");
+    NSAssert(_new_implementation != nil, @"APC: Lost _new_implementation.");
     
     IMP newImp = _new_implementation;
     if(atomic_compare_exchange_strong(&_new_implementation, &newImp, nil))
@@ -479,6 +530,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
                                     , self.restoredImplementation
                                     , _methodTypeEncoding);
             }
+            apc_propertyhook_dispose_nolock(self);
         }
         else
         {
@@ -488,8 +540,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
             }
         }
     }
-    
-    apc_propertyhook_delete(self);
 }
 
 - (IMP)restoredImplementation

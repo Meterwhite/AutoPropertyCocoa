@@ -63,11 +63,6 @@
 
 #endif
 
-
-#define APCMTypesFunction(funcBody, APCCoderValue) funcBody##APCCoderValue
-
-#define APCCoderValue(type) (*((unsigned long*)@encode(type)))
-
 /**
  APCCoderEqualMask(@encode(CGRect), APCStructCoderMaskValue)
  */
@@ -82,32 +77,14 @@
 
 union apc_coder_t {
     
-    char mask;
-    char encode[sizeof(unsigned long)];
+    char        mask;
+    char        encode[sizeof(unsigned long)];
 #if __LP64__
-    unsigned long value;
+    uint64_t    value;
 #else
-    uint32 value;
+    uint32      value;
 #endif
-    char alloc[2*sizeof(unsigned long) + 1];
+    char __size[2*sizeof(unsigned long) + 1];
 };
 
 typedef union apc_coder_t APCCoder;
-
-//APCCoder APCMakeTypeEncodings(const char* encode)
-//{
-//    APCCoder s = {0};
-//    s.value = *(unsigned long*)encode;
-//    return s;
-//}
-//
-//IMP APCCoderGetIMP(APCCoder enc)
-//{
-//    return *(IMP*)(&enc + sizeof(sizeof(unsigned long) + 1));
-//}
-//
-//void APCTypeEncodingsSetIMP(APCCoder enc , IMP* imp)
-//{
-//    void* des = (void*)(&enc + sizeof(sizeof(unsigned long) + 1));
-//    memcpy(des, imp, sizeof(uintptr_t));
-//}

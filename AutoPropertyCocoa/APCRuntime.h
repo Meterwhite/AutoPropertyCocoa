@@ -7,6 +7,40 @@
 //
 
 #import "APCHookProperty.h"
+#include <pthread.h>
+#import "APCScope.h"
+
+/**
+ @apc_lockruntime_writing({
+ 
+    //Unable to break points...
+ });
+ */
+#define apc_lockruntime_writing(...)\
+\
+submacro_apc_keywordify \
+\
+apc_runtimelock_writing(^()__VA_ARGS__)
+
+/**
+ @apc_lockruntime_reading({
+ 
+    //Unable to break points...
+ });
+ */
+#define apc_lockruntime_reading(...)\
+\
+submacro_apc_keywordify \
+\
+apc_runtimelock_reading(^()__VA_ARGS__)
+
+
+#pragma mark - For runtime lock
+OBJC_EXPORT void
+apc_runtimelock_writing(void(NS_NOESCAPE^ _Nonnull block)(void));
+
+OBJC_EXPORT void
+apc_runtimelock_reading(void(NS_NOESCAPE^ _Nonnull block)(void));
 
 #pragma mark - For hook
 
@@ -38,7 +72,7 @@ OBJC_EXPORT APCPropertyHook* _Nullable
 apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
 
 OBJC_EXPORT void
-apc_propertyhook_delete(APCPropertyHook* _Nonnull hook);
+apc_propertyhook_dispose_nolock(APCPropertyHook* _Nonnull hook);
 
 #pragma mark - For property
 
@@ -52,9 +86,6 @@ apc_property_getSuperPropertyList(APCHookProperty* _Nonnull p);
 
 OBJC_EXPORT void
 apc_registerProperty(APCHookProperty* _Nonnull p);
-
-OBJC_EXPORT void
-apc_disposeProperty(APCHookProperty* _Nonnull p);
 
 OBJC_EXPORT Class _Nullable
 apc_class_getSuperclass(Class _Nonnull cls);

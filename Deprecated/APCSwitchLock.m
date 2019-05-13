@@ -19,7 +19,6 @@ static bool _apc_false  = false;
     dispatch_semaphore_t        _order;
     dispatch_semaphore_t        _task;
     bool                        _state;
-    pthread_rwlock_t            _lock;
 }
 
 - (instancetype)init
@@ -31,7 +30,7 @@ static bool _apc_false  = false;
         _task   = dispatch_semaphore_create(1);
         _state  = true;
         
-        _lock   = PTHREAD_RWLOCK_INITIALIZER;
+
     }
     return self;
 }
