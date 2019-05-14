@@ -19,7 +19,7 @@
     self = [super init];
     if (self) {
         
-//        _name = @"init _name";
+        _name = @"init _name";
     }
     return self;
 }

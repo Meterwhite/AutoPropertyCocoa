@@ -300,10 +300,10 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         if(_kindOfOwner == APCPropertyOwnerKindOfClass){
             
             apc_runtimelock_writer_t writing(apc_runtimelock);
-            ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
+            ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, nil);
         }else{
             
-            ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
+            ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, nil);
         }
     }
 }
