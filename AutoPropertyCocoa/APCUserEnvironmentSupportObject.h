@@ -18,7 +18,7 @@
 @end
 
 typedef id id_apc_t;
-#warning restore
+#warning ifdef/ifndef
 #ifndef DEBUG
 
 OBJC_EXPORT void

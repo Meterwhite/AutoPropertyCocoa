@@ -99,7 +99,7 @@ static NSHashTable* apc_runtime_proxyinstances()
 }
 
 
-APCPropertyHook* apc_lookup_propertyhook_nolock(Class clazz, NSString* property)
+NS_INLINE APCPropertyHook* apc_lookup_propertyhook_nolock(Class clazz, NSString* property)
 {
     if(clazz == nil){
         

@@ -220,9 +220,9 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     APCPropertyValueKind    _kindOfValue;
     APCPropertyOwnerKind    _kindOfOwner;
     APCMethodStyle          _methodStyle;
-    _Atomic(void*)          _getterTrigger;
-    _Atomic(void*)          _setterTrigger;
-    _Atomic(void*)          _lazyload;
+    APCAtomicPtr            _getterTrigger;
+    APCAtomicPtr            _setterTrigger;
+    APCAtomicPtr            _lazyload;
     __weak id               _instance;
 }
 
@@ -280,9 +280,12 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
         apc_runtimelock_writer_t writing(apc_runtimelock);
+        
+        ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
+    }else{
+        
+        ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
     }
-    
-    ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
 }
 
 - (void)unbindProperty:(__kindof APCHookProperty *)property
@@ -297,8 +300,11 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         if(_kindOfOwner == APCPropertyOwnerKindOfClass){
             
             apc_runtimelock_writer_t writing(apc_runtimelock);
+            ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
+        }else{
+            
+            ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
         }
-        ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
     }
 }
 
@@ -328,8 +334,11 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
         apc_runtimelock_reader_t reading(apc_runtimelock);
+        return (__bridge APCLazyProperty *)(_lazyload);
+    }else{
+        
+        return (__bridge APCLazyProperty *)(_lazyload);
     }
-    return (__bridge APCLazyProperty *)(_lazyload);
 }
 
 - (void)setGetterTrigger:(APCTriggerGetterProperty *)getterTrigger
@@ -358,8 +367,11 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
         apc_runtimelock_reader_t reading(apc_runtimelock);
+        return (__bridge APCTriggerGetterProperty *)(_getterTrigger);
+    }else{
+        
+        return (__bridge APCTriggerGetterProperty *)(_getterTrigger);
     }
-    return (__bridge APCTriggerGetterProperty *)(_getterTrigger);
 }
 
 - (void)setSetterTrigger:(APCTriggerSetterProperty *)setterTrigger
@@ -388,8 +400,11 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     if(_kindOfOwner == APCPropertyOwnerKindOfClass){
         
         apc_runtimelock_reader_t reading(apc_runtimelock);
+        return (__bridge APCTriggerSetterProperty *)(_setterTrigger);
+    }else{
+        
+        return (__bridge APCTriggerSetterProperty *)(_setterTrigger);
     }
-    return (__bridge APCTriggerSetterProperty *)(_setterTrigger);
 }
 
 - (BOOL)isEmpty

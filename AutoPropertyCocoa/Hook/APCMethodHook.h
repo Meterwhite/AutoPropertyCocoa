@@ -32,7 +32,7 @@
     IMP             _old_implementation;
 @protected
     
-    _Atomic(IMP)    _new_implementation;
+    APCAtomicIMP    _new_implementation;
     Class           _source_class;
 }
 

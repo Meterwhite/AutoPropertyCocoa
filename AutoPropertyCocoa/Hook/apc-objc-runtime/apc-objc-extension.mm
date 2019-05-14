@@ -476,7 +476,6 @@ struct apc_objc_class : apc_objc_object {
  ---------------------------------
  */
 #pragma mark - objc-object.h
-static pthread_mutex_t _apc_class_removeMethod_APC_OBJC2_lock;
 void class_removeMethod_APC_OBJC2(Class cls, SEL name)
 {
     
@@ -485,15 +484,11 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        
-        _apc_class_removeMethod_APC_OBJC2_lock
-        =
-        PTHREAD_MUTEX_INITIALIZER;
-    });
+    static pthread_mutex_t _func_lock
+    =
+    PTHREAD_MUTEX_INITIALIZER;
     
-    pthread_mutex_lock(&_apc_class_removeMethod_APC_OBJC2_lock);
+    pthread_mutex_lock(&_func_lock);
     
     apc_objc_class* clazz = (__bridge apc_objc_class*)(cls);
     unsigned int    count;
@@ -512,7 +507,7 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
         }
     }
     
-    pthread_mutex_unlock(&_apc_class_removeMethod_APC_OBJC2_lock);
+    pthread_mutex_unlock(&_func_lock);
 #pragma clang diagnostic pop
 #endif
 }

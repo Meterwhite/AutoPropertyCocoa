@@ -31,10 +31,14 @@
 #ifndef __STDC_NO_ATOMICS__
 
 #import <stdatomic.h>
-#define APCAtomicUInteger   _Atomic(NSUInteger)
+typedef _Atomic(NSUInteger) APCAtomicUInteger;
+typedef _Atomic(void*)      APCAtomicPtr;
+typedef _Atomic(IMP)        APCAtomicIMP;
 #define APCMemoryBarrier    atomic_thread_fence(memory_order_seq_cst)
 #else
-#define APCAtomicUInteger NSUInteger
+typedef NSUInteger          APCAtomicUInteger
+typedef void*               APCAtomicPtr
+typedef _Atomic(IMP)        IMP;
 #define APCMemoryBarrier
 #endif
 
