@@ -7,15 +7,15 @@
 //
 
 #include "apc-objc-runtimelock.h"
+#include "apc-fishhook.h"
 #include "apc-objc-os.h"
-#include "fishhook.h"
 #include <pthread.h>
 
 
 class APCOBJCRuntimelocker;
 
-//static pthread_mutex_t              pthread_mutex_null  = {0};
-static pthread_mutex_t              apc_objcruntimelock = PTHREAD_MUTEX_INITIALIZER;
+/** Initialize in apc_in_main() */
+static pthread_mutex_t apc_objcruntimelock = {0};
 
 _Bool apc_contains_objcruntimelock(void)
 {
@@ -31,8 +31,6 @@ _Bool apc_contains_objcruntimelock(void)
 }
 
 static APCOBJCRuntimelocker*        apc_objcruntimelocker;
-
-
 
 
 class APCOBJCRuntimelocker : apc_nocopy_t{
@@ -142,7 +140,7 @@ void* apc_calloc(size_t __count, size_t __size)
 
 void apc_in_main(void)
 {
-    struct rebinding
+    struct apc_rebinding
     rebindInfo
     =
     {
@@ -151,7 +149,7 @@ void apc_in_main(void)
         .replaced       =   (void**)(&apc_calloc_ptr)
     };
     
-    rebind_symbols((struct rebinding[1]){rebindInfo} , 1);
+    apc_rebind_symbols((struct apc_rebinding[1]){rebindInfo} , 1);
     
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

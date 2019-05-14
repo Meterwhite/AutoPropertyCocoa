@@ -35,7 +35,7 @@
 		9FCF5DE92264D93A0059A876 /* APCTriggerSetterProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FCF5DE82264D93A0059A876 /* APCTriggerSetterProperty.m */; };
 		9FCF5DED2264E03D0059A876 /* APCMethodHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FCF5DEC2264E03D0059A876 /* APCMethodHook.m */; };
 		9FD9F76A2284837700F7BF0E /* apc-objc-extension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9FD9F7682284837600F7BF0E /* apc-objc-extension.mm */; };
-		9FD9F7722284841100F7BF0E /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = 9FD9F7702284841100F7BF0E /* fishhook.c */; };
+		9FD9F7722284841100F7BF0E /* apc-fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = 9FD9F7702284841100F7BF0E /* apc-fishhook.c */; };
 		9FF3F526227C5310001962A7 /* NSObject+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FF3F525227C5310001962A7 /* NSObject+APCExtension.m */; };
 /* End PBXBuildFile section */
 
@@ -100,8 +100,8 @@
 		9FCF5DEC2264E03D0059A876 /* APCMethodHook.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCMethodHook.m; sourceTree = "<group>"; };
 		9FD9F7682284837600F7BF0E /* apc-objc-extension.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "apc-objc-extension.mm"; sourceTree = "<group>"; };
 		9FD9F7692284837600F7BF0E /* apc-objc-extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-extension.h"; sourceTree = "<group>"; };
-		9FD9F7702284841100F7BF0E /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fishhook.c; sourceTree = "<group>"; };
-		9FD9F7712284841100F7BF0E /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fishhook.h; sourceTree = "<group>"; };
+		9FD9F7702284841100F7BF0E /* apc-fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "apc-fishhook.c"; sourceTree = "<group>"; };
+		9FD9F7712284841100F7BF0E /* apc-fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-fishhook.h"; sourceTree = "<group>"; };
 		9FF3F524227C5310001962A7 /* NSObject+APCExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCExtension.h"; sourceTree = "<group>"; };
 		9FF3F525227C5310001962A7 /* NSObject+APCExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCExtension.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -245,7 +245,7 @@
 		9F737C3422808F05007FEB7E /* apc-objc-runtime */ = {
 			isa = PBXGroup;
 			children = (
-				9FD9F76F2284841100F7BF0E /* fishhook */,
+				9FD9F76F2284841100F7BF0E /* apc-fishhook */,
 				9FD9F7692284837600F7BF0E /* apc-objc-extension.h */,
 				9FD9F7682284837600F7BF0E /* apc-objc-extension.mm */,
 				457118A62283C65E0062F406 /* apc-objc-runtimelock.h */,
@@ -268,13 +268,13 @@
 			path = Hook;
 			sourceTree = "<group>";
 		};
-		9FD9F76F2284841100F7BF0E /* fishhook */ = {
+		9FD9F76F2284841100F7BF0E /* apc-fishhook */ = {
 			isa = PBXGroup;
 			children = (
-				9FD9F7702284841100F7BF0E /* fishhook.c */,
-				9FD9F7712284841100F7BF0E /* fishhook.h */,
+				9FD9F7702284841100F7BF0E /* apc-fishhook.c */,
+				9FD9F7712284841100F7BF0E /* apc-fishhook.h */,
 			);
-			path = fishhook;
+			path = "apc-fishhook";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -361,7 +361,7 @@
 				45B12FBB225B2C5D002D825E /* APCProperty.m in Sources */,
 				450AA494226A2CBE0005A745 /* APCClassMapper.m in Sources */,
 				45B12FBE225B2C5D002D825E /* NSObject+APCTriggerProperty.m in Sources */,
-				9FD9F7722284841100F7BF0E /* fishhook.c in Sources */,
+				9FD9F7722284841100F7BF0E /* apc-fishhook.c in Sources */,
 				456FC471225DBFBF006CD604 /* Superman.m in Sources */,
 				45B12FBC225B2C5D002D825E /* APCLazyProperty.m in Sources */,
 				457118A82283C65E0062F406 /* apc-objc-runtimelock.mm in Sources */,

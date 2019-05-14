@@ -1,9 +1,9 @@
 //
 //  apc-objc-private.cpp
-//  Test123123
+//  AutoPropertyCocoa
 //
-//  Created by MDLK on 2019/5/5.
-//  Copyright © 2019 MDLK. All rights reserved.
+//  Created by Novo on 2019/5/5.
+//  Copyright © 2019 Novo. All rights reserved.
 //
 
 #import "apc-objc-runtimelock.h"

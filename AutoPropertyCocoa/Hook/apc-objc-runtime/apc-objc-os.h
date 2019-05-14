@@ -1,12 +1,11 @@
 //
 //  apc-objc-os.cpp
-//  AutoPropertyCocoaiOS
+//  AutoPropertyCocoa
 //
-//  Created by MDLK on 2019/5/13.
+//  Created by Novo on 2019/5/13.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-//#include "apc-objc-os.h"
 #include <pthread.h>
 
 class apc_nocopy_t {

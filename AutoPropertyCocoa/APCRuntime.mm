@@ -161,7 +161,7 @@ APCPropertyHook* apc_lookup_implementationPropertyhook_inRange(Class from, Class
     
     if(YES == [from isSubclassOfClass:to]){
         
-        APCPropertyHook*ret;
+        APCPropertyHook* ret;
         do {
             
             if(nil != ((void)(ret = apc_runtime_propertyhook(from, property)), ret->_old_implementation))

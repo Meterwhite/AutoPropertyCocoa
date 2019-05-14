@@ -21,16 +21,20 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef fishhook_h
-#define fishhook_h
+
+/**
+    AUTOPROPERTYCOCOA : Embedded fishhook.In order to prevent duplicate symbols from adding the prefix 'apc_'.
+ */
+#ifndef apc_fishhook_h
+#define apc_fishhook_h
 
 #include <stddef.h>
 #include <stdint.h>
 
-#if !defined(FISHHOOK_EXPORT)
-#define FISHHOOK_VISIBILITY __attribute__((visibility("hidden")))
+#if !defined(APC_FISHHOOK_EXPORT)
+#define APC_FISHHOOK_VISIBILITY __attribute__((visibility("hidden")))
 #else
-#define FISHHOOK_VISIBILITY __attribute__((visibility("default")))
+#define APC_FISHHOOK_VISIBILITY __attribute__((visibility("default")))
 #endif
 
 #ifdef __cplusplus
@@ -38,39 +42,39 @@ extern "C" {
 #endif //__cplusplus
 
 /*
- * A structure representing a particular intended rebinding from a symbol
+ * A structure representing a particular intended apc_rebinding from a symbol
  * name to its replacement
  */
-struct rebinding {
+struct apc_rebinding {
   const char *name;
   void *replacement;
   void **replaced;
 };
 
 /*
- * For each rebinding in rebindings, rebinds references to external, indirect
+ * For each apc_rebinding in apc_rebindings, rebinds references to external, indirect
  * symbols with the specified name to instead point at replacement for each
  * image in the calling process as well as for all future images that are loaded
  * by the process. If rebind_functions is called more than once, the symbols to
- * rebind are added to the existing list of rebindings, and if a given symbol
- * is rebound more than once, the later rebinding will take precedence.
+ * rebind are added to the existing list of apc_rebindings, and if a given symbol
+ * is rebound more than once, the later apc_rebinding will take precedence.
  */
-FISHHOOK_VISIBILITY
-int rebind_symbols(struct rebinding rebindings[], size_t rebindings_nel);
+APC_FISHHOOK_VISIBILITY
+int apc_rebind_symbols(struct apc_rebinding apc_rebindings[], size_t apc_rebindings_nel);
 
 /*
  * Rebinds as above, but only in the specified image. The header should point
  * to the mach-o header, the slide should be the slide offset. Others as above.
  */
-FISHHOOK_VISIBILITY
-int rebind_symbols_image(void *header,
+APC_FISHHOOK_VISIBILITY
+int apc_rebind_symbols_image(void *header,
                          intptr_t slide,
-                         struct rebinding rebindings[],
-                         size_t rebindings_nel);
+                         struct apc_rebinding apc_rebindings[],
+                         size_t apc_rebindings_nel);
 
 #ifdef __cplusplus
 }
 #endif //__cplusplus
 
-#endif //fishhook_h
+#endif //apc_fishhook_h
 
