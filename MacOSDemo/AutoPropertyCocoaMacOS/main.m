@@ -7,7 +7,10 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "APCScope.h"
 
 int main(int argc, const char * argv[]) {
+    
+    apc_in_main();
     return NSApplicationMain(argc, argv);
 }

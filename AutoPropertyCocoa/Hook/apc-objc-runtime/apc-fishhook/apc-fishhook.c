@@ -1,3 +1,9 @@
+/**
+ AutoPropertyCocoa
+ :
+ Embedded fishhook.In order to prevent duplicate symbols from adding the prefix 'apc'.
+ */
+
 // Copyright (c) 2013, Facebook, Inc.
 // All rights reserved.
 // Redistribution and use in source and binary forms, with or without

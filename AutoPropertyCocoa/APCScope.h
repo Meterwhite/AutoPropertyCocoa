@@ -7,6 +7,7 @@
 #import "APCTypeEncodings.h"
 #import <objc/NSObject.h>
 #import <objc/runtime.h>
+#import "APCExtScope.h"
 
 
 #if TARGET_OS_IPHONE || TARGET_OS_TV || TARGET_OS_WATCH
@@ -43,6 +44,12 @@ typedef _Atomic(IMP)        IMP;
 #endif
 
 #define APCThreadID ([NSThread currentThread])
+
+#if DEBUG & APCDebugLogSwitch
+#define APCDlog(...) NSLog(__VA_ARGS__)
+#else
+#define APCDlog(...)
+#endif
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_10_0 \
 || MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12 \

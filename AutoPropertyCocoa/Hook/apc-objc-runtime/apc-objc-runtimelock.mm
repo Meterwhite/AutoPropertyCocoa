@@ -160,3 +160,21 @@ void apc_in_main(void)
         NSCAssert(0 == result, @"Failed to initialize mutex with error %d.", result);
     });
 }
+
+
+#if DEBUG
+void apc_objcruntimelock_testing_delete(void)
+{
+    pthread_mutex_destroy(&apc_objcruntimelock);
+    apc_objcruntimelock = {0};
+}
+
+void apc_objcruntimelock_testing_create(void)
+{
+    const int result __attribute__((unused))
+    =
+    pthread_mutex_init(&apc_objcruntimelock, NULL);
+    NSCAssert(0 == result, @"Failed to initialize mutex with error %d.", result);
+}
+
+#endif

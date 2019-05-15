@@ -1,4 +1,6 @@
 
+#define APCDebugLogSwitch 1
+
 
 #define APCBoxSelector(sel) \
 \

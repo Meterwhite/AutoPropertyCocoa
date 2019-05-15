@@ -613,8 +613,9 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 {
     if(_proxyClass != nil){
         
-        _proxyClass = nil;
+        APCDlog(@"disposeRuntimeResource : %@",NSStringFromClass(_proxyClass));
         apc_class_disposeProxyClass(_proxyClass);
+        _proxyClass = nil;
     }
 }
 @end

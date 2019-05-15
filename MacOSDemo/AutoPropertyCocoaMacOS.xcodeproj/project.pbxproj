@@ -205,16 +205,16 @@
 		45E1CDB9228BF3BB00DCD3F0 /* Property */ = {
 			isa = PBXGroup;
 			children = (
-				45E1CDBA228BF3BB00DCD3F0 /* APCTriggerSetterProperty.h */,
-				45E1CDBB228BF3BB00DCD3F0 /* APCProperty.m */,
-				45E1CDBC228BF3BB00DCD3F0 /* APCTriggerGetterProperty.m */,
-				45E1CDBD228BF3BB00DCD3F0 /* APCLazyProperty.m */,
 				45E1CDBE228BF3BB00DCD3F0 /* APCHookProperty.h */,
-				45E1CDBF228BF3BB00DCD3F0 /* APCTriggerSetterProperty.m */,
-				45E1CDC0228BF3BB00DCD3F0 /* APCProperty.h */,
 				45E1CDC1228BF3BB00DCD3F0 /* APCHookProperty.m */,
 				45E1CDC2228BF3BB00DCD3F0 /* APCLazyProperty.h */,
+				45E1CDBD228BF3BB00DCD3F0 /* APCLazyProperty.m */,
+				45E1CDC0228BF3BB00DCD3F0 /* APCProperty.h */,
+				45E1CDBB228BF3BB00DCD3F0 /* APCProperty.m */,
 				45E1CDC3228BF3BB00DCD3F0 /* APCTriggerGetterProperty.h */,
+				45E1CDBC228BF3BB00DCD3F0 /* APCTriggerGetterProperty.m */,
+				45E1CDBA228BF3BB00DCD3F0 /* APCTriggerSetterProperty.h */,
+				45E1CDBF228BF3BB00DCD3F0 /* APCTriggerSetterProperty.m */,
 			);
 			path = Property;
 			sourceTree = "<group>";
@@ -235,11 +235,11 @@
 		45E1CDD7228BF3BB00DCD3F0 /* Hook */ = {
 			isa = PBXGroup;
 			children = (
-				45E1CDD8228BF3BB00DCD3F0 /* APCPropertyHook.mm */,
-				45E1CDD9228BF3BB00DCD3F0 /* APCMethodHook.h */,
-				45E1CDDA228BF3BB00DCD3F0 /* APCPropertyHook.h */,
-				45E1CDDB228BF3BB00DCD3F0 /* APCMethodHook.m */,
 				45E1CDDC228BF3BB00DCD3F0 /* apc-objc-runtime */,
+				45E1CDD9228BF3BB00DCD3F0 /* APCMethodHook.h */,
+				45E1CDDB228BF3BB00DCD3F0 /* APCMethodHook.m */,
+				45E1CDDA228BF3BB00DCD3F0 /* APCPropertyHook.h */,
+				45E1CDD8228BF3BB00DCD3F0 /* APCPropertyHook.mm */,
 			);
 			path = Hook;
 			sourceTree = "<group>";
@@ -247,13 +247,13 @@
 		45E1CDDC228BF3BB00DCD3F0 /* apc-objc-runtime */ = {
 			isa = PBXGroup;
 			children = (
-				45E1CDDD228BF3BB00DCD3F0 /* apc-objc-config.h */,
-				45E1CDDE228BF3BB00DCD3F0 /* apc-objc-extension.mm */,
 				45E1CDDF228BF3BB00DCD3F0 /* apc-fishhook */,
-				45E1CDE2228BF3BB00DCD3F0 /* apc-objc-runtimelock.h */,
+				45E1CDDD228BF3BB00DCD3F0 /* apc-objc-config.h */,
 				45E1CDE3228BF3BB00DCD3F0 /* apc-objc-extension.h */,
-				45E1CDE4228BF3BB00DCD3F0 /* apc-objc-runtimelock.mm */,
+				45E1CDDE228BF3BB00DCD3F0 /* apc-objc-extension.mm */,
 				45E1CDE5228BF3BB00DCD3F0 /* apc-objc-os.h */,
+				45E1CDE2228BF3BB00DCD3F0 /* apc-objc-runtimelock.h */,
+				45E1CDE4228BF3BB00DCD3F0 /* apc-objc-runtimelock.mm */,
 			);
 			path = "apc-objc-runtime";
 			sourceTree = "<group>";
@@ -261,8 +261,8 @@
 		45E1CDDF228BF3BB00DCD3F0 /* apc-fishhook */ = {
 			isa = PBXGroup;
 			children = (
-				45E1CDE0228BF3BB00DCD3F0 /* apc-fishhook.c */,
 				45E1CDE1228BF3BB00DCD3F0 /* apc-fishhook.h */,
+				45E1CDE0228BF3BB00DCD3F0 /* apc-fishhook.c */,
 			);
 			path = "apc-fishhook";
 			sourceTree = "<group>";

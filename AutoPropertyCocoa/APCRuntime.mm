@@ -154,7 +154,7 @@ APCPropertyHook* apc_lookups_propertyhook(Class clazz, NSString* property)
         if(nil != (ret = apc_runtime_propertyhook(clazz, property)))
             
             break;
-    } while (nil != (clazz = apc_class_getSuperclass(clazz)));
+    } while (nil != (clazz = class_getSuperclass(clazz)));
     
     return ret;
 }
@@ -203,6 +203,14 @@ APCPropertyHook* apc_lookup_implementationPropertyhook_inRange(Class from, Class
     return (APCPropertyHook*)0;
 }
 
+__kindof APCHookProperty* apc_lookup_property(Class cls, NSString* property, SEL outlet)
+{
+    apc_runtimelock_reader_t reading(apc_runtimelock);
+    
+    APCPropertyHook* hook = apc_lookup_propertyhook_nolock(cls, property);
+    return ((__kindof APCHookProperty*(*)(id,SEL))objc_msgSend)(hook, outlet);
+}
+
 APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
 {
     apc_runtimelock_reader_t reading(apc_runtimelock);
@@ -242,12 +250,6 @@ void apc_propertyhook_dispose_nolock(APCPropertyHook* hook)
         
         apc_runtime_inherit_dispose(hook.hookclass);
     }
-}
-
-NS_INLINE APCPropertyHook* apc_instance_propertyhook(id instance, NSString* property);
-APCPropertyHook* apc_lookup_instancePropertyhook(APCProxyInstance* instance, NSString* property)
-{
-    return apc_instance_propertyhook(instance, property);
 }
 
 #pragma mark - For class - public
@@ -335,7 +337,7 @@ apc_property_getSuperPropertyList(APCHookProperty* p)
 }
 
 #pragma mark - For instance - private
-static NSMapTable* apc_boundInstanceMapper(id instance)
+static NSMapTable* apc_boundInstanceMapper(APCProxyInstance* instance)
 {
     NSMapTable*         mapper;
     
@@ -356,11 +358,44 @@ static NSMapTable* apc_boundInstanceMapper(id instance)
     return mapper;
 }
 
+NS_INLINE void apc_removeBoundInstanceMapper(APCProxyInstance* instance)
+{
+    @synchronized (instance) {
+        
+        for (APCPropertyHook* hook in [apc_boundInstanceMapper(instance) objectEnumerator]) {
+            
+            hook->_proxyClass = nil;
+        }
+        objc_setAssociatedObject(instance
+                                 , &_keyForAPCInstanceBoundMapper
+                                 , nil
+                                 , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+}
+
 NS_INLINE APCPropertyHook*
-apc_instance_propertyhook(id instance, NSString* property)
+apc_instance_propertyhook(APCProxyInstance* instance, NSString* property)
 {
     return [apc_boundInstanceMapper(instance) objectForKey:property];
 }
+
+__kindof APCHookProperty* apc_lookup_instanceProperty(APCProxyInstance* instance, NSString* property, SEL outlet)
+{
+    @synchronized (instance) {
+        
+        APCPropertyHook* hook = apc_instance_propertyhook(instance, property);
+        return ((__kindof APCHookProperty*(*)(id,SEL))objc_msgSend)(hook, outlet);
+    }
+}
+
+APCPropertyHook* apc_lookup_instancePropertyhook(APCProxyInstance* instance, NSString* property)
+{
+    return
+    apc_object_isProxyInstance(instance)
+    ?   apc_instance_propertyhook(instance, property)
+    :   nil;
+}
+
 #pragma mark - For instance - public
 void apc_instance_setAssociatedProperty(APCProxyInstance* instance, APCHookProperty* p)
 {
@@ -389,12 +424,10 @@ void apc_instance_setAssociatedProperty(APCProxyInstance* instance, APCHookPrope
 
 void apc_instance_removeAssociatedProperty(APCProxyInstance* instance, APCHookProperty* p)
 {
-    if(NO == apc_object_isProxyInstance(instance)){
+    if(YES == apc_object_isProxyInstance(instance)) {
         
-        return;
+        [apc_instance_propertyhook(instance, p->_hooked_name) unbindProperty:p];
     }
-    
-    [apc_instance_propertyhook(instance, p->_hooked_name) unbindProperty:p];
 }
 
 #pragma mark - Proxy class - private
@@ -490,9 +523,11 @@ APCProxyClass apc_instance_unhookFromProxyClass(APCProxyInstance* instance)
             return (APCProxyClass)0;
         }
         [apc_runtime_proxyinstances() removeObject:instance];
+        apc_removeBoundInstanceMapper(instance);
         
         return (APCProxyClass)
         
-        object_setClass(instance, apc_class_unproxyClass(object_getClass(instance)));
+        object_setClass(instance
+                        , apc_class_unproxyClass(object_getClass(instance)));
     }
 }

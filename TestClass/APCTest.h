@@ -22,10 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 \
 + (void)name##__##idx
 
-apc_testfunc(testClassInstanceLazyLoadSimple,0);
-
-
-apc_testfunc(testTriggerFrontNormalInstance, 100);
 @end
 
 NS_ASSUME_NONNULL_END

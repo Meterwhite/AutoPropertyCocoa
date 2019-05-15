@@ -7,6 +7,7 @@
 //
 
 #import "APCTriggerGetterProperty.h"
+#import "apc-objc-extension.h"
 #import "AutoPropertyCocoa.h"
 #import "APCPropertyHook.h"
 #import "APCLazyProperty.h"
@@ -19,7 +20,6 @@
 
 @implementation APCTest
 
-
 + (void)testDemo:(NSUInteger)index
 {
     NSString* fName = _f_map[@(index)];
@@ -31,6 +31,7 @@
     IMP imp = [self methodForSelector:sel];
     ((void(*)(id,SEL))imp)(self,sel);
 }
+
 + (void)testDemoFrom:(NSUInteger)from to:(NSUInteger)to
 {
 
@@ -39,7 +40,6 @@
         [self testDemo:i];
     }
 }
-
 
 static NSMutableDictionary* _f_map;
 + (void)load
@@ -82,25 +82,26 @@ do{\
 }while(0);
 
 
-#pragma mark - demo
+#pragma mark - Demos
 
-apc_testfunc(ClassUnhook,100)
+apc_testfunc(removeMethod,0)
 {
     APC_TEST_CLEAN
     {
-        ///Implementation is replaced and then deleted.
-        [Man apc_lazyLoadForProperty:@key_manDeletedWillCallPerson usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
-            
-            return @(__func__);
-        }];
+        class_removeMethod_APC_OBJC2([Man class], @selector(manDeletedWillCallPerson));
         
-        [Man apc_unbindLazyLoadForProperty:@key_manDeletedWillCallPerson];
+        APCTestInstance(Man, m);
+        NSParameterAssert([m.manDeletedWillCallPerson isEqualToString:@"Person"]);
         
         APCTestInstance(Superman, sm);
-        
-        NSAssert([sm.manDeletedWillCallPerson isEqualToString:@"Person"], @"Fail");
+        NSParameterAssert([sm.manDeletedWillCallPerson isEqualToString:@"Person"]);
     }
-    
+}
+
+
+apc_testfunc(ClassUnhook,100)
+{
+   
     APC_TEST_CLEAN
     {
         ///Unimplemented method, add and delete.
@@ -111,9 +112,88 @@ apc_testfunc(ClassUnhook,100)
         
         [Man apc_unbindLazyLoadForProperty:@key_manObj];
         
-        APCTestInstance(Superman, sm);
+        APCTestInstance(Man, m);
+        NSParameterAssert(m.manObj == nil);
         
-        NSAssert(sm.manDeletedWillCallPerson == nil, @"Fail");
+        APCTestInstance(Superman, sm);
+        NSParameterAssert(sm.manObj == nil);
+    }
+    
+    APC_TEST_CLEAN
+    {
+        ///Repeat bind and unbind
+        [Man apc_lazyLoadForProperty:@key_manObj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            return @"Man0";
+        }];
+        
+        [Man apc_lazyLoadForProperty:@key_manObj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            return @"Man1";
+        }];
+        
+        {
+            APCTestInstance(Man, m);
+            APCTestInstance(Superman, sm);
+            NSParameterAssert([m.manObj isEqualToString:@"Man1"]);
+            NSParameterAssert([sm.manObj isEqualToString:@"Man1"]);
+        }
+        
+        {
+            APCTestInstance(Man, m);
+            APCTestInstance(Superman, sm);
+            [Man apc_unbindLazyLoadForProperty:@key_manObj];
+            NSParameterAssert(m.manObj == nil);
+            NSParameterAssert(sm.manObj == nil);
+        }
+    }
+}
+
+apc_testfunc(InstanceUnhook,101)
+{
+    APC_TEST_CLEAN
+    {
+        APCTestInstance(Man, m);
+        APCTestInstance(Superman, sm);
+        ///Reapt bind.
+        [m apc_lazyLoadForProperty:@key_manObj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            return @"M a n";
+        }];
+        
+        [sm apc_lazyLoadForProperty:@key_manObj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            return @"S u p e r m a n";
+        }];
+        
+        NSParameterAssert([m.manObj isEqualToString:@"M a n"]);
+        NSParameterAssert([sm.manObj isEqualToString:@"S u p e r m a n"]);
+        
+        m.manObj = nil;
+        sm.manObj = nil;
+        
+        [m apc_unbindLazyLoadForProperty:@key_manObj];
+        
+        NSParameterAssert(m.manObj == nil);
+        NSParameterAssert([sm.manObj isEqualToString:@"S u p e r m a n"]);
+    }
+    
+    APC_TEST_CLEAN
+    {
+        APCTestInstance(Man, m);
+        ///Repeat unbind instance
+        [m apc_lazyLoadForProperty:@key_manObj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            return @"M a n";
+        }];
+        
+        NSParameterAssert([m.manObj isEqualToString:@"M a n"]);
+        m.manObj = nil;
+        
+        [m apc_unbindLazyLoadForProperty:@key_manObj];
+        [m apc_unbindLazyLoadForProperty:@key_manObj];
+        
+        NSParameterAssert(m.manObj == nil);
     }
 }
 

@@ -12,6 +12,7 @@
 {
     id _apc_manRealizeToPerson;
 }
+@synthesize manObj = _manObj;
 
 - (id)manRealizeToPerson
 {

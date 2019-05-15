@@ -79,6 +79,16 @@ OBJC_EXPORT APCPropertyHook* _Nullable
 apc_lookup_instancePropertyhook(APCProxyInstance* _Nonnull instance
                                 , NSString* _Nonnull property);
 
+OBJC_EXPORT __kindof APCHookProperty* _Nullable
+apc_lookup_property(Class _Nonnull cls
+                    , NSString* _Nonnull property
+                    , SEL outlet);
+
+OBJC_EXPORT __kindof APCHookProperty*
+apc_lookup_instanceProperty(APCProxyInstance* instance
+                            , NSString* property
+                            , SEL outlet)
+
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
 
