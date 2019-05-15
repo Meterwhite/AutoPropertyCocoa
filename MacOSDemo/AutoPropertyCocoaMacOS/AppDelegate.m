@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "APCTest.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +18,11 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    
+    //    [APCTest testDemoFrom:0 to:100];
+    //    [APCTest testDemoFrom:2 to:10];
+    
+    [APCTest testDemo:911];
 }
 
 

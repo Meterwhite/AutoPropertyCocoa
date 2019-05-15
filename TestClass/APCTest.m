@@ -62,432 +62,61 @@ static NSMutableDictionary* _f_map;
     free(m_list);
 }
 
-#define APC_TEST_CLEANCLASS \
-[APCTest unbindAllClass];
-+ (void)unbindAllClass
+static bool _clearTest;
+
++ (void)openClearTest
 {
-#warning <#message#>
-//    [APCLazyProperty unhookClassAllProperties:[Person class]];
-//    [APCLazyProperty unhookClassAllProperties:[Man class]];
-    
-//    [APCTriggerGetterProperty unhookClassAllProperties:[Person class]];
-//    [APCTriggerGetterProperty unhookClassAllProperties:[Man class]];
+    _clearTest = YES;
 }
++ (void)closeClearTest
+{
+    _clearTest = NO;
+}
+
+#define APC_TEST_CLEAN \
+do{\
+    if(_clearTest){\
+    \
+        apc_unhook_all();\
+    };\
+}while(0);
+
 
 #pragma mark - demo
 
-apc_testfunc(testClassInstanceLazyLoadSimple,0)
+apc_testfunc(ClassUnhook,100)
 {
-    APC_TEST_CLEANCLASS
-    
-    Man* m = [Man new];
-    Man* m2 = [Man new];
-    
-    [Man apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id _Nonnull instance) {
+    APC_TEST_CLEAN
+    {
+        ///Implementation is replaced and then deleted.
+        [Man apc_lazyLoadForProperty:@key_manDeletedWillCallPerson usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            return @(__func__);
+        }];
         
-        return @(999);
-    }];
-    
-    [m apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id _Nonnull instance) {
+        [Man apc_unbindLazyLoadForProperty:@key_manDeletedWillCallPerson];
         
-        return @(111);
-    }];
+        APCTestInstance(Superman, sm);
+        
+        NSAssert([sm.manDeletedWillCallPerson isEqualToString:@"Person"], @"Fail");
+    }
     
-    
-    NSParameterAssert(m2.age == 999);
-    NSParameterAssert(m.age == 111);
+    APC_TEST_CLEAN
+    {
+        ///Unimplemented method, add and delete.
+        [Man apc_lazyLoadForProperty:@key_manObj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            return @"Man";
+        }];
+        
+        [Man apc_unbindLazyLoadForProperty:@key_manObj];
+        
+        APCTestInstance(Superman, sm);
+        
+        NSAssert(sm.manDeletedWillCallPerson == nil, @"Fail");
+    }
 }
 
-apc_testfunc(testClassInstanceLazyLoadSimple,1)
-{
-    APC_TEST_CLEANCLASS
-    
-    Person* p = [Person new];
-    Man* m = [Man new];
-    
-    [Person apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @(999);
-    }];
-    
-    [m apc_lazyLoadForProperty:@"age" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @(111);
-    }];
-    
-    
-    NSParameterAssert(p.age == 999);
-    NSParameterAssert(m.age == 111);
-}
-
-apc_testfunc(testSuperAndSubClass,2)
-{
-    APC_TEST_CLEANCLASS
-    
-    Person* p = [Person new];
-    Man* m = [Man new];
-    
-    [Person apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"Person";
-    }];
-    
-    
-    NSParameterAssert([p.name isEqualToString:@"Person"]);
-    NSParameterAssert([m.name isEqualToString:@"Person"]);
-}
-
-apc_testfunc(testSuperAndSubClass,3)
-{
-    APC_TEST_CLEANCLASS
-    
-    Person*   p = [Person new];
-    Superman* m = [Superman new];
-    
-    [Person apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"Person";
-    }];
-    
-    
-    NSParameterAssert([p.name isEqualToString:@"Person"]);
-    NSParameterAssert([m.name isEqualToString:@"Person"]);
-}
-
-apc_testfunc(testSuperAndSubClass,4)
-{
-    APC_TEST_CLEANCLASS
-    
-    Person* p = [Person new];
-    Man* m = [Man new];
-    
-    [Man apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"Person";
-    }];
-    
-    
-    NSParameterAssert(p.name == nil);
-    NSParameterAssert([m.name isEqualToString:@"Person"]);
-}
-
-apc_testfunc(testSuperAndSubClass,5)
-{
-    APC_TEST_CLEANCLASS
-    
-    Person*     p   = [Person new];
-    Superman*   m   = [Superman new];
-    
-    [Man apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"Person";
-    }];
-    
-    
-    NSParameterAssert(p.name == nil);
-    NSParameterAssert([m.name isEqualToString:@"Person"]);
-}
-
-apc_testfunc(testUnbindDeadCycle,50)
-{
-    APC_TEST_CLEANCLASS
-    
-    Person*     p   = [Person new];
-    Man*        m   = [Man new];
-    Superman*   sm  = [Superman new];
-    
-    [Person apc_lazyLoadForProperty:@"name1" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"Person";
-    }];
-    
-    [Man apc_lazyLoadForProperty:@"name1" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"Man";
-    }];
-    
-    [Superman apc_lazyLoadForProperty:@"name1" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"Superman";
-    }];
-    
-    //Normal
-    NSParameterAssert([p.name1 isEqualToString:@"Person"]);
-    NSParameterAssert([m.name1 isEqualToString:@"Man"]);
-    NSParameterAssert([sm.name1 isEqualToString:@"Superman"]);
-}
-
-apc_testfunc(testUnbindDeadCycleMultThread,51)
-{
-    APC_TEST_CLEANCLASS
-    
-    Superman*   sm  = [Superman new];
-    
-    [Person apc_lazyLoadForProperty:@"name1" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"Person";
-    }];
-    
-    [Man apc_lazyLoadForProperty:@"name1" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"Man";
-    }];
-    
-    [Superman apc_lazyLoadForProperty:@"name1" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"Superman";
-    }];
-    
-    //APCLazyloadOldLoopController.h -> joinLoop: -> count>4 -> error
-    dispatch_queue_t queue = dispatch_queue_create("Lazy-load", DISPATCH_QUEUE_CONCURRENT);
-    
-    dispatch_apply(30000, queue, ^(size_t s) {
-        
-        int i = 100;
-        while (i--) {
-            NSLog(@"%@",sm.name1);
-        }
-    });
-    
-}
-
-apc_testfunc(testTriggerFrontNormalInstance, 100)
-{
-    APC_TEST_CLEANCLASS
-    Person* p = Person.new;
-    Person* p1 = Person.new;
-    [p apc_frontOfPropertyGetter:@"age" bindWithBlock:^(id  _Nonnull instance) {
-        
-        NSLog(@"Afront of age!");
-    }];
-    
-    [p apc_backOfPropertyGetter:@"age" bindWithBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"Abakc of age!");
-    }];
-    
-    [p apc_propertyGetter:@"age" bindUserCondition:^BOOL(id  _Nonnull instance, id  _Nullable value) {
-        
-        if([value unsignedIntegerValue] == 999){
-            return YES;
-        }
-        return NO;
-    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"Auser condition!");
-    }];
-    
-    [p apc_propertyGetter:@"age" bindAccessCountCondition:^BOOL(id  _Nonnull instance, id  _Nullable value, NSUInteger count) {
-        
-        if(count == 1){
-            return YES;
-        }
-        return NO;
-    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"Auser count!");
-    }];
-    //////
-    [p apc_frontOfPropertySetter:@"age" bindWithBlock:^(id  _Nonnull instance) {
-        
-        NSLog(@"front of age!");
-    }];
-    
-    [p apc_backOfPropertySetter:@"age" bindWithBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"bakc of age!");
-    }];
-    
-    [p apc_propertySetter:@"age" bindUserCondition:^BOOL(id  _Nonnull instance, id  _Nullable value) {
-        
-        if([value unsignedIntegerValue] == 999){
-            return YES;
-        }
-        return NO;
-    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"user condition!");
-    }];
-    
-    [p apc_propertySetter:@"age" bindAccessCountCondition:^BOOL(id  _Nonnull instance, id  _Nullable value, NSUInteger count) {
-        
-        if(count == 1){
-            return YES;
-        }
-        return NO;
-    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"user count!");
-    }];
-    
-    NSUInteger age0 = p.age;
-    p.age = 123;
-    NSUInteger age1 = p1.age;
-}
-
-apc_testfunc(testTriggerFrontNormalClass,101)
-{
-    APC_TEST_CLEANCLASS
-    [Person apc_frontOfPropertyGetter:@"age" bindWithBlock:^(id  _Nonnull instance) {
-        
-        NSLog(@"Afront of age!");
-    }];
-    
-    [Person apc_backOfPropertyGetter:@"age" bindWithBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"Abakc of age!");
-    }];
-    
-    [Person apc_propertyGetter:@"age" bindUserCondition:^BOOL(id  _Nonnull instance, id  _Nullable value) {
-        
-        if([value unsignedIntegerValue] == 999){
-            return YES;
-        }
-        return NO;
-    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"Auser condition!");
-    }];
-    
-    [Person apc_propertyGetter:@"age" bindAccessCountCondition:^BOOL(id  _Nonnull instance, id  _Nullable value, NSUInteger count) {
-        
-        if(count == 1){
-            return YES;
-        }
-        return NO;
-    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"Auser count!");
-    }];
-    //////
-    [Person apc_frontOfPropertySetter:@"age" bindWithBlock:^(id  _Nonnull instance) {
-        
-        NSLog(@"front of age!");
-    }];
-    
-    [Person apc_backOfPropertySetter:@"age" bindWithBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"bakc of age!");
-    }];
-    
-    [Person apc_propertySetter:@"age" bindUserCondition:^BOOL(id  _Nonnull instance, id  _Nullable value) {
-        
-        if([value unsignedIntegerValue] == 999){
-            return YES;
-        }
-        return NO;
-    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"user condition!");
-    }];
-    
-    [Person apc_propertySetter:@"age" bindAccessCountCondition:^BOOL(id  _Nonnull instance, id  _Nullable value, NSUInteger count) {
-        
-        if(count == 1){
-            return YES;
-        }
-        return NO;
-    } withBlock:^(id  _Nonnull instance, id  _Nullable value) {
-        
-        NSLog(@"user count!");
-    }];
-    
-    Person* p = [Person new];
-    p.age = 999;
-    NSUInteger age0 = p.age;
-}
-
-//static APCClassMapper* _test_mapper;
-//apc_testfunc(testUnbindDeadCycleMultThread,9000)
-//{
-//    while (0){
-//
-//        APCClassMapper* mapper = [[APCClassMapper alloc] init];
-//        [mapper addClass:[NSMutableString class]];
-//        [mapper addClass:[NSMutableArray class]];
-//        [mapper addClass:[NSMutableDictionary class]];
-//        [mapper addClass:[NSString class]];
-//        [mapper addClass:[NSArray class]];
-//        [mapper addClass:[NSDictionary class]];
-//        [mapper addClass:[NSObject class]];
-//
-//        NSLog(@"%@",mapper);
-//        break;
-//    }
-//
-//    while (1) {
-//
-//        _test_mapper = [[APCClassMapper alloc] init];
-//        [_test_mapper addClass:[NSProxy class]];
-//        [_test_mapper addClass:[NSMutableArray class]];
-//        [_test_mapper addClass:[NSString class]];
-//        [_test_mapper addClass:[NSArray class]];
-//        [_test_mapper addClass:[NSDictionary class]];
-//        [_test_mapper addClass:[NSObject class]];
-//        [_test_mapper addClass:[NSMutableDictionary class]];
-//        [_test_mapper addClass:[NSMutableString class]];
-////        NSLog(@"%@",mapper);
-//        [_test_mapper removeClass:[NSObject class]];
-//
-////        [_test_mapper removeKindOfClass:[NSArray class]];
-//
-//        NSLog(@"%@",_test_mapper);
-//
-//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//
-//            NSLog(@"%@",_test_mapper);
-//        });
-//
-//
-//        break;
-//    }
-//}
 
 
-apc_testfunc(testClassInstanceLazyLoadSimple,911)
-{
-    APC_TEST_CLEANCLASS
-    
-    Man* m = [Man new];
-    
-    [m apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id _Nonnull instance) {
-        
-        return @"FuckAStockMarket";
-    }];
-    
-    [m apc_unbindLazyLoadForProperty:@"name"];
-    
-    
-    NSParameterAssert([m.name isEqualToString:@"init _name"]);
-}
-
-apc_testfunc(testClassInstanceLazyLoadSimple,912)
-{
-//    APCLazyProperty* p = [APCLazyProperty instanceWithProperty:@"name" aClass:[Person class]];
-//    APCPropertyHook* hook = [APCPropertyHook hookWithProperty:p];
-//
-//    [p apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
-//
-//        return APCSuperPerformedAsId(instance);
-//    }];
-    
-    [Person apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
-        
-        id xx = APCSuperPerformedAsId(instance);
-        [instance apc_performUserSuperAsId];
-        
-        return @"In Person";
-    }];
-    
-    [Man apc_lazyLoadForProperty:@"name" usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
-
-        return APCSuperPerformedAsId(instance);
-    }];
-    
-    [Man apc_unbindLazyLoadForProperty:@"name"];
-    
-    
-    Man* m = [Man new];
-    id name = m.name;
-}
 @end

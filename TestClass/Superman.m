@@ -9,5 +9,22 @@
 #import "Superman.h"
 
 @implementation Superman
+{
+    id _apc_supermanRealizeToPerson;
+}
+
+- (id)supermanRealizeToPerson
+{
+    
+    NSLog(@"APCTest << %s << _apc_supermanRealizeToPerson = %@", __func__, _apc_supermanRealizeToPerson);
+    return _apc_supermanRealizeToPerson;
+}
+
+- (void)setSupermanRealizeToPerson:(id)supermanRealizeToPerson
+{
+    
+    NSLog(@"APCTest << %s << _apc_supermanRealizeToPerson = %@", __func__, supermanRealizeToPerson);
+    _apc_supermanRealizeToPerson = supermanRealizeToPerson;
+}
 
 @end

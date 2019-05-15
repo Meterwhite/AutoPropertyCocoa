@@ -109,6 +109,36 @@ NS_INLINE APCPropertyHook* apc_lookup_propertyhook_nolock(Class clazz, NSString*
 }
 
 #pragma mark - For hook - public
+
+void apc_unhook_allClass(void)
+{
+    apc_runtimelock_writer_t writting(apc_runtimelock);
+    
+    NSMapTable* c_map   = apc_runtime_property_classmapper();
+    for (Class iCls in c_map) {
+        
+        for (APCPropertyHook* hook in [[c_map objectForKey:iCls] objectEnumerator]) {
+            
+            ///Ensure that - unhook is without runtimelock.
+            ((void(*)(id,SEL))objc_msgSend)(hook, @selector(unhook));
+        }
+    }
+}
+
+void apc_unhook_allInstance(void)
+{
+    for (id instance in apc_runtime_proxyinstances()) {
+        
+        apc_instance_unhookFromProxyClass(instance);
+    }
+}
+
+void apc_unhook_all(void)
+{
+    apc_unhook_allInstance();
+    apc_unhook_allClass();
+}
+
 APCPropertyHook* apc_lookups_propertyhook(Class clazz, NSString* property)
 {
     
@@ -368,7 +398,7 @@ void apc_instance_removeAssociatedProperty(APCProxyInstance* instance, APCHookPr
 }
 
 #pragma mark - Proxy class - private
-static const char* _apcProxyClassID = ".APCProxyClass+";
+static const char* _apcProxyClassID = "<APCProxyClass>:";
 /** free! */
 NS_INLINE char* apc_instanceProxyClassName(id instance)
 {

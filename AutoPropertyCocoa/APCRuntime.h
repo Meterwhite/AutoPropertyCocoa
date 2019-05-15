@@ -46,6 +46,14 @@ OBJC_EXPORT void
 apc_runtimelock_reading(void(NS_NOESCAPE^ _Nonnull block)(void));
 
 #pragma mark - For hook
+OBJC_EXPORT void
+apc_unhook_all(void);
+
+OBJC_EXPORT void
+apc_unhook_allClass(void);
+
+OBJC_EXPORT void
+apc_unhook_allInstance(void);
 
 OBJC_EXPORT APCPropertyHook*  _Nullable
 apc_lookups_propertyhook(Class  _Nullable cls

@@ -93,7 +93,7 @@ public:
     {
         dispatch_queue_t q
         =
-        dispatch_queue_create("APC_OBJC_Runtimelock_lock", DISPATCH_QUEUE_CONCURRENT);
+        dispatch_queue_create("APCOBJCRuntimelocker::triggerObjcRuntimelockAsync", DISPATCH_QUEUE_CONCURRENT);
         
         dispatch_async(q, ^{
             

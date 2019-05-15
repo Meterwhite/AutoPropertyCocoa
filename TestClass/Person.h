@@ -8,18 +8,64 @@
 
 #import <Foundation/Foundation.h>
 #import "APCScope.h"
-@interface Person : NSObject
 
-@property (nonatomic,copy)NSString* name;
-@property (nonatomic,copy,getter=myGetName1,setter=mySetName1:)NSString* name1;
-@property (nonatomic,copy,getter=myGetName2)NSString*  name2;
-@property (nonatomic,copy,setter=mySetName3:)NSString* name3;
+#define APCTestInstance(...) \
+\
+submacro_apc_concat(APCTestInstance_ , submacro_apc_argcount(__VA_ARGS__))(__VA_ARGS__)
 
-@property (nonatomic,assign)APCRect frame;
-@property (nonatomic,assign,getter=myFrame1,setter=mySetFrame1:)APCRect frame1;
-@property (nonatomic,assign,getter=myGetFrame2)APCRect  frame2;
-@property (nonatomic,assign,setter=mySetFrame3:)APCRect frame3;
+#define APCTestInstance_3(cls,T,var)    cls<T>* var = [cls instanceWithTestingSymbol:__func__]
+#define APCTestInstance_2(cls,var)      cls* var = [cls instanceWithTestingSymbol:__func__]
+#define APCTestInstance_1(cls)          APCTestInstance_2(cls)
+#define APCTestInstance_0()             APCTestInstance_2()
 
-@property (nonatomic,assign)NSUInteger age;
+@interface Person<TestType> : NSObject
+
++ (nonnull instancetype)instanceWithTestingSymbol:(nonnull const char*)symbol;
+
+#define key_obj "obj"
+@property (nonatomic,
+           nullable,strong)             TestType    obj;
+
+#define key_gettersetterobj "gettersetterobj"
+@property (nonatomic,
+           nullable,strong,
+           getter=myGetGettersetterobj,
+           setter=mySetGettersetterobj:)TestType    gettersetterobj;
+
+#define key_getterobj "getterobj"
+@property (nonatomic,
+           nullable,strong,
+           getter=myGetGetterobj)       TestType    getterobj;
+
+#define key_setterobj "setterobj"
+@property (nonatomic,
+           nullable,strong,
+           setter=mySetSetterobj:)      TestType    setterobj;
+
+#define key_objNoIvar "objNoIvar"
+@property (nonatomic,
+           nullable,strong)             TestType    objNoIvar;
+
+#define key_objReadonly "objReadonly"
+@property (nonatomic,
+           nullable,strong,readonly)    TestType    objReadonly;
+
+#define key_manRealizeToPerson "manRealizeToPerson"
+@property (nonatomic,
+           nullable,strong)             TestType    manRealizeToPerson;
+
+#define key_supermanRealizeToPerson "supermanRealizeToPerson"
+@property (nonatomic,
+           nullable,strong)             TestType    supermanRealizeToPerson;
+
+#define key_objCopy "objCopy"
+@property (nonatomic,
+           nullable,copy)               TestType    objCopy;
+
+#define key_rectValue "rectValue"
+@property (assign)                      APCRect     rectValue;
+
+#define key_intValue "intValue"
+@property (assign)                      NSUInteger  intValue;
 @end
 

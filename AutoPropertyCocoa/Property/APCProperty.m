@@ -334,7 +334,6 @@
 - (void)invalid
 {
     _enable      = NO;
-    APCMemoryBarrier;
     atomic_store(&_accessCount, 0);
 }
 

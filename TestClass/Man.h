@@ -8,8 +8,15 @@
 
 #import "Person.h"
 
+@interface Man<TestType> : Person
 
-@interface Man : Person
+#define key_manDeletedWillCallPerson "manDeletedWillCallPerson"
+///superman called.
+@property (nonatomic,nullable,copy)NSString*  manDeletedWillCallPerson;
+
+#define key_manObj "manObj"
+@property (nonatomic,nullable,strong)TestType  manObj;
+
 
 @end
 

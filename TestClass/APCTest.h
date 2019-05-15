@@ -12,12 +12,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface APCTest : NSObject
 
++ (void)openClearTest;
++ (void)closeClearTest;
+
 + (void)testDemo:(NSUInteger)index;
 + (void)testDemoFrom:(NSUInteger)from to:(NSUInteger)to;
 
 #define apc_testfunc(name,idx)\
 \
-+ (void)name##_##idx
++ (void)name##__##idx
 
 apc_testfunc(testClassInstanceLazyLoadSimple,0);
 
