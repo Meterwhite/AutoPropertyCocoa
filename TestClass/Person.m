@@ -140,10 +140,8 @@
 - (void)dealloc
 {
     NSLog(@"%s/%@/dealloc : %p",_testingSymbol,NSStringFromClass([self class]), self);
-    Class cls = apc_object_hookWithProxyClass(self);
-    objc_disposeClassPair(cls);
-//    _objc_flush_caches([NSObject class]);
-//    _objc_flush_caches([APCPropertyHook class]);
+//    Class cls = apc_object_hookWithProxyClass(self);
+//    objc_disposeClassPair(cls);
 }
 
 - (NSString *)manDeletedWillCallPerson

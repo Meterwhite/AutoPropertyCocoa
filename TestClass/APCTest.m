@@ -263,7 +263,7 @@ APC_TEST_DEMO(InstanceLazyload,103)
         
         {
 //            NSParameterAssert(m.objCopy == nil);
-            NSParameterAssert([m.arrayValue isKindOfClass:[NSArray class]] && m.arrayValue.count == 0);
+//            NSParameterAssert([m.arrayValue isKindOfClass:[NSArray class]] && m.arrayValue.count == 0);
             NSParameterAssert([m.gettersetterobj isEqualToString:@"gettersetterobj"]);
 //            NSParameterAssert([m.getterobj isEqualToString:@"getterobj"]);
 //            NSParameterAssert([m.setterobj isEqualToString:@"setterobj"]);

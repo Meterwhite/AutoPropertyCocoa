@@ -38,9 +38,9 @@
 /**
  Result is a valid property.
  */
-@property (nullable,nonatomic,strong,readonly) APCTriggerGetterProperty* getterTrigger;
-@property (nullable,nonatomic,strong,readonly) APCTriggerSetterProperty* setterTrigger;
-@property (nullable,nonatomic,strong,readonly) APCLazyProperty* lazyload;
+@property (nullable,nonatomic,weak,readonly) APCTriggerGetterProperty* getterTrigger;
+@property (nullable,nonatomic,weak,readonly) APCTriggerSetterProperty* setterTrigger;
+@property (nullable,nonatomic,weak,readonly) APCLazyProperty* lazyload;
 
 @property (nonnull,nonatomic,readonly) Class sourceclass;
 @property (nonnull,nonatomic,readonly) Class hookclass;

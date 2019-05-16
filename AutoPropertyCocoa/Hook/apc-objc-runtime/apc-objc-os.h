@@ -6,6 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#include <Foundation/Foundation.h>
 #include <pthread.h>
 
 class apc_nocopy_t {

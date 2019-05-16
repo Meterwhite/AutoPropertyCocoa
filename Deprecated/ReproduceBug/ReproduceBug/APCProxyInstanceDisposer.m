@@ -7,14 +7,14 @@
 //
 
 #import "APCProxyInstanceDisposer.h"
-#import "APCRuntime.h"
+#import <objc/runtime.h>
 
 @implementation APCProxyInstanceDisposer
 {
-    APCProxyClass _class;
+    Class _class;
 }
 
-- (instancetype)initWithClass:(APCProxyClass)clazz
+- (instancetype)initWithClass:(Class)clazz
 {
     self = [super init];
     if (self) {
@@ -28,11 +28,9 @@
 {
     if(_class){
         
-        if(YES == apc_class_conformsProxyClass(_class)){
-            
-            APCDlog(@"Diposer : %@", NSStringFromClass(_class));
-            objc_disposeClassPair(_class);
-        }
+        NSLog(@"Diposer : %@", NSStringFromClass(_class));
+        objc_disposeClassPair(_class);
+        
     }
 }
 

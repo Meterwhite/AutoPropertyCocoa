@@ -458,10 +458,11 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
                             , NSSelectorFromString(_hookMethod)
                             , _new_implementation
                             , _methodTypeEncoding);
+        APCDlog(@"_proxyClass << %p",_proxyClass);
     }
     
     if(!apc_contains_objcruntimelock()){
-        
+#warning what ?
         IMP cmp = (_methodStyle == APCMethodGetterStyle)
         ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
         : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);

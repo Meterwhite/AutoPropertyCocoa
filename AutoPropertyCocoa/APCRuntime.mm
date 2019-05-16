@@ -44,7 +44,7 @@ static NSMapTable*          _apc_runtime_property_classmapper;
 /** (weak)ThreadID : (weak)Instance : (strong)CMDs*/
 static NSMapTable*          _apc_object_hookRecursiveMapper;
 static APCClassMapper*      _apc_runtime_inherit_map;
-static NSMapTable*         _apc_runtime_proxyinstances;
+static NSMapTable*          _apc_runtime_proxyinstances;
 
 
 static NSMapTable* apc_runtime_property_classmapper()
@@ -552,7 +552,12 @@ void apc_instance_unhookFromProxyClass(APCProxyInstance* instance)
         object_setClass(instance
                         , apc_class_unproxyClass(object_getClass(instance)));
         
-        apc_removeBoundInstanceMapper(instance);
-        [apc_runtime_proxyinstances() removeObjectForKey:instance];
+//        apc_removeBoundInstanceMapper(instance);
+//        [apc_runtime_proxyinstances() removeObjectForKey:instance];
     }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        
+         [apc_runtime_proxyinstances() removeAllObjects];
+    });
 }
