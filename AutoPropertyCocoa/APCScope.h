@@ -104,7 +104,7 @@ FOUNDATION_EXPORT NSString *const APCProgramingType_longlong;
 FOUNDATION_EXPORT NSString *const APCProgramingType_unsignedlonglong;
 FOUNDATION_EXPORT NSString *const APCProgramingType_float;
 FOUNDATION_EXPORT NSString *const APCProgramingType_double;
-FOUNDATION_EXPORT NSString *const APCProgramingType_bool;
+FOUNDATION_EXPORT NSString *const APCProgramingType_Bool;
 
 static inline void APCBoxedInvokeBasicValueSetterIMP(id _SELF,SEL _CMD,IMP imp,const char* encode, id arg)
 {

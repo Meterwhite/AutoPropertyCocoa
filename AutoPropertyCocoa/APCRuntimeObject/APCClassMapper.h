@@ -17,12 +17,12 @@
 - (BOOL)containsClass:(nonnull Class)cls;
 
 /**
- Must first check if the type exists.
+ Must first check if the Class exists.
  */
 - (void)addClass:(nonnull Class)cls;
 
 /**
- Must first check if the type exists.
+ Must first check if the Class exists.
  */
 - (void)removeClass:(nonnull Class)cls;
 

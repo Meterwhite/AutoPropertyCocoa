@@ -7,6 +7,7 @@
 //
 
 #import "APCTriggerGetterProperty.h"
+#import "NSObject+APCExtension.h"
 #import "apc-objc-extension.h"
 #import "AutoPropertyCocoa.h"
 #import "APCPropertyHook.h"
@@ -84,7 +85,7 @@ do{\
 
 #pragma mark - Demos
 
-apc_testfunc(removeMethod,0)
+APC_TEST_DEMO(removeMethod,0)
 {
     APC_TEST_CLEAN
     {
@@ -99,7 +100,7 @@ apc_testfunc(removeMethod,0)
 }
 
 
-apc_testfunc(ClassUnhook,100)
+APC_TEST_DEMO(ClassUnhook,100)
 {
    
     APC_TEST_CLEAN
@@ -149,7 +150,7 @@ apc_testfunc(ClassUnhook,100)
     }
 }
 
-apc_testfunc(InstanceUnhook,101)
+APC_TEST_DEMO(InstanceUnhook,101)
 {
     APC_TEST_CLEAN
     {
@@ -197,6 +198,89 @@ apc_testfunc(InstanceUnhook,101)
     }
 }
 
+APC_TEST_DEMO(ClassLazyload,102)
+{
+    APC_TEST_CLEAN
+    {
+        [Man apc_lazyLoadForProperty:@key_arrayValue selector:@selector(array)];
+        [Man apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            return @"gettersetterobj";
+        }];
+        
+        [Man apc_lazyLoadForProperty:@key_getterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            return @"getterobj";
+        }];
+        
+        [Man apc_lazyLoadForProperty:@key_setterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            return @"setterobj";
+        }];
+        
+        {
+            APCTestInstance(Man, m);
+            
+            NSParameterAssert(m.objCopy == nil);
+            NSParameterAssert([m.arrayValue isKindOfClass:[NSArray class]] && m.arrayValue.count == 0);
+            NSParameterAssert([m.gettersetterobj isEqualToString:@"gettersetterobj"]);
+            NSParameterAssert([m.getterobj isEqualToString:@"getterobj"]);
+            NSParameterAssert([m.setterobj isEqualToString:@"setterobj"]);
+        }
+        
+        {
+            APCTestInstance(Superman, m);
+            
+            NSParameterAssert(m.objCopy == nil);
+            NSParameterAssert([m.arrayValue isKindOfClass:[NSArray class]] && m.arrayValue.count == 0);
+            NSParameterAssert([m.gettersetterobj isEqualToString:@"gettersetterobj"]);
+            NSParameterAssert([m.getterobj isEqualToString:@"getterobj"]);
+            NSParameterAssert([m.setterobj isEqualToString:@"setterobj"]);
+        }
+    }
+}
+
+APC_TEST_DEMO(InstanceLazyload,103)
+{
+    APC_TEST_CLEAN
+    {
+        APCTestInstance(Man, m);
+        [m apc_lazyLoadForProperty:@key_arrayValue selector:@selector(array)];
+        [m apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+
+            return @"gettersetterobj";
+        }];
+//
+//        [m apc_lazyLoadForProperty:@key_getterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+//
+//            return @"getterobj";
+//        }];
+//
+//        [m apc_lazyLoadForProperty:@key_setterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+//
+//            return @"setterobj";
+//        }];
+        
+        {
+//            NSParameterAssert(m.objCopy == nil);
+            NSParameterAssert([m.arrayValue isKindOfClass:[NSArray class]] && m.arrayValue.count == 0);
+            NSParameterAssert([m.gettersetterobj isEqualToString:@"gettersetterobj"]);
+//            NSParameterAssert([m.getterobj isEqualToString:@"getterobj"]);
+//            NSParameterAssert([m.setterobj isEqualToString:@"setterobj"]);
+        }
+        m.arrayValue = nil;
+        m.gettersetterobj = nil;
+        apc_instance_unhookFromProxyClass(m);
+        
+        {
+            NSParameterAssert(m.arrayValue == nil);
+            NSParameterAssert(m.gettersetterobj == nil);
+        }
+        
+        
+        printf("K");
+    }
+}
 
 
 @end

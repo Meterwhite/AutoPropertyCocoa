@@ -19,7 +19,7 @@
     [self apc_classSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:nil];
 }
 
-+ (void)apc_lazyLoadForProperty:(NSString *)property initializeSelector:(SEL)selector
++ (void)apc_lazyLoadForProperty:(NSString *)property selector:(SEL)selector
 {
     [self apc_classSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:selector];
 }
@@ -94,7 +94,10 @@
     if(p == nil){
         
         p = [APCLazyProperty instanceWithProperty:property aInstance:self];
-        apc_object_hookWithProxyClass(self);
+        if(NO == apc_object_isProxyInstance(self)){
+            
+            apc_object_hookWithProxyClass(self);
+        }
         apc_instance_setAssociatedProperty(self, p);
     }
     

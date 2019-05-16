@@ -29,7 +29,7 @@
 {
 @public
     __kindof APCMethodHook* _superhook;
-    APCProxyClass           _proxyClass;
+
 }
 
 + (nullable instancetype)hookWithProperty:(nonnull __kindof APCHookProperty*)property;

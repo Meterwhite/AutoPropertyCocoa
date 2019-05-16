@@ -6,6 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#include "APCProxyInstanceDisposer.h"
 #include "apc-objc-runtimelock.h"
 #include "APCPropertyHook.h"
 #include "APCClassMapper.h"
@@ -14,6 +15,8 @@
 #include "APCRuntime.h"
 #include "APCScope.h"
 
+#pragma mark - Private
+static SEL _apc_message_unhook = @selector(unhook);
 
 #pragma mark - For lock - private
 
@@ -41,7 +44,7 @@ static NSMapTable*          _apc_runtime_property_classmapper;
 /** (weak)ThreadID : (weak)Instance : (strong)CMDs*/
 static NSMapTable*          _apc_object_hookRecursiveMapper;
 static APCClassMapper*      _apc_runtime_inherit_map;
-static NSHashTable*         _apc_runtime_proxyinstances;
+static NSMapTable*         _apc_runtime_proxyinstances;
 
 
 static NSMapTable* apc_runtime_property_classmapper()
@@ -89,17 +92,29 @@ static void apc_runtime_inherit_dispose(Class cls)
         [map removeClass:cls];
 }
 
-static NSHashTable* apc_runtime_proxyinstances()
+//static NSHashTable* apc_runtime_proxyinstances()
+//{
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//        _apc_runtime_proxyinstances = [NSHashTable weakObjectsHashTable];
+//    });
+//    return _apc_runtime_proxyinstances;
+//}
+
+/**
+ instance : disposer
+ */
+static NSMapTable* apc_runtime_proxyinstances()
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _apc_runtime_proxyinstances = [NSHashTable weakObjectsHashTable];
+        _apc_runtime_proxyinstances = [NSMapTable weakToStrongObjectsMapTable];
     });
     return _apc_runtime_proxyinstances;
 }
 
 
-NS_INLINE APCPropertyHook* apc_lookup_propertyhook_nolock(Class clazz, NSString* property)
+NS_INLINE APCPropertyHook* apc_getPropertyhook_nolock(Class clazz, NSString* property)
 {
     if(clazz == nil){
         
@@ -120,7 +135,7 @@ void apc_unhook_allClass(void)
         for (APCPropertyHook* hook in [[c_map objectForKey:iCls] objectEnumerator]) {
             
             ///Ensure that - unhook is without runtimelock.
-            ((void(*)(id,SEL))objc_msgSend)(hook, @selector(unhook));
+            ((void(*)(id,SEL))objc_msgSend)(hook, _apc_message_unhook);
         }
     }
 }
@@ -139,7 +154,7 @@ void apc_unhook_all(void)
     apc_unhook_allClass();
 }
 
-APCPropertyHook* apc_lookups_propertyhook(Class clazz, NSString* property)
+APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
 {
     
     if(clazz == nil){
@@ -159,7 +174,7 @@ APCPropertyHook* apc_lookups_propertyhook(Class clazz, NSString* property)
     return ret;
 }
 
-APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
+APCPropertyHook* apc_getPropertyhook(Class clazz, NSString* property)
 {
     if(clazz == nil){
         
@@ -207,7 +222,7 @@ __kindof APCHookProperty* apc_lookup_property(Class cls, NSString* property, SEL
 {
     apc_runtimelock_reader_t reading(apc_runtimelock);
     
-    APCPropertyHook* hook = apc_lookup_propertyhook_nolock(cls, property);
+    APCPropertyHook* hook = apc_getPropertyhook_nolock(cls, property);
     return ((__kindof APCHookProperty*(*)(id,SEL))objc_msgSend)(hook, outlet);
 }
 
@@ -259,6 +274,19 @@ Class apc_class_getSuperclass(Class cls)
     return [apc_runtime_inherit_map() superclassOfClass:cls];
 }
 
+void apc_class_unhook(Class cls)
+{
+    apc_runtimelock_writer_t writting(apc_runtimelock);
+    
+    NSMutableDictionary*dictionary = [apc_runtime_property_classmapper() objectForKey:cls];
+    if(dictionary == nil) return;
+    
+    for (APCPropertyHook* iHook in dictionary) {
+        
+        ((void(*)(id,SEL))objc_msgSend)(iHook, _apc_message_unhook);
+    }
+}
+
 void apc_registerProperty(APCHookProperty* p)
 {
     apc_runtimelock_writer_t writting(apc_runtimelock);
@@ -286,14 +314,14 @@ void apc_registerProperty(APCHookProperty* p)
     dictionary[p->_hooked_name] = hook;
     
     ///Update superhook
-    hook->_superhook = apc_lookup_propertyhook_nolock(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
+    hook->_superhook = apc_getPropertyhook_nolock(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
     
     ///Subhook
     for (Class itCls in apc_runtime_property_classmapper()) {
 
         if(apc_class_getSuperclass(itCls) ==  p->_des_class){
             
-            if(nil != (itHook = apc_lookup_propertyhook_nolock(itCls, p->_hooked_name))){
+            if(nil != (itHook = apc_getPropertyhook_nolock(itCls, p->_hooked_name))){
                 
                 itHook->_superhook = hook;
             }
@@ -337,6 +365,10 @@ apc_property_getSuperPropertyList(APCHookProperty* p)
 }
 
 #pragma mark - For instance - private
+
+/**
+ property : hook
+ */
 static NSMapTable* apc_boundInstanceMapper(APCProxyInstance* instance)
 {
     NSMapTable*         mapper;
@@ -360,16 +392,21 @@ static NSMapTable* apc_boundInstanceMapper(APCProxyInstance* instance)
 
 NS_INLINE void apc_removeBoundInstanceMapper(APCProxyInstance* instance)
 {
+    
     @synchronized (instance) {
         
-        for (APCPropertyHook* hook in [apc_boundInstanceMapper(instance) objectEnumerator]) {
+        //        for (APCPropertyHook* hook in [apc_boundInstanceMapper(instance) objectEnumerator]) {
+        //
+        //            hook->_proxyClass = nil;
+        //        }
+        @autoreleasepool {
             
-            hook->_proxyClass = nil;
+            [apc_boundInstanceMapper(instance) removeAllObjects];
+            objc_setAssociatedObject(instance
+                                     , &_keyForAPCInstanceBoundMapper
+                                     , nil
+                                     , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
-        objc_setAssociatedObject(instance
-                                 , &_keyForAPCInstanceBoundMapper
-                                 , nil
-                                 , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
 }
 
@@ -468,17 +505,9 @@ Class apc_class_unproxyClass(APCProxyClass cls)
     return (Class)0;
 }
 
-void apc_class_disposeProxyClass(APCProxyClass cls)
-{
-    if(YES == apc_class_conformsProxyClass(cls)){
-        
-        objc_disposeClassPair(cls);
-    }
-}
-
 BOOL apc_object_isProxyInstance(id instance)
 {
-    return [apc_runtime_proxyinstances() containsObject:instance];
+    return [apc_runtime_proxyinstances() objectForKey:instance] != nil;
 }
 
 APCProxyClass apc_instance_getProxyClass(APCProxyInstance* instance)
@@ -493,7 +522,7 @@ APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
 {
     @synchronized (instance) {
         
-        if(YES == [apc_runtime_proxyinstances() containsObject:instance]){
+        if(nil != [apc_runtime_proxyinstances() objectForKey:instance]){
             
             return object_getClass(instance);
         }
@@ -502,9 +531,10 @@ APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
         APCProxyClass   cls  = objc_allocateClassPair(object_getClass(instance), name, 0);
         if(cls != nil){
             
+            [apc_runtime_proxyinstances() setObject:[[APCProxyInstanceDisposer alloc] initWithClass:cls] forKey:instance];
             objc_registerClassPair(cls);
             object_setClass(instance, cls);
-            [apc_runtime_proxyinstances() addObject:instance];
+            
         }else if (nil == (cls = objc_getClass(name))){
             
             fprintf(stderr, "APC: Can not register class '%s' in runtime.",name);
@@ -514,20 +544,15 @@ APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
     }
 }
 
-APCProxyClass apc_instance_unhookFromProxyClass(APCProxyInstance* instance)
+void apc_instance_unhookFromProxyClass(APCProxyInstance* instance)
 {
+    
     @synchronized (instance) {
-        
-        if(NO == apc_object_isProxyInstance(instance)){
-            
-            return (APCProxyClass)0;
-        }
-        [apc_runtime_proxyinstances() removeObject:instance];
-        apc_removeBoundInstanceMapper(instance);
-        
-        return (APCProxyClass)
         
         object_setClass(instance
                         , apc_class_unproxyClass(object_getClass(instance)));
+        
+        apc_removeBoundInstanceMapper(instance);
+        [apc_runtime_proxyinstances() removeObjectForKey:instance];
     }
 }

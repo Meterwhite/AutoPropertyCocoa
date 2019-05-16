@@ -56,13 +56,16 @@ dispatch_semaphore_signal(_lock);
     APC_CLASS_MAPPER_LOCK;
     @autoreleasepool {
         
-        NSEnumerator<APCClassInheritanceNode*>*e;
-        APCClassInheritanceNode*            n_curr;
-        APCClassInheritanceNode*            n_next;
-        NSArray<APCClassInheritanceNode*>*  iNodes;
-        APCClassInheritanceNode*            iNode;
-        NSArray*                            others;
-        APCClassInheritanceNode*            newNode = [APCClassInheritanceNode nodeWithClass:cls];
+        NSArray<APCClassInheritanceNode*>*      iNodes;
+        APCClassInheritanceNode*                n_curr;
+        APCClassInheritanceNode*                n_next;
+        NSArray*                                others;
+        APCClassInheritanceNode*                iNode;
+        NSEnumerator<APCClassInheritanceNode*>* e;
+        
+        APCClassInheritanceNode*                newNode
+        =
+        [APCClassInheritanceNode nodeWithClass:cls];
         if(_tree.isEmpty){
             
             _tree.root = newNode;

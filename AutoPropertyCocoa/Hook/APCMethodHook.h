@@ -13,10 +13,6 @@
 
 @protocol APCMethodHookProtocol <NSObject>
 
-@required
-- (void)disposeRuntimeResource;
-
-
 @optional
 - (nullable __kindof APCMethodHook*)superhook;
 - (nullable Class)hookclass;

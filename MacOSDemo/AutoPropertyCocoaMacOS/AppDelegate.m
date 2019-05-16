@@ -20,8 +20,9 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
 
-    [APCTest testDemo:0];
-    [APCTest testDemo:101];
+//    [APCTest testDemo:0];
+//    [APCTest testDemo:101];
+    [APCTest testDemo:103];
 }
 
 

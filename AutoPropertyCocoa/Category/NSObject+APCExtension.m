@@ -22,23 +22,21 @@
     return [self class];
 }
 
-- (void)apc_performUserSuperAsVoid
+- (void)apc_instanceUnbind
 {
-    
+    if(YES == apc_object_isProxyInstance(self)){
+        
+        apc_instance_unhookFromProxyClass(self);
+    }
 }
 
-- (void)apc_performUserSuperAsVoidWithObject:(id)object
++ (void)apc_classUnbind
 {
-    
+    apc_class_unhook(self);
 }
 
-- (BOOL)apc_performUserSuperAsBOOLWithObject:(id)object
-{
-    return NO;
-}
-
-- (nullable id)apc_performUserSuperAsId
-{
-    return nil;
-}
+- (BOOL)apc_performUserSuperAsBOOLWithObject:(id)object{return NO;}
+- (void)apc_performUserSuperAsVoidWithObject:(id)object{}
+- (nullable id)apc_performUserSuperAsId{return nil;}
+- (void)apc_performUserSuperAsVoid{}
 @end

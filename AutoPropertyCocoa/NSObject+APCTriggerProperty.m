@@ -179,7 +179,7 @@
     
     APCPropertyHook* hook
     =
-    apc_lookup_propertyhook(self, property);
+    apc_getPropertyhook(self, property);
     
     __kindof APCHookProperty* p = hook.getterTrigger;
     if(option & APCPropertyTriggerOfGetter){

@@ -18,7 +18,7 @@
                      usingBlock:(id _Nullable(^ _Nonnull)(id_apc_t _Nonnull instance))block;
 
 + (void)apc_lazyLoadForProperty:(nonnull NSString*)property
-             initializeSelector:(nonnull SEL)selector;
+             selector:(nonnull SEL)selector;
 
 + (void)apc_lazyLoadForPropertyHooks:(nonnull NSDictionary<NSString*,id>*)propertyHooks;
 

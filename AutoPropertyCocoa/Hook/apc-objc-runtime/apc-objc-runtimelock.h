@@ -23,6 +23,14 @@ submacro_apc_keywordify \
 \
 apc_objcruntimelock_lock(^()__VA_ARGS__)
 
+#if DEBUG
+#define APCTestCloseOBJCRuntimelock() apc_objcruntimelock_testing_delete()
+#define APCTestOpenOBJCRuntimelock() apc_objcruntimelock_testing_create()
+#else
+#define APCTestCloseOBJCRuntimelock()
+#define APCTestOpenOBJCRuntimelock()
+#endif
+
 
 /**
  This is a necessary step to get runtimelock,which allows APC to actually delete a method at runtime.
@@ -44,11 +52,13 @@ OBJC_EXPORT void
 apc_objcruntimelock_lock(void(NS_NOESCAPE^userblock)(void));
 
 #if DEBUG
+
 OBJC_EXPORT void
 apc_objcruntimelock_testing_delete(void);
 
 OBJC_EXPORT void
 apc_objcruntimelock_testing_create(void);
+
 #endif
 
 

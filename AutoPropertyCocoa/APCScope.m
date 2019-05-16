@@ -20,6 +20,6 @@ NSString *const  APCProgramingType_longlong          =   @"long long";
 NSString *const  APCProgramingType_unsignedlonglong  =   @"unsigned long long";
 NSString *const  APCProgramingType_float             =   @"float";
 NSString *const  APCProgramingType_double            =   @"double";
-NSString *const  APCProgramingType_bool              =   @"bool";
+NSString *const  APCProgramingType_Bool              =   @"_Bool";
 
 #endif

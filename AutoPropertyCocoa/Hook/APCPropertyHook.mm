@@ -25,7 +25,7 @@ id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
     if(YES == apc_object_isProxyInstance(_SELF)){
         
         hook = apc_lookup_instancePropertyhook(_SELF, cmdstr);
-    }else if(nil == (hook = apc_lookups_propertyhook(object_getClass(_SELF), cmdstr))){
+    }else if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
         
         @throw
         
@@ -105,7 +105,7 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
     if(YES == apc_object_isProxyInstance(_SELF)){
         
         hook = apc_lookup_instancePropertyhook(_SELF, cmdstr);
-    }else if(nil == (hook = apc_lookups_propertyhook(object_getClass(_SELF), cmdstr))){
+    }else if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
         
         @throw
         
@@ -222,6 +222,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     APCMethodStyle          _methodStyle;
     APCAtomicPtr            _getterTrigger;
     APCAtomicPtr            _setterTrigger;
+//    APCProxyClass           _proxyClass;
     APCAtomicPtr            _lazyload;
     __weak id               _instance;
 }
@@ -440,7 +441,9 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
                             , _methodTypeEncoding);
     }else{
         
+#warning ...
         ///APCPropertyOwnerKindOfInstance
+        APCProxyClass _proxyClass;
         if(NO == apc_object_isProxyInstance(_instance)){
             
             _proxyClass = apc_object_hookWithProxyClass(_instance);
@@ -506,7 +509,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         {
             if(YES == apc_object_isProxyInstance(_instance))
             {
-                apc_class_disposeProxyClass(apc_instance_unhookFromProxyClass(_instance));
+                apc_instance_unhookFromProxyClass(_instance);
             }
         }
     }
@@ -586,36 +589,24 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)dealloc
 {
-    _instance = nil;
-    
     if(_lazyload != nil){
         
         CFRelease(_lazyload);
+        atomic_store(&_lazyload, NULL);
     }
     
     if(_getterTrigger != nil){
         
         CFRelease(_getterTrigger);
+        atomic_store(&_getterTrigger, NULL);
     }
     
     if(_setterTrigger != nil){
         
         CFRelease(_setterTrigger);
+        atomic_store(&_setterTrigger, NULL);
     }
-    
-    if(_kindOfOwner == APCPropertyOwnerKindOfInstance){
-        
-        [self disposeRuntimeResource];
-    }
+    APCDlog(@"Hook dealoc: %p", self);
 }
 
-- (void)disposeRuntimeResource
-{
-    if(_proxyClass != nil){
-        
-        APCDlog(@"disposeRuntimeResource : %@",NSStringFromClass(_proxyClass));
-        apc_class_disposeProxyClass(_proxyClass);
-        _proxyClass = nil;
-    }
-}
 @end

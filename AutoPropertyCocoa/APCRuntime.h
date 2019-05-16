@@ -56,12 +56,12 @@ OBJC_EXPORT void
 apc_unhook_allInstance(void);
 
 OBJC_EXPORT APCPropertyHook*  _Nullable
-apc_lookups_propertyhook(Class  _Nullable cls
+apc_lookup_propertyhook(Class  _Nullable cls
                         , NSString* _Nonnull property);
 
 OBJC_EXPORT APCPropertyHook*  _Nullable
-apc_lookup_propertyhook(Class  _Nullable cls
-                        , NSString* _Nonnull property);
+apc_getPropertyhook(Class  _Nullable cls
+                    , NSString* _Nonnull property);
 
 /** The second parameter 'to' is include. */
 OBJC_EXPORT APCPropertyHook* _Nullable
@@ -82,12 +82,12 @@ apc_lookup_instancePropertyhook(APCProxyInstance* _Nonnull instance
 OBJC_EXPORT __kindof APCHookProperty* _Nullable
 apc_lookup_property(Class _Nonnull cls
                     , NSString* _Nonnull property
-                    , SEL outlet);
+                    , SEL _Nonnull outlet);
 
-OBJC_EXPORT __kindof APCHookProperty*
-apc_lookup_instanceProperty(APCProxyInstance* instance
-                            , NSString* property
-                            , SEL outlet)
+OBJC_EXPORT __kindof APCHookProperty* _Nullable
+apc_lookup_instanceProperty(APCProxyInstance* _Nonnull instance
+                            , NSString* _Nonnull property
+                            , SEL _Nonnull outlet);
 
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
@@ -111,6 +111,9 @@ apc_registerProperty(APCHookProperty* _Nonnull p);
 OBJC_EXPORT Class _Nullable
 apc_class_getSuperclass(Class _Nonnull cls);
 
+OBJC_EXPORT void
+apc_class_unhook(Class _Nonnull cls);
+
 #pragma mark - For instance
 
 OBJC_EXPORT void
@@ -126,9 +129,6 @@ apc_instance_removeAssociatedProperty(APCProxyInstance* _Nonnull instance
 OBJC_EXPORT BOOL
 apc_class_conformsProxyClass(Class _Nonnull cls);
 
-OBJC_EXPORT void
-apc_class_disposeProxyClass(APCProxyClass _Nonnull cls);
-
 OBJC_EXPORT Class _Nullable
 apc_class_unproxyClass(APCProxyClass _Nonnull cls);
 
@@ -138,7 +138,7 @@ apc_instance_getProxyClass(APCProxyInstance* _Nonnull instance);
 OBJC_EXPORT APCProxyClass _Nonnull
 apc_object_hookWithProxyClass(id _Nonnull instance);
 
-OBJC_EXPORT APCProxyClass _Nullable
+OBJC_EXPORT void
 apc_instance_unhookFromProxyClass(APCProxyInstance* _Nonnull instance);
 
 OBJC_EXPORT BOOL

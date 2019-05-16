@@ -67,5 +67,9 @@ submacro_apc_concat(APCTestInstance_ , submacro_apc_argcount(__VA_ARGS__))(__VA_
 
 #define key_intValue "intValue"
 @property (assign)                      NSUInteger  intValue;
+
+#define key_arrayValue "arrayValue"
+@property (nonatomic,
+           nullable,strong)             NSArray*    arrayValue;
 @end
 

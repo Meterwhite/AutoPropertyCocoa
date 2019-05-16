@@ -15,6 +15,8 @@
  Get the original class of the instance that has been bound property.
  */
 - (nonnull Class)apc_originalClass;
+- (void)apc_instanceUnbind;
++ (void)apc_classUnbind;
 
 - (BOOL)apc_performUserSuperAsBOOLWithObject:(nullable id)object;
 - (void)apc_performUserSuperAsVoidWithObject:(nullable id)object;

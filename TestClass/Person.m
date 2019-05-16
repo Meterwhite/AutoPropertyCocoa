@@ -6,6 +6,10 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "AutoPropertyCocoa.h"
+#import "APCPropertyHook.h"
+#import <objc/runtime.h>
+#import "APCRuntime.h"
 #import "Person.h"
 
 @implementation Person
@@ -136,6 +140,10 @@
 - (void)dealloc
 {
     NSLog(@"%s/%@/dealloc : %p",_testingSymbol,NSStringFromClass([self class]), self);
+    Class cls = apc_object_hookWithProxyClass(self);
+    objc_disposeClassPair(cls);
+//    _objc_flush_caches([NSObject class]);
+//    _objc_flush_caches([APCPropertyHook class]);
 }
 
 - (NSString *)manDeletedWillCallPerson

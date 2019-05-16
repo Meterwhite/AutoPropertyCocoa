@@ -189,7 +189,7 @@
             _kindOfValue = APCPropertyValueKindOfNumber;
         }else if ([code isEqualToString:@"B"]){
             //bool
-            _programmingType = APCProgramingType_bool;
+            _programmingType = APCProgramingType_Bool;
             _kindOfValue = APCPropertyValueKindOfNumber;
         }
         
