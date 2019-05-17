@@ -24,7 +24,10 @@
 {
     if(self = [super initWithPropertyName:propertyName aClass:aClass]){
         
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
         _inlet          = @selector(setSetterTrigger:);
+#pragma clang diagnostic pop
         _outlet         = @selector(setterTrigger);
         _kindOfUserHook = APCPropertyHookKindOfIMP;
         _triggerOption  = APCPropertyNonTrigger;

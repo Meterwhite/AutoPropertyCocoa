@@ -38,6 +38,9 @@ APC_TEST_DEMO(InstanceGettertrigger,105);
 APC_TEST_DEMO(ClassSettertrigger,106);
 APC_TEST_DEMO(InstanceSettertrigger,107);
 
+APC_TEST_DEMO(ClassMix,108);
+APC_TEST_DEMO(InstanceMix,109);
+
 @end
 
 NS_ASSUME_NONNULL_END

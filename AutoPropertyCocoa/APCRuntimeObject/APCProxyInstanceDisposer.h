@@ -11,5 +11,7 @@
 
 
 @interface APCProxyInstanceDisposer : NSObject
+
 - (nonnull instancetype)initWithClass:(nullable APCProxyClass)clazz;
+
 @end

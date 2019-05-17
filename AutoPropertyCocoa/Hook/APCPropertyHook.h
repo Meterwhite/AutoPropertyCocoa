@@ -28,8 +28,7 @@
 @interface APCPropertyHook : APCMethodHook<APCPropertyHookProtocol>
 {
 @public
-    __kindof APCMethodHook* _superhook;
-
+    __kindof __weak APCMethodHook* _superhook;
 }
 
 + (nullable instancetype)hookWithProperty:(nonnull __kindof APCHookProperty*)property;
@@ -42,10 +41,10 @@
 @property (nullable,nonatomic,weak,readonly) APCTriggerSetterProperty* setterTrigger;
 @property (nullable,nonatomic,weak,readonly) APCLazyProperty* lazyload;
 
+@property (nullable,nonatomic,weak,readonly) __kindof APCPropertyHook* superhook;
+@property (nullable,nonatomic,copy,readonly) NSString* hookMethod;
 @property (nonnull,nonatomic,readonly) Class sourceclass;
 @property (nonnull,nonatomic,readonly) Class hookclass;
-@property (nonnull,nonatomic,strong,readonly) __kindof APCPropertyHook* superhook;
-@property (nullable,nonatomic,copy,readonly) NSString* hookMethod;
 
 - (void)bindProperty:(nonnull __kindof APCHookProperty*)property;
 - (void)unbindProperty:(nonnull __kindof APCHookProperty*)property;

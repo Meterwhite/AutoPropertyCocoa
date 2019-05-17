@@ -18,8 +18,10 @@
 {
     if(self = [super initWithPropertyName:propertyName
                                    aClass:aClass]){
-        
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
         _inlet          =   @selector(setLazyload:);
+#pragma clang diagnostic pop
         _methodStyle    =   APCMethodGetterStyle;
         _outlet         =   @selector(lazyload);
         _hooked_name    =   _des_getter_name;

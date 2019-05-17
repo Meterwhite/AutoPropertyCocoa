@@ -132,12 +132,18 @@ apc_class_conformsProxyClass(Class _Nonnull cls);
 OBJC_EXPORT Class _Nullable
 apc_class_unproxyClass(APCProxyClass _Nonnull cls);
 
+OBJC_EXPORT Class _Nullable
+apc_object_unproxyClass(id _Nonnull obj);
+
 OBJC_EXPORT APCProxyClass _Nullable
 apc_instance_getProxyClass(APCProxyInstance* _Nonnull instance);
 
 OBJC_EXPORT APCProxyClass _Nonnull
 apc_object_hookWithProxyClass(id _Nonnull instance);
 
+/**
+ Unlike the object that is auto released,the 'ProxyClass' will be dispose immediately.
+ */
 OBJC_EXPORT void
 apc_instance_unhookFromProxyClass(APCProxyInstance* _Nonnull instance);
 

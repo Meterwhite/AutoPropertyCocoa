@@ -63,7 +63,7 @@ static NSMutableDictionary* _f_map;
     free(m_list);
 }
 
-static bool _clearTest;
+static bool _clearTest = YES;
 
 + (void)openClearTest
 {
@@ -250,37 +250,124 @@ APC_TEST_DEMO(InstanceLazyload,103)
 
             return @"gettersetterobj";
         }];
-//
-//        [m apc_lazyLoadForProperty:@key_getterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
-//
-//            return @"getterobj";
-//        }];
-//
-//        [m apc_lazyLoadForProperty:@key_setterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
-//
-//            return @"setterobj";
-//        }];
+
+        [m apc_lazyLoadForProperty:@key_getterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+
+            return @"getterobj";
+        }];
+
+        [m apc_lazyLoadForProperty:@key_setterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+
+            return @"setterobj";
+        }];
         
         {
-//            NSParameterAssert(m.objCopy == nil);
-//            NSParameterAssert([m.arrayValue isKindOfClass:[NSArray class]] && m.arrayValue.count == 0);
+            NSParameterAssert(m.objCopy == nil);
+            NSParameterAssert([m.arrayValue isKindOfClass:[NSArray class]] && m.arrayValue.count == 0);
             NSParameterAssert([m.gettersetterobj isEqualToString:@"gettersetterobj"]);
-//            NSParameterAssert([m.getterobj isEqualToString:@"getterobj"]);
-//            NSParameterAssert([m.setterobj isEqualToString:@"setterobj"]);
+            NSParameterAssert([m.getterobj isEqualToString:@"getterobj"]);
+            NSParameterAssert([m.setterobj isEqualToString:@"setterobj"]);
         }
-        m.arrayValue = nil;
-        m.gettersetterobj = nil;
-        apc_instance_unhookFromProxyClass(m);
-        
-        {
-            NSParameterAssert(m.arrayValue == nil);
-            NSParameterAssert(m.gettersetterobj == nil);
-        }
-        
-        
-        printf("K");
     }
 }
 
+APC_TEST_DEMO(ClassGettertrigger,104)
+{
+    APC_TEST_CLEAN
+    {
+        __block ushort flag = 0;
+        __block ushort apc_propertyGetterbindUserCondition_2 = 0;
+        __block ushort apc_propertyGetterbindAccessCountCondition_2 = 0;
+        
+        [Man apc_frontOfPropertyGetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance) {
+            
+            ++flag;
+            NSParameterAssert(flag == 1);
+        }];
+        
+        [Man apc_backOfPropertyGetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            ++flag;
+            NSParameterAssert(flag == 2);
+        }];
+        
+        [Man apc_propertyGetter:@key_obj bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            apc_propertyGetterbindUserCondition_2++;
+            return 1;
+        } withBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            apc_propertyGetterbindUserCondition_2++;
+        }];
+        
+        [Man apc_propertyGetter:@key_intValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+            
+            apc_propertyGetterbindAccessCountCondition_2++;
+            return 1;
+        } withBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            apc_propertyGetterbindAccessCountCondition_2++;
+        }];
+        
+        APCTestInstance(Man, m);
+        [m obj];
+        [m intValue];
+        NSParameterAssert(flag == 2);
+        NSParameterAssert(apc_propertyGetterbindUserCondition_2 == 2);
+        NSParameterAssert(apc_propertyGetterbindAccessCountCondition_2 == 2);
+    }
+    
+    APC_TEST_CLEAN
+    {
+        __block ushort flag = 0;
+        __block ushort apc_propertySetterbindUserCondition_2 = 0;
+        __block ushort apc_propertySetterbindAccessCountCondition_2 = 0;
+        
+        [Man apc_frontOfPropertySetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance) {
+            
+            ++flag;
+            NSParameterAssert(flag == 1);
+        }];
+        
+        [Man apc_backOfPropertySetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            ++flag;
+            NSParameterAssert(flag == 2);
+        }];
+        
+        [Man apc_propertySetter:@key_obj bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            if([value integerValue] == 100){
+            
+                apc_propertySetterbindUserCondition_2++;
+            }
+            return 1;
+        } withBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            apc_propertySetterbindUserCondition_2++;
+        }];
+        
+        [Man apc_propertySetter:@key_intValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+            
+            apc_propertySetterbindAccessCountCondition_2++;
+            return 1;
+        } withBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            apc_propertySetterbindAccessCountCondition_2++;
+        }];
+        
+        APCTestInstance(Man, m);
+        m.obj = @(0);
+        m.intValue = 100;
+        NSParameterAssert(flag == 2);
+        NSParameterAssert(apc_propertySetterbindUserCondition_2 == 2);
+        NSParameterAssert(apc_propertySetterbindAccessCountCondition_2 == 2);
+    }
+}
+
+APC_TEST_DEMO(InstanceGettertrigger,105)
+{
+    
+}
 
 @end

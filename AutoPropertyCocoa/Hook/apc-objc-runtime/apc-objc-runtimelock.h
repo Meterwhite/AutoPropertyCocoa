@@ -54,10 +54,10 @@ apc_objcruntimelock_lock(void(NS_NOESCAPE^userblock)(void));
 #if DEBUG
 
 OBJC_EXPORT void
-apc_objcruntimelock_testing_delete(void);
+apc_debug_objcruntimelock_delete(void);
 
 OBJC_EXPORT void
-apc_objcruntimelock_testing_create(void);
+apc_debug_objcruntimelock_create(void);
 
 #endif
 

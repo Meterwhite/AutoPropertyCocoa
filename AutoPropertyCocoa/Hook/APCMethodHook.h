@@ -15,10 +15,10 @@
 
 @optional
 - (nullable __kindof APCMethodHook*)superhook;
-- (nullable Class)hookclass;
-- (nullable NSString*)hookMethod;
 - (nonnull IMP)restoredImplementation;
+- (nullable NSString*)hookMethod;
 - (nonnull IMP)oldImplementation;
+- (nullable Class)hookclass;
 @end
 
 @interface APCMethodHook : NSObject<APCMethodHookProtocol>

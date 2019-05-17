@@ -26,14 +26,28 @@
 
 - (void)dealloc
 {
-    if(_class){
+    APCDlog(@"Enter Disposer << dealoc: %@", NSStringFromClass(_class));
+    if(_class != nil){
         
         if(YES == apc_class_conformsProxyClass(_class)){
             
-            APCDlog(@"Diposer : %@", NSStringFromClass(_class));
+            APCDlog(@"Disposer << dealoc << objc_disposeClassPair : %@", NSStringFromClass(_class));
             objc_disposeClassPair(_class);
+            _class = nil;
         }
     }
+}
+
+- (NSUInteger)hash
+{
+    return [_class hash];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if(self == object) return YES;
+    
+    return [self hash] == [object hash];
 }
 
 @end

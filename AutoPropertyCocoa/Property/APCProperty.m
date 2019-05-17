@@ -8,6 +8,7 @@
 
 #import "NSString+APCExtension.h"
 #import "APCProperty.h"
+#import "APCRuntime.h"
 #import "APCScope.h"
 
 @implementation APCProperty
@@ -22,30 +23,34 @@
 }
 
 + (instancetype)instanceWithProperty:(NSString*)propertyName
-                              aClass:(Class)aClass
+                              aClass:(Class)clazz
 {
-    return [[self alloc] initWithPropertyName:propertyName aClass:aClass];
+    return [[self alloc] initWithPropertyName:propertyName aClass:clazz];
 }
 - (instancetype)initWithPropertyName:(NSString*)propertyName
-                           aInstance:(id)aInstance
+                           aInstance:(id)instance
 {
-    if(self = [self initWithPropertyName:propertyName aClass:[aInstance class]]){
+    
+    if(self = [self initWithPropertyName:propertyName
+                                  aClass:[instance class]]){
         
         _kindOfOwner = APCPropertyOwnerKindOfInstance;
-        _instance    = aInstance;
+        _instance    = instance;
     }
     return self;
 }
 
-- (instancetype)initWithPropertyName:(NSString*)propertyName
-                      aClass:(Class)aClass
+- (instancetype)initWithPropertyName:(NSString*)property
+                      aClass:(Class)clazz
 {
     if(self = [super init]){
         
+        clazz               =   apc_class_unproxyClass(clazz);
+        
         _kindOfOwner        =   APCPropertyOwnerKindOfClass;
-        _ori_property_name  =   propertyName;
-        _des_getter_name =      propertyName;
-        _des_class          =   aClass;
+        _ori_property_name  =   property;
+        _des_getter_name    =   property;
+        _des_class          =   clazz;
         _enable             =   YES;
         _hashcode           =   0;
         objc_property_t*        p_list;
@@ -53,18 +58,18 @@
         unsigned int            count;
         do {
             
-            p_list = class_copyPropertyList(aClass, &count);
+            p_list = class_copyPropertyList(clazz, &count);
             while (count--) {
                 
-                if([propertyName isEqualToString:@(property_getName(p_list[count]))]){
+                if([property isEqualToString:@(property_getName(p_list[count]))]){
                     
-                    _src_class         =    aClass;
+                    _src_class         =    clazz;
                     attr_str          = @(property_getAttributes(p_list[count]));
                 }
             }
-        } while (nil != (aClass = class_getSuperclass(aClass)));
+        } while (nil != (clazz = class_getSuperclass(clazz)));
         
-        NSAssert(_des_class, @"APC: Can not find a property named %@.",propertyName);
+        NSAssert(_des_class, @"APC: Can not find a property named %@.",property);
         
         
         NSArray*    attr_cmps   = [attr_str componentsSeparatedByString:@","];
@@ -79,7 +84,7 @@
             code = [attr_str substringWithRange:NSMakeRange(loc, dotLoc - loc)];
         }
         
-        NSAssert(code.length > 0, @"APC: Property %@ is disable.",propertyName);
+        NSAssert(code.length > 0, @"APC: Property %@ is disable.",property);
         
         _valueAttibute      = [code copy];
         _valueTypeEncoding  = [code copy];
@@ -250,69 +255,84 @@
         }
     }
     
-    
+    Class em_cls;
     ///AssociatedSetter
-    if(NO == (_accessOption & APCPropertyComponentOfSetter)){
+    if(NO == (_accessOption & APCPropertyComponentOfSetter)) {
         
-        unsigned int count;
-        Method* m_list = class_copyMethodList(_des_class, &count);
-        NSMutableArray* methodNames = [NSMutableArray array];
-        while (count--) {
+        for (em_cls = _des_class; em_cls != nil; em_cls = class_getSuperclass(em_cls)) {
             
-            [methodNames addObject:NSStringFromSelector(method_getName(m_list[count]))];
-        }
-        if(methodNames.count > 0){
-            
-            if([methodNames containsObject:_ori_property_name.apc_kvcAssumedSetterName1]){
+            unsigned int    count;
+            Method*         m_list = class_copyMethodList(em_cls, &count);
+            NSMutableArray* methodNames = [NSMutableArray array];
+            while (count--) {
                 
-                _des_setter_name    =   _ori_property_name.apc_kvcAssumedSetterName1;
-                _associatedSetter   =   NSSelectorFromString(_des_setter_name);
-                _accessOption       |=  APCPropertyAssociatedSetter;
-            }else if ([methodNames containsObject:_ori_property_name.apc_kvcAssumedSetterName2]){
-                
-                _des_setter_name    =   _ori_property_name.apc_kvcAssumedSetterName2;
-                _associatedSetter   =   NSSelectorFromString(_des_setter_name);
-                _accessOption       |=  APCPropertyAssociatedSetter;
+                [methodNames addObject:NSStringFromSelector(method_getName(m_list[count]))];
             }
+            if(methodNames.count > 0){
+                
+                if([methodNames containsObject:_ori_property_name.apc_kvcAssumedSetterName1]){
+                    
+                    _des_setter_name    =   _ori_property_name.apc_kvcAssumedSetterName1;
+                    _associatedSetter   =   NSSelectorFromString(_des_setter_name);
+                    _accessOption       |=  APCPropertyAssociatedSetter;
+                    break;
+                }else if ([methodNames containsObject:_ori_property_name.apc_kvcAssumedSetterName2]){
+                    
+                    _des_setter_name    =   _ori_property_name.apc_kvcAssumedSetterName2;
+                    _associatedSetter   =   NSSelectorFromString(_des_setter_name);
+                    _accessOption       |=  APCPropertyAssociatedSetter;
+                    break;
+                }
+            }
+            free(m_list);
         }
-        free(m_list);
     }
     
     ///Ivar
     if(NO == (_accessOption & APCPropertyComponentOfIVar)){
         
-        unsigned int count;
-        Ivar* ivar_list = class_copyIvarList(_des_class, &count);
-        NSUInteger flag = 0;//[0,4]
-        while (count--) {
+        for (em_cls = _des_class; em_cls != nil; em_cls = class_getSuperclass(em_cls)) {
             
-            if([@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName1]){
-                
-                _associatedIvar = ivar_list[count];
-                _accessOption   |= APCPropertyAssociatedIVar;
-                break;
-            }else if (flag < 3
-                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName2]){
-                
-                _associatedIvar = ivar_list[count];
-                _accessOption   |= APCPropertyAssociatedIVar;
-                flag = 3;
-            }else if (flag < 2
-                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName3]){
-                
-                _associatedIvar = ivar_list[count];
-                _accessOption   |= APCPropertyAssociatedIVar;
-                flag = 2;
-            }else if (flag < 1
-                      && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName4]){
-                
-                _associatedIvar = ivar_list[count];
-                _accessOption   |= APCPropertyAssociatedIVar;
-                flag = 1;
+            unsigned int    count;
+            Ivar*           ivar_list = class_copyIvarList(em_cls, &count);
+            NSUInteger      flag      = 0;//[0,4]
+            BOOL            stop      = NO;
+            while (count--)
+            {
+                if([@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName1]){
+                    
+                    _associatedIvar = ivar_list[count];
+                    _accessOption   |= APCPropertyAssociatedIVar;
+                    stop            = YES;
+                    break;
+                }else if (flag < 3
+                          && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName2]){
+                    
+                    _associatedIvar = ivar_list[count];
+                    _accessOption   |= APCPropertyAssociatedIVar;
+                    stop            = YES;
+                    flag = 3;
+                    break;
+                }else if (flag < 2
+                          && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName3]){
+                    
+                    _associatedIvar = ivar_list[count];
+                    _accessOption   |= APCPropertyAssociatedIVar;
+                    stop            = YES;
+                    flag = 2;
+                    break;
+                }else if (flag < 1
+                          && [@(ivar_getName(ivar_list[count])) isEqualToString:_ori_property_name.apc_kvcAssumedIvarName4]){
+                    
+                    _associatedIvar = ivar_list[count];
+                    _accessOption   |= APCPropertyAssociatedIVar;
+                    stop            = YES;
+                    flag = 1;
+                }
             }
+            free(ivar_list);
+            if(stop) break;
         }
-        
-        free(ivar_list);
     }
     
     return self;
@@ -437,5 +457,10 @@
                      hash];
     }
     return _hashcode;
+}
+
+- (void)dealloc
+{
+    _instance = nil;
 }
 @end

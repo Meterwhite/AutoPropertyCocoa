@@ -42,7 +42,7 @@
     if (self) {
         
         _testingSymbol  = symbol;
-        
+        _defaultString  = @"defaultString";
         NSString* str   = [NSString stringWithUTF8String:_testingSymbol];
         NSArray* cnps   = [str componentsSeparatedByString:@"__"];
         _testKind       = cnps.firstObject;
@@ -92,6 +92,11 @@
     _apc_setterobj = setterobj;
 }
 
+- (NSString *)defaultString
+{
+    return _defaultString;
+}
+
 - (NSString *)description
 {
     NSMutableString* ret = [NSMutableString stringWithString:NSStringFromClass([self class])];
@@ -137,16 +142,13 @@
     return [ret copy];
 }
 
-- (void)dealloc
-{
-    NSLog(@"%s/%@/dealloc : %p",_testingSymbol,NSStringFromClass([self class]), self);
-//    Class cls = apc_object_hookWithProxyClass(self);
-//    objc_disposeClassPair(cls);
-}
-
 - (NSString *)manDeletedWillCallPerson
 {
     return @"Person";
 }
 
+- (void)dealloc
+{
+    APCDlog(@"%s << %@ << dealloc : %p",_testingSymbol,NSStringFromClass([self class]), self);
+}
 @end

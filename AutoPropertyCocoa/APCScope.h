@@ -82,7 +82,6 @@ typedef _Atomic(IMP)        IMP;
     return iblock ? iblock(args) : 0;\
 })()
 
-
 typedef NSObject        APCProxyInstance;
 typedef Class           APCProxyClass;
 typedef apc_spinlock    APCSpinLock;

@@ -9,6 +9,7 @@
 #include "apc-objc-runtimelock.h"
 #include "apc-fishhook.h"
 #include "apc-objc-os.h"
+#include "APCExtScope.h"
 #include <pthread.h>
 
 
@@ -19,6 +20,10 @@ static pthread_mutex_t apc_objcruntimelock = {0};
 
 _Bool apc_contains_objcruntimelock(void)
 {
+#if APCDebugSchemeDiagnosticsGuardMalloc
+    
+    return return true;
+#else
     unsigned int i = sizeof(pthread_mutex_t);
     while (i -= sizeof(long)) {
         
@@ -28,6 +33,7 @@ _Bool apc_contains_objcruntimelock(void)
         }
     }
     return false;
+#endif
 }
 
 static APCOBJCRuntimelocker*        apc_objcruntimelocker;
@@ -116,23 +122,31 @@ void apc_objcruntimelock_lock(void(NS_NOESCAPE^userblock)(void))
 #pragma mark - hook calloc
 static void*(*apc_calloc_ptr)(size_t __count, size_t __size);
 
+void apc_objcruntimelocker_trylock(void)
+{
+    if(apc_objcruntimelocker->testingThreadID()){
+        
+        /**
+         objc_allocateProtocol(...) ---> [here] ---> calloc(...) ---> userblock(...)
+         */
+        apc_objcruntimelocker->signal_runtimeLockedSuccess();
+        
+        /**
+         userblock(...) ---> [here] ---> No longer blocking the thread.
+         */
+        apc_objcruntimelocker->wait_unlockRuntime();
+    }
+}
+
+/**
+ This should compress the function call stack to a minimum.
+ */
 void* apc_calloc(size_t __count, size_t __size)
 {
     
     if(apc_objcruntimelocker != NULL){
         
-        if(apc_objcruntimelocker->testingThreadID()){
-            
-            /**
-             objc_allocateProtocol(...) ---> [here] ---> calloc(...) ---> userblock(...)
-             */
-            apc_objcruntimelocker->signal_runtimeLockedSuccess();
-            
-            /**
-             userblock(...) ---> [here] ---> No longer blocking the thread.
-             */
-            apc_objcruntimelocker->wait_unlockRuntime();
-        }
+        apc_objcruntimelocker_trylock();
     }
     
     return apc_calloc_ptr(__count, __size);
@@ -140,6 +154,7 @@ void* apc_calloc(size_t __count, size_t __size)
 
 void apc_in_main(void)
 {
+#if !APCDebugSchemeDiagnosticsGuardMalloc
     struct apc_rebinding
     rebindInfo
     =
@@ -159,22 +174,22 @@ void apc_in_main(void)
         pthread_mutex_init(&apc_objcruntimelock, NULL);
         NSCAssert(0 == result, @"Failed to initialize mutex with error %d.", result);
     });
+#endif
 }
 
 
 #if DEBUG
-void apc_objcruntimelock_testing_delete(void)
+void apc_debug_objcruntimelock_delete(void)
 {
     pthread_mutex_destroy(&apc_objcruntimelock);
     apc_objcruntimelock = {0};
 }
 
-void apc_objcruntimelock_testing_create(void)
+void apc_debug_objcruntimelock_create(void)
 {
     const int result __attribute__((unused))
     =
     pthread_mutex_init(&apc_objcruntimelock, NULL);
     NSCAssert(0 == result, @"Failed to initialize mutex with error %d.", result);
 }
-
 #endif
