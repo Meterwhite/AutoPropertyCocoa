@@ -42,6 +42,25 @@
     return self;
 }
 
+- (NSUInteger)count
+{
+    return [_readonly count];
+}
+
+- (NSArray<NSString *> *)allKeys
+{
+    return [_readonly allKeys];
+}
+
+- (NSArray<NSString *> *)allKeysForObject:(id)anObject
+{
+    return [_readonly allKeysForObject:anObject];
+}
+
+- (NSArray *)allValues
+{
+    return [_values copy];
+}
 
 - (void)setObject:(id)anObject forKey:(APCStringStringKey *)mKey
 {

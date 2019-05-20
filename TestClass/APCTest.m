@@ -566,6 +566,8 @@ APC_TEST_DEMO(ClassInstanceMix,10086)
     [dictionary setObject:@"2" forKey:k2];
     [dictionary setObject:@"3" forKey:k3];
     
+    
+    
     APCDlog(@"Pause...");
 }
 

@@ -26,9 +26,18 @@
                                  getter:(nullable NSString*)getter
                                  setter:(nullable NSString*)setter;
 
-- (nonnull instancetype)initWithString:(NSString*)string;
++ (nonnull instancetype)keyFromArray:(nonnull NSArray<NSString*>*)array;
 
+- (nonnull instancetype)initWithString:(nonnull NSString*)string;
+
+@property (readonly) NSUInteger count;
+
+/**
+ As a basis for determining equality in a set.Just compare the head value.
+ */
 - (BOOL)isEqual:(nonnull APCStringStringKey*)object;
+
+- (BOOL)isEqualToStringString:(nullable APCStringStringKey*)stringstring;
 
 - (NSUInteger)hash;
 @end

@@ -17,7 +17,7 @@
 
 + (nonnull instancetype)keyWithMatchingProperty:(NSString*)property
 {
-    return [[APCStringStringKey alloc] initWithString:property];
+    return [[self allocWithZone:NSDefaultMallocZone()] initWithString:property];
 }
 
 + (nonnull instancetype)keyWithProperty:(NSString*)property
@@ -50,6 +50,30 @@
     return ihead;
 }
 
++ (instancetype)keyFromArray:(NSArray<NSString *> *)array
+{
+    APCStringStringKey* ihead       = nil;
+    APCStringStringKey* previous    = nil;
+    APCStringStringKey* current     = nil;
+    for (NSString* item in array) {
+        
+        if(previous == nil){
+            
+            ihead = [APCStringStringKey keyWithMatchingProperty:item];
+            ihead->head = ihead;
+            current     = ihead;
+        }else {
+            
+            current = [APCStringStringKey keyWithMatchingProperty:item];
+            previous->next = current;
+            previous->head = ihead;
+        }
+        previous = current;
+    }
+    
+    return ihead;
+}
+
 - (instancetype)initWithString:(NSString*)string
 {
     self = [super init];
@@ -73,6 +97,41 @@
     if(value.length != object->value.length) return YES;
     
     return [value isEqualToString:object->value];
+}
+
+- (NSUInteger)count
+{
+    
+    NSUInteger          count   = 1;
+    APCStringStringKey* item    = self;
+    
+    while (nil != (item = item->next))
+        ++count;
+    
+    return count;
+}
+
+- (BOOL)isEqualToStringString:(APCStringStringKey *)stringstring
+{
+    if(self == stringstring) return YES;
+    
+    if(self.count != stringstring.count) return NO;
+    
+    APCStringStringKey* selfKey = self;
+    while (selfKey != nil && stringstring != nil) {
+        
+        if(selfKey){
+            
+            if(NO ==[selfKey isEqual:stringstring]) return NO;
+                
+            selfKey         = selfKey->next;
+            stringstring    = stringstring->next;
+        }
+    }
+    
+    if(selfKey == nil && stringstring == nil) return YES;
+    
+    return NO;
 }
 
 - (void)dealloc
