@@ -42,9 +42,11 @@
 @property (nullable,nonatomic,weak,readonly) APCLazyProperty* lazyload;
 
 @property (nullable,nonatomic,weak,readonly) __kindof APCPropertyHook* superhook;
-@property (nullable,nonatomic,copy,readonly) NSString* hookMethod;
+@property (nullable,nonatomic,copy,readonly) NSString*  hookMethod;
+@property (nonatomic,readonly) APCPropertyOwnerKind     kindOfOwner;
 @property (nonnull,nonatomic,readonly) Class sourceclass;
 @property (nonnull,nonatomic,readonly) Class hookclass;
+
 
 - (void)bindProperty:(nonnull __kindof APCHookProperty*)property;
 - (void)unbindProperty:(nonnull __kindof APCHookProperty*)property;

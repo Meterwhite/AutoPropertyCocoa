@@ -117,7 +117,7 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
     
     if(hook.isEmpty){
         
-        return [apc_propertyhook_rootHook(hook) performOldSetterFromTarget:_SELF withValue:value];
+        return [hook performOldSetterFromTarget:_SELF withValue:value];
     }
     
     APCTriggerSetterProperty*   p_trigger   = hook.setterTrigger;
@@ -125,7 +125,7 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
     /** ----------------Future----------------- */
     if(p_trigger != nil){
         
-        if(p_trigger.triggerOption & APCPropertyGetterFrontTrigger) {
+        if(p_trigger.triggerOption & APCPropertySetterFrontTrigger) {
             
             [p_trigger performSetterFrontTriggerBlock:_SELF value:value];
         }
@@ -140,12 +140,12 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
     /** ----------------Result----------------- */
     if(p_trigger != nil){
         
-        if(p_trigger.triggerOption & APCPropertyGetterPostTrigger){
+        if(p_trigger.triggerOption & APCPropertySetterPostTrigger){
             
             [p_trigger performSetterPostTriggerBlock:_SELF value:value];
         }
         
-        if(p_trigger.triggerOption & APCPropertyGetterUserTrigger){
+        if(p_trigger.triggerOption & APCPropertySetterUserTrigger){
             
             if(YES == [p_trigger performSetterUserConditionBlock:_SELF value:value]){
                 
@@ -153,7 +153,7 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
             }
         }
         
-        if(p_trigger.triggerOption & APCPropertyGetterCountTrigger){
+        if(p_trigger.triggerOption & APCPropertySetterCountTrigger){
             
             if(YES == [p_trigger performSetterCountConditionBlock:_SELF value:value]){
                 
@@ -269,6 +269,11 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     return _superhook;
 }
 
+- (APCPropertyOwnerKind)kindOfOwner
+{
+    return _kindOfOwner;
+}
+
 - (void)bindProperty:(__kindof APCHookProperty *)property
 {
     
@@ -331,14 +336,12 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (APCLazyProperty *)lazyload
 {
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-        
-        apc_runtimelock_reader_t reading(apc_runtimelock);
-        return (__bridge APCLazyProperty *)(_lazyload);
-    }else{
+    if(_lazyload != NULL){
         
         return (__bridge APCLazyProperty *)(_lazyload);
     }
+    
+    return apc_propertyhook_lookupSuperProperty(self, "_lazyload");
 }
 
 - (void)setGetterTrigger:(APCTriggerGetterProperty *)getterTrigger
@@ -364,14 +367,12 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (APCTriggerGetterProperty *)getterTrigger
 {
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-        
-        apc_runtimelock_reader_t reading(apc_runtimelock);
-        return (__bridge APCTriggerGetterProperty *)(_getterTrigger);
-    }else{
+    if(_getterTrigger != NULL){
         
         return (__bridge APCTriggerGetterProperty *)(_getterTrigger);
     }
+    
+    return apc_propertyhook_lookupSuperProperty(self, "_getterTrigger");
 }
 
 - (void)setSetterTrigger:(APCTriggerSetterProperty *)setterTrigger
@@ -397,14 +398,12 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (APCTriggerSetterProperty *)setterTrigger
 {
-    if(_kindOfOwner == APCPropertyOwnerKindOfClass){
-        
-        apc_runtimelock_reader_t reading(apc_runtimelock);
-        return (__bridge APCTriggerSetterProperty *)(_setterTrigger);
-    }else{
+    if(_setterTrigger != NULL){
         
         return (__bridge APCTriggerSetterProperty *)(_setterTrigger);
     }
+    
+    return apc_propertyhook_lookupSuperProperty(self, "_setterTrigger");
 }
 
 - (BOOL)isEmpty
@@ -488,18 +487,28 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     {
         if(_kindOfOwner == APCPropertyOwnerKindOfClass)
         {
-            
-            if(apc_contains_objcruntimelock()){
+            if(_old_implementation != nil){
                 
-                class_removeMethod_APC_OBJC2
-                (self->_hookclass
-                 , NSSelectorFromString(self->_hookMethod));
-            }else{
-                
+                //Realized by itself
                 class_replaceMethod(_hookclass
                                     , NSSelectorFromString(_hookMethod)
-                                    , self.restoredImplementation
+                                    , _old_implementation
                                     , _methodTypeEncoding);
+            }else{
+                
+                ///Not realized by itself
+                if(apc_contains_objcruntimelock()){
+                    
+                    class_removeMethod_APC_OBJC2
+                    (self->_hookclass
+                     , NSSelectorFromString(self->_hookMethod));
+                }else{
+                    
+                    class_replaceMethod(_hookclass
+                                        , NSSelectorFromString(_hookMethod)
+                                        , self.restoredImplementation
+                                        , _methodTypeEncoding);
+                }
             }
             apc_propertyhook_dispose_nolock(self);
         }
@@ -542,7 +551,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     
     APCPropertyHook* hook
     =
-    apc_lookup_implementationPropertyhook_inRange(apc_class_getSuperclass(_hookclass)
+    apc_lookup_sourcePropertyhook_inRange(apc_class_getSuperclass(_hookclass)
                                                   , _source_class
                                                   , _hookMethod);
     if(hook != nil){

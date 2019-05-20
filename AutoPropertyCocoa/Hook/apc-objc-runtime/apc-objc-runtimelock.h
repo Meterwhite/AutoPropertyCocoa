@@ -59,6 +59,9 @@ apc_debug_objcruntimelock_delete(void);
 OBJC_EXPORT void
 apc_debug_objcruntimelock_create(void);
 
+OBJC_EXPORT void
+apc_debug_test_objcruntimelock(void);
+
 #endif
 
 

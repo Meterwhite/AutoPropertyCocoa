@@ -165,9 +165,9 @@ struct apc_entsize_list_tt {
     
     void deleteElement(Element* elm) {
         
-        Element* item;
-        size_t size = sizeof(Element);
-        uint32_t idx = UINT32_MAX;
+        Element*    item;
+        size_t      size = sizeof(Element);
+        uint32_t    idx = UINT32_MAX;
         for(uint32_t i = 0 ; i < count ; i++){
             
             item = (Element *)((char*)&first + i*size);

@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		454A320C22904F4E00D64483 /* APCPropertyMappingKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 454A320B22904F4E00D64483 /* APCPropertyMappingKey.m */; };
+		456EABA922925491009C5DFB /* APCStringStringDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 456EABA822925491009C5DFB /* APCStringStringDictionary.m */; };
 		45B12F82225B2C06002D825E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F81225B2C06002D825E /* AppDelegate.m */; };
 		45B12F84225B2C07002D825E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F83225B2C07002D825E /* Assets.xcassets */; };
 		45B12F87225B2C07002D825E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F85225B2C07002D825E /* MainMenu.xib */; };
 		45B12F8A225B2C07002D825E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F89225B2C07002D825E /* main.m */; };
 		45B12FEB225B2C9B002D825E /* Man.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FDD225B2C9B002D825E /* Man.m */; };
 		45B12FEC225B2C9B002D825E /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FDF225B2C9B002D825E /* Person.m */; };
+		45CFD61E22925740000C9438 /* APCStringStringKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 45CFD61D22925740000C9438 /* APCStringStringKey.m */; };
 		45E1CDE9228BF3BB00DCD3F0 /* APCUserEnvironmentSupportObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDB2228BF3BB00DCD3F0 /* APCUserEnvironmentSupportObject.m */; };
 		45E1CDEA228BF3BB00DCD3F0 /* APCScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDB3228BF3BB00DCD3F0 /* APCScope.m */; };
 		45E1CDEB228BF3BB00DCD3F0 /* NSString+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDB7228BF3BB00DCD3F0 /* NSString+APCExtension.m */; };
@@ -40,6 +43,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		454A320A22904F4E00D64483 /* APCPropertyMappingKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCPropertyMappingKey.h; sourceTree = "<group>"; };
+		454A320B22904F4E00D64483 /* APCPropertyMappingKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCPropertyMappingKey.m; sourceTree = "<group>"; };
+		456EABA722925491009C5DFB /* APCStringStringDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCStringStringDictionary.h; sourceTree = "<group>"; };
+		456EABA822925491009C5DFB /* APCStringStringDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCStringStringDictionary.m; sourceTree = "<group>"; };
 		45B12F7D225B2C06002D825E /* AutoPropertyCocoaMacOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoPropertyCocoaMacOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45B12F80225B2C06002D825E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		45B12F81225B2C06002D825E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -52,6 +59,8 @@
 		45B12FDD225B2C9B002D825E /* Man.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Man.m; sourceTree = "<group>"; };
 		45B12FDE225B2C9B002D825E /* Man.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Man.h; sourceTree = "<group>"; };
 		45B12FDF225B2C9B002D825E /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+		45CFD61C22925740000C9438 /* APCStringStringKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCStringStringKey.h; sourceTree = "<group>"; };
+		45CFD61D22925740000C9438 /* APCStringStringKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCStringStringKey.m; sourceTree = "<group>"; };
 		45E1CDB2228BF3BB00DCD3F0 /* APCUserEnvironmentSupportObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCUserEnvironmentSupportObject.m; sourceTree = "<group>"; };
 		45E1CDB3228BF3BB00DCD3F0 /* APCScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCScope.m; sourceTree = "<group>"; };
 		45E1CDB5228BF3BB00DCD3F0 /* NSString+APCExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+APCExtension.h"; sourceTree = "<group>"; };
@@ -233,6 +242,12 @@
 				45E1CDCF228BF3BB00DCD3F0 /* APCClassMapper.m */,
 				45E1CE04228D34F800DCD3F0 /* APCProxyInstanceDisposer.h */,
 				45E1CE05228D34F800DCD3F0 /* APCProxyInstanceDisposer.m */,
+				454A320A22904F4E00D64483 /* APCPropertyMappingKey.h */,
+				454A320B22904F4E00D64483 /* APCPropertyMappingKey.m */,
+				456EABA722925491009C5DFB /* APCStringStringDictionary.h */,
+				456EABA822925491009C5DFB /* APCStringStringDictionary.m */,
+				45CFD61C22925740000C9438 /* APCStringStringKey.h */,
+				45CFD61D22925740000C9438 /* APCStringStringKey.m */,
 			);
 			path = APCRuntimeObject;
 			sourceTree = "<group>";
@@ -351,12 +366,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				45E1CE02228BF3DE00DCD3F0 /* Superman.m in Sources */,
+				454A320C22904F4E00D64483 /* APCPropertyMappingKey.m in Sources */,
 				45E1CDF9228BF3BB00DCD3F0 /* APCMethodHook.m in Sources */,
 				45E1CDFB228BF3BB00DCD3F0 /* apc-fishhook.c in Sources */,
 				45E1CDF8228BF3BB00DCD3F0 /* APCPropertyHook.mm in Sources */,
 				45E1CDEF228BF3BB00DCD3F0 /* APCLazyProperty.m in Sources */,
 				45B12FEB225B2C9B002D825E /* Man.m in Sources */,
 				45E1CDEB228BF3BB00DCD3F0 /* NSString+APCExtension.m in Sources */,
+				456EABA922925491009C5DFB /* APCStringStringDictionary.m in Sources */,
 				45E1CE03228BF3DE00DCD3F0 /* APCTest.m in Sources */,
 				45B12FEC225B2C9B002D825E /* Person.m in Sources */,
 				45E1CDF1228BF3BB00DCD3F0 /* APCHookProperty.m in Sources */,
@@ -374,6 +391,7 @@
 				45E1CDEC228BF3BB00DCD3F0 /* NSObject+APCExtension.m in Sources */,
 				45E1CDFD228BF3BB00DCD3F0 /* APCMethod.m in Sources */,
 				45E1CDF4228BF3BB00DCD3F0 /* APCClassInheritanceNode.m in Sources */,
+				45CFD61E22925740000C9438 /* APCStringStringKey.m in Sources */,
 				45E1CDF7228BF3BB00DCD3F0 /* NSObject+APCTriggerProperty.m in Sources */,
 				45E1CE06228D34F800DCD3F0 /* APCProxyInstanceDisposer.m in Sources */,
 				45E1CDE9228BF3BB00DCD3F0 /* APCUserEnvironmentSupportObject.m in Sources */,

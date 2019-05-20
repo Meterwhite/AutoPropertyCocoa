@@ -8,6 +8,8 @@
 
 #import "APCScope.h"
 
+@class APCPropertyMappingKey;
+
 typedef NS_OPTIONS (NSUInteger,APCPropertyAccessOptions){
     
     APCPropertyKVCDisable          =   0,
@@ -155,5 +157,7 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
  OriginalClass/TargetClass.UserProperty
  */
 - (NSUInteger)hash;
+
+- (nonnull APCPropertyMappingKey*)mappingKey;
 @end
 

@@ -7,13 +7,15 @@
 //
 
 #import "NSString+APCExtension.h"
+#import "APCPropertyMappingKey.h"
 #import "APCProperty.h"
 #import "APCRuntime.h"
 #import "APCScope.h"
 
 @implementation APCProperty
 {
-    volatile APCAtomicUInteger _accessCount;
+    volatile APCAtomicUInteger  _accessCount;
+    APCPropertyMappingKey*      _mappingKey;
 }
 
 + (instancetype)instanceWithProperty:(NSString*)propertyName
@@ -457,6 +459,15 @@
                      hash];
     }
     return _hashcode;
+}
+
+- (APCPropertyMappingKey *)mappingKey
+{
+    if(_mappingKey == nil){
+        
+        _mappingKey = [[APCPropertyMappingKey alloc] initWithProperty:_ori_property_name getter:_des_getter_name setter:_des_setter_name];
+    }
+    return _mappingKey;
 }
 
 - (void)dealloc

@@ -32,14 +32,12 @@ APC_TEST_DEMO(InstanceUnhook,101);
 APC_TEST_DEMO(ClassLazyload,102);
 APC_TEST_DEMO(InstanceLazyload,103);
 
-APC_TEST_DEMO(ClassGettertrigger,104);
-APC_TEST_DEMO(InstanceGettertrigger,105);
+APC_TEST_DEMO(ClassTrigger,104);
+APC_TEST_DEMO(InstanceTrigger,105);
 
-APC_TEST_DEMO(ClassSettertrigger,106);
-APC_TEST_DEMO(InstanceSettertrigger,107);
-
-APC_TEST_DEMO(ClassMix,108);
-APC_TEST_DEMO(InstanceMix,109);
+APC_TEST_DEMO(ClassMix,106);
+APC_TEST_DEMO(InstanceMix,107);
+APC_TEST_DEMO(ClassInstanceMix,108);
 
 @end
 

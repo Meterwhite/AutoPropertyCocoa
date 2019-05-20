@@ -14,7 +14,6 @@
 
 @implementation NSObject (APCTriggerProperty)
 
-
 #pragma mark - Class
 + (void)apc_frontOfPropertyGetter:(NSString *)property bindWithBlock:(void (^)(id _Nonnull))block
 {
@@ -177,52 +176,63 @@
 {
     if(option == APCPropertyNonTrigger) return;
     
-    APCPropertyHook* hook
-    =
-    apc_getPropertyhook(self, property);
-    
-    __kindof APCHookProperty* p = hook.getterTrigger;
+    APCPropertyHook* hook    = apc_getPropertyhook(self, property);
+    BOOL             regneed = NO;
+    __kindof APCHookProperty*   p;
     if(option & APCPropertyTriggerOfGetter){
         
-        if(p == nil){
+        
+        p       = hook.getterTrigger;
+        
+        if((regneed = (p == nil))){
             
             p = [APCTriggerGetterProperty instanceWithProperty:property aClass:self];
-            apc_registerProperty(p);
         }
         if(option & APCPropertyGetterFrontTrigger){
+            
             [p getterBindFrontTrigger:block];
         }
         else if (option & APCPropertyGetterPostTrigger){
+            
             [p getterBindPostTrigger:block];
         }
         else if (option & APCPropertyGetterUserTrigger){
+            
             [p getterBindUserTrigger:block condition:condition];
         }
         else if (option & APCPropertyGetterCountTrigger){
+            
             [p getterBindCountTrigger:block condition:condition];
         }
+        
+        if(regneed) apc_registerProperty(p);
         
         return;
     }
     
-    p = hook.setterTrigger;
-    if(p == nil){
+    p       = hook.setterTrigger;
+    if((regneed = (p == nil))){
         
         p = [APCTriggerSetterProperty instanceWithProperty:property aClass:self];
-        apc_registerProperty(p);
     }
     if(option & APCPropertySetterFrontTrigger){
+        
         [p setterBindFrontTrigger:block];
     }
     else if (option & APCPropertySetterPostTrigger){
+        
         [p setterBindPostTrigger:block];
     }
     else if (option & APCPropertySetterUserTrigger){
+        
         [p setterBindUserTrigger:block condition:condition];
     }
     else if (option & APCPropertySetterCountTrigger){
+        
         [p setterBindCountTrigger:block condition:condition];
     }
+    
+    if(regneed) apc_registerProperty(p);
 }
 
 #pragma mark - Instance
@@ -386,53 +396,70 @@
 {
     if(option == APCPropertyNonTrigger) return;
     
-    APCPropertyHook* hook
-    =
-    apc_lookup_instancePropertyhook(self, property);
+    APCPropertyHook*  hook      = apc_lookup_instancePropertyhook(self, property);
+    BOOL              regneed   = NO;
+    __kindof APCHookProperty*   p;
     
-    __kindof APCHookProperty* p = hook.getterTrigger;
     if(option & APCPropertyTriggerOfGetter){
         
-        if(p == nil){
+        
+        p = hook.getterTrigger;
+        if((regneed = (p == nil))){
             
             p = [APCTriggerGetterProperty instanceWithProperty:property aInstance:self];
-            apc_object_hookWithProxyClass(self);
-            apc_instance_setAssociatedProperty(self, p);
         }
         if(option & APCPropertyGetterFrontTrigger){
+            
             [p getterBindFrontTrigger:block];
         }
         else if (option & APCPropertyGetterPostTrigger){
+            
             [p getterBindPostTrigger:block];
         }
         else if (option & APCPropertyGetterUserTrigger){
+            
             [p getterBindUserTrigger:block condition:condition];
         }
         else if (option & APCPropertyGetterCountTrigger){
+            
             [p getterBindCountTrigger:block condition:condition];
+        }
+        
+        if(regneed){
+            
+            apc_object_hookWithProxyClass(self);
+            apc_instance_setAssociatedProperty(self, p);
         }
         
         return;
     }
     
     p = hook.setterTrigger;
-    if(p == nil){
+    if((regneed = (p == nil))){
         
         p = [APCTriggerSetterProperty instanceWithProperty:property aInstance:self];
-        apc_object_hookWithProxyClass(self);
-        apc_instance_setAssociatedProperty(self, p);
     }
     if(option & APCPropertySetterFrontTrigger){
+        
         [p setterBindFrontTrigger:block];
     }
     else if (option & APCPropertySetterPostTrigger){
+        
         [p setterBindPostTrigger:block];
     }
     else if (option & APCPropertySetterUserTrigger){
+        
         [p setterBindUserTrigger:block condition:condition];
     }
     else if (option & APCPropertySetterCountTrigger){
+        
         [p setterBindCountTrigger:block condition:condition];
+    }
+    
+    if(regneed){
+        
+        apc_object_hookWithProxyClass(self);
+        apc_instance_setAssociatedProperty(self, p);
     }
 }
 

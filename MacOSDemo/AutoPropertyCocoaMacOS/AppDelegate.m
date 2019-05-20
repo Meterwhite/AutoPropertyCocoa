@@ -9,6 +9,8 @@
 #import "AppDelegate.h"
 #import "APCScope.h"
 #import "APCTest.h"
+#warning <#message#>
+#import "apc-objc-runtimelock.h"
 
 @interface AppDelegate ()
 
@@ -22,7 +24,11 @@
 
 //    [APCTest testDemo:0];
 //    [APCTest testDemo:101];
-    [APCTest testDemo:104];
+//    [APCTest testDemo:106];
+    
+//    [APCTest testDemoFrom:100 to:106];
+    
+    [APCTest testDemo:10086];
 }
 
 

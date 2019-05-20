@@ -38,7 +38,6 @@ _Bool apc_contains_objcruntimelock(void)
 
 static APCOBJCRuntimelocker*        apc_objcruntimelocker;
 
-
 class APCOBJCRuntimelocker : apc_nocopy_t{
     
 protected:
@@ -66,31 +65,30 @@ public:
     ~APCOBJCRuntimelocker()
     {
         signal_unlockRuntime();
-        apc_objcruntimelocker = nil;
         pthread_mutex_unlock(lock);
     }
     
-    _Bool testingThreadID()
+    inline _Bool testingThreadID()
     {
         return pthread_equal(thread_id, pthread_self());
     }
     
-    void wait_runtimeLockedSuccess()
+    inline void wait_runtimeLockedSuccess()
     {
         dispatch_semaphore_wait(runtime_locked_success, DISPATCH_TIME_FOREVER);
     }
     
-    void signal_runtimeLockedSuccess()
+    inline void signal_runtimeLockedSuccess()
     {
         dispatch_semaphore_signal(runtime_locked_success);
     }
     
-    void wait_unlockRuntime()
+    inline void wait_unlockRuntime()
     {
         dispatch_semaphore_wait(need_unlock_runtime, DISPATCH_TIME_FOREVER);
     }
     
-    void signal_unlockRuntime()
+    inline void signal_unlockRuntime()
     {
         dispatch_semaphore_signal(need_unlock_runtime);
     }
@@ -99,15 +97,15 @@ public:
     {
         dispatch_queue_t q
         =
-        dispatch_queue_create("APCOBJCRuntimelocker::triggerObjcRuntimelockAsync", DISPATCH_QUEUE_CONCURRENT);
-        
+        dispatch_queue_create("APCOBJCRuntimelocker::triggerObjcRuntimelockAsync", DISPATCH_QUEUE_SERIAL);
+        ///The serial queue guarantees that the locker will not be changed when the task is executed.
         dispatch_async(q, ^{
             
             /**
              The runtimelock will be locked in the function objc_allocateProtocol() and then 'calloc' will be called.
              Use fishhook to hook the 'calloc' function, then block 'calloc' to know that we can unlock the thread after completing our work.
              */
-            thread_id = pthread_self();
+            this->thread_id = pthread_self();
             objc_allocateProtocol("CN198964");
         });
     }
@@ -130,11 +128,12 @@ void apc_objcruntimelocker_trylock(void)
          objc_allocateProtocol(...) ---> [here] ---> calloc(...) ---> userblock(...)
          */
         apc_objcruntimelocker->signal_runtimeLockedSuccess();
-        
         /**
          userblock(...) ---> [here] ---> No longer blocking the thread.
          */
         apc_objcruntimelocker->wait_unlockRuntime();
+        //Make sure it won't be executed again
+        apc_objcruntimelocker = nil;
     }
 }
 
@@ -192,4 +191,31 @@ void apc_debug_objcruntimelock_create(void)
     pthread_mutex_init(&apc_objcruntimelock, NULL);
     NSCAssert(0 == result, @"Failed to initialize mutex with error %d.", result);
 }
+
+pthread_rwlock_t apc_test_runtimelock = PTHREAD_RWLOCK_INITIALIZER;
+void apc_debug_test_objcruntimelock(void)
+{
+    {
+        int count = 50000;
+        while (count--) {
+
+            apc_runtimelock_writer_t writting(apc_test_runtimelock);
+            printf("%u\n",count);
+        }
+    }
+    
+    {
+        __block int count = 50000;
+        dispatch_queue_t queue
+        =
+        dispatch_queue_create(0, DISPATCH_QUEUE_CONCURRENT);
+        
+        dispatch_apply(count, queue, ^(size_t) {
+            
+            apc_runtimelock_writer_t writting(apc_test_runtimelock);
+            printf("%u\n" ,--count);
+        });
+    }
+}
+
 #endif

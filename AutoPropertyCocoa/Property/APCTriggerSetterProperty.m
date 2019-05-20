@@ -42,33 +42,33 @@
 - (void)setterBindFrontTrigger:(void (^)(id _Nonnull, id _Nullable))block
 {
     _block_fronttrigger = [block copy];
-    _triggerOption |= APCPropertySetterFrontTrigger;
+    _triggerOption      |= APCPropertySetterFrontTrigger;
 }
 
 - (void)setterBindPostTrigger:(void (^)(id _Nonnull, id _Nullable))block
 {
-    _block_posttrigger = [block copy];
-    _triggerOption |= APCPropertySetterPostTrigger;
+    _block_posttrigger  = [block copy];
+    _triggerOption      |= APCPropertySetterPostTrigger;
 }
 
 - (void)setterBindUserTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable))condition
 {
-    _block_usertrigger   = [block copy];
-    _block_usercondition = [condition copy];
-    _triggerOption |= APCPropertySetterUserTrigger;
+    _block_usertrigger  = [block copy];
+    _block_usercondition= [condition copy];
+    _triggerOption      |= APCPropertySetterUserTrigger;
 }
 
 - (void)setterBindCountTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition
 {
-    _block_counttrigger   = [block copy];
-    _block_countcondition = [condition copy];
-    _triggerOption |= APCPropertySetterCountTrigger;
+    _block_counttrigger     = [block copy];
+    _block_countcondition   = [condition copy];
+    _triggerOption          |= APCPropertySetterCountTrigger;
 }
 
 - (void)setterUnbindFrontTrigger
 {
     _block_fronttrigger = nil;
-    _triggerOption &= ~APCPropertySetterFrontTrigger;
+    _triggerOption      &= ~APCPropertySetterFrontTrigger;
 }
 
 - (void)setterUnbindPostTrigger
@@ -79,16 +79,16 @@
 
 - (void)setterUnbindUserTrigger
 {
-    _block_usertrigger   = nil;
-    _block_usercondition = nil;
-    _triggerOption &= ~APCPropertySetterUserTrigger;
+    _block_usertrigger      = nil;
+    _block_usercondition    = nil;
+    _triggerOption          &= ~APCPropertySetterUserTrigger;
 }
 
 - (void)setterUnbindCountTrigger
 {
-    _block_counttrigger   = nil;
-    _block_countcondition = nil;
-    _triggerOption &= ~APCPropertySetterCountTrigger;
+    _block_counttrigger     = nil;
+    _block_countcondition   = nil;
+    _triggerOption          &= ~APCPropertySetterCountTrigger;
 }
 
 - (void)performSetterFrontTriggerBlock:(id)_SELF value:(id)value
