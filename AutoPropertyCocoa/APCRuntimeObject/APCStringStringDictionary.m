@@ -16,6 +16,7 @@
     NSMutableDictionary <NSString*, id>*
     _read_data;
     
+    ///Immutable type can increase reading speed by 10~20%
     NSDictionary        <NSString*, id>*
     _readonly;
     
