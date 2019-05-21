@@ -84,7 +84,8 @@ union apc_coder_t {
 #else
     uint32      value;
 #endif
-    char __size[2*sizeof(unsigned long) + 1];
+    uintptr_t       : sizeof(uintptr_t);
+    uintptr_t   imp : sizeof(uintptr_t);
 };
 
 typedef union apc_coder_t APCCoder;

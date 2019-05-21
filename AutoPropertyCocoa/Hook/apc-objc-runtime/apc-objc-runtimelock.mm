@@ -68,27 +68,27 @@ public:
         pthread_mutex_unlock(lock);
     }
     
-    inline _Bool testingThreadID()
+    OS_ALWAYS_INLINE _Bool testingThreadID()
     {
         return pthread_equal(thread_id, pthread_self());
     }
     
-    inline void wait_runtimeLockedSuccess()
+    OS_ALWAYS_INLINE void wait_runtimeLockedSuccess()
     {
         dispatch_semaphore_wait(runtime_locked_success, DISPATCH_TIME_FOREVER);
     }
     
-    inline void signal_runtimeLockedSuccess()
+    OS_ALWAYS_INLINE void signal_runtimeLockedSuccess()
     {
         dispatch_semaphore_signal(runtime_locked_success);
     }
     
-    inline void wait_unlockRuntime()
+    OS_ALWAYS_INLINE void wait_unlockRuntime()
     {
         dispatch_semaphore_wait(need_unlock_runtime, DISPATCH_TIME_FOREVER);
     }
     
-    inline void signal_unlockRuntime()
+    OS_ALWAYS_INLINE void signal_unlockRuntime()
     {
         dispatch_semaphore_signal(need_unlock_runtime);
     }

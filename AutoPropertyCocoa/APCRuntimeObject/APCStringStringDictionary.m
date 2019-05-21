@@ -96,7 +96,7 @@
     
     ///Find head key
     iKey = iKey.head;
-#warning iKey will work normally? cxx rewrite!
+    
     for (iKey in iKey.head) {
         
         [_manager removeObjectForKey:iKey];
