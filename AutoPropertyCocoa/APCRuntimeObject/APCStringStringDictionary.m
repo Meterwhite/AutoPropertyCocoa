@@ -1,8 +1,8 @@
 //
 //  APCStringStringDictionary.m
-//  AutoPropertyCocoaMacOS
+//  AutoPropertyCocoa
 //
-//  Created by MDLK on 2019/5/20.
+//  Created by Novo on 2019/5/20.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
@@ -10,7 +10,7 @@
 
 @implementation APCStringStringDictionary
 {
-    NSMapTable          <APCStringStringKey*, id>*
+    NSMapTable          <APCStringkeyString*, id>*
     _manager;
 
     NSMutableDictionary <NSString*, id>*
@@ -62,15 +62,13 @@
     return [_values copy];
 }
 
-- (void)setObject:(id)anObject forKey:(APCStringStringKey *)mKey
+- (void)setObject:(id)anObject forKey:(APCStringkeyString *)mKey
 {
-    APCStringStringKey * key = mKey->head;
-    
-    do {
+    for (APCStringkeyString * item in mKey.head) {
         
-        [_manager setObject:anObject forKey:key];
-        [_read_data setObject:anObject forKey:key->value];
-    } while ((key = key->next));
+        [_manager setObject:anObject forKey:item];
+        [_read_data setObject:anObject forKey:item->value];
+    }
     
     [_values addObject:anObject];
     
@@ -84,24 +82,28 @@
 
 - (void)removeObjectForKey:(NSString *)aKey
 {
-    id value = [_readonly objectForKey:aKey];
+    APCStringkeyString* iKey;
+    for (APCStringkeyString* item in _manager.keyEnumerator) {
+        
+        if([item isEqualToString:aKey]){
+            
+            iKey = item;
+            break;
+        }
+    }
     
-    if(value == nil) return;
-    
-    APCStringStringKey* iKey = [APCStringStringKey keyWithMatchingProperty:aKey];
-    
-    iKey = [_manager objectForKey:iKey];
+    if(iKey == nil) return;
     
     ///Find head key
-    iKey = iKey->head;
-    
-    do {
+    iKey = iKey.head;
+#warning iKey will work normally? cxx rewrite!
+    for (iKey in iKey.head) {
         
         [_manager removeObjectForKey:iKey];
         [_read_data removeObjectForKey:iKey->value];
-    } while ((iKey = iKey->next));
+    }
     
-    [_values removeObject:value];
+    [_values removeObject:[_readonly objectForKey:aKey]];
     
     _readonly = [_read_data copy];
 }

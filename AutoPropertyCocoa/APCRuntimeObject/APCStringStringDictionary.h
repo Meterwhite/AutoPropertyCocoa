@@ -1,13 +1,13 @@
 //
 //  APCStringStringDictionary.h
-//  AutoPropertyCocoaMacOS
+//  AutoPropertyCocoa
 //
-//  Created by MDLK on 2019/5/20.
+//  Created by Novo on 2019/5/20.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "APCStringStringKey.h"
+#import "APCStringkeyString.h"
 
 /**
  Many string to one object dictionary.
@@ -53,7 +53,7 @@
 
 + (nonnull instancetype)dictionary;
 
-- (void)setObject:(nonnull ObjectType)anObject forKey:(nonnull APCStringStringKey*)aKey;
+- (void)setObject:(nonnull ObjectType)anObject forKey:(nonnull APCStringkeyString*)aKey;
 
 - (nonnull ObjectType)objectForKey:(nonnull NSString*)aKey;
 

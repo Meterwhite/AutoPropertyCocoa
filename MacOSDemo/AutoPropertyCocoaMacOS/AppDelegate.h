@@ -1,8 +1,8 @@
 //
 //  AppDelegate.h
-//  AutoPropertyCocoaMacOS
+//  AutoPropertyCocoa
 //
-//  Created by MDLK on 2019/4/8.
+//  Created by Novo on 2019/4/8.
 //  Copyright © 2019 Novo. All rights reserved.
 //
 

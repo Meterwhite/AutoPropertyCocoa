@@ -6,6 +6,7 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+
 #import "APCStringStringDictionary.h"
 #import "APCTriggerGetterProperty.h"
 #import "NSObject+APCExtension.h"
@@ -537,36 +538,36 @@ APC_TEST_DEMO(ClassInstanceMix,10086)
     =
     [APCStringStringDictionary dictionary];
     
-    APCStringStringKey* k0
+    APCStringkeyString* k0
     =
-    [APCStringStringKey keyWithProperty:@"a"
+    [APCStringkeyString stringkeyStringWithProperty:@"a"
                                  getter:@"G_a"
                                  setter:@"S_a"];
     
-    APCStringStringKey* k1
+    APCStringkeyString* k1
     =
-    [APCStringStringKey keyWithProperty:@"b"
+    [APCStringkeyString stringkeyStringWithProperty:@"b"
                                  getter:[NSString stringWithFormat:@"G_%@",@"b"]
                                  setter:[NSMutableString stringWithString:@"S_b"]];
     
-    APCStringStringKey* k2
+    APCStringkeyString* k2
     =
-    [APCStringStringKey keyWithProperty:@"c"
+    [APCStringkeyString stringkeyStringWithProperty:@"c"
                                  getter:nil
                                  setter:nil];
     
-    APCStringStringKey* k3
+    APCStringkeyString* k3
     =
-    [APCStringStringKey keyWithProperty:@"A"
+    [APCStringkeyString stringkeyStringWithProperty:@"A"
                                  getter:@"B"
                                  setter:@"C"];
     
-    [dictionary setObject:@"0" forKey:k0];
-    [dictionary setObject:@"1" forKey:k1];
-    [dictionary setObject:@"2" forKey:k2];
-    [dictionary setObject:@"3" forKey:k3];
+    [dictionary setObject:@"00" forKey:k0];
+    [dictionary setObject:@"11" forKey:k1];
+    [dictionary setObject:@"22" forKey:k2];
+    [dictionary setObject:@"33" forKey:k3];
     
-    
+    [dictionary removeObjectForKey:@"G_b"];
     
     APCDlog(@"Pause...");
 }
