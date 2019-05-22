@@ -166,7 +166,7 @@
 #pragma mark - debug working
 void apc_debug_super_method_void1(APCUserEnvironmentSupportObject* instance)
 {
-    if([instance isProxy] == NO){
+    if(![instance isProxy]){
         
         return;
     }
@@ -177,7 +177,7 @@ void apc_debug_super_method_void1(APCUserEnvironmentSupportObject* instance)
 
 void apc_debug_super_method_void2(APCUserEnvironmentSupportObject* instance, id object)
 {
-    if([instance isProxy] == NO){
+    if(![instance isProxy]){
         
         return;
     }
@@ -189,7 +189,7 @@ void apc_debug_super_method_void2(APCUserEnvironmentSupportObject* instance, id 
 
 BOOL apc_debug_super_method_BOOL2(APCUserEnvironmentSupportObject* instance, id object)
 {
-    if([instance isProxy] == NO){
+    if(![instance isProxy]){
         
         return NO;
     }
@@ -204,7 +204,7 @@ BOOL apc_debug_super_method_BOOL2(APCUserEnvironmentSupportObject* instance, id 
 
 id apc_debug_super_method_id1(APCUserEnvironmentSupportObject* instance)
 {
-    if([instance isProxy] == NO){
+    if(![instance isProxy]){
         
         return nil;
     }

@@ -102,7 +102,7 @@
     if(p == nil){
         
         p = [APCLazyProperty instanceWithProperty:property aInstance:self];
-        if(NO == apc_object_isProxyInstance(self)){
+        if(!apc_object_isProxyInstance(self)){
             
             apc_object_hookWithProxyClass(self);
         }

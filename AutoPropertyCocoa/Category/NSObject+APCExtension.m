@@ -24,7 +24,7 @@
 
 - (void)apc_instanceUnbind
 {
-    if(YES == apc_object_isProxyInstance(self)){
+    if(apc_object_isProxyInstance(self)){
         
         apc_instance_unhookFromProxyClass(self);
     }

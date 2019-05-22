@@ -69,7 +69,7 @@ submacro_apc_concat(apc_debug_super_method_id, submacro_apc_argcount(__VA_ARGS__
 
 #define APCSuperPerformedAsVoid(instance, ...) \
 \
-if(YES == [(id)instance isProxy]){         \
+if([(id)instance isProxy]){         \
 \
 ((void(*)(submacro_apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)\
     (                                                   \
@@ -82,7 +82,7 @@ if(YES == [(id)instance isProxy]){         \
 
 #define APCSuperPerformedAsBOOL(instance, ...) \
 \
-((YES == [(id)instance isProxy])\
+(([(id)instance isProxy])\
 ?                               \
 ((BOOL(*)(submacro_apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)\
 (                                                       \
@@ -94,7 +94,7 @@ if(YES == [(id)instance isProxy]){         \
 
 #define APCSuperPerformedAsId(instance, ...) \
 \
-((YES == [(APCUserEnvironmentSupportObject*)instance isProxy])  \
+(([(APCUserEnvironmentSupportObject*)instance isProxy])  \
 ?                                                   \
 ((id(*)(submacro_apc_msgSend_t_list(__VA_ARGS__)))objc_msgSend)  \
 (                                                       \
@@ -128,14 +128,15 @@ submacro_apc_concat(submacro_apc_t_list_ , submacro_apc_argcount(__VA_ARGS__))
  */
 @interface APCUserEnvironmentSupportObject<MessageType> : NSProxy
 - (nonnull id_apc_t)initWithObject:(nonnull NSObject*)object
-                               message:(nonnull MessageType<APCUserEnvironmentMessage>)message
-                                action:(nonnull SEL)action;
+                           message:(nonnull MessageType<APCUserEnvironmentMessage>)message
+                            action:(nonnull SEL)action;
+
 - (nullable MessageType)superMessage;
 
 - (nonnull SEL)action;
 
 /**
- Overwrite <NSObject>.
+ Overwrite protocol <NSObject>.
  Returns the object that actually responds to the objc message.
  */
 - (nonnull id)self;

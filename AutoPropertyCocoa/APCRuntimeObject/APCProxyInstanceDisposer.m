@@ -29,7 +29,7 @@
     APCDlog(@"Enter Disposer << dealoc: %@", NSStringFromClass(_class));
     if(_class != nil){
         
-        if(YES == apc_class_conformsProxyClass(_class)){
+        if(apc_class_conformsProxyClass(_class)){
             
             APCDlog(@"Disposer << dealoc << objc_disposeClassPair : %@", NSStringFromClass(_class));
             objc_disposeClassPair(_class);

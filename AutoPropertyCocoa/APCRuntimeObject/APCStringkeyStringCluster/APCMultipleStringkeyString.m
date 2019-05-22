@@ -94,7 +94,7 @@
         
         if(selfKey){
             
-            if(NO ==[selfKey isEqual:stringstring]) return NO;
+            if(![selfKey isEqual:stringstring]) return NO;
             
             selfKey         = selfKey->next;
             stringstring    = stringstring->next;

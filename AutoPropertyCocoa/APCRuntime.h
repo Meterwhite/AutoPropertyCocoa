@@ -72,8 +72,8 @@ apc_lookup_superPropertyhook_inRange(Class _Nonnull from
 /** The second parameter 'to' is include. */
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_lookup_sourcePropertyhook_inRange(Class _Nonnull from
-                                              , Class _Nonnull to
-                                              , NSString* _Nonnull property);
+                                      , Class _Nonnull to
+                                      , NSString* _Nonnull property);
 
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_lookup_instancePropertyhook(APCProxyInstance* _Nonnull instance
@@ -91,9 +91,6 @@ apc_lookup_instanceProperty(APCProxyInstance* _Nonnull instance
 
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
-
-OBJC_EXPORT void
-apc_propertyhook_dispose_nolock(APCPropertyHook* _Nonnull hook);
 
 __kindof APCHookProperty* _Nullable
 apc_propertyhook_lookupSuperProperty(APCPropertyHook* _Nonnull hook, const char* _Nonnull ivar);

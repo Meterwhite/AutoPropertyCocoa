@@ -260,6 +260,14 @@ dispatch_semaphore_signal(_lock);
     APC_CLASS_MAPPER_UNLOCK;
 }
 
+- (void)removeAllClasses
+{
+    APC_CLASS_MAPPER_LOCK;
+    [_map removeAllObjects];
+    [_tree clean];
+    APC_CLASS_MAPPER_UNLOCK;
+}
+
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id  _Nullable __unsafe_unretained [])buffer count:(NSUInteger)len
 {
     return [_map countByEnumeratingWithState:state objects:buffer count:len];

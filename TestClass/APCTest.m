@@ -55,7 +55,7 @@ static NSMutableDictionary* _f_map;
         
         Method m = m_list[count];
         NSString* fName = @(sel_getName(method_getName(m)));
-        if(NO == [fName containsString:@"_"]){
+        if(![fName containsString:@"_"]){
             
             continue;
         }

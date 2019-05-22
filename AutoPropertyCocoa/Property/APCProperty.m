@@ -259,7 +259,7 @@
     
     Class em_cls;
     ///AssociatedSetter
-    if(NO == (_accessOption & APCPropertyComponentOfSetter)) {
+    if(!(_accessOption & APCPropertyComponentOfSetter)) {
         
         for (em_cls = _des_class; em_cls != nil; em_cls = class_getSuperclass(em_cls)) {
             
@@ -291,7 +291,7 @@
     }
     
     ///Ivar
-    if(NO == (_accessOption & APCPropertyComponentOfIVar)){
+    if(!(_accessOption & APCPropertyComponentOfIVar)){
         
         for (em_cls = _des_class; em_cls != nil; em_cls = class_getSuperclass(em_cls)) {
             

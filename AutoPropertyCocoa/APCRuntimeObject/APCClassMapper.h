@@ -31,6 +31,8 @@
  */
 - (void)removeKindOfClass:(nonnull Class)cls;
 
+- (void)removeAllClasses;
+
 - (nullable Class)superclassOfClass:(nonnull Class)cls;
 
 @end
