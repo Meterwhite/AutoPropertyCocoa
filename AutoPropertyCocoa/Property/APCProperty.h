@@ -8,7 +8,7 @@
 
 #import "APCScope.h"
 
-@class APCPropertyMappingKey;
+@class APCStringkeyString;
 
 typedef NS_OPTIONS (NSUInteger,APCPropertyAccessOptions){
     
@@ -157,7 +157,7 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
  OriginalClass/TargetClass.UserProperty
  */
 - (NSUInteger)hash;
-
-- (nonnull APCPropertyMappingKey*)mappingKey;
+#warning change to mappingKeyString
+- (nonnull APCStringkeyString*)mappingKey;
 @end
 

@@ -23,11 +23,19 @@
                                      setter:(NSString*)setter
 {
     
+    NSAssert(property, @"APC: Property can not be nil!");
+    
+    if(getter || setter){
+        
+        return
+        
+        [APCMultipleStringkeyString stringkeyStringWithProperty:property
+                                                         getter:getter
+                                                         setter:setter];
+    }
     return
     
-    [APCMultipleStringkeyString stringkeyStringWithProperty:property
-                                                     getter:getter
-                                                     setter:setter];
+    [APCSingleStringkeyString stringkeyStringWithString:property];
 }
 
 + (instancetype)stringkeyStringFromArray:(NSArray<NSString *> *)array

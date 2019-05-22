@@ -108,6 +108,9 @@ apc_property_getSuperProperty(APCHookProperty* _Nonnull p);
 OBJC_EXPORT void
 apc_registerProperty(APCHookProperty* _Nonnull p);
 
+OBJC_EXPORT void
+apc_disposeProperty(APCHookProperty* _Nonnull p);
+
 OBJC_EXPORT Class _Nullable
 apc_class_getSuperclass(Class _Nonnull cls);
 
@@ -115,6 +118,8 @@ OBJC_EXPORT void
 apc_class_unhook(Class _Nonnull cls);
 
 #pragma mark - For instance
+OBJC_EXPORT BOOL
+apc_instance_isNeedUnhook(APCProxyInstance* _Nonnull instance);
 
 OBJC_EXPORT void
 apc_instance_setAssociatedProperty(APCProxyInstance* _Nonnull instance

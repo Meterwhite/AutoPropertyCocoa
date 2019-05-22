@@ -45,7 +45,10 @@
 
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-    [apc_lookup_property(self, property, @selector(lazyload)) unhook];
+    apc_disposeProperty
+    (
+        apc_lookup_property(self, property, @selector(lazyload))
+    );
 }
 
 
@@ -82,7 +85,12 @@
 
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
-    [apc_lookup_instanceProperty(self, property, @selector(lazyload)) unhook];
+    apc_instance_removeAssociatedProperty
+    (
+        self
+        ,
+        apc_lookup_instanceProperty(self, property, @selector(lazyload))
+    );
 }
 
 - (void)apc_instanceSetLazyLoadProperty:(NSString*)property

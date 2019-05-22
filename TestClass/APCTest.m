@@ -569,6 +569,15 @@ APC_TEST_DEMO(ClassInstanceMix,10086)
     
     [dictionary removeObjectForKey:@"G_b"];
     
+    id adsfa = [dictionary objectForKey:@"a"];
+    
+    
+    [dictionary removeObjectForKey:@"G_a"];
+    
+    [dictionary removeObjectForKey:@"c"];
+    
+    [dictionary removeObjectForKey:@"C"];
+    
     APCDlog(@"Pause...");
 }
 

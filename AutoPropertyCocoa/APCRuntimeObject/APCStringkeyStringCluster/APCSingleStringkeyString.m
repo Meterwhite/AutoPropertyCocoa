@@ -11,12 +11,18 @@
 
 @implementation APCSingleStringkeyString
 {
-    NSArray<NSString*>* _allStrings;
+    void*  _self_ptr;
 }
 
 + (instancetype)stringkeyStringWithString:(NSString*)string
 {
-    return [APCSingleStringkeyString stringkeyWithString:string];
+    APCSingleStringkeyString* ret
+    =
+    [APCSingleStringkeyString stringkeyWithString:string];
+    
+    ret->_self_ptr = (__bridge void *)(ret);
+    
+    return ret;
 }
 
 - (APCStringkeyString *)head
@@ -42,10 +48,15 @@
                                   objects:(__unsafe_unretained id  _Nullable [])buffer
                                     count:(NSUInteger)len
 {
-    if(state->state != 0) return 0;
+    if(state->state == 0){
+        
+        state->mutationsPtr = (unsigned long*)&_self_ptr;
+    }else if(state->state != 0){
+        
+        return 0;
+    }
     
-    __unsafe_unretained const id * const_ptr = &value;
-    state->itemsPtr = (__typeof__(state->itemsPtr))const_ptr;
+    state->itemsPtr = (typeof(state->itemsPtr))(__unsafe_unretained const id *)(void*)(&_self_ptr);
     
     (state->state)++;
     

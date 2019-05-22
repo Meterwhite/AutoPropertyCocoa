@@ -10,9 +10,9 @@
 #import "APCMutableStringkeyString.h"
 
 @implementation APCMultipleStringkeyString
-+ (instancetype)stringkeyStringWithProperty:(NSString*)property
-                                 getter:(NSString*)getter
-                                 setter:(NSString*)setter
++ (APCMultipleStringkeyString*)stringkeyStringWithProperty:(NSString*)property
+                                                    getter:(NSString*)getter
+                                                    setter:(NSString*)setter
 {
     
     APCMultipleStringkeyString* isetter = setter ? [self stringkey] : nil;
@@ -124,29 +124,25 @@
                                   objects:(__unsafe_unretained id  _Nullable [])buffer
                                     count:(NSUInteger)len
 {
-    NSUInteger      count   = 0;
     unsigned long   counted = state->state;
     NSUInteger      length  = self.length;
-    
+    NSUInteger      count   = 0;
     if(counted == 0){
         
         state->mutationsPtr = (unsigned long*)(&(_head->_mutation));
         atomic_fetch_add(&_enumerating, 1);
-    }else if (counted < length) {
-        
-        state->itemsPtr = buffer;
-        
-        for (APCMultipleStringkeyString* item = self
-             ; (counted < length) && (count < len)
-             ; (count++, counted++, item = item->next) ) {
-            
-            buffer[count] = item;
-        }
-    }else{
+    }else if (counted >= length) {
         
         atomic_fetch_sub(&_enumerating, 1);
+        return 0;
     }
-    
+    state->itemsPtr = buffer;
+    for (APCMultipleStringkeyString* item = self
+         ; (counted < length) && (count < len)
+         ; (count++, counted++, item = item->next) ) {
+        
+        buffer[count] = item;
+    }
     state->state = counted;
     
     return count;
@@ -154,7 +150,9 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    return [[APCMultipleStringkeyString allocWithZone:zone] initWithStringArray:self.allStrings];
+    return
+    
+    [[APCMultipleStringkeyString allocWithZone:zone] initWithStringArray:self.allStrings];
 }
 
 - (void)dealloc

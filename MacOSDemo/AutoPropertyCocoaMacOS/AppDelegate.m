@@ -26,9 +26,9 @@
 //    [APCTest testDemo:101];
 //    [APCTest testDemo:106];
     
-//    [APCTest testDemoFrom:100 to:106];
+    [APCTest testDemoFrom:100 to:106];
     
-    [APCTest testDemo:10086];
+//    [APCTest testDemo:10086];
 }
 
 

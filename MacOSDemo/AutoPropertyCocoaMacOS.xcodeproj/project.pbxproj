@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		454A320C22904F4E00D64483 /* APCPropertyMappingKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 454A320B22904F4E00D64483 /* APCPropertyMappingKey.m */; };
 		456B1BE5229395C8001840FA /* APCSingleStringkeyString.m in Sources */ = {isa = PBXBuildFile; fileRef = 456B1BE4229395C8001840FA /* APCSingleStringkeyString.m */; };
 		456B1BE822939D87001840FA /* APCStringkey.m in Sources */ = {isa = PBXBuildFile; fileRef = 456B1BE722939D87001840FA /* APCStringkey.m */; };
 		456B1BEB2293A2C9001840FA /* APCStringkeyString.m in Sources */ = {isa = PBXBuildFile; fileRef = 456B1BEA2293A2C9001840FA /* APCStringkeyString.m */; };
@@ -47,8 +46,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		454A320A22904F4E00D64483 /* APCPropertyMappingKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCPropertyMappingKey.h; sourceTree = "<group>"; };
-		454A320B22904F4E00D64483 /* APCPropertyMappingKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCPropertyMappingKey.m; sourceTree = "<group>"; };
 		456B1BE3229395C8001840FA /* APCSingleStringkeyString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCSingleStringkeyString.h; sourceTree = "<group>"; };
 		456B1BE4229395C8001840FA /* APCSingleStringkeyString.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCSingleStringkeyString.m; sourceTree = "<group>"; };
 		456B1BE622939D87001840FA /* APCStringkey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCStringkey.h; sourceTree = "<group>"; };
@@ -265,8 +262,6 @@
 				45E1CDCD228BF3BB00DCD3F0 /* APCClassInheritanceTree.m */,
 				45E1CDD2228BF3BB00DCD3F0 /* APCClassMapper.h */,
 				45E1CDCF228BF3BB00DCD3F0 /* APCClassMapper.m */,
-				454A320A22904F4E00D64483 /* APCPropertyMappingKey.h */,
-				454A320B22904F4E00D64483 /* APCPropertyMappingKey.m */,
 				45E1CE04228D34F800DCD3F0 /* APCProxyInstanceDisposer.h */,
 				45E1CE05228D34F800DCD3F0 /* APCProxyInstanceDisposer.m */,
 				456B1BE622939D87001840FA /* APCStringkey.h */,
@@ -394,7 +389,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				45E1CE02228BF3DE00DCD3F0 /* Superman.m in Sources */,
-				454A320C22904F4E00D64483 /* APCPropertyMappingKey.m in Sources */,
 				45E1CDF9228BF3BB00DCD3F0 /* APCMethodHook.m in Sources */,
 				45E1CDFB228BF3BB00DCD3F0 /* apc-fishhook.c in Sources */,
 				45E1CDF8228BF3BB00DCD3F0 /* APCPropertyHook.mm in Sources */,

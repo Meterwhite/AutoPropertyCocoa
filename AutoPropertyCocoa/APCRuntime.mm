@@ -8,7 +8,6 @@
 
 #include "APCStringStringDictionary.h"
 #include "APCProxyInstanceDisposer.h"
-#include "APCPropertyMappingKey.h"
 #include "NSString+APCExtension.h"
 #include "apc-objc-runtimelock.h"
 #include "APCPropertyHook.h"
@@ -42,15 +41,20 @@ void apc_runtimelock_reading(void(NS_NOESCAPE^block)(void))
 
 /** { Instance : { Property : Hook } } */
 const static char           _keyForAPCInstanceBoundMapper = '\0';
-/** Class : { Key : Hook -> [Property] } */
-static NSMapTable*          _apc_runtime_property_classmapper;
+
+/** Class : { sKey : Hook -> [Property] } */
+static NSMapTable<Class,APCStringStringDictionary<__kindof APCMethodHook*>*>*
+_apc_runtime_property_classmapper;
+
 static NSMapTable*          _apc_runtime_proxyinstances;
+
 static APCClassMapper*      _apc_runtime_inherit_map;
 
 /**
- { Class : { Key : Hook -> [Property] } }
+ { Class : { sKey : Hook -> [Property] } }
  */
-static NSMapTable* apc_runtime_property_classmapper()
+static NSMapTable<Class,APCStringStringDictionary<__kindof APCMethodHook*>*>*
+apc_runtime_property_classmapper()
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -63,13 +67,7 @@ static NSMapTable* apc_runtime_property_classmapper()
 NS_INLINE APCPropertyHook* _Nonnull
 apc_runtime_propertyhook(Class __unsafe_unretained _Nonnull clazz, NSString* _Nonnull property)
 {
-    return [[apc_runtime_property_classmapper() objectForKey:clazz]
-            objectForKey:[[APCPropertyMappingKey alloc] initWithMatchingProperty:property]];
-//    NSMapTable* c_map = apc_runtime_property_classmapper();
-//    NSMapTable* dictionary = [c_map objectForKey:clazz];
-//    APCPropertyMappingKey* mk = [[APCPropertyMappingKey alloc] initWithMatchingProperty:property];
-//    id ret = [dictionary objectForKey:mk];
-//    return ret;
+    return [[apc_runtime_property_classmapper() objectForKey:clazz] objectForKey:property];
 }
 
 static APCClassMapper* apc_runtime_inherit_map()
@@ -264,7 +262,7 @@ void apc_propertyhook_dispose_nolock(APCPropertyHook* hook)
         }
     }
     
-    [[c_map objectForKey:hook.hookclass] removeObjectForKey:[[APCPropertyMappingKey alloc] initWithMatchingProperty:hook.hookMethod]];
+    [[c_map objectForKey:hook.hookclass] removeObjectForKey:hook.hookMethod];
     
     ///Update class inheritence list
     if(0 == [[c_map objectForKey:hook.hookclass] count]){
@@ -311,10 +309,13 @@ void apc_class_unhook(Class cls)
 {
     apc_runtimelock_writer_t writting(apc_runtimelock);
     
-    NSMapTable*dictionary = [apc_runtime_property_classmapper() objectForKey:cls];
+    APCStringStringDictionary* dictionary
+    =
+    [apc_runtime_property_classmapper() objectForKey:cls];
+    
     if(dictionary == nil) return;
     
-    for (APCPropertyHook* iHook in dictionary) {
+    for (APCPropertyHook* iHook in dictionary.objectEnumerator) {
         
         ((void(*)(id,SEL))objc_msgSend)(iHook, _apc_message_unhook);
     }
@@ -324,18 +325,20 @@ void apc_registerProperty(APCHookProperty* p)
 {
     apc_runtimelock_writer_t writting(apc_runtimelock);
     
-    NSMapTable*dictionary = [apc_runtime_property_classmapper() objectForKey:p->_des_class];
+    APCStringStringDictionary* dictionary
+    =
+    [apc_runtime_property_classmapper() objectForKey:p->_des_class];
+    
     APCPropertyHook*    itHook;
     APCPropertyHook*    hook;
     if(dictionary == nil) {
         
-#warning 哈希在这里不太实用，全是冲突再哈希，应该考虑再定制新结构
-        dictionary = [NSMapTable strongToStrongObjectsMapTable];
+        dictionary = [APCStringStringDictionary dictionary];
         [apc_runtime_property_classmapper() setObject:dictionary forKey:p->_des_class];
         apc_runtime_inherit_register(p->_des_class);
     }
     
-    hook = [dictionary objectForKey:p.mappingKey];
+    hook = [dictionary objectForKey:p->_hooked_name];
     
     if(hook != nil){
         
@@ -363,6 +366,14 @@ void apc_registerProperty(APCHookProperty* p)
     }
 }
 
+void apc_disposeProperty(APCHookProperty* _Nonnull p)
+{
+    apc_runtimelock_writer_t writting(apc_runtimelock);
+    
+    [p.associatedHook unbindProperty:p];
+    [apc_runtime_property_classmapper() removeObjectForKey:p->_hooked_name];
+}
+
 __kindof APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 {
     apc_runtimelock_reader_t reading(apc_runtimelock);
@@ -385,25 +396,25 @@ __kindof APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 /**
  property : hook
  */
-static NSMapTable* apc_boundInstanceMapper(APCProxyInstance* instance)
+static APCStringStringDictionary<__kindof APCMethodHook*>* apc_boundInstanceMapper(APCProxyInstance* instance)
 {
-    NSMapTable*         mapper;
+    APCStringStringDictionary*         dictionary;
     
-    if(nil == (mapper = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
+    if(nil == (dictionary = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
         
         @synchronized (instance) {
             
-            if(nil == (mapper = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
+            if(nil == (dictionary = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
                 
-                mapper = [NSMapTable strongToStrongObjectsMapTable];
+                dictionary = [APCStringStringDictionary dictionary];
                 objc_setAssociatedObject(instance
                                          , &_keyForAPCInstanceBoundMapper
-                                         , mapper
+                                         , dictionary
                                          , OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             }
         }
     }
-    return mapper;
+    return dictionary;
 }
 
 NS_INLINE void apc_removeBoundInstanceMapper(APCProxyInstance* instance)
@@ -420,7 +431,7 @@ NS_INLINE void apc_removeBoundInstanceMapper(APCProxyInstance* instance)
 NS_INLINE APCPropertyHook*
 apc_instance_propertyhook(APCProxyInstance* instance, NSString* property)
 {
-    return [apc_boundInstanceMapper(instance) objectForKey:[[APCPropertyMappingKey alloc] initWithMatchingProperty:property]];
+    return [apc_boundInstanceMapper(instance) objectForKey:property];
 }
 
 __kindof APCHookProperty* apc_lookup_instanceProperty(APCProxyInstance* instance, NSString* property, SEL outlet)
@@ -434,53 +445,25 @@ __kindof APCHookProperty* apc_lookup_instanceProperty(APCProxyInstance* instance
 
 APCPropertyHook* apc_lookup_instancePropertyhook(APCProxyInstance* instance, NSString* property)
 {
-    return
-    apc_object_isProxyInstance(instance)
+    return apc_object_isProxyInstance(instance)
+    
     ?   apc_instance_propertyhook(instance, property)
     :   nil;
 }
 
-//APCPropertyHook* apc_lookup_instanceSetterPropertyhook(APCProxyInstance* instance, NSString* property)
-//{
-//    if(NO == apc_object_isProxyInstance(instance)) return nil;
-//    APCPropertyHook* hook = nil;
-//
-//    do {
-//
-//        if(nil != (hook = apc_instance_propertyhook(instance, property)))
-//
-//            break;
-//
-//
-//        if(nil != (hook = apc_instance_propertyhook(instance, property.apc_kvcAssumedSetterName1)))
-//
-//            break;
-//
-//
-//        if(nil != (hook = apc_instance_propertyhook(instance, property.apc_kvcAssumedSetterName2)))
-//
-//            break;
-//
-//    } while (0);
-//
-//    return hook;
-//}
 
 #pragma mark - For instance - public
 void apc_instance_setAssociatedProperty(APCProxyInstance* instance, APCHookProperty* p)
 {
-    if(NO == apc_object_isProxyInstance(instance)){
-        
-        return;
-    }
+    if(!apc_object_isProxyInstance(instance)) return;
     
-    APCPropertyHook* hook = [apc_boundInstanceMapper(instance) objectForKey:p.mappingKey];
+    APCPropertyHook* hook = [apc_boundInstanceMapper(instance) objectForKey:p->_hooked_name];
     
     if(hook == nil){
         
         @synchronized (instance) {
             
-            if(nil == (hook = [apc_boundInstanceMapper(instance) objectForKey:p.mappingKey])){
+            if(nil == (hook = [apc_boundInstanceMapper(instance) objectForKey:p->_hooked_name])){
                 
                 hook = [APCPropertyHook hookWithProperty:p];
                 [apc_boundInstanceMapper(instance) setObject:hook forKey:p.mappingKey];
@@ -494,9 +477,19 @@ void apc_instance_setAssociatedProperty(APCProxyInstance* instance, APCHookPrope
 
 void apc_instance_removeAssociatedProperty(APCProxyInstance* instance, APCHookProperty* p)
 {
-    if(YES == apc_object_isProxyInstance(instance)) {
+    if(!apc_object_isProxyInstance(instance)) return;
+    
+    APCStringStringDictionary* dictionary = apc_boundInstanceMapper(instance);
+    
+    @synchronized (instance) {
         
-        [apc_instance_propertyhook(instance, p->_hooked_name) unbindProperty:p];
+        [p.associatedHook unbindProperty:p];
+        [dictionary removeObjectForKey:p->_hooked_name];
+    }
+    
+    if([dictionary count] == 0){
+        
+        apc_instance_unhookFromProxyClass(instance);
     }
 }
 
@@ -573,10 +566,12 @@ APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
         APCProxyClass   cls  = objc_allocateClassPair(object_getClass(instance), name, 0);
         if(cls != nil){
             
-            [apc_runtime_proxyinstances() setObject:[[APCProxyInstanceDisposer alloc] initWithClass:cls] forKey:instance];
+            [apc_runtime_proxyinstances()
+             
+             setObject:[[APCProxyInstanceDisposer alloc] initWithClass:cls]
+             forKey:instance];
             objc_registerClassPair(cls);
             object_setClass(instance, cls);
-            
         }else if (nil == (cls = objc_getClass(name))){
             
             fprintf(stderr, "APC: Can not register class '%s' in runtime.",name);

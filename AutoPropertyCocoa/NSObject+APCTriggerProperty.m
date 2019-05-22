@@ -31,7 +31,7 @@
         [p getterUnbindFrontTrigger];
         if(p.triggerOption == APCPropertyNonTrigger){
             
-            [p unhook];
+            apc_disposeProperty(p);
         }
     }
 }
@@ -51,7 +51,7 @@
     [p getterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_disposeProperty(p);
     }
 }
 
@@ -70,7 +70,7 @@
     [p getterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_disposeProperty(p);
     }
 }
 
@@ -89,7 +89,7 @@
     [p getterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_disposeProperty(p);
     }
 }
 
@@ -108,7 +108,7 @@
     [p setterUnbindFrontTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_disposeProperty(p);
     }
 }
 
@@ -127,7 +127,7 @@
     [p setterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_disposeProperty(p);
     }
 }
 
@@ -146,7 +146,7 @@
     [p setterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_disposeProperty(p);
     }
 }
 
@@ -165,7 +165,7 @@
     [p setterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_disposeProperty(p);
     }
 }
 
@@ -252,7 +252,7 @@
     [p getterUnbindFrontTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_instance_removeAssociatedProperty(self, p);
     }
 }
 
@@ -271,7 +271,7 @@
     [p getterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_instance_removeAssociatedProperty(self, p);
     }
 }
 
@@ -290,7 +290,7 @@
     [p getterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_instance_removeAssociatedProperty(self, p);
     }
 }
 
@@ -309,7 +309,7 @@
     [p getterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_instance_removeAssociatedProperty(self, p);
     }
 }
 
@@ -328,7 +328,7 @@
     [p setterUnbindFrontTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_instance_removeAssociatedProperty(self, p);
     }
 }
 
@@ -347,7 +347,7 @@
     [p setterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_instance_removeAssociatedProperty(self, p);
     }
 }
 
@@ -366,7 +366,7 @@
     [p setterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_instance_removeAssociatedProperty(self, p);
     }
 }
 
@@ -385,7 +385,7 @@
     [p setterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
         
-        [p unhook];
+        apc_instance_removeAssociatedProperty(self, p);
     }
 }
 

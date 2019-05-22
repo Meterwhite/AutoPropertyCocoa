@@ -75,17 +75,22 @@
 #define if_APCCoderCompare(encstring, codevalue) if(APCCoderCompare(encstring, codevalue))
 
 
-union apc_coder_t {
+struct apc_coder_t {
     
-    char        mask;
-    char        encode[sizeof(unsigned long)];
+    union
+    {
+        
+        char        mask;
+        char        encode[sizeof(unsigned long)];
 #if __LP64__
-    uint64_t    value;
+        uint64_t    value;
 #else
-    uint32      value;
+        uint32      value;
 #endif
-    uintptr_t       : sizeof(uintptr_t);
-    uintptr_t   imp : sizeof(uintptr_t);
+    };
+    
+    uintptr_t       : 8*sizeof(uintptr_t);
+    uintptr_t   imp : 8*sizeof(uintptr_t);
 };
 
-typedef union apc_coder_t APCCoder;
+typedef struct apc_coder_t APCCoder;

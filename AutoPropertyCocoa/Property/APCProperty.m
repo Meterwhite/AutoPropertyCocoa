@@ -6,8 +6,8 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "APCStringStringDictionary.h"
 #import "NSString+APCExtension.h"
-#import "APCPropertyMappingKey.h"
 #import "APCProperty.h"
 #import "APCRuntime.h"
 #import "APCScope.h"
@@ -15,7 +15,7 @@
 @implementation APCProperty
 {
     volatile APCAtomicUInteger  _accessCount;
-    APCPropertyMappingKey*      _mappingKey;
+    APCStringkeyString*         _mappingKey;
 }
 
 + (instancetype)instanceWithProperty:(NSString*)propertyName
@@ -461,11 +461,11 @@
     return _hashcode;
 }
 
-- (APCPropertyMappingKey *)mappingKey
+- (APCStringkeyString *)mappingKey
 {
     if(_mappingKey == nil){
         
-        _mappingKey = [[APCPropertyMappingKey alloc] initWithProperty:_ori_property_name getter:_des_getter_name setter:_des_setter_name];
+        _mappingKey = [APCStringkeyString stringkeyStringWithProperty:_ori_property_name getter:_des_getter_name setter:_des_setter_name];
     }
     return _mappingKey;
 }

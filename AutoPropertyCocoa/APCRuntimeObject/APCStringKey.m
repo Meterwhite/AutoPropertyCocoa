@@ -56,7 +56,7 @@
 
 - (nonnull instancetype)copyKey
 {
-    return [[self.class alloc] initWithString:value];
+    return [[APCStringkey alloc] initWithString:value];
 }
 
 @end

@@ -17,7 +17,6 @@
 
 @property (nullable,strong,readonly) APCStringkeyString* head;
 
-//@property (nonnull,readonly,copy) NSArray<APCStringkeyString*> *allObjects;
 @property (nonnull,readonly,strong) NSArray<NSString*> *allStrings;
 
 @property (readonly) NSUInteger length;
