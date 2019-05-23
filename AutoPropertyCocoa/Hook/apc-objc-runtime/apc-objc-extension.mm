@@ -21,12 +21,18 @@
 //#include <cstddef>
 #include <pthread.h>
 #include <iterator>
+#include <malloc/malloc.h>
 
 struct apc_objc_class;
 struct apc_objc_object;
 
 typedef struct apc_objc_class *APCClass;
 typedef struct apc_objc_object *id;
+
+static void try_free(const void *p)
+{
+    if (p && malloc_size(p)) free((void *)p);
+}
 
 union apc_isa_t
 {
@@ -382,12 +388,24 @@ public:
             return &list;
         }
     }
-    
+
+    void tryFree() {
+        if (hasArray()) {
+            for (uint32_t i = 0; i < array()->count; i++) {
+                try_free(array()->lists[i]);
+            }
+            try_free(array());
+        }
+        else if (list) {
+            try_free(list);
+        }
+    }
     
     void deleteElement(Element* elm) {
         
         if(hasArray()) {
             
+            uint32_t del;
             array_t* a = array();
             for (uint32_t i = 0; i < a->count; i++) {
                 
@@ -397,32 +415,53 @@ public:
                     
                     if(j_list->deleteElement(elm)) {
                         
-                        apc_method_list_t* lili;
-                        lili->count;
-                        /** 空表删掉 */
                         if(j_list->count == 0){
-#warning <#message#>
+                            
+                            del= i;
+                            goto CALL_DELETE_LIST;
                         }
                         return;
                     }
+                }
+            }
+            return;
+            
+        CALL_DELETE_LIST:
+            {
+                
+                if(a->count > 2){
+                    ///many -> many new array
+//                    auto *newer = (List *)calloc(sizeof(List*), a->count-1);
+                    setArray((array_t *)realloc(array(), array_t::byteSize(a->count-1)));
+                    (array()->count)--;
+                    uint32_t j = 0;
+                    for (uint32_t i = 0; i < a->count; i++) {
+                        
+                        //List : apc_method_list
+//                        List* item = a->lists[i];
+                        if(del != i){
+                            
+//                            memmove(newer + j, a->lists[i], sizeof(List*));
+                            memmove(array()->lists + j, array()->lists + i, sizeof(array()->lists[0]));
+                        }
+                    }
+                    
+                }else if (a->count == 2){
+                    ///2 -> 1 new array
+                    
+                }else {
+                    ///1 -> 0 try_free
+                    
                 }
             }
         } else if (list) {
             
             if(list->deleteElement(elm)) {
                 
+                tryFree();
                 return;
             }
         }
-        
-        return;
-        
-        ///many -> many new array
-        
-        ///many -> 1 new array
-        
-        ///1 -> 0 try_free
-        
     }
 };
 
