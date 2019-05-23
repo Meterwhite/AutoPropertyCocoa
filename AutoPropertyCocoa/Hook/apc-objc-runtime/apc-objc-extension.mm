@@ -163,7 +163,7 @@ struct apc_entsize_list_tt {
     uint32_t count;
     Element first;
     
-    void deleteElement(Element* elm) {
+    bool deleteElement(Element* elm) {
         
         Element*    item;
         size_t      size = sizeof(Element);
@@ -180,7 +180,7 @@ struct apc_entsize_list_tt {
         
         if(idx == UINT32_MAX){
             
-            return;
+            return false;
         }
         
         Element* pre  = NULL;
@@ -205,6 +205,7 @@ struct apc_entsize_list_tt {
             j++;
         }
         count --;
+        return true;
     }
     
     uint32_t entsize() const {
@@ -390,16 +391,38 @@ public:
             array_t* a = array();
             for (uint32_t i = 0; i < a->count; i++) {
                 
-                List* j_list = a->lists[i];//apc_method_list
+                //List : apc_method_list
+                List* j_list = a->lists[i];
                 for (uint32_t j = 0; j < j_list->count; j++) {
                     
-                    j_list->deleteElement(elm);
+                    if(j_list->deleteElement(elm)) {
+                        
+                        apc_method_list_t* lili;
+                        lili->count;
+                        /** 空表删掉 */
+                        if(j_list->count == 0){
+#warning <#message#>
+                        }
+                        return;
+                    }
                 }
             }
         } else if (list) {
             
-            list->deleteElement(elm);
+            if(list->deleteElement(elm)) {
+                
+                return;
+            }
         }
+        
+        return;
+        
+        ///many -> many new array
+        
+        ///many -> 1 new array
+        
+        ///1 -> 0 try_free
+        
     }
 };
 
@@ -426,19 +449,19 @@ public apc_list_array_tt<apc_protocol_ref_t, apc_protocol_list_t>
 
 
 struct apc_class_rw_t {
-    uint32_t flags;
-    uint32_t version;
+    uint32_t                flags;
+    uint32_t                version;
     
-    const apc_class_ro_t *ro;
+    const apc_class_ro_t *  ro;
     
-    apc_method_array_t methods;
-    apc_property_array_t properties;
-    apc_protocol_array_t protocols;
+    apc_method_array_t      methods;
+    apc_property_array_t    properties;
+    apc_protocol_array_t    protocols;
     
-    Class firstSubclass;
-    Class nextSiblingClass;
+    Class                   firstSubclass;
+    Class                   nextSiblingClass;
     
-    char *demangledName;
+    char *                  demangledName;
 };
 
 struct apc_class_data_bits_t {
@@ -494,19 +517,37 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
     unsigned int    count;
     apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
     apc_method_t*   method;
+    
+#warning log each ptr address
+    
+    {
+        for (int i =0; i<count; i++) {
+            
+            NSLog(@"<>_<>:%p",methods[i]);
+        }
+    }
+    
     while (count--) {
         
         if(((method = (apc_method_t*)methods[count])->name) == name){
             
-            @lockruntime({
+//            @lockruntime({
+//
+//                clazz->data()->methods.deleteElement(method);
+//            });
+            
+            apc_objcruntimelock_lock(^{
                 
                 clazz->data()->methods.deleteElement(method);
             });
-            _objc_flush_caches(cls);
+            
+#warning alternative
+//            _objc_flush_caches(cls);
+//            _objc_flush_caches(nil);
             break;
         }
     }
-    
+    free(methods);
     pthread_mutex_unlock(&_func_lock);
 #pragma clang diagnostic pop
 #endif

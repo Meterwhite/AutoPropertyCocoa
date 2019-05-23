@@ -32,7 +32,6 @@
         if(apc_class_conformsProxyClass(_class)){
             
             APCDlog(@"Disposer << dealoc << objc_disposeClassPair : %@", NSStringFromClass(_class));
-#warning <#message#>
             objc_disposeClassPair(_class);
             _class = nil;
         }

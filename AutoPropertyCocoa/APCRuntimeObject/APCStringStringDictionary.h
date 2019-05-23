@@ -40,6 +40,7 @@
  b1 -> object
  
  */
+#warning change me to APCStringkeyStringDictionary
 @interface APCStringStringDictionary<__covariant ObjectType> : NSObject<NSFastEnumeration>
 
 @property (readonly) NSUInteger count;

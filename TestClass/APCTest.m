@@ -240,6 +240,8 @@ APC_TEST_DEMO(ClassLazyload,102)
             NSParameterAssert([m.setterobj isEqualToString:@"setterobj"]);
         }
     }
+    
+    APC_TEST_CLEAN;
 }
 
 APC_TEST_DEMO(InstanceLazyload,103)

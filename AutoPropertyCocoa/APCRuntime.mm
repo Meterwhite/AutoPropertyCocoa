@@ -101,6 +101,7 @@ static void apc_runtime_inherit_dispose(Class cls)
 /**
  {(weak)instance : (strong)disposer}
  The map of weakToStrong type can be delayed release.
+ Manager memory by objc runtime ,Do not delete objects manually!
  */
 static NSMapTable* apc_runtime_proxyinstances()
 {
@@ -120,6 +121,11 @@ NS_INLINE APCPropertyHook* apc_getPropertyhook_nolock(Class clazz, NSString* pro
     return apc_runtime_propertyhook(clazz, property);
 }
 
+NS_INLINE void apc_runtime_proxyinstanceRegister(APCProxyInstance* instance, Class cls)
+{
+    [apc_runtime_proxyinstances() setObject:[[APCProxyInstanceDisposer alloc] initWithClass:cls]
+                                     forKey:instance];
+}
 
 NS_INLINE void apc_propertyhook_dispose_nolock(APCPropertyHook* hook)
 {
@@ -153,6 +159,9 @@ void apc_unhook_allClass(void)
     
     ///Copy to prevent mutations when enumerated.
     NSMapTable*         c_map   = apc_runtime_property_classmapper();
+    
+    if([c_map count] == 0) return;
+    
     for (APCStringStringDictionary* dictionary in [c_map objectEnumerator]) {
         
         for (__kindof APCMethodHook* hook in [dictionary objectEnumerator]) {
@@ -168,10 +177,11 @@ void apc_unhook_allClass(void)
 
 void apc_unhook_allInstance(void)
 {
-    ///Copy to disctionary representation to prevent mutations when enumerating.
-    for (APCProxyInstance* instance in [apc_runtime_proxyinstances() dictionaryRepresentation]) {
+    ///Copy to immutable collection to  prevent mutations when enumerating.
+    NSArray* allInstances = [apc_runtime_proxyinstances() objectEnumerator].allObjects;
+    for (APCProxyInstance* item in allInstances) {
         
-        apc_instance_unhookFromProxyClass(instance);
+        apc_instance_unhookFromProxyClass(item);
     }
 }
 
@@ -395,7 +405,7 @@ __kindof APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 #pragma mark - For instance - private
 
 /**
- property : hook
+ (string)property : hook
  */
 static APCStringStringDictionary<__kindof APCMethodHook*>* apc_boundInstanceMapper(APCProxyInstance* instance)
 {
@@ -569,8 +579,7 @@ APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
         APCProxyClass   cls  = objc_allocateClassPair(object_getClass(instance), name, 0);
         if(cls != nil){
             
-            [apc_runtime_proxyinstances() setObject:[[APCProxyInstanceDisposer alloc] initWithClass:cls]
-                                             forKey:instance];
+            apc_runtime_proxyinstanceRegister(instance, cls);
             objc_registerClassPair(cls);
             object_setClass(instance, cls);
         }else if (nil == (cls = objc_getClass(name))){
@@ -592,6 +601,5 @@ void apc_instance_unhookFromProxyClass(APCProxyInstance* instance)
                         , apc_class_unproxyClass(object_getClass(instance)));
         
         apc_removeBoundInstanceMapper(instance);
-        [apc_runtime_proxyinstances() removeObjectForKey:instance];
     }
 }
