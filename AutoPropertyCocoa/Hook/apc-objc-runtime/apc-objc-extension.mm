@@ -173,45 +173,38 @@ struct apc_entsize_list_tt {
         
         Element*    item;
         size_t      size = sizeof(Element);
-        uint32_t    idx = UINT32_MAX;
+//        uint32_t    idx = UINT32_MAX;
         for(uint32_t i = 0 ; i < count ; i++){
             
             item = (Element *)((char*)&first + i*size);
             if(item == elm){
                 
-                idx = i;
-                break;
+                try_free(item->types);
+                ///Erase method data
+                memset((Element*)((char*)&first + i*size), 0, size);
+                ///Do not to count --,Let the runtime manage the memory itself.
+                return true;
             }
         }
-        
-        if(idx == UINT32_MAX){
-            
-            return false;
-        }
-        
-        Element* pre  = NULL;
-        Element* next = NULL;
-        for(uint32_t i = 0 , j = i ; i < count ; i++){
-            
-            if(i < idx) {
-                
-                continue;
-            }
-            
-            pre  = (Element*)((char*)&first + i*size);
-            if(i == count -1) {
-                
-                memset(pre, 0, size);
-            } else {
-                
-                next = (Element*)((char*)&first + (i + 1)*size);
-                memcpy(pre, next, sizeof(Element));
-            }
-            
-            j++;
-        }
-        count --;
-        return true;
+        return false;
+//        Element* pre  = NULL;
+//        Element* next = NULL;
+//        for(uint32_t i = 0 , j = i ; i < count ; i++){
+//
+//            if(i < idx) continue;
+//
+//            pre  = (Element*)((char*)&first + i*size);
+//            if(i == count - 1) {
+//
+//                memset(pre, 0, size);
+//            } else {
+//
+//                next = (Element*)((char*)&first + (i + 1)*size);
+//                memcpy(pre, next, sizeof(Element));
+//            }
+//
+//            j++;
+//        }
     }
     
     uint32_t entsize() const {
@@ -338,6 +331,11 @@ private:
         arrayAndFlag = (uintptr_t)array | 1;
     }
     
+    void deleteArray() {
+        arrayAndFlag = array();
+        free(arrayAndFlag);
+    }
+    
 public:
     
     uint32_t count() {
@@ -409,7 +407,7 @@ public:
             array_t* a = array();
             for (uint32_t i = 0; i < a->count; i++) {
                 
-                //List : apc_method_list
+                //List -> apc_method_list
                 List* j_list = a->lists[i];
                 for (uint32_t j = 0; j < j_list->count; j++) {
                     
@@ -428,30 +426,33 @@ public:
             
         CALL_DELETE_LIST:
             {
-                
                 if(a->count > 2){
-                    ///many -> many new array
-//                    auto *newer = (List *)calloc(sizeof(List*), a->count-1);
-                    setArray((array_t *)realloc(array(), array_t::byteSize(a->count-1)));
-                    (array()->count)--;
-                    uint32_t j = 0;
-                    for (uint32_t i = 0; i < a->count; i++) {
+                    ///many -> many
+                    uint32_t  newcount = array()->count - 1 ;
+                    array_t * newer = (array_t *)malloc(array_t::byteSize(newcount));
+                    for (uint32_t i = 0, j = i; i < a->count; i++) {
                         
-                        //List : apc_method_list
-//                        List* item = a->lists[i];
-                        if(del != i){
+                        if(del != i) {
                             
-//                            memmove(newer + j, a->lists[i], sizeof(List*));
-                            memmove(array()->lists + j, array()->lists + i, sizeof(array()->lists[0]));
+                            memcpy(newer + j, a->lists + i
+                                   , sizeof(a->lists[0]));
+                            continue;
                         }
+                        j++;
                     }
                     
+                    try_free(a->lists[del]);
+                    setArray(newer);
                 }else if (a->count == 2){
-                    ///2 -> 1 new array
-                    
+                    ///2 -> 1
+                    uint32 newi = del ? 0 : 1;
+                    try_free(elm->types);
+                    try_free(a->lists[del]);
+                    arrayAndFlag = 0;
+                    list = a->lists[newi];
                 }else {
-                    ///1 -> 0 try_free
-                    
+                    ///1 -> 0
+                    tryFree();
                 }
             }
         } else if (list) {
@@ -459,7 +460,6 @@ public:
             if(list->deleteElement(elm)) {
                 
                 tryFree();
-                return;
             }
         }
     }
@@ -557,32 +557,22 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
     apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
     apc_method_t*   method;
     
-#warning log each ptr address
-    
-    {
-        for (int i =0; i<count; i++) {
-            
-            NSLog(@"<>_<>:%p",methods[i]);
-        }
-    }
     
     while (count--) {
         
         if(((method = (apc_method_t*)methods[count])->name) == name){
             
+#warning Change to B
 //            @lockruntime({
 //
 //                clazz->data()->methods.deleteElement(method);
 //            });
-            
             apc_objcruntimelock_lock(^{
                 
                 clazz->data()->methods.deleteElement(method);
             });
-            
-#warning alternative
-//            _objc_flush_caches(cls);
-//            _objc_flush_caches(nil);
+            ///Erase cache.
+            _objc_flush_caches(cls);
             break;
         }
     }
