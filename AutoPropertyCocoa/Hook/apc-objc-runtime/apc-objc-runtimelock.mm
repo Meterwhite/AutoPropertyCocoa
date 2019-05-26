@@ -7,6 +7,7 @@
 //
 
 #include "apc-objc-runtimelock.h"
+#include "apc-objc-extension.h"
 #include "apc-fishhook.h"
 #include "apc-objc-os.h"
 #include "APCExtScope.h"
@@ -17,6 +18,8 @@ class APCOBJCRuntimelocker;
 
 /** Initialize in apc_in_main() */
 static pthread_mutex_t apc_objcruntimelock = {0};
+
+static APCSpinLock apc_lockerlock = apc_spinlock_init;
 
 _Bool apc_contains_objcruntimelock(void)
 {
@@ -65,6 +68,10 @@ public:
     ~APCOBJCRuntimelocker()
     {
         signal_unlockRuntime();
+        
+        apc_spinlock_lock(&apc_lockerlock);
+        apc_spinlock_unlock(&apc_lockerlock);
+        
         pthread_mutex_unlock(lock);
     }
     
@@ -124,6 +131,7 @@ void apc_objcruntimelocker_trylock(void)
 {
     if(apc_objcruntimelocker->testingThreadID()){
         
+        apc_spinlock_lock(&apc_lockerlock);
         /**
          objc_allocateProtocol(...) ---> [here] ---> calloc(...) ---> userblock(...)
          */
@@ -134,6 +142,7 @@ void apc_objcruntimelocker_trylock(void)
         apc_objcruntimelocker->wait_unlockRuntime();
         //Make sure it won't be executed again
         apc_objcruntimelocker = nil;
+        apc_spinlock_unlock(&apc_lockerlock);
     }
 }
 
@@ -155,7 +164,7 @@ void apc_in_main(void)
 {
 #if !APCDebugSchemeDiagnosticsGuardMalloc
     struct apc_rebinding
-    rebindInfo
+    rb_calloc
     =
     {
         .name           =   "calloc",
@@ -163,7 +172,16 @@ void apc_in_main(void)
         .replaced       =   (void**)(&apc_calloc_ptr)
     };
     
-    apc_rebind_symbols((struct apc_rebinding[1]){rebindInfo} , 1);
+    struct apc_rebinding
+    rb_class_copyMethodList
+    =
+    {
+        .name           =   "class_copyMethodList",
+        .replacement    =   (void*)apc_class_copyMethodList,
+        .replaced       =   (void**)(&apc_class_copyMethodList_ptr)
+    };
+    
+    apc_rebind_symbols((struct apc_rebinding[2]){rb_calloc,rb_class_copyMethodList} , 2);
     
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

@@ -11,6 +11,9 @@
 
 #import <objc/runtime.h>
 
+extern Method _Nonnull * _Nullable
+(* _Nonnull apc_class_copyMethodList_ptr)(Class _Nonnull cls, unsigned int * _Nullable outCount);
+
 #if defined __cplusplus
 extern "C"
 {
@@ -25,6 +28,11 @@ extern "C"
     void class_removeMethod_APC_OBJC2(Class _Nonnull cls, SEL _Nonnull name);
     
     IMP _Nullable class_itMethodImplementation_APC(Class _Nonnull cls, SEL _Nonnull name);
+    
+
+    
+    Method _Nonnull * _Nullable
+    apc_class_copyMethodList(Class _Nonnull cls, unsigned int * _Nullable outCount);
     
 #if defined __cplusplus
 };

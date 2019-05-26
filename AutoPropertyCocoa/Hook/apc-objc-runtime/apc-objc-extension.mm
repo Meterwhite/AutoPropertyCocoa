@@ -163,48 +163,36 @@ struct apc_cache_t {
     apc_mask_t _occupied;
 };
 
+
 template <typename Element, typename List, uint32_t FlagMask>
 struct apc_entsize_list_tt {
     uint32_t entsizeAndFlags;
     uint32_t count;
     Element first;
     
-    bool deleteElement(Element* elm) {
+    int32_t deleteElement(Element* elm) {
         
-        Element*    item;
+        static Element nonelm = {0};
+        
         size_t      size = sizeof(Element);
-//        uint32_t    idx = UINT32_MAX;
+        Element*    item = NULL;
+        int32_t     ret  = 0;
         for(uint32_t i = 0 ; i < count ; i++){
             
             item = (Element *)((char*)&first + i*size);
+            if(0 == memcmp(item, &nonelm, sizeof(Element))){
+                
+               ++ret;
+            }
             if(item == elm){
                 
                 try_free(item->types);
                 ///Erase method data
                 memset((Element*)((char*)&first + i*size), 0, size);
                 ///Do not to count --,Let the runtime manage the memory itself.
-                return true;
             }
         }
-        return false;
-//        Element* pre  = NULL;
-//        Element* next = NULL;
-//        for(uint32_t i = 0 , j = i ; i < count ; i++){
-//
-//            if(i < idx) continue;
-//
-//            pre  = (Element*)((char*)&first + i*size);
-//            if(i == count - 1) {
-//
-//                memset(pre, 0, size);
-//            } else {
-//
-//                next = (Element*)((char*)&first + (i + 1)*size);
-//                memcpy(pre, next, sizeof(Element));
-//            }
-//
-//            j++;
-//        }
+        return ++ret;
     }
     
     uint32_t entsize() const {
@@ -411,14 +399,10 @@ public:
                 List* j_list = a->lists[i];
                 for (uint32_t j = 0; j < j_list->count; j++) {
                     
-                    if(j_list->deleteElement(elm)) {
+                    if(0 == j_list->deleteElement(elm)) {
                         
-                        if(j_list->count == 0){
-                            
-                            del= i;
-                            goto CALL_DELETE_LIST;
-                        }
-                        return;
+                        del= i;
+                        goto CALL_DELETE_LIST;
                     }
                 }
             }
@@ -457,7 +441,7 @@ public:
             }
         } else if (list) {
             
-            if(list->deleteElement(elm)) {
+            if(0 == list->deleteElement(elm)) {
                 
                 tryFree();
             }
@@ -562,13 +546,8 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
         
         if(((method = (apc_method_t*)methods[count])->name) == name){
             
-#warning Change to B
-//            @lockruntime({
-//
-//                clazz->data()->methods.deleteElement(method);
-//            });
-            apc_objcruntimelock_lock(^{
-                
+            @lockruntime({
+
                 clazz->data()->methods.deleteElement(method);
             });
             ///Erase cache.
@@ -596,4 +575,45 @@ IMP class_itMethodImplementation_APC(Class cls, SEL name)
         }
     }
     return NULL;
+}
+
+static apc_method_t non_method = {0};
+
+Method _Nonnull * _Nullable
+(* _Nonnull apc_class_copyMethodList_ptr)(Class _Nonnull cls, unsigned int * _Nullable outCount) = NULL;
+
+Method *
+apc_class_copyMethodList(Class cls, unsigned int *outCount)
+{
+    unsigned int count;
+    APCMethod* mds = (APCMethod*) apc_class_copyMethodList_ptr(cls, &count);
+    
+    for (int i = 0; i < count; i++) {
+        
+        if(0 == memcmp(&non_method, mds[i], sizeof(apc_method_t))){
+            
+            goto CALL_MEMMOV;
+        }
+    }
+    *outCount = count;
+    return (Method *)mds;
+    
+CALL_MEMMOV:
+    
+    APCMethod *result = nil;
+    int newCount = 0;
+    for (int i = 0, j = 1; i < count; i++) {
+        
+        if(0 != memcmp(&non_method, mds[i], sizeof(apc_method_t))){
+            
+            result = (APCMethod*)realloc(result, j*sizeof(APCMethod*));
+            result[j - 1] = mds[i];
+            ++j;
+            ++newCount;
+        }
+    }
+    
+    *outCount = newCount;
+    free(mds);
+    return (Method *)result;
 }
