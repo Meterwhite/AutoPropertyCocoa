@@ -14,6 +14,8 @@
 #pragma mark - Lazy load for class.
 + (void)apc_lazyLoadForProperty:(nonnull NSString*)property;
 
++ (void)apc_lazyLoadForPropertyArray:(nonnull NSArray<NSString*> *)array;
+
 + (void)apc_lazyLoadForProperty:(nonnull NSString*)property
                      usingBlock:(id _Nullable(^ _Nonnull)(id_apc_t _Nonnull instance))block;
 
@@ -27,6 +29,8 @@
 
 #pragma mark - Lazy load for instance.
 - (void)apc_lazyLoadForProperty:(nonnull NSString*)property;
+
+- (void)apc_lazyLoadForPropertyArray:(nonnull NSArray<NSString*> *)array;
 
 - (void)apc_lazyLoadForProperty:(nonnull NSString*)property
                      usingBlock:(id _Nullable(^ _Nonnull)(id_apc_t _Nonnull instance))block;

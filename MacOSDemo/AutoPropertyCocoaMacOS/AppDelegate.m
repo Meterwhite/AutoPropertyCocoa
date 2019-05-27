@@ -6,10 +6,11 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
+#import "AutoPropertyCocoa.h"
 #import "AppDelegate.h"
 #import "APCScope.h"
 #import "APCTest.h"
-#import "JiNvW.h"
+#import "Person.h"
 
 #warning <#message#>
 #import "apc-objc-runtimelock.h"
@@ -24,14 +25,9 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
-
-//    [APCTest testDemo:0];
-//    [APCTest testDemo:101];
-//    [APCTest testDemo:106];
     
-    [APCTest testDemoFrom:100 to:106];
-    
-//    [APCTest testDemo:10086];
+//    [APCTest testDemoFrom:100 to:106];
+    [APCTest testDemo:107];
 }
 
 

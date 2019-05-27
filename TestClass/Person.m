@@ -86,6 +86,11 @@
     return _apc_getterobj;
 }
 
+- (id)setterobj
+{
+    return _apc_setterobj;
+}
+
 - (void)mySetSetterobj:(id)setterobj
 {
     NSLog(@"APCTest << %s << _apc_setterobj = %@", __func__, setterobj);

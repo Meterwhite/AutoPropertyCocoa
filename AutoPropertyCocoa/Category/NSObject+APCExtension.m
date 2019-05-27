@@ -16,10 +16,10 @@
 {
     if(apc_object_isProxyInstance(self)){
         
-        return apc_class_unproxyClass([self class]);
+        return apc_class_unproxyClass(object_getClass(self));
     }
     
-    return [self class];
+    return object_getClass(self);
 }
 
 - (void)apc_instanceUnbind

@@ -20,7 +20,7 @@ extern "C"
 #endif
     
     /**
-     apc_in_main() should be called before.
+     apc_main_classHookFullSupport() should be called before.
      Does not affect the super class
      The runtimelock is not locked when the function is called.
      So avoid the write behavior of other threads to the method_list of that Class when the function is called.

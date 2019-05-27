@@ -11,7 +11,6 @@
 		456B1BE822939D87001840FA /* APCStringkey.m in Sources */ = {isa = PBXBuildFile; fileRef = 456B1BE722939D87001840FA /* APCStringkey.m */; };
 		456B1BEB2293A2C9001840FA /* APCStringkeyString.m in Sources */ = {isa = PBXBuildFile; fileRef = 456B1BEA2293A2C9001840FA /* APCStringkeyString.m */; };
 		456B1BEE2293E96F001840FA /* APCMutableStringkeyString.m in Sources */ = {isa = PBXBuildFile; fileRef = 456B1BED2293E96E001840FA /* APCMutableStringkeyString.m */; };
-		456B1BF32297F7D4001840FA /* JiNvW.m in Sources */ = {isa = PBXBuildFile; fileRef = 456B1BF22297F7D4001840FA /* JiNvW.m */; };
 		456EABA922925491009C5DFB /* APCStringStringDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 456EABA822925491009C5DFB /* APCStringStringDictionary.m */; };
 		45B12F82225B2C06002D825E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F81225B2C06002D825E /* AppDelegate.m */; };
 		45B12F84225B2C07002D825E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F83225B2C07002D825E /* Assets.xcassets */; };
@@ -55,8 +54,6 @@
 		456B1BEA2293A2C9001840FA /* APCStringkeyString.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCStringkeyString.m; sourceTree = "<group>"; };
 		456B1BEC2293E96E001840FA /* APCMutableStringkeyString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCMutableStringkeyString.h; sourceTree = "<group>"; };
 		456B1BED2293E96E001840FA /* APCMutableStringkeyString.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCMutableStringkeyString.m; sourceTree = "<group>"; };
-		456B1BF12297F7D4001840FA /* JiNvW.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JiNvW.h; sourceTree = "<group>"; };
-		456B1BF22297F7D4001840FA /* JiNvW.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JiNvW.m; sourceTree = "<group>"; };
 		456EABA722925491009C5DFB /* APCStringStringDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCStringStringDictionary.h; sourceTree = "<group>"; };
 		456EABA822925491009C5DFB /* APCStringStringDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCStringStringDictionary.m; sourceTree = "<group>"; };
 		45B12F7D225B2C06002D825E /* AutoPropertyCocoaMacOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoPropertyCocoaMacOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -196,8 +193,6 @@
 				45B12FDD225B2C9B002D825E /* Man.m */,
 				45E1CDFE228BF3DE00DCD3F0 /* Superman.h */,
 				45E1CDFF228BF3DE00DCD3F0 /* Superman.m */,
-				456B1BF12297F7D4001840FA /* JiNvW.h */,
-				456B1BF22297F7D4001840FA /* JiNvW.m */,
 			);
 			name = TestClass;
 			path = ../../TestClass;
@@ -396,7 +391,6 @@
 				45E1CE02228BF3DE00DCD3F0 /* Superman.m in Sources */,
 				45E1CDF9228BF3BB00DCD3F0 /* APCMethodHook.m in Sources */,
 				45E1CDFB228BF3BB00DCD3F0 /* apc-fishhook.c in Sources */,
-				456B1BF32297F7D4001840FA /* JiNvW.m in Sources */,
 				45E1CDF8228BF3BB00DCD3F0 /* APCPropertyHook.mm in Sources */,
 				45E1CDEF228BF3BB00DCD3F0 /* APCLazyProperty.m in Sources */,
 				45B12FEB225B2C9B002D825E /* Man.m in Sources */,

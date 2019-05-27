@@ -461,7 +461,7 @@
     return _hashcode;
 }
 
-- (APCStringkeyString *)mappingKey
+- (APCStringkeyString *)mappingKeyString
 {
     if(_mappingKey == nil){
         

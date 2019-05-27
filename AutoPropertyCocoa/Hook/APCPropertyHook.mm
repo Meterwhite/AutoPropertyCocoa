@@ -24,16 +24,25 @@ id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
     NSString*           cmdstr  =   @((const char*)(const void*)_CMD);
     if(apc_object_isProxyInstance(_SELF)){
         
-        hook = apc_lookup_instancePropertyhook(_SELF, cmdstr);
-    }else if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
-        
-        @throw
-        
-        [NSException exceptionWithName:NSGenericException
-                                reason:@"APC can not find any infomation about this  property."
-                              userInfo:nil];
+        if(nil != (hook = apc_lookup_instancePropertyhook(_SELF, cmdstr))){
+            
+            goto CALL_WORKING;
+        }
     }
     
+    if(nil != (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
+        
+        goto CALL_WORKING;
+    }
+    
+    @throw
+    
+    [NSException exceptionWithName:NSGenericException
+                            reason:@"APC can not find any infomation about this property."
+                          userInfo:nil];
+    
+    
+CALL_WORKING:
     
     if(hook.isEmpty){
         ///If unbind in other threads.
@@ -104,16 +113,25 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
     NSString*           cmdstr  =   @((const char*)(const void*)_CMD);
     if(apc_object_isProxyInstance(_SELF)){
         
-        hook = apc_lookup_instancePropertyhook(_SELF, cmdstr);
-    }else if(nil == (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
-        
-        @throw
-        
-        [NSException exceptionWithName:NSGenericException
-                                reason:@"APC can not find any infomation about this property."
-                              userInfo:nil];
+        if(nil != (hook = apc_lookup_instancePropertyhook(_SELF, cmdstr))){
+            
+            goto CALL_WORKING;
+        }
     }
     
+    if(nil != (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
+        
+        goto CALL_WORKING;
+    }
+    
+    @throw
+    
+    [NSException exceptionWithName:NSGenericException
+                            reason:@"APC can not find any infomation about this property."
+                          userInfo:nil];
+    
+    
+CALL_WORKING:
     
     if(hook.isEmpty){
         
@@ -525,11 +543,15 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         return _old_implementation;
     }
     
+    Class tagCls = _kindOfOwner == APCPropertyOwnerKindOfClass
+    ? apc_class_getSuperclass(_hookclass)
+    : _hookclass;
+    
     APCPropertyHook* hook
     =
-    apc_lookup_sourcePropertyhook_inRange(apc_class_getSuperclass(_hookclass)
-                                                  , _source_class
-                                                  , _hookMethod);
+    apc_lookup_sourcePropertyhook_inRange(tagCls
+                                          , _source_class
+                                          , _hookMethod);
     if(hook != nil){
         
         return hook->_old_implementation;
@@ -543,11 +565,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)performOldSetterFromTarget:(id)target withValue:(id)value
 {
-    if(!(_new_implementation && _old_implementation)){
-        
-        return;
-    }
-    
     APCBoxedInvokeBasicValueSetterIMP(target
                            , NSSelectorFromString(_hookMethod)
                            , self.oldImplementation
@@ -557,11 +574,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (id)performOldGetterFromTarget:(id)target
 {
-    if(!(_new_implementation && _old_implementation)){
-        
-        return nil;
-    }
-    
     return
     
     APCBoxedInvokeBasicValueGetterIMP(target

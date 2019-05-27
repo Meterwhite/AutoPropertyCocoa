@@ -11,10 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 #define APC_TEST_DEMO(domo,id) + (void)domo##__##id
-/**
- 100
- 101
- */
+
 @interface APCTest : NSObject
 
 + (void)openClearTest;

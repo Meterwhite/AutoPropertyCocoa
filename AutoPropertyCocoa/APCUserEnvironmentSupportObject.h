@@ -65,8 +65,6 @@ submacro_apc_concat(apc_debug_super_method_id, submacro_apc_argcount(__VA_ARGS__
 
 #else
 
-#define APCSuperMethod APCSuperPerformedAsVoid
-
 #define APCSuperPerformedAsVoid(instance, ...) \
 \
 if([(id)instance isProxy]){         \

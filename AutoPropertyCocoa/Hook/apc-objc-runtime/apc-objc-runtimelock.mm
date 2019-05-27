@@ -16,7 +16,7 @@
 
 class APCOBJCRuntimelocker;
 
-/** Initialize in apc_in_main() */
+/** Initialize in apc_main_classHookFullSupport() */
 static pthread_mutex_t apc_objcruntimelock = {0};
 
 static APCSpinLock apc_lockerlock = apc_spinlock_init;
@@ -160,7 +160,7 @@ void* apc_calloc(size_t __count, size_t __size)
     return apc_calloc_ptr(__count, __size);
 }
 
-void apc_in_main(void)
+void apc_main_classHookFullSupport(void)
 {
 #if !APCDebugSchemeDiagnosticsGuardMalloc
     struct apc_rebinding

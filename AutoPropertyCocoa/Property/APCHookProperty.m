@@ -11,9 +11,9 @@
 #import "APCRuntime.h"
 
 @implementation APCHookProperty
-{
-    NSString*   _methodTypeEncoding;
-}
+//{
+//    NSString*   _methodTypeEncoding;
+//}
 
 - (instancetype)initWithPropertyName:(NSString *)propertyName aClass:(__unsafe_unretained Class)aClass
 {
@@ -33,26 +33,14 @@
     return self;
 }
 
-- (NSString *)methodTypeEncoding
+static NSString const* _apc_hookPropertyGetterEncodeing = @"%@@:";
+static NSString const* _apc_hookPropertySetterEncodeing = @"v@:%@";
+
+- (NSString const*)methodTypeEncoding
 {
-    if(nil == _methodTypeEncoding){
-        
-        switch (_methodStyle) {
-            case APCMethodGetterStyle:
-            {
-                _methodTypeEncoding = [NSString stringWithFormat:@"%@@:", self.valueTypeEncoding];
-            }
-                break;
-            case APCMethodSetterStyle:
-            {
-                _methodTypeEncoding = [NSString stringWithFormat:@"v@:%@", self.valueTypeEncoding];
-            }
-                break;
-            default:
-                break;
-        }
-    }
-    return _methodTypeEncoding;
+    return _methodStyle == APCMethodGetterStyle
+    ? _apc_hookPropertyGetterEncodeing
+    : _apc_hookPropertySetterEncodeing;
 }
 
 - (NSString *)hookedMethod

@@ -240,8 +240,6 @@ APC_TEST_DEMO(ClassLazyload,102)
             NSParameterAssert([m.setterobj isEqualToString:@"setterobj"]);
         }
     }
-    
-    APC_TEST_CLEAN;
 }
 
 APC_TEST_DEMO(InstanceLazyload,103)
@@ -519,68 +517,87 @@ APC_TEST_DEMO(ClassMix,106)
         [sm myGetGettersetterobj];
     }
 }
+
 APC_TEST_DEMO(InstanceMix,107)
 {
     APC_TEST_CLEAN
     {
+        __block int count = 0;
         
+        APCTestInstance(Man, m);
+        
+        [m apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            return @"gettersetterobj";
+        }];
+        
+        [m apc_lazyLoadForProperty:@key_obj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            return @"obj";
+        }];
+        
+        [m apc_backOfPropertySetter:@key_gettersetterobj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            ++count;
+        }];
+        
+        [m apc_propertySetter:@key_gettersetterobj bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+            
+            ++count;
+            return YES;
+        } withBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            ++count;
+        }];
+        
+        NSParameterAssert([m.gettersetterobj isEqualToString:@"gettersetterobj"]);
+        NSParameterAssert(count==1);
+        NSParameterAssert([m.obj isEqualToString:@"obj"]);
+        NSParameterAssert(count==2);
+        m.gettersetterobj = @"0";
+        NSParameterAssert(count==4);
     }
 }
+
 APC_TEST_DEMO(ClassInstanceMix,108)
 {
     APC_TEST_CLEAN
     {
+        __block int count = 0;
+        [Person apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            return @"Person.gettersetterobj";
+        }];
         
+        [Man apc_lazyLoadForProperty:@key_obj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            return @"Man.obj";
+        }];
+        
+        [Man apc_backOfPropertySetter:@key_setterobj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            ++count;
+        }];
+        
+        APCTestInstance(Man, m);
+        
+        [m apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            return APCSuperPerformedAsId(instance);
+        }];
+        
+        NSParameterAssert([m.gettersetterobj isEqualToString:@"Person.gettersetterobj"]);
+        NSParameterAssert([m.obj isEqualToString:@"Man.obj"]);
+        m.setterobj = @"0";
+        NSParameterAssert([m.setterobj isEqualToString:@"0"]);
+        
+        NSParameterAssert(count==4);
     }
-}
-
-APC_TEST_DEMO(ClassInstanceMix,10086)
-{
-    APCStringStringDictionary* dictionary
-    =
-    [APCStringStringDictionary dictionary];
-    
-    APCStringkeyString* k0
-    =
-    [APCStringkeyString stringkeyStringWithProperty:@"a"
-                                 getter:@"G_a"
-                                 setter:@"S_a"];
-    
-    APCStringkeyString* k1
-    =
-    [APCStringkeyString stringkeyStringWithProperty:@"b"
-                                 getter:[NSString stringWithFormat:@"G_%@",@"b"]
-                                 setter:[NSMutableString stringWithString:@"S_b"]];
-    
-    APCStringkeyString* k2
-    =
-    [APCStringkeyString stringkeyStringWithProperty:@"c"
-                                 getter:nil
-                                 setter:nil];
-    
-    APCStringkeyString* k3
-    =
-    [APCStringkeyString stringkeyStringWithProperty:@"A"
-                                 getter:@"B"
-                                 setter:@"C"];
-    
-    [dictionary setObject:@"00" forKey:k0];
-    [dictionary setObject:@"11" forKey:k1];
-    [dictionary setObject:@"22" forKey:k2];
-    [dictionary setObject:@"33" forKey:k3];
-    
-    [dictionary removeObjectForKey:@"G_b"];
-    
-    id adsfa = [dictionary objectForKey:@"a"];
-    
-    
-    [dictionary removeObjectForKey:@"G_a"];
-    
-    [dictionary removeObjectForKey:@"c"];
-    
-    [dictionary removeObjectForKey:@"C"];
-    
-    APCDlog(@"Pause...");
 }
 
 @end

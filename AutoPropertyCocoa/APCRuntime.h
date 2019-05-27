@@ -108,6 +108,9 @@ apc_registerProperty(APCHookProperty* _Nonnull p);
 OBJC_EXPORT void
 apc_disposeProperty(APCHookProperty* _Nonnull p);
 
+/**
+ @param cls A Class only in APC.
+ */
 OBJC_EXPORT Class _Nullable
 apc_class_getSuperclass(Class _Nonnull cls);
 

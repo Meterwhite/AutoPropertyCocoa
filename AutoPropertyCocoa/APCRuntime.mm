@@ -246,7 +246,8 @@ APCPropertyHook* apc_lookup_sourcePropertyhook_inRange(Class from, Class to, NSS
         APCPropertyHook* ret;
         do {
             
-            if(nil != ((void)(ret = apc_runtime_propertyhook(from, property)), ret->_old_implementation))
+            if(nil != (ret = apc_runtime_propertyhook(from, property)) &&
+               ret->_old_implementation)
                 
                 return ret;
             
@@ -281,8 +282,8 @@ APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
 
 __kindof APCHookProperty* apc_propertyhook_lookupSuperProperty(APCPropertyHook* hook, const char* ivarname)
 {
-    
-    if(hook.kindOfOwner == APCPropertyOwnerKindOfClass){
+    APCPropertyOwnerKind owner = hook.kindOfOwner;//Symmetric locking.
+    if(owner == APCPropertyOwnerKindOfClass){
         
         pthread_rwlock_rdlock(&apc_runtimelock);
     }
@@ -298,7 +299,7 @@ __kindof APCHookProperty* apc_propertyhook_lookupSuperProperty(APCPropertyHook* 
         }
     } while (nil != (hook = hook->_superhook));
     
-    if(hook.kindOfOwner == APCPropertyOwnerKindOfClass){
+    if(owner == APCPropertyOwnerKindOfClass){
         
         pthread_rwlock_unlock(&apc_runtimelock);
     }
@@ -390,12 +391,33 @@ __kindof APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
     apc_runtimelock_reader_t reading(apc_runtimelock);
     
     APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
+    BOOL shouldRet = NO;
+
+        
     APCHookProperty* item;
     while (nil != (hook = [hook superhook])) {
         
-        if(nil != (item = ((id(*)(id,SEL))objc_msgSend)(hook, p.outlet))){
+    CALL_FIND_IN_SUPERHOOK:
+        {
+            if(nil != (item = ((id(*)(id,SEL))objc_msgSend)(hook, p.outlet))){
+                
+                return item;
+            }
+        }
+    }
+    
+    
+    if(!shouldRet && p.kindOfOwner == APCPropertyOwnerKindOfInstance){
+        
+        Class cls = p->_des_class;
+        
+        while (nil != (cls = class_getSuperclass(p->_des_class))) {
             
-            return item;
+            if(nil != (hook = apc_runtime_propertyhook(cls, p->_hooked_name))){
+                
+                shouldRet = YES;
+                goto CALL_FIND_IN_SUPERHOOK;
+            }
         }
     }
     

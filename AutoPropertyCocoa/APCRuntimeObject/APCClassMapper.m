@@ -43,12 +43,21 @@ dispatch_semaphore_signal(_lock);
 
 - (BOOL)containsClass:(Class)cls
 {
-    return (nil == [_map objectForKey:cls]) ? NO : YES;
+    return (nil != [_map objectForKey:cls]);
 }
 
 - (Class)superclassOfClass:(Class)cls
 {
-    return [[[_map objectForKey:cls] father] value];
+    Class ret = [[[_map objectForKey:cls] father] value];
+    
+    if(ret != nil) return ret;
+    
+    while (nil != (cls = class_getSuperclass(cls))){
+        
+        if([self containsClass:cls]) return cls;
+    }
+    
+    return (Class)0;
 }
 
 - (void)addClass:(Class)cls

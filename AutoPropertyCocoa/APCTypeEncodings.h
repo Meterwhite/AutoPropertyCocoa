@@ -63,18 +63,16 @@
 
 #endif
 
-#define APCEncoder(encstring)
-
 /**
  APCCoderEqualMask(@encode(CGRect), APCStructCoderMaskValue)
  */
-#define APCCoderEqualMask(encstring , mask) \
+#define APCCoderEqualMask(coderValue , mask) \
 \
-(mask == (_APCCoderValue(encstring) & mask))
+(mask == (coderValue & mask))
 
-#define APCCoderCompare(encstring, codevalue) (_APCCoderValue(encstring) == codevalue)
+#define APCCoderCompare(coderValue, code) (coderValue == code)
 
-#define if_APCCoderCompare(encstring, codevalue) if(APCCoderCompare(encstring, codevalue))
+#define if_APCCoderCompare(coderValue, code) if(coderValue == code)
 
 struct apc_coder_t {
     
@@ -114,7 +112,7 @@ struct apc_coderimp_t {
 };
 typedef struct apc_coderimp_t APCCoderMapper;
 
-NS_INLINE unsigned long _APCCoderValue(const char* enc)
+NS_INLINE unsigned long APCCoderValue(const char* enc)
 {
     APCCoder coder = {0};
     strncpy(coder.encode, enc, sizeof(unsigned long));

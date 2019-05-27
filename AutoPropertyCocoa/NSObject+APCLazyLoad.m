@@ -19,6 +19,14 @@
     [self apc_classSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:nil];
 }
 
++ (void)apc_lazyLoadForPropertyArray:(nonnull NSArray<NSString*> *)array
+{
+    for (NSString* item in array.reverseObjectEnumerator) {
+        
+        [self apc_classSetLazyLoadProperty:item hookWithBlock:nil hookWithSEL:nil];
+    }
+}
+
 + (void)apc_lazyLoadForProperty:(NSString *)property selector:(SEL)selector
 {
     [self apc_classSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:selector];
@@ -55,6 +63,15 @@
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property
 {
     [self apc_instanceSetLazyLoadProperty:property hookWithBlock:nil hookWithSEL:nil];
+}
+
+
+- (void)apc_lazyLoadForPropertyArray:(nonnull NSArray<NSString*> *)array
+{
+    for (NSString* item in array.reverseObjectEnumerator) {
+        
+        [self apc_instanceSetLazyLoadProperty:item hookWithBlock:nil hookWithSEL:nil];
+    }
 }
 
 - (void)apc_lazyLoadForProperty:(NSString* _Nonnull)property

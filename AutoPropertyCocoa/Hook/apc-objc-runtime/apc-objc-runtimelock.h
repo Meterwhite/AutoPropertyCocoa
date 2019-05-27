@@ -43,7 +43,7 @@ apc_objcruntimelock_lock(^()__VA_ARGS__)
  
  */
 OBJC_EXPORT void
-apc_in_main(void);
+apc_main_classHookFullSupport(void);
 
 OBJC_EXPORT _Bool
 apc_contains_objcruntimelock(void);

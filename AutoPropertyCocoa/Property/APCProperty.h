@@ -157,7 +157,7 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
  OriginalClass/TargetClass.UserProperty
  */
 - (NSUInteger)hash;
-#warning change to mappingKeyString
-- (nonnull APCStringkeyString*)mappingKey;
+
+- (nonnull APCStringkeyString*)mappingKeyString;
 @end
 
