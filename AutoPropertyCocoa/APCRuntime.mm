@@ -357,7 +357,7 @@ void apc_registerProperty(APCHookProperty* p)
     
     ///Creat new hook
     hook = [APCPropertyHook hookWithProperty:p];
-    [dictionary setObject:hook forKey:p.mappingKey];
+    [dictionary setObject:hook forKey:p.mappingKeyString];
     
     ///Update superhook
     hook->_superhook = apc_getPropertyhook_nolock(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
@@ -501,7 +501,7 @@ void apc_instance_setAssociatedProperty(APCProxyInstance* instance, APCHookPrope
             if(nil == (hook = [apc_boundInstanceMapper(instance) objectForKey:p->_hooked_name])){
                 
                 hook = [APCPropertyHook hookWithProperty:p];
-                [apc_boundInstanceMapper(instance) setObject:hook forKey:p.mappingKey];
+                [apc_boundInstanceMapper(instance) setObject:hook forKey:p.mappingKeyString];
             }
         }
     }else{
@@ -592,7 +592,7 @@ APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
 {
     @synchronized (instance) {
         
-        if(nil != [apc_runtime_proxyinstances() objectForKey:instance]){
+        if(nil != [apc_runtime_proxyinstances() objectForKey:instance]) {
             
             return object_getClass(instance);
         }

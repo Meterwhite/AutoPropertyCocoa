@@ -29,6 +29,10 @@
 {
 @public
     __kindof __weak APCMethodHook* _superhook;
+    IMP             _old_setter_implementation;
+@protected
+    
+    APCAtomicIMP    _new_setter_implementation;
 }
 
 + (nullable instancetype)hookWithProperty:(nonnull __kindof APCHookProperty*)property;
@@ -42,7 +46,6 @@
 @property (nullable,nonatomic,weak,readonly) APCLazyProperty* lazyload;
 
 @property (nullable,nonatomic,weak,readonly) __kindof APCPropertyHook* superhook;
-@property (nullable,nonatomic,copy,readonly) NSString*  hookMethod;
 @property (nonatomic,readonly) APCPropertyOwnerKind     kindOfOwner;
 @property (nonnull,nonatomic,readonly) Class sourceclass;
 @property (nonnull,nonatomic,readonly) Class hookclass;

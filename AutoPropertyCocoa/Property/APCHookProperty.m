@@ -33,14 +33,15 @@
     return self;
 }
 
-static NSString const* _apc_hookPropertyGetterEncodeing = @"%@@:";
-static NSString const* _apc_hookPropertySetterEncodeing = @"v@:%@";
-
 - (NSString const*)methodTypeEncoding
 {
-    return _methodStyle == APCMethodGetterStyle
-    ? _apc_hookPropertyGetterEncodeing
-    : _apc_hookPropertySetterEncodeing;
+    return
+    
+    @(
+        _methodStyle == APCMethodGetterStyle
+        ? APCGetterMethodEncoding
+        : APCSetterMethodEncoding
+    );
 }
 
 - (NSString *)hookedMethod

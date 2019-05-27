@@ -105,6 +105,10 @@ FOUNDATION_EXPORT NSString *const APCProgramingType_float;
 FOUNDATION_EXPORT NSString *const APCProgramingType_double;
 FOUNDATION_EXPORT NSString *const APCProgramingType_Bool;
 
+FOUNDATION_EXPORT char *const APCDeallocMethodEncoding;
+FOUNDATION_EXPORT char *const APCGetterMethodEncoding;
+FOUNDATION_EXPORT char *const APCSetterMethodEncoding;
+
 static inline void APCBoxedInvokeBasicValueSetterIMP(id _SELF,SEL _CMD,IMP imp,const char* enc, id arg)
 {
     NSCAssert(*enc != '\0', @"APC: Type encoding can not be nil.");

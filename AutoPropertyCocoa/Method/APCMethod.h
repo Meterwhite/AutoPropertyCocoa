@@ -8,15 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_OPTIONS (NSUInteger,APCMethodStyle){
+typedef NS_OPTIONS (char,APCMethodStyle){
     ///v@:
-    APCMethodDeallocStyle       =   0,
+    APCMethodDeallocStyle       =   'D',
     
     ///@@:
-    APCMethodGetterStyle        =   1,
+    APCMethodGetterStyle        =   'G',
     
     ///v@:@
-    APCMethodSetterStyle        =   2,
+    APCMethodSetterStyle        =   'S',
 };
 
 @protocol APCMethodProtocol <NSObject>

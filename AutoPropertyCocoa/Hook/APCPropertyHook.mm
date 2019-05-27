@@ -233,11 +233,14 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 @implementation APCPropertyHook
 {
-    const char*             _methodTypeEncoding;
+//    const char*             _methodTypeEncoding;
+    //    APCMethodStyle          _methodStyle;
+    NSString*               _ori_name;
+    NSString*               _getter_name;
+    NSString*               _setter_name;
     NSString*               _valueTypeEncoding;
     APCPropertyValueKind    _kindOfValue;
     APCPropertyOwnerKind    _kindOfOwner;
-    APCMethodStyle          _methodStyle;
     APCAtomicPtr            _getterTrigger;
     APCAtomicPtr            _setterTrigger;
     APCAtomicPtr            _lazyload;
@@ -260,19 +263,20 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         
         _source_class   = property->_src_class;
         _hookclass      = property->_des_class;
-        _hookMethod     = property->_hooked_name;
+//        _hookMethod     = property->_hooked_name;
         _kindOfValue    = property.kindOfValue;
         _kindOfOwner    = property.kindOfOwner;
-        _methodStyle    = property.methodStyle;
         _valueTypeEncoding  = property.valueTypeEncoding;
-        _methodTypeEncoding = property.methodTypeEncoding.UTF8String;
+        _ori_name       = property->_ori_property_name;
+        _getter_name    = property->_des_getter_name;
+        _setter_name    = property->_des_setter_name;
         
         if(_kindOfOwner == APCPropertyOwnerKindOfInstance) {
             
             _instance = property->_instance;
         }
         
-        [self hook];
+        [self hook:property.methodStyle];
     }
     return self;
 }
@@ -294,10 +298,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)bindProperty:(__kindof APCHookProperty *)property
 {
-    
-    NSAssert((_hookclass == property->_des_class) && ([_hookMethod isEqualToString:property->_hooked_name])
-             , @"APC: Mismatched type or property.");
-    
     NSAssert(property.inlet != nil, @"APC: Undefined behavior!");
     
     ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
@@ -305,9 +305,6 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)unbindProperty:(__kindof APCHookProperty *)property
 {
-    NSAssert((_hookclass == property->_des_class) && ([_hookMethod isEqualToString:property->_hooked_name])
-             , @"APC: Mismatched type or property.");
-    
     NSAssert(property.inlet != nil, @"APC: Undefined behavior!");
     
     ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, nil);
@@ -411,18 +408,30 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     return !(_lazyload || _getterTrigger || _setterTrigger);
 }
 
-- (void)hook
+
+/**
+ 'G'/'S'
+ */
+- (void)hook:(APCMethodStyle)style
 {
+    const char* const  methodTypeEncoding = (style == APCMethodGetterStyle)
+    ? APCGetterMethodEncoding
+    : APCSetterMethodEncoding;
+    
+    NSString* method = style == APCMethodGetterStyle
+    ? _getter_name
+    : _setter_name;
+    
     IMP newimp;
     if(_kindOfValue == APCPropertyValueKindOfBlock ||
        _kindOfValue == APCPropertyValueKindOfObject){
         
-        newimp = (_methodStyle == APCMethodGetterStyle)
+        newimp = (style == APCMethodGetterStyle)
         ? (IMP)apc_propertyhook_getter
         : (IMP)apc_propertyhook_setter;
     }else{
         
-        newimp = (_methodStyle == APCMethodGetterStyle)
+        newimp = (style == APCMethodGetterStyle)
         ? (IMP)apc_propertyhook_getter_HookIMPMapper(_valueTypeEncoding)
         : (IMP)apc_propertyhook_setter_HookIMPMapper(_valueTypeEncoding);
     }
@@ -434,9 +443,9 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         _old_implementation
         =
         class_replaceMethod(_hookclass
-                            , NSSelectorFromString(_hookMethod)
+                            , NSSelectorFromString(method)
                             , _new_implementation
-                            , _methodTypeEncoding);
+                            , methodTypeEncoding);
     }else{
         
         APCProxyClass iProxyClass;
@@ -451,15 +460,15 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         _old_implementation
         =
         class_replaceMethod(iProxyClass
-                            , NSSelectorFromString(_hookMethod)
+                            , NSSelectorFromString(method)
                             , _new_implementation
-                            , _methodTypeEncoding);
+                            , methodTypeEncoding);
     }
     
     ///Delete the wrong _old_implementation.
     if(!apc_contains_objcruntimelock()){
 
-        IMP cmp = (_methodStyle == APCMethodGetterStyle)
+        IMP cmp = (style == APCMethodGetterStyle)
         ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
         : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);
         
@@ -480,23 +489,45 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)unhook
 {
-    NSAssert(_new_implementation != nil, @"APC: Lost _new_implementation.");
+    [self unhook:APCMethodGetterStyle];
+    [self unhook:APCMethodSetterStyle];
+}
+
+- (void)unhook:(APCMethodStyle)style
+{
+    const char* const  methodTypeEncoding = (style == APCMethodGetterStyle)
+    ? APCGetterMethodEncoding
+    : APCSetterMethodEncoding;
+    
+    APCAtomicIMP*   newimp_ptr = (style == APCMethodGetterStyle)
+    ? &_new_implementation
+    : &_new_setter_implementation;
+    
+    IMP*            oldimp_ptr = (style == APCMethodGetterStyle)
+    ? &_old_implementation
+    : &_old_setter_implementation;
+    
+    NSString* method = style == APCMethodGetterStyle
+    ? _getter_name
+    : _setter_name;
+    
+    NSAssert(*newimp_ptr != nil, @"APC: Lost implementation.");
     
     Class unhookClass = (_kindOfOwner == APCPropertyOwnerKindOfClass)
     ? _hookclass
     : object_getClass(_instance);
     
     
-    IMP newImp = _new_implementation;
-    if(atomic_compare_exchange_strong(&_new_implementation, &newImp, nil))
+    IMP newImp = *newimp_ptr;
+    if(atomic_compare_exchange_strong(newimp_ptr, &newImp, nil))
     {
-        if(_old_implementation != nil){
+        if(*oldimp_ptr != nil){
             
             //Realized by itself
             class_replaceMethod(unhookClass
-                                , NSSelectorFromString(_hookMethod)
-                                , _old_implementation
-                                , _methodTypeEncoding);
+                                , NSSelectorFromString(method)
+                                , *oldimp_ptr
+                                , methodTypeEncoding);
         }else{
             
             ///Not realized by itself
@@ -504,44 +535,54 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
                 
                 class_removeMethod_APC_OBJC2
                 (unhookClass
-                 , NSSelectorFromString(_hookMethod));
+                 , NSSelectorFromString(method));
             }else {
                 
                 class_replaceMethod(unhookClass
-                                    , NSSelectorFromString(_hookMethod)
-                                    , self.restoredImplementation
-                                    , _methodTypeEncoding);
+                                    , NSSelectorFromString(method)
+                                    , [self restoredImplementation:style]
+                                    , methodTypeEncoding);
             }
         }
     }
 }
 
-- (IMP)restoredImplementation
+- (IMP)restoredImplementation:(APCMethodStyle)style
 {
-    if(_old_implementation){
+    if(style == APCMethodGetterStyle && _old_implementation){
         
         return _old_implementation;
+    }else if (style == APCMethodSetterStyle && _old_setter_implementation){
+        
+        return _old_setter_implementation;
     }
     
     if(_kindOfValue == APCPropertyValueKindOfObject ||
        _kindOfValue == APCPropertyValueKindOfBlock) {
         
-        return (_methodStyle == APCMethodGetterStyle)
+        return (style == APCMethodGetterStyle)
         ? (IMP)apc_null_getter : (IMP)apc_null_setter;
     }else{
         
-        return  (_methodStyle == APCMethodGetterStyle)
+        return  (style == APCMethodGetterStyle)
         ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
         : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);
     }
 }
 
-- (IMP)oldImplementation
+- (IMP)oldImplementation:(APCMethodStyle)style
 {
-    if(_old_implementation){
+    if(style == APCMethodGetterStyle && _old_implementation){
         
         return _old_implementation;
+    }else if (style == APCMethodSetterStyle && _old_setter_implementation){
+        
+        return _old_setter_implementation;
     }
+    
+    NSString* method = style == APCMethodGetterStyle
+    ? _getter_name
+    : _setter_name;
     
     Class tagCls = _kindOfOwner == APCPropertyOwnerKindOfClass
     ? apc_class_getSuperclass(_hookclass)
@@ -551,22 +592,24 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     =
     apc_lookup_sourcePropertyhook_inRange(tagCls
                                           , _source_class
-                                          , _hookMethod);
+                                          , method);
     if(hook != nil){
         
-        return hook->_old_implementation;
+        return style == APCMethodGetterStyle
+        ? hook->_old_implementation
+        : hook->_old_setter_implementation;
     }
     
     return
     
     class_getMethodImplementation(_source_class
-                                  , NSSelectorFromString(_hookMethod));
+                                  , NSSelectorFromString(method));
 }
 
 - (void)performOldSetterFromTarget:(id)target withValue:(id)value
 {
     APCBoxedInvokeBasicValueSetterIMP(target
-                           , NSSelectorFromString(_hookMethod)
+                           , NSSelectorFromString(_setter_name)
                            , self.oldImplementation
                            , _valueTypeEncoding.UTF8String
                            , value);
@@ -577,7 +620,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     return
     
     APCBoxedInvokeBasicValueGetterIMP(target
-                           , NSSelectorFromString(_hookMethod)
+                           , NSSelectorFromString(_getter_name)
                            , self.oldImplementation
                            , _valueTypeEncoding.UTF8String);
 }
