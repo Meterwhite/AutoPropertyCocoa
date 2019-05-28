@@ -86,23 +86,7 @@
 {
     NSAssert(self.accessOption & APCPropertySetValueEnable, @"APC: Object %@ must have setter or _ivar.",target);
     
-    if((self.accessOption & APCPropertyAssociatedSetter)
-       || (self.accessOption & APCPropertyComponentOfSetter)){
-        
-        ///Set value by setter
-        IMP imp = class_getMethodImplementation([target class]
-                                                , self.propertySetter ?: self.associatedSetter);
-        NSAssert(imp
-                 , @"APC: Can not find implementation named %@ in %@"
-                 , NSStringFromSelector(self.propertySetter)
-                 , [target class]);
-        
-        APCBoxedInvokeBasicValueSetterIMP(target
-                               , self.propertySetter
-                               , imp
-                               , self.valueTypeEncoding.UTF8String
-                               , value);
-    }else{
+    if((self.accessOption & APCPropertyIvarAccessible)){
         
         ///Set value to ivar
         if(self.kindOfValue == APCPropertyValueKindOfBlock ||
@@ -113,6 +97,22 @@
             
             [target setValue:value forKey:@(ivar_getName(self.associatedIvar))];
         }
+    }else{
+        
+        ///Set value by setter
+        IMP imp = class_getMethodImplementation([target class]
+                                                , self.propertySetter
+                                                ? : self.associatedSetter);
+        NSAssert(imp
+                 , @"APC: Can not find implementation named %@ in %@"
+                 , NSStringFromSelector(self.propertySetter)
+                 , [target class]);
+        
+        APCBoxedInvokeBasicValueSetterIMP(target
+                                          , self.propertySetter
+                                          , imp
+                                          , self.valueTypeEncoding.UTF8String
+                                          , value);
     }
 }
 
@@ -130,13 +130,13 @@
      , so super-propery should not be called here.
      */
     id v;
-    ///Safe
-    if(self.accessOption & APCPropertyComponentOfGetter){
-        
-        v = [self.associatedHook performOldGetterFromTarget:target];
-    }else{
+    
+    if(self.accessOption & APCPropertyIvarAccessible){
         
         v = [self getIvarValueFromTarget:target];
+    }else{
+        
+        v = [self.associatedHook performOldGetterFromTarget:target];
     }
     
     if(v == nil &&

@@ -337,6 +337,11 @@
         }
     }
     
+    if(!(_accessOption & APCPropertyComponentOfGetter)){
+        
+        _accessOption   |=  APCPropertyComponentOfGetter;
+    }
+    
     return self;
 }
 

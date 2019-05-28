@@ -552,12 +552,12 @@ APC_TEST_DEMO(InstanceMix,107)
             ++count;
         }];
         
-        NSParameterAssert([m.gettersetterobj isEqualToString:@"gettersetterobj"]);
-        NSParameterAssert(count==1);
         NSParameterAssert([m.obj isEqualToString:@"obj"]);
-        NSParameterAssert(count==2);
-        m.gettersetterobj = @"0";
+        NSParameterAssert(count==1);
+        NSParameterAssert([m.gettersetterobj isEqualToString:@"gettersetterobj"]);
         NSParameterAssert(count==4);
+        m.gettersetterobj = @"0";
+        NSParameterAssert(count==6);
     }
 }
 
@@ -599,5 +599,65 @@ APC_TEST_DEMO(ClassInstanceMix,108)
         NSParameterAssert(count==4);
     }
 }
+
+APC_TEST_DEMO(UserEnviroment, 109)
+{
+    APC_TEST_CLEAN
+    {
+        __block int count = 0;
+        
+        [Person apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            return @"Person.gettersetterobj";
+        }];
+        
+        [Man apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            return APCSuperPerformedAsId(instance);
+        }];
+        
+        [Superman apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            return APCSuperPerformedAsId(instance);
+        }];
+        
+        APCTestInstance(Superman, sm);
+        
+        NSParameterAssert([sm.gettersetterobj isEqualToString:@"Person.gettersetterobj"]);
+        NSParameterAssert(count == 3);
+        
+        
+        [sm apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            return APCSuperPerformedAsId(instance);
+        }];
+        
+        NSParameterAssert([sm.gettersetterobj isEqualToString:@"Person.gettersetterobj"]);
+        
+        NSParameterAssert(count == 9);
+    }
+}
+
+//APC_TEST_DEMO(Tffff,10086)
+//{
+//     APCTestInstance(Man, m);
+//    [m apc_lazyLoadForProperty:@key_manObj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+//
+//        return @"M a n";
+//    }];
+//    [m apc_unbindLazyLoadForProperty:@key_manObj];
+//
+//    [m apc_lazyLoadForProperty:@key_manObj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+//
+//        return @"M a n";
+//    }];
+//    [m apc_unbindLazyLoadForProperty:@key_manObj];
+//
+//
+//}
 
 @end

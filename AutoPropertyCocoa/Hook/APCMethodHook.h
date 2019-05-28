@@ -15,9 +15,6 @@
 
 @optional
 - (nullable __kindof APCMethodHook*)superhook;
-- (nonnull IMP)restoredImplementation;
-- (nullable NSString*)hookMethod;
-- (nonnull IMP)oldImplementation;
 - (nullable Class)hookclass;
 @end
 

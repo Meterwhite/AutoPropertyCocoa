@@ -60,6 +60,11 @@
 
 - (void)removeObjectForKey:(nonnull NSString*)aKey;
 
+/**
+ The last two objects will be deleted at the same time
+ */
+- (void)removePropertyHookForKey:(nonnull NSString*)aKey;
+
 - (nonnull NSEnumerator<NSString*> *)keyEnumerator;
 
 - (void)removeAllObjects;

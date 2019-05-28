@@ -36,6 +36,8 @@ APC_TEST_DEMO(ClassMix,106);
 APC_TEST_DEMO(InstanceMix,107);
 APC_TEST_DEMO(ClassInstanceMix,108);
 
+APC_TEST_DEMO(UserEnviroment, 109);
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -24,14 +24,15 @@ typedef NS_OPTIONS (NSUInteger,APCPropertyAccessOptions){
     ///Ivar from ivar list.
     APCPropertyAssociatedIVar      =   1   <<  4,
     
-    APCPropertySetValueEnable      =   APCPropertyComponentOfSetter
-                                        | APCPropertyAssociatedSetter
-                                        | APCPropertyComponentOfIVar
+    APCPropertyIvarAccessible      =    APCPropertyComponentOfIVar
                                         | APCPropertyAssociatedIVar,
     
+    APCPropertySetValueEnable      =   APCPropertyComponentOfSetter
+                                        | APCPropertyAssociatedSetter
+                                        | APCPropertyIvarAccessible,
+    
     APCPropertyGetValueEnable      =   APCPropertyComponentOfGetter
-                                        | APCPropertyComponentOfIVar
-                                        | APCPropertyAssociatedIVar,
+                                        | APCPropertyIvarAccessible,
 };
 
 typedef NS_OPTIONS(NSUInteger,APCPropertyValueKind){
@@ -145,8 +146,8 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
  Call it when it is accessed.
  */
 - (void)access;
-- (NSUInteger)accessCount;
 
+- (NSUInteger)accessCount;
 
 /**
  [obj isEqual: @"Srcclass/Desclass.property"] => YES
@@ -159,5 +160,6 @@ typedef NS_OPTIONS(NSUInteger, APCPropertyHookKind){
 - (NSUInteger)hash;
 
 - (nonnull APCStringkeyString*)mappingKeyString;
+
 @end
 

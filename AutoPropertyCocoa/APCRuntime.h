@@ -92,7 +92,7 @@ apc_lookup_instanceProperty(APCProxyInstance* _Nonnull instance
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
 
-__kindof APCHookProperty* _Nullable
+OBJC_EXPORT __kindof APCHookProperty* _Nullable
 apc_propertyhook_lookupSuperProperty(APCPropertyHook* _Nonnull hook, const char* _Nonnull ivar);
 
 #pragma mark - For property

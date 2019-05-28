@@ -34,7 +34,7 @@
 		45E1CDF5228BF3BB00DCD3F0 /* APCClassMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDCF228BF3BB00DCD3F0 /* APCClassMapper.m */; };
 		45E1CDF6228BF3BB00DCD3F0 /* APCRuntime.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDD3228BF3BB00DCD3F0 /* APCRuntime.mm */; };
 		45E1CDF7228BF3BB00DCD3F0 /* NSObject+APCTriggerProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDD6228BF3BB00DCD3F0 /* NSObject+APCTriggerProperty.m */; };
-		45E1CDF8228BF3BB00DCD3F0 /* APCPropertyHook.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDD8228BF3BB00DCD3F0 /* APCPropertyHook.mm */; };
+		45E1CDF8228BF3BB00DCD3F0 /* APCPropertyHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDD8228BF3BB00DCD3F0 /* APCPropertyHook.m */; };
 		45E1CDF9228BF3BB00DCD3F0 /* APCMethodHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDDB228BF3BB00DCD3F0 /* APCMethodHook.m */; };
 		45E1CDFA228BF3BB00DCD3F0 /* apc-objc-extension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDDE228BF3BB00DCD3F0 /* apc-objc-extension.mm */; };
 		45E1CDFB228BF3BB00DCD3F0 /* apc-fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDE0228BF3BB00DCD3F0 /* apc-fishhook.c */; };
@@ -104,7 +104,7 @@
 		45E1CDD4228BF3BB00DCD3F0 /* NSObject+APCLazyLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCLazyLoad.h"; sourceTree = "<group>"; };
 		45E1CDD5228BF3BB00DCD3F0 /* APCExtScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCExtScope.h; sourceTree = "<group>"; };
 		45E1CDD6228BF3BB00DCD3F0 /* NSObject+APCTriggerProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCTriggerProperty.m"; sourceTree = "<group>"; };
-		45E1CDD8228BF3BB00DCD3F0 /* APCPropertyHook.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = APCPropertyHook.mm; sourceTree = "<group>"; };
+		45E1CDD8228BF3BB00DCD3F0 /* APCPropertyHook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCPropertyHook.m; sourceTree = "<group>"; };
 		45E1CDD9228BF3BB00DCD3F0 /* APCMethodHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCMethodHook.h; sourceTree = "<group>"; };
 		45E1CDDA228BF3BB00DCD3F0 /* APCPropertyHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCPropertyHook.h; sourceTree = "<group>"; };
 		45E1CDDB228BF3BB00DCD3F0 /* APCMethodHook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCMethodHook.m; sourceTree = "<group>"; };
@@ -282,7 +282,7 @@
 				45E1CDD9228BF3BB00DCD3F0 /* APCMethodHook.h */,
 				45E1CDDB228BF3BB00DCD3F0 /* APCMethodHook.m */,
 				45E1CDDA228BF3BB00DCD3F0 /* APCPropertyHook.h */,
-				45E1CDD8228BF3BB00DCD3F0 /* APCPropertyHook.mm */,
+				45E1CDD8228BF3BB00DCD3F0 /* APCPropertyHook.m */,
 			);
 			path = Hook;
 			sourceTree = "<group>";
@@ -391,7 +391,7 @@
 				45E1CE02228BF3DE00DCD3F0 /* Superman.m in Sources */,
 				45E1CDF9228BF3BB00DCD3F0 /* APCMethodHook.m in Sources */,
 				45E1CDFB228BF3BB00DCD3F0 /* apc-fishhook.c in Sources */,
-				45E1CDF8228BF3BB00DCD3F0 /* APCPropertyHook.mm in Sources */,
+				45E1CDF8228BF3BB00DCD3F0 /* APCPropertyHook.m in Sources */,
 				45E1CDEF228BF3BB00DCD3F0 /* APCLazyProperty.m in Sources */,
 				45B12FEB225B2C9B002D825E /* Man.m in Sources */,
 				45E1CDEB228BF3BB00DCD3F0 /* NSString+APCExtension.m in Sources */,

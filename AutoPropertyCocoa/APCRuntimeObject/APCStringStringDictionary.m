@@ -108,6 +108,41 @@
     _readonly = [_read_data copy];
 }
 
+- (void)removePropertyHookForKey:(NSString *)aKey
+{
+    APCStringkeyString* iKey;
+    for (APCStringkeyString* item in _manager.keyEnumerator) {
+        
+        if([item isEqualToString:aKey]){
+            
+            iKey = item;
+            break;
+        }
+    }
+    
+    if(iKey == nil) return;
+    
+    if(iKey.head.length > 2){
+        
+        [_manager removeObjectForKey:iKey];
+        [_read_data removeObjectForKey:iKey->value];
+        return;
+    }
+    
+    ///Find head key
+    iKey = iKey.head;
+    
+    for (iKey in iKey.head) {
+        
+        [_manager removeObjectForKey:iKey];
+        [_read_data removeObjectForKey:iKey->value];
+    }
+    
+    [_values removeObject:[_readonly objectForKey:aKey]];
+    
+    _readonly = [_read_data copy];
+}
+
 - (NSEnumerator *)objectEnumerator
 {
     return [_values objectEnumerator];
