@@ -11,5 +11,7 @@
 
 @interface Superman : Man
 
+- (void)fly;
+
 @end
 

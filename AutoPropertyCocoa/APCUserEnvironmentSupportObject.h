@@ -19,7 +19,7 @@
 
 typedef id id_apc_t;
 #warning ifdef/ifndef
-#ifndef DEBUG
+#ifdef DEBUG
 
 OBJC_EXPORT void
 apc_debug_super_method_void1(id_apc_t _Nonnull instance);

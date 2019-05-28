@@ -14,6 +14,7 @@
 /**
  Get the original class of the instance that has been bound property.
  */
+- (BOOL)apc_isKindOfClass:(nonnull Class)cls;
 - (nonnull Class)apc_originalClass;
 - (void)apc_instanceUnbind;
 + (void)apc_classUnbind;

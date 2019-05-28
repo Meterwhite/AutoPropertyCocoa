@@ -12,6 +12,11 @@
 
 @implementation NSObject(APCExtension)
 
+- (BOOL)apc_isKindOfClass:(Class)cls
+{
+    return [[self apc_originalClass] isSubclassOfClass:cls];
+}
+
 - (nonnull Class)apc_originalClass
 {
     if(apc_object_isProxyInstance(self)){

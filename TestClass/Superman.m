@@ -27,4 +27,9 @@
     _apc_supermanRealizeToPerson = supermanRealizeToPerson;
 }
 
+- (void)fly
+{
+    NSLog(@"Wuu~~~");
+}
+
 @end

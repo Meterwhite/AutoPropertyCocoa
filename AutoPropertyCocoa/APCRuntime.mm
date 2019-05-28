@@ -400,36 +400,35 @@ void apc_disposeProperty(APCHookProperty* _Nonnull p)
 __kindof APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 {
     apc_runtimelock_reader_t reading(apc_runtimelock);
-#warning modify
-    APCPropertyHook* hook = apc_runtime_propertyhook(p->_des_class, p->_hooked_name);
-    BOOL shouldRet = NO;
     
-    APCHookProperty* item;
-    while (nil != (hook = [hook superhook])) {
+    APCPropertyHook* hook;
+    if(p.kindOfOwner == APCPropertyOwnerKindOfInstance){
+        
+        Class cls = p->_des_class;
+        
+        do {
+            
+            if(nil != (hook = apc_runtime_propertyhook(cls, p->_hooked_name))){
+                break;
+            }
+        } while (nil != (cls = class_getSuperclass(cls)));
+    } else {
+        
+        hook = [apc_runtime_propertyhook(p->_des_class, p->_hooked_name) superhook];
+    }
     
-    CALL_FIND_IN_SUPERHOOK:
-        {
+    if(hook != nil) {
+        
+        APCHookProperty* item;
+        do {
+            
             if(nil != (item = ((id(*)(id,SEL))objc_msgSend)(hook, p.outlet))){
                 
                 return item;
             }
-        }
+        }while (nil != (hook = [hook superhook]));
     }
-    
-    if(!shouldRet && p.kindOfOwner == APCPropertyOwnerKindOfInstance){
-        
-        Class cls = p->_des_class;
-        
-        while (nil != (cls = class_getSuperclass(p->_des_class))) {
-            
-            if(nil != (hook = apc_runtime_propertyhook(cls, p->_hooked_name))){
-                
-                shouldRet = YES;
-                goto CALL_FIND_IN_SUPERHOOK;
-            }
-        }
-    }
-    
+
     return (APCHookProperty*)0;
 }
 

@@ -630,15 +630,18 @@ APC_TEST_DEMO(UserEnviroment, 109)
         NSParameterAssert(count == 3);
         
         
-        [sm apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+        [sm apc_lazyLoadForProperty:@key_gettersetterobj  usingBlock:^id _Nullable(Superman*  _Nonnull instance) {
             
             ++count;
+            [instance fly];
+            NSParameterAssert([instance apc_isKindOfClass:[Superman class]]);
             return APCSuperPerformedAsId(instance);
         }];
         
+        sm.gettersetterobj = nil;
         NSParameterAssert([sm.gettersetterobj isEqualToString:@"Person.gettersetterobj"]);
         
-        NSParameterAssert(count == 9);
+        NSParameterAssert(count == 7);
     }
 }
 
