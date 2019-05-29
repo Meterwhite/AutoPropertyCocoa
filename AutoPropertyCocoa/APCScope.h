@@ -301,10 +301,6 @@ return [NSValue valueWithBytes:&returnValue objCType:enc];
 
 #pragma mark - Fast
 
-//#define APCPropertiesArray(...)\
-//\
-//@[APCProperties(__VA_ARGS__)]
-
 #define APCPropertiesArray(...)\
 \
 submacro_apc_concat(submacro_apc_plist_,submacro_apc_argcount(__VA_ARGS__))(__VA_ARGS__)

@@ -22,8 +22,14 @@ NSString *const  APCProgramingType_float             =   @"float";
 NSString *const  APCProgramingType_double            =   @"double";
 NSString *const  APCProgramingType_Bool              =   @"_Bool";
 
+#if __LP64__
 char *const  APCDeallocMethodEncoding                =   "v16@0:8";
 char *const  APCGetterMethodEncoding                 =   "@16@0:8";
 char *const  APCSetterMethodEncoding                 =   "v24@0:8@16";
+#else
+char *const  APCDeallocMethodEncoding                =   "v8@0:4";
+char *const  APCGetterMethodEncoding                 =   "@8@0:4";
+char *const  APCSetterMethodEncoding                 =   "v12@0:4@8";
+#endif
 
 #endif

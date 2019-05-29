@@ -164,8 +164,10 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
     return
     
     ((BOOL)_father | (BOOL)_previousBrother)
-    & !(BOOL)_child
-    & !(BOOL)_nextBrother;
+    &
+    !(BOOL)_child
+    &
+    !(BOOL)_nextBrother;
 }
 
 - (NSUInteger)degree
@@ -211,8 +213,7 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
     
     while (YES){
         
-        if(nil == iNode.previousBrother)
-            break;
+        if(nil == iNode.previousBrother) break;
         iNode = iNode.previousBrother;
     }
     return iNode;
@@ -224,8 +225,7 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
     
     while (YES){
         
-        if(nil == iNode.nextBrother)
-            break;
+        if(nil == iNode.nextBrother)  break;
         iNode = iNode.nextBrother;
     }
     return iNode;

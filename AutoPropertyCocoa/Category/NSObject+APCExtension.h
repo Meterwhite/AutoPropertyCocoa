@@ -12,6 +12,7 @@
 
 
 /**
+ Use when type marked as id_apc_t.
  Get the original class of the instance that has been bound property.
  */
 - (BOOL)apc_isKindOfClass:(nonnull Class)cls;

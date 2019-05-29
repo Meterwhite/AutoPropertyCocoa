@@ -36,7 +36,6 @@
 {
 @public
     
-#warning del and use set get.
     NSString*       _hooked_name;
 @protected
 
@@ -44,20 +43,19 @@
     SEL             _outlet;
     SEL             _inlet;
 }
-@property (nullable,nonatomic,copy,readonly)NSString*           methodTypeEncoding;
-@property (nonnull,nonatomic,copy,readonly)NSString const*      hookedMethod;
-@property (nullable,nonatomic,weak)APCPropertyHook*             associatedHook;
-@property (nonatomic,readonly)APCMethodStyle                    methodStyle;
+@property (nullable,nonatomic,copy,readonly)NSString*      methodTypeEncoding;
+@property (nullable,nonatomic,weak)APCPropertyHook*        associatedHook;
+@property (nonnull,nonatomic,copy,readonly)NSString const* hookedMethod;
+@property (nonatomic,readonly)APCMethodStyle               methodStyle;
 
 - (nullable SEL)outlet;
 - (nullable SEL)inlet;
 
-
 /**
- NSClass.APCClass.hooedMethod
+ NSClass.APCClass.hookedMethod
  */
 - (NSUInteger)hash;
 
 #pragma mark - APCUserEnvironmentMessage
-- (nullable instancetype)superObject;
+- (nullable instancetype)superEnvironmentMessage;
 @end

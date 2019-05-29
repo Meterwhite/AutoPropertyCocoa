@@ -11,9 +11,6 @@
 #import "APCRuntime.h"
 
 @implementation APCHookProperty
-//{
-//    NSString*   _methodTypeEncoding;
-//}
 
 - (instancetype)initWithPropertyName:(NSString *)propertyName aClass:(__unsafe_unretained Class)aClass
 {
@@ -82,7 +79,7 @@
     return _hashcode;
 }
 
-- (instancetype)superObject
+- (instancetype)superEnvironmentMessage
 {
     return apc_property_getSuperProperty(self);
 }

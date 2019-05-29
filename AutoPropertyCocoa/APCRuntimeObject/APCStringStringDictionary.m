@@ -94,21 +94,17 @@
     
     if(iKey == nil) return;
     
-    ///Find head key
-    iKey = iKey.head;
-    
-    for (iKey in iKey.head) {
+    [_manager removeObjectForKey:iKey];
+    [_read_data removeObjectForKey:iKey->value];
+    id value = [_readonly objectForKey:aKey];
+    if(![[_read_data allValues] containsObject:value]){
         
-        [_manager removeObjectForKey:iKey];
-        [_read_data removeObjectForKey:iKey->value];
+        [_values removeObject:value];
     }
-    
-    [_values removeObject:[_readonly objectForKey:aKey]];
-    
     _readonly = [_read_data copy];
 }
 
-- (void)removePropertyHookForKey:(NSString *)aKey
+- (void)removeObjectsForKey:(NSString *)aKey
 {
     APCStringkeyString* iKey;
     for (APCStringkeyString* item in _manager.keyEnumerator) {
@@ -121,13 +117,6 @@
     }
     
     if(iKey == nil) return;
-    
-    if(iKey.head.length > 2){
-        
-        [_manager removeObjectForKey:iKey];
-        [_read_data removeObjectForKey:iKey->value];
-        return;
-    }
     
     ///Find head key
     iKey = iKey.head;

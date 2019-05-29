@@ -38,10 +38,7 @@ APC_TEST_DEMO(ClassInstanceMix,108);
 
 APC_TEST_DEMO(UserEnviroment, 109);
 
-///basic-value
-
-///struct value
-
+APC_TEST_DEMO(BasicValue, 110);
 
 @end
 

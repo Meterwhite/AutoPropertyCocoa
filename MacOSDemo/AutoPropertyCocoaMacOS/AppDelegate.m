@@ -8,13 +8,7 @@
 
 #import "AutoPropertyCocoa.h"
 #import "AppDelegate.h"
-#import "APCScope.h"
 #import "APCTest.h"
-#import "Person.h"
-
-#warning <#message#>
-#import "apc-objc-runtimelock.h"
-#import "apc-objc-extension.h"
 
 @interface AppDelegate ()
 
@@ -26,8 +20,7 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
     
-    [APCTest testDemoFrom:100 to:110];
-//    [APCTest testDemo:10086];
+    [APCTest testDemoFrom:100 to:111];
 }
 
 

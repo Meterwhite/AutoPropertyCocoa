@@ -43,7 +43,7 @@
 }
 
 - (instancetype)initWithPropertyName:(NSString*)property
-                      aClass:(Class)clazz
+                              aClass:(Class)clazz
 {
     if(self = [super init]){
         

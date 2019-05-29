@@ -21,10 +21,6 @@
 
 - (nonnull instancetype)initWithString:(nonnull NSString*)string;
 
-/**
- Only used for matching the keys of the collection object.
- [single isEqual: single];
- */
 - (BOOL)isEqual:(nonnull APCStringkey*)object;
 
 - (BOOL)isEqualToString:(nullable NSString*)string;

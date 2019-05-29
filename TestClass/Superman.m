@@ -22,14 +22,13 @@
 
 - (void)setSupermanRealizeToPerson:(id)supermanRealizeToPerson
 {
-    
     NSLog(@"APCTest << %s << _apc_supermanRealizeToPerson = %@", __func__, supermanRealizeToPerson);
     _apc_supermanRealizeToPerson = supermanRealizeToPerson;
 }
 
 - (void)fly
 {
-    NSLog(@"Wuu~~~");
+    NSLog(@"Shoo~~~");
 }
 
 @end

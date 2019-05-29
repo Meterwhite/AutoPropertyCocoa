@@ -5,7 +5,7 @@
 //  Created by Novo on 2019/3/20.
 //  Copyright © 2019 Novo. All rights reserved.
 //
-//#import "NSObject+APCLazyLoad.h"
+
 #import "APCLazyProperty.h"
 #import "APCPropertyHook.h"
 #import "APCRuntime.h"
@@ -25,14 +25,20 @@
         _methodStyle    =   APCMethodGetterStyle;
         _outlet         =   @selector(lazyload);
         _hooked_name    =   _des_getter_name;
-        if(self.kindOfOwner == APCPropertyOwnerKindOfClass){
-            
-            if(self.kindOfValue != APCPropertyValueKindOfObject
-               && self.kindOfValue != APCPropertyValueKindOfBlock){
-                
-                NSAssert(NO, @"APC: Disable binding on basic-value property for class object.");
-            }
-        }
+    }
+    return self;
+}
+
+- (instancetype)initWithPropertyName:(NSString *)propertyName aInstance:(id)aInstance
+{
+    if(self = [super initWithPropertyName:propertyName aInstance:aInstance]){
+        
+        
+        NSAssert(!(self.kindOfOwner == APCPropertyOwnerKindOfClass  &&
+                   self.kindOfValue != APCPropertyValueKindOfObject &&
+                   self.kindOfValue != APCPropertyValueKindOfBlock)
+                 
+                 , @"APC: Disable binding on basic-value property for class.");
     }
     return self;
 }

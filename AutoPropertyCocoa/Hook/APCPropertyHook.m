@@ -21,27 +21,28 @@ id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
 {
     APCPropertyHook*    hook    =   nil;
     NSString*           cmdstr  =   @((const char*)(const void*)_CMD);
-    if(apc_object_isProxyInstance(_SELF)){
+    do {
         
-        if(nil != (hook = apc_lookup_instancePropertyhook(_SELF, cmdstr))){
+        if(apc_object_isProxyInstance(_SELF)){
             
-            goto CALL_WORKING;
+            if(nil != (hook = apc_lookup_instancePropertyhook(_SELF, cmdstr))){
+                
+                break;
+            }
         }
-    }
-    
-    if(nil != (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
         
-        goto CALL_WORKING;
-    }
+        if(nil != (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
+            
+            break;
+        }
+        
+        @throw
+        
+        [NSException exceptionWithName:NSGenericException
+                                reason:@"APC: Can not find any infomation about this property.The data seems to have been deleted in other threads."
+                              userInfo:nil];
+    } while (0);
     
-    @throw
-    
-    [NSException exceptionWithName:NSGenericException
-                            reason:@"APC can not find any infomation about this property."
-                          userInfo:nil];
-    
-    
-CALL_WORKING:
     
     if(hook.isGetterEmpty){
         ///If unbind in other threads.
@@ -110,27 +111,28 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
 {
     APCPropertyHook*    hook    =   nil;
     NSString*           cmdstr  =   @((const char*)(const void*)_CMD);
-    if(apc_object_isProxyInstance(_SELF)){
+    do {
         
-        if(nil != (hook = apc_lookup_instancePropertyhook(_SELF, cmdstr))){
+        if(apc_object_isProxyInstance(_SELF)){
             
-            goto CALL_WORKING;
+            if(nil != (hook = apc_lookup_instancePropertyhook(_SELF, cmdstr))){
+                
+                break;
+            }
         }
-    }
-    
-    if(nil != (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
         
-        goto CALL_WORKING;
-    }
+        if(nil != (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
+            
+            break;
+        }
+        
+        @throw
+        
+        [NSException exceptionWithName:NSGenericException
+                                reason:@"APC: Can not find any infomation about this property.The data seems to have been deleted in other threads."
+                              userInfo:nil];
+    } while (0);
     
-    @throw
-    
-    [NSException exceptionWithName:NSGenericException
-                            reason:@"APC can not find any infomation about this property."
-                          userInfo:nil];
-    
-    
-CALL_WORKING:
     
     if(hook.isSetterEmpty){
         
@@ -645,9 +647,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     
     APCPropertyHook* hook
     =
-    apc_lookup_sourcePropertyhook_inRange(tagCls
-                                          , _source_class
-                                          , method);
+    apc_lookup_sourcePropertyhook_inRange(tagCls, _source_class, method);
     if(hook != nil){
         
         return style == APCMethodGetterStyle

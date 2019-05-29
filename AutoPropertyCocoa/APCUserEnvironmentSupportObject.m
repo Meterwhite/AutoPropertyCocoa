@@ -16,7 +16,9 @@
     SEL                             _action;
 }
 
-- (id)initWithObject:(NSObject *)object message:(id<APCUserEnvironmentMessage>)message action:(SEL)action
+- (id)initWithObject:(NSObject *)object
+             message:(id<APCUserEnvironmentMessage>)message
+              action:(SEL)action
 {
     NSAssert([message conformsToProtocol:@protocol(APCUserEnvironmentMessage)]
              , @"APC: Need conforms to APCUserEnvironmentMessage.");
@@ -26,28 +28,28 @@
     return self;
 }
 
-- (SEL)action
+- (SEL)apc_environmentAction
 {
     return _action;
 }
 
 #pragma mark - received message
 
-- (id)superMessage
+- (id)apc_superEnvironmentMessage
 {
-    return [_message superObject];
+    return [_message superEnvironmentMessage];
 }
 
 - (void)apc_performUserSuperAsVoid
 {
-    ((void(*)(id,SEL,id))objc_msgSend)([self superMessage]
+    ((void(*)(id,SEL,id))objc_msgSend)([self apc_superEnvironmentMessage]
                                           , _action
                                           , _instance);
 }
 
 - (void)apc_performUserSuperAsVoidWithObject:(id)object
 {
-    ((void(*)(id,SEL,id,id))objc_msgSend)([self superMessage]
+    ((void(*)(id,SEL,id,id))objc_msgSend)([self apc_superEnvironmentMessage]
                                              , _action
                                              , _instance
                                              , object);
@@ -55,7 +57,7 @@
 
 - (BOOL)apc_performUserSuperAsBOOLWithObject:(id)object
 {
-    return ((BOOL(*)(id,SEL,id,id))objc_msgSend)([self superMessage]
+    return ((BOOL(*)(id,SEL,id,id))objc_msgSend)([self apc_superEnvironmentMessage]
                                                     , _action
                                                     , _instance
                                                     , object);
@@ -65,7 +67,7 @@
 {
     return
     
-    ((id(*)(id,SEL,id))objc_msgSend)([self superMessage]
+    ((id(*)(id,SEL,id))objc_msgSend)([self apc_superEnvironmentMessage]
                                      , _action
                                      , _instance);
 }
@@ -164,14 +166,15 @@
 
 
 #pragma mark - debug working
+#ifdef DEBUG
 void apc_debug_super_method_void1(APCUserEnvironmentSupportObject* instance)
 {
     if(![instance isProxy]){
         
         return;
     }
-    ((void(*)(id,SEL,id))objc_msgSend)([instance superMessage]
-                                       , [instance action]
+    ((void(*)(id,SEL,id))objc_msgSend)([instance apc_superEnvironmentMessage]
+                                       , [instance apc_environmentAction]
                                        , [instance self]);
 }
 
@@ -181,8 +184,8 @@ void apc_debug_super_method_void2(APCUserEnvironmentSupportObject* instance, id 
         
         return;
     }
-    ((void(*)(id,SEL,id,id))objc_msgSend)([instance superMessage]
-                                          , [instance action]
+    ((void(*)(id,SEL,id,id))objc_msgSend)([instance apc_superEnvironmentMessage]
+                                          , [instance apc_environmentAction]
                                           , [instance self]
                                           , object);
 }
@@ -196,8 +199,8 @@ BOOL apc_debug_super_method_BOOL2(APCUserEnvironmentSupportObject* instance, id 
     
     return
     
-    ((BOOL(*)(id,SEL,id,id))objc_msgSend)([instance superMessage]
-                                          , [instance action]
+    ((BOOL(*)(id,SEL,id,id))objc_msgSend)([instance apc_superEnvironmentMessage]
+                                          , [instance apc_environmentAction]
                                           , [instance self]
                                           , object);
 }
@@ -211,9 +214,8 @@ id apc_debug_super_method_id1(APCUserEnvironmentSupportObject* instance)
     
     return
     
-    ((id(*)(id,SEL,id))objc_msgSend)([instance superMessage]
-                                          , [instance action]
+    ((id(*)(id,SEL,id))objc_msgSend)([instance apc_superEnvironmentMessage]
+                                          , [instance apc_environmentAction]
                                           , [instance self]);
 }
-
-
+#endif

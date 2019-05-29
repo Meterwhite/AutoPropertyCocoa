@@ -1,7 +1,7 @@
 /**
  AutoPropertyCocoa
  :
- Embedded fishhook.In order to prevent duplicate symbols from adding the prefix 'apc'.
+ To avoid potential conflicts, AutoPropertyCocoa has embedded fishhook.
  */
 
 // Copyright (c) 2013, Facebook, Inc.

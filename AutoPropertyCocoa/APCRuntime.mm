@@ -21,21 +21,8 @@
 static SEL _apc_sel_unhook = @selector(unhook);
 
 #pragma mark - For lock - private
-
-pthread_rwlock_t apc_runtimelock = PTHREAD_RWLOCK_INITIALIZER;
-
-#pragma mark - For lock - public
-void apc_runtimelock_writing(void(NS_NOESCAPE^block)(void))
-{
-    apc_runtimelock_writer_t writting(apc_runtimelock);
-    block();
-}
-
-void apc_runtimelock_reading(void(NS_NOESCAPE^block)(void))
-{
-    apc_runtimelock_reader_t reading(apc_runtimelock);
-    block();
-}
+/** This lock is used for Class. */
+static pthread_rwlock_t apc_runtimelock = PTHREAD_RWLOCK_INITIALIZER;
 
 #pragma mark - For class - private
 
@@ -46,9 +33,10 @@ const static char           _keyForAPCInstanceBoundMapper = '\0';
 static NSMapTable<Class,APCStringStringDictionary<__kindof APCMethodHook*>*>*
 _apc_runtime_property_classmapper;
 
-static NSMapTable*          _apc_runtime_proxyinstances;
-
+/** Inherited relationship mapping for registered classes. */
 static APCClassMapper*      _apc_runtime_inherit_map;
+/** Quickly detect registered instance objects. */
+static NSMapTable*          _apc_runtime_proxyinstances;
 
 /**
  { Class : { sKey : Hook -> [Property] } }
@@ -157,7 +145,6 @@ void apc_unhook_allClass(void)
 {
     apc_runtimelock_writer_t writting(apc_runtimelock);
     
-    ///Copy to prevent mutations when enumerated.
     NSMapTable*         c_map   = apc_runtime_property_classmapper();
     
     if([c_map count] == 0) return;
@@ -177,7 +164,7 @@ void apc_unhook_allClass(void)
 
 void apc_unhook_allInstance(void)
 {
-    ///Copy to immutable collection to  prevent mutations when enumerating.
+    ///Copy to prevent mutations when enumerating.
     NSArray* allInstances = [apc_runtime_proxyinstances() objectEnumerator].allObjects;
     for (APCProxyInstance* item in allInstances) {
         
@@ -387,13 +374,13 @@ void apc_disposeProperty(APCHookProperty* _Nonnull p)
         
         [[apc_runtime_property_classmapper() objectForKey:p->_des_class]
          
-         removeObjectForKey:p->_hooked_name];
+         removeObjectsForKey:p->_hooked_name];
         apc_propertyhook_dispose_nolock(p.associatedHook);
     }else{
         
         [[apc_runtime_property_classmapper() objectForKey:p->_des_class]
          
-         removePropertyHookForKey:p->_hooked_name];
+         removeObjectForKey:p->_hooked_name];
     }
 }
 
@@ -526,10 +513,10 @@ void apc_instance_removeAssociatedProperty(APCProxyInstance* instance, APCHookPr
         [p.associatedHook unbindProperty:p];
         if([p.associatedHook isEmpty]){
             
-            [dictionary removeObjectForKey:p->_hooked_name];
+            [dictionary removeObjectsForKey:p->_hooked_name];
         }else{
             
-            [dictionary removePropertyHookForKey:p->_hooked_name];
+            [dictionary removeObjectForKey:p->_hooked_name];
         }
         if([dictionary count] == 0){
             
@@ -634,6 +621,9 @@ void apc_instance_unhookFromProxyClass(APCProxyInstance* instance)
         
         apc_removeBoundInstanceMapper(instance);
         
+        /**
+         Unlike the object that is auto released , the 'ProxyClass' will be dispose immediately.
+         */
         [apc_runtime_proxyinstances() removeObjectForKey:instance];
     }
 }

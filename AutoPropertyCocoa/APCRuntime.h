@@ -10,42 +10,7 @@
 #include <pthread.h>
 #import "APCScope.h"
 
-/**
- @apc_lockruntime_writing({
- 
-    //Unable to break points...
- });
- */
-#define apc_lockruntime_writing(...)\
-\
-submacro_apc_keywordify \
-\
-apc_runtimelock_writing(^()__VA_ARGS__)
-
-/**
- @apc_lockruntime_reading({
- 
-    //Unable to break points...
- });
- */
-#define apc_lockruntime_reading(...)\
-\
-submacro_apc_keywordify \
-\
-apc_runtimelock_reading(^()__VA_ARGS__)
-
-
-#pragma mark - For runtime lock
-
-OBJC_EXTERN pthread_rwlock_t apc_runtimelock;
-
-OBJC_EXPORT void
-apc_runtimelock_writing(void(NS_NOESCAPE^ _Nonnull block)(void));
-
-OBJC_EXPORT void
-apc_runtimelock_reading(void(NS_NOESCAPE^ _Nonnull block)(void));
-
-#pragma mark - For hook
+#pragma mark - Hook
 OBJC_EXPORT void
 apc_unhook_all(void);
 
@@ -95,12 +60,12 @@ apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
 OBJC_EXPORT __kindof APCHookProperty* _Nullable
 apc_propertyhook_lookupSuperProperty(APCPropertyHook* _Nonnull hook, const char* _Nonnull ivar);
 
-#pragma mark - For property
+#pragma mark - Property
 
 OBJC_EXPORT __kindof APCHookProperty* _Nullable
 apc_property_getSuperProperty(APCHookProperty* _Nonnull p);
 
-#pragma mark - For class
+#pragma mark - Class
 
 OBJC_EXPORT void
 apc_registerProperty(APCHookProperty* _Nonnull p);
@@ -117,7 +82,7 @@ apc_class_getSuperclass(Class _Nonnull cls);
 OBJC_EXPORT void
 apc_class_unhook(Class _Nonnull cls);
 
-#pragma mark - For instance
+#pragma mark - Instance
 OBJC_EXPORT BOOL
 apc_instance_isNeedUnhook(APCProxyInstance* _Nonnull instance);
 
@@ -129,7 +94,7 @@ OBJC_EXPORT void
 apc_instance_removeAssociatedProperty(APCProxyInstance* _Nonnull instance
                                       , APCHookProperty* _Nonnull p);
 
-#pragma mark - Proxy class(For instance)
+#pragma mark - Instance / Proxy class
 
 OBJC_EXPORT BOOL
 apc_class_conformsProxyClass(Class _Nonnull cls);
@@ -146,9 +111,6 @@ apc_instance_getProxyClass(APCProxyInstance* _Nonnull instance);
 OBJC_EXPORT APCProxyClass _Nonnull
 apc_object_hookWithProxyClass(id _Nonnull instance);
 
-/**
- Unlike the object that is auto released,the 'ProxyClass' will be dispose immediately.
- */
 OBJC_EXPORT void
 apc_instance_unhookFromProxyClass(APCProxyInstance* _Nonnull instance);
 

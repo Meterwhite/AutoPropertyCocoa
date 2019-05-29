@@ -201,6 +201,7 @@
 		45E1CDB1228BF3BB00DCD3F0 /* AutoPropertyCocoa */ = {
 			isa = PBXGroup;
 			children = (
+				45E1CDC6228BF3BB00DCD3F0 /* AutoPropertyCocoa.h */,
 				45E1CDCA228BF3BB00DCD3F0 /* APCBasicValueVersionScope.h */,
 				45E1CDD5228BF3BB00DCD3F0 /* APCExtScope.h */,
 				45E1CDC8228BF3BB00DCD3F0 /* APCRuntime.h */,
@@ -210,7 +211,6 @@
 				45E1CDC9228BF3BB00DCD3F0 /* APCTypeEncodings.h */,
 				45E1CDC7228BF3BB00DCD3F0 /* APCUserEnvironmentSupportObject.h */,
 				45E1CDB2228BF3BB00DCD3F0 /* APCUserEnvironmentSupportObject.m */,
-				45E1CDC6228BF3BB00DCD3F0 /* AutoPropertyCocoa.h */,
 				45E1CDD4228BF3BB00DCD3F0 /* NSObject+APCLazyLoad.h */,
 				45E1CDC5228BF3BB00DCD3F0 /* NSObject+APCLazyLoad.m */,
 				45E1CDC4228BF3BB00DCD3F0 /* NSObject+APCTriggerProperty.h */,

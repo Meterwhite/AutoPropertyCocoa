@@ -32,7 +32,7 @@
  b1 -> object
  
  3.
- [dictionary removeObjectForKey:a1]
+ [dictionary removeObjectsForKey:a1]
  
  =>
  
@@ -40,7 +40,6 @@
  b1 -> object
  
  */
-#warning change me to APCStringkeyStringDictionary
 @interface APCStringStringDictionary<__covariant ObjectType> : NSObject<NSFastEnumeration>
 
 @property (readonly) NSUInteger count;
@@ -61,14 +60,13 @@
 - (void)removeObjectForKey:(nonnull NSString*)aKey;
 
 /**
- The last two objects will be deleted at the same time
+ Remove all key-value pairs of the key-related object.
  */
-- (void)removePropertyHookForKey:(nonnull NSString*)aKey;
+- (void)removeObjectsForKey:(nonnull NSString*)aKey;
 
 - (nonnull NSEnumerator<NSString*> *)keyEnumerator;
 
 - (void)removeAllObjects;
-
 
 /**
  Non-repeating mapped objects.

@@ -6,75 +6,15 @@
 //  Copyright © 2019 Novo. All rights reserved.
 //
 
-
-#import "APCStringStringDictionary.h"
-#import "APCTriggerGetterProperty.h"
-#import "NSObject+APCExtension.h"
 #import "apc-objc-extension.h"
 #import "AutoPropertyCocoa.h"
-#import "APCPropertyHook.h"
-#import "APCLazyProperty.h"
-#import "APCClassMapper.h"
-#import <objc/runtime.h>
-#import "APCTest.h"
+#import "APCRuntime.h"
 #import "Superman.h"
+#import "APCTest.h"
 #import "Person.h"
 #import "Man.h"
 
 @implementation APCTest
-
-+ (void)testDemo:(NSUInteger)index
-{
-    NSString* fName = _f_map[@(index)];
-    if(fName == nil){
-        
-        return;
-    }
-    SEL sel = NSSelectorFromString(fName);
-    IMP imp = [self methodForSelector:sel];
-    ((void(*)(id,SEL))imp)(self,sel);
-}
-
-+ (void)testDemoFrom:(NSUInteger)from to:(NSUInteger)to
-{
-
-    for (NSUInteger i = from; i < to; i++) {
-        
-        [self testDemo:i];
-    }
-}
-
-static NSMutableDictionary* _f_map;
-+ (void)load
-{
-    unsigned int count;
-    _f_map = [NSMutableDictionary dictionary];
-    Method* m_list = class_copyMethodList(objc_getMetaClass(class_getName(self)), &count);//
-    
-    while (count--) {
-        
-        Method m = m_list[count];
-        NSString* fName = @(sel_getName(method_getName(m)));
-        if(![fName containsString:@"_"]){
-            
-            continue;
-        }
-        NSArray* cmps = [fName componentsSeparatedByString:@"_"];
-        _f_map[@((NSUInteger)[cmps.lastObject integerValue])] = fName;
-    }
-    free(m_list);
-}
-
-static bool _clearTest = YES;
-
-+ (void)openClearTest
-{
-    _clearTest = YES;
-}
-+ (void)closeClearTest
-{
-    _clearTest = NO;
-}
 
 #define APC_TEST_CLEAN \
 do{\
@@ -83,7 +23,6 @@ do{\
         apc_unhook_all();\
     };\
 }while(0);
-
 
 #pragma mark - Demos
 
@@ -645,22 +584,110 @@ APC_TEST_DEMO(UserEnviroment, 109)
     }
 }
 
-//APC_TEST_DEMO(Tffff,10086)
-//{
-//     APCTestInstance(Man, m);
-//    [m apc_lazyLoadForProperty:@key_manObj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
-//
-//        return @"M a n";
-//    }];
-//    [m apc_unbindLazyLoadForProperty:@key_manObj];
-//
-//    [m apc_lazyLoadForProperty:@key_manObj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
-//
-//        return @"M a n";
-//    }];
-//    [m apc_unbindLazyLoadForProperty:@key_manObj];
-//
-//
-//}
+APC_TEST_DEMO(BasicValue, 110)
+{
+    APC_TEST_CLEAN
+    {
+        APCTestInstance(Man, m);
+        __block int count = 0;
+        [m apc_lazyLoadForProperty:@key_intValue usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            return @(1024);
+        }];
+        
+        [m apc_propertyGetter:@key_intValue bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            ++count;
+            if([value integerValue] > 0){
+                return YES;
+            }
+            return NO;
+        } withBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            
+            ++count;
+        }];
+        
+        [m apc_lazyLoadForProperty:@key_rectValue usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+            
+            ++count;
+            APCRect rect = {{1024,1024},{1024,1024}};
+            return [NSValue valueWithRect:rect];
+        }];
+        
+        [m apc_propertySetter:@key_rectValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger icount) {
+            
+            if(icount == 0){
+                ++count;
+                return YES;
+            }
+            return NO;
+        } withBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+            ++count;
+        }];
+        
+        NSParameterAssert(m.intValue == 1024);
+        NSParameterAssert(count == 3);
+        
+        NSParameterAssert(m.rectValue.size.width == 1024);
+        NSParameterAssert(count == 4);
+        
+        APCRect newrect = {{1024,1024},{1024,1024}};
+        m.rectValue = newrect;
+        NSParameterAssert(count == 6);
+    }
+}
 
+#pragma mark - Ready for Work
+
++ (void)testDemo:(NSUInteger)index
+{
+    NSString* fName = _f_map[@(index)];
+    if(fName == nil){
+        
+        return;
+    }
+    SEL sel = NSSelectorFromString(fName);
+    IMP imp = [self methodForSelector:sel];
+    ((void(*)(id,SEL))imp)(self,sel);
+}
+
++ (void)testDemoFrom:(NSUInteger)from to:(NSUInteger)to
+{
+    for (NSUInteger i = from; i < to; i++)
+        
+        [self testDemo:i];
+}
+
+static NSMutableDictionary* _f_map;
++ (void)load
+{
+    unsigned int count;
+    _f_map = [NSMutableDictionary dictionary];
+    Method* m_list = class_copyMethodList(objc_getMetaClass(class_getName(self)), &count);//
+    
+    while (count--) {
+        
+        Method m = m_list[count];
+        NSString* fName = @(sel_getName(method_getName(m)));
+        if(![fName containsString:@"_"]){
+            
+            continue;
+        }
+        NSArray* cmps = [fName componentsSeparatedByString:@"_"];
+        _f_map[@((NSUInteger)[cmps.lastObject integerValue])] = fName;
+    }
+    free(m_list);
+}
+
+static bool _clearTest = YES;
+
++ (void)openClearTest
+{
+    _clearTest = YES;
+}
++ (void)closeClearTest
+{
+    _clearTest = NO;
+}
 @end

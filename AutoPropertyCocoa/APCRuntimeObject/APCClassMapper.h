@@ -27,7 +27,7 @@
 - (void)removeClass:(nonnull Class)cls;
 
 /**
- Itself and its subclasses
+ Subclasses included.
  */
 - (void)removeKindOfClass:(nonnull Class)cls;
 
