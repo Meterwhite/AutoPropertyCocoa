@@ -651,9 +651,9 @@ APC_TEST_DEMO(MultiThread, 111)
         
         queueA = dispatch_queue_create("A", DISPATCH_QUEUE_CONCURRENT);
         queueB = dispatch_queue_create("B", DISPATCH_QUEUE_CONCURRENT);
+        queueC = dispatch_queue_create("C", DISPATCH_QUEUE_CONCURRENT);
         
-        
-        for (int i = 50000; i >= 0; i--) {
+        for (int i = 1000; i >= 0; i--) {
             
             
                 dispatch_async(queueA, ^{
@@ -674,9 +674,14 @@ APC_TEST_DEMO(MultiThread, 111)
                         }];
                     }
                 });
+            
+            dispatch_async(queueC, ^{
+                
+                [m obj];
+            });
         }
         
-        queueC = dispatch_queue_create("C", DISPATCH_QUEUE_CONCURRENT);
+        
         queueD = dispatch_queue_create("C", DISPATCH_QUEUE_CONCURRENT);
 //
 //        for (int i = 50000; i >= 0; i--) {

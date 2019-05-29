@@ -149,7 +149,8 @@
         v = [self.associatedHook performOldGetterFromTarget:target];
     }
     
-    if(v == nil &&
+    if(v == nil
+       &&
        (self.kindOfValue == APCPropertyValueKindOfBlock ||
         self.kindOfValue == APCPropertyValueKindOfObject))
     {
@@ -164,8 +165,9 @@
         }
         [self setValue:v toTarget:target];
     }
-    else if (self.accessCount == 0 &&
-             (self.kindOfValue != APCPropertyValueKindOfBlock ||
+    else if (self.accessCount == 0
+             &&
+             (self.kindOfValue != APCPropertyValueKindOfBlock &&
               self.kindOfValue != APCPropertyValueKindOfObject))
     {
         
