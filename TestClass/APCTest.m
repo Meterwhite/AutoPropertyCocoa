@@ -638,6 +638,65 @@ APC_TEST_DEMO(BasicValue, 110)
     }
 }
 
+APC_TEST_DEMO(MultiThread, 111)
+{
+    APC_TEST_CLEAN
+    {
+        static Man* m;
+        m = [Man new];
+        static dispatch_queue_t queueA;
+        static dispatch_queue_t queueB;
+        static dispatch_queue_t queueC;
+        static dispatch_queue_t queueD;
+        
+        queueA = dispatch_queue_create("A", DISPATCH_QUEUE_CONCURRENT);
+        queueB = dispatch_queue_create("B", DISPATCH_QUEUE_CONCURRENT);
+        
+        
+        for (int i = 50000; i >= 0; i--) {
+            
+            
+                dispatch_async(queueA, ^{
+
+                    @autoreleasepool {
+                        
+                        [m apc_unbindLazyLoadForProperty:@key_obj];
+                    }
+                });
+            
+                dispatch_async(queueB, ^{
+                    
+                    @autoreleasepool {
+                        
+                        [m apc_lazyLoadForProperty:@key_obj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+                            
+                            return @"obj";
+                        }];
+                    }
+                });
+        }
+        
+        queueC = dispatch_queue_create("C", DISPATCH_QUEUE_CONCURRENT);
+        queueD = dispatch_queue_create("C", DISPATCH_QUEUE_CONCURRENT);
+//
+//        for (int i = 50000; i >= 0; i--) {
+//
+//            dispatch_async(queueA, ^{
+//
+//                [m apc_unbindLazyLoadForProperty:@key_obj];
+//            });
+//
+//            dispatch_async(queueB, ^{
+//
+//                [m apc_lazyLoadForProperty:@key_obj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+//
+//                    return @"obj";
+//                }];
+//            });
+//        }
+    }
+}
+
 #pragma mark - Ready for Work
 
 + (void)testDemo:(NSUInteger)index

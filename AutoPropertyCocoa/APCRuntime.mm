@@ -464,9 +464,9 @@ apc_instance_propertyhook(APCProxyInstance* instance, NSString* property)
 
 __kindof APCHookProperty* apc_lookup_instanceProperty(APCProxyInstance* instance, NSString* property, SEL outlet)
 {
-    if(!apc_object_isProxyInstance(instance)) return (APCHookProperty*)0;
-    
     @synchronized (instance) {
+        
+        if(!apc_object_isProxyInstance(instance)) return (APCHookProperty*)0;
         
         APCPropertyHook* hook = apc_instance_propertyhook(instance, property);
         return ((__kindof APCHookProperty*(*)(id,SEL))objc_msgSend)(hook, outlet);

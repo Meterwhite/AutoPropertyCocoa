@@ -17,6 +17,9 @@
 #import "APCScope.h"
 
 
+/**
+ Core
+ */
 id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
 {
     APCPropertyHook*    hook    =   nil;
@@ -24,23 +27,29 @@ id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
     do {
         
         if(apc_object_isProxyInstance(_SELF)){
-            
+            ///Find in instance hook cache.
             if(nil != (hook = apc_lookup_instancePropertyhook(_SELF, cmdstr))){
                 
                 break;
             }
         }
-        
+        ///Find in class hook cache.
         if(nil != (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
             
             break;
         }
-        
+        ///Find nothing.
         @throw
         
         [NSException exceptionWithName:NSGenericException
                                 reason:@"APC: Can not find any infomation about this property.The data seems to have been deleted in other threads."
+         
+         "When unhook a class, you should ensure that the property is not accessed by other threads at the same time.Because the user can access a property at any time. And this can't be stopped. "
+         
+         "Therefore, the mutex lock cannot be used inside the method to achieve effective control. This control can only be done externally by the user."
                               userInfo:nil];
+        
+        return nil;
     } while (0);
     
     
@@ -106,22 +115,24 @@ id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
 APCDefBasicValueGetterVersionAndHookIMPMapper(APCTemplate_NSNumber_HookOfGetter,
                                                APCTemplate_NSValue_HookOfGetter,
                                                apc_propertyhook_getter)
-
+/**
+ Core
+ */
 void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable value)
 {
     APCPropertyHook*    hook    =   nil;
     NSString*           cmdstr  =   @((const char*)(const void*)_CMD);
     do {
         
-        if(apc_object_isProxyInstance(_SELF)){
+        if(apc_object_isProxyInstance(_SELF)) {
             
-            if(nil != (hook = apc_lookup_instancePropertyhook(_SELF, cmdstr))){
+            if(nil != (hook = apc_lookup_instancePropertyhook(_SELF, cmdstr))) {
                 
                 break;
             }
         }
         
-        if(nil != (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))){
+        if(nil != (hook = apc_lookup_propertyhook(object_getClass(_SELF), cmdstr))) {
             
             break;
         }
@@ -130,7 +141,13 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
         
         [NSException exceptionWithName:NSGenericException
                                 reason:@"APC: Can not find any infomation about this property.The data seems to have been deleted in other threads."
+         
+         "When unhook a class, you should ensure that the property is not accessed by other threads at the same time.Because the user can access a property at any time. And this can't be stopped. "
+         
+         "Therefore, the mutex lock cannot be used inside the method to achieve effective control. This control can only be done externally by the user."
                               userInfo:nil];
+        
+        return ;
     } while (0);
     
     
@@ -187,6 +204,10 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
                                                apc_propertyhook_setter)
 
 
+/**
+ Deleting an instance method of a Class when ClassHookFullSupport is not enabled will replace the method implementation with the following method implementation.
+ So be careful when using the class_replaceMethod() method, you should be clear about the class type to be replaced instead of relying on the method to find the super class method, because it is possible to returned you 'null_getter' or 'null_setter'
+ */
 id _Nullable apc_null_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
 {
     Class cls = object_getClass(_SELF);
@@ -234,16 +255,14 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 @implementation APCPropertyHook
 {
-//    const char*             _methodTypeEncoding;
-    //    APCMethodStyle          _methodStyle;
-    NSString*               _ori_name;
-    NSString*               _getter_name;
-    NSString*               _setter_name;
     NSString*               _valueTypeEncoding;
-    APCPropertyValueKind    _kindOfValue;
-    APCPropertyOwnerKind    _kindOfOwner;
+    NSString*               _original_name;
     APCAtomicPtr            _getterTrigger;
     APCAtomicPtr            _setterTrigger;
+    NSString*               _getter_name;
+    NSString*               _setter_name;
+    APCPropertyValueKind    _kindOfValue;
+    APCPropertyOwnerKind    _kindOfOwner;
     APCAtomicPtr            _lazyload;
     __weak id               _instance;
 }
@@ -262,15 +281,14 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
         
         ((void(*)(id,SEL,id))objc_msgSend)(self, property.inlet, property);
         
-        _source_class   = property->_src_class;
-        _hookclass      = property->_des_class;
-//        _hookMethod     = property->_hooked_name;
-        _kindOfValue    = property.kindOfValue;
-        _kindOfOwner    = property.kindOfOwner;
+        _original_name      = property->_ori_property_name;
         _valueTypeEncoding  = property.valueTypeEncoding;
-        _ori_name       = property->_ori_property_name;
-        _getter_name    = property->_des_getter_name;
-        _setter_name    = property->_des_setter_name;
+        _getter_name        = property->_des_getter_name;
+        _setter_name        = property->_des_setter_name;
+        _source_class       = property->_src_class;
+        _hookclass          = property->_des_class;
+        _kindOfValue        = property.kindOfValue;
+        _kindOfOwner        = property.kindOfOwner;
         
         if(_kindOfOwner == APCPropertyOwnerKindOfInstance) {
             
@@ -299,7 +317,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (NSString *)propertyName
 {
-    return _ori_name;
+    return _original_name;
 }
 
 - (void)bindProperty:(__kindof APCHookProperty *)property
@@ -320,6 +338,8 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)setLazyload:(APCLazyProperty *)lazyload
 {
+    if(lazyload == nil && _lazyload == nil) return;
+    
     void* desired = (void*)CFBridgingRetain(lazyload);
     while (YES) {
         
@@ -328,13 +348,10 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
             
             if(desired == nil){
                 
-//                APCMethodStyle style = ((__bridge APCLazyProperty*)expected).methodStyle;
                 CFRelease(expected);
-//                [self tryUnhook:style];
             }else{
                 
                 lazyload.associatedHook = self;
-//                [self tryHook:lazyload.methodStyle];
             }
             break;
         }
@@ -353,6 +370,8 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)setGetterTrigger:(APCTriggerGetterProperty *)getterTrigger
 {
+    if(getterTrigger == nil && _getterTrigger == nil) return;
+    
     void* desired = (void*)CFBridgingRetain(getterTrigger);
     while (YES) {
         
@@ -361,13 +380,10 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
             
             if(desired == nil){
                 
-//                APCMethodStyle style = ((__bridge APCTriggerGetterProperty*)expected).methodStyle;
                 CFRelease(expected);
-//                [self tryUnhook:style];
             }else{
                 
                 getterTrigger.associatedHook = self;
-//                [self tryHook:getterTrigger.methodStyle];
             }
             break;
         }
@@ -386,6 +402,8 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
 
 - (void)setSetterTrigger:(APCTriggerSetterProperty *)setterTrigger
 {
+    if(setterTrigger == nil && _setterTrigger == nil) return;
+    
     void* desired = (void*)CFBridgingRetain(setterTrigger);
     while (YES) {
         
@@ -394,13 +412,10 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
             
             if(desired == nil){
                 
-//                APCMethodStyle style = ((__bridge APCTriggerSetterProperty*)expected).methodStyle;
                 CFRelease(expected);
-//                [self tryUnhook:style];
             }else{
                 
                 setterTrigger.associatedHook = self;
-//                [self tryHook:setterTrigger.methodStyle];
             }
             break;
         }
@@ -512,14 +527,22 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     ///Delete the wrong _old_implementation.
     if(!apc_contains_objcruntimelock()){
 
-        IMP cmp = (style == APCMethodGetterStyle)
-        ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
-        : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);
-        
-        if(*oldimp_ptr == cmp){
+        IMP nonimp = nil;
+        if(_kindOfValue == APCPropertyValueKindOfObject ||
+           _kindOfValue == APCPropertyValueKindOfBlock){
             
-            *oldimp_ptr = nil;
+            nonimp = (style == APCMethodGetterStyle)
+            ? (IMP)apc_null_getter
+            : (IMP)apc_null_setter;
+            
+        }else{
+            
+            nonimp = (style == APCMethodGetterStyle)
+            ? (IMP)apc_null_getter_HookIMPMapper(_valueTypeEncoding)
+            : (IMP)apc_null_setter_HookIMPMapper(_valueTypeEncoding);
         }
+        
+        if(*oldimp_ptr == nonimp) *oldimp_ptr = nil;
     }
 }
 

@@ -40,6 +40,8 @@ APC_TEST_DEMO(UserEnviroment, 109);
 
 APC_TEST_DEMO(BasicValue, 110);
 
+APC_TEST_DEMO(MultiThread, 111);
+
 @end
 
 NS_ASSUME_NONNULL_END

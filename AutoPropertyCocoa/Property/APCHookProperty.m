@@ -11,12 +11,15 @@
 #import "APCRuntime.h"
 
 @implementation APCHookProperty
-
+{
+    dispatch_semaphore_t _lock;
+}
 - (instancetype)initWithPropertyName:(NSString *)propertyName aClass:(__unsafe_unretained Class)aClass
 {
     if(self = [super initWithPropertyName:propertyName aClass:aClass]){
         
-        _hashcode = 0;
+        _hashcode   = 0;
+        _lock       = dispatch_semaphore_create(1);
     }
     return self;
 }
@@ -25,7 +28,8 @@
 {
     if(self = [super initWithPropertyName:propertyName aInstance:aInstance]){
         
-        _hashcode = 0;
+        _hashcode   = 0;
+        _lock       = dispatch_semaphore_create(1);
     }
     return self;
 }
@@ -83,5 +87,16 @@
 {
     return apc_property_getSuperProperty(self);
 }
+
+- (void)lockLock
+{
+    dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
+}
+
+- (void)lockUnlock
+{
+    dispatch_semaphore_signal(_lock);
+}
+
 
 @end

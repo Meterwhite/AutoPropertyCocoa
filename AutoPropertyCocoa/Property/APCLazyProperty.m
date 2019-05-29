@@ -45,16 +45,20 @@
 
 - (void)bindingUserSelector:(SEL)aSelector
 {
+    [self lockLock];
     _kindOfUserHook =   APCPropertyHookKindOfSelector;
     _userSelector   =   aSelector?:@selector(new);
     _userBlock      =   nil;
+    [self lockUnlock];
 }
 
 - (void)bindindUserBlock:(id)block
 {
+    [self lockLock];
     _kindOfUserHook =   APCPropertyHookKindOfBlock;
     _userBlock      =   [block copy];
     _userSelector   =   nil;
+    [self lockUnlock];
 }
 
 - (id _Nullable)instancetypeNewObjectByUserSelector

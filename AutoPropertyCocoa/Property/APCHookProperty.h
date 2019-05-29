@@ -51,6 +51,9 @@
 - (nullable SEL)outlet;
 - (nullable SEL)inlet;
 
+- (void)lockLock;
+- (void)lockUnlock;
+
 /**
  NSClass.APCClass.hookedMethod
  */
