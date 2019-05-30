@@ -1,5 +1,5 @@
 //
-//  APCProxyInstanceResource.h
+//  APCProxyInstanceDisposer.h
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/5/16.
@@ -10,13 +10,6 @@
 #import "APCScope.h"
 
 
-@interface APCProxyInstanceResource : NSObject
-{
-@public
-    
-    pthread_rwlock_t instanceLock;
-}
-
+@interface APCProxyInstanceDisposer : NSObject
 - (nonnull instancetype)initWithClass:(nullable APCProxyClass)clazz;
-
 @end
