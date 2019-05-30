@@ -49,7 +49,8 @@ id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
 //         "Therefore, the mutex lock cannot be used inside the method to achieve effective control. This control can only be done externally by the user."
 //                              userInfo:nil];
         
-        return apc_propertyhook_getter(_SELF, _CMD);
+//        return apc_propertyhook_getter(_SELF, _CMD);
+        return ((id(*)(id,SEL))objc_msgSend)(_SELF, _CMD);
     } while (0);
     
     

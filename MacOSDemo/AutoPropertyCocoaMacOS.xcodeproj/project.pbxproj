@@ -42,7 +42,7 @@
 		45E1CDFD228BF3BB00DCD3F0 /* APCMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDE8228BF3BB00DCD3F0 /* APCMethod.m */; };
 		45E1CE02228BF3DE00DCD3F0 /* Superman.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CDFF228BF3DE00DCD3F0 /* Superman.m */; };
 		45E1CE03228BF3DE00DCD3F0 /* APCTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CE00228BF3DE00DCD3F0 /* APCTest.m */; };
-		45E1CE06228D34F800DCD3F0 /* APCProxyInstanceDisposer.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CE05228D34F800DCD3F0 /* APCProxyInstanceDisposer.m */; };
+		45E1CE06228D34F800DCD3F0 /* APCProxyInstanceResource.m in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CE05228D34F800DCD3F0 /* APCProxyInstanceResource.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -122,8 +122,8 @@
 		45E1CDFF228BF3DE00DCD3F0 /* Superman.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Superman.m; sourceTree = "<group>"; };
 		45E1CE00228BF3DE00DCD3F0 /* APCTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCTest.m; sourceTree = "<group>"; };
 		45E1CE01228BF3DE00DCD3F0 /* APCTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCTest.h; sourceTree = "<group>"; };
-		45E1CE04228D34F800DCD3F0 /* APCProxyInstanceDisposer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCProxyInstanceDisposer.h; sourceTree = "<group>"; };
-		45E1CE05228D34F800DCD3F0 /* APCProxyInstanceDisposer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCProxyInstanceDisposer.m; sourceTree = "<group>"; };
+		45E1CE04228D34F800DCD3F0 /* APCProxyInstanceResource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCProxyInstanceResource.h; sourceTree = "<group>"; };
+		45E1CE05228D34F800DCD3F0 /* APCProxyInstanceResource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCProxyInstanceResource.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -262,8 +262,8 @@
 				45E1CDCD228BF3BB00DCD3F0 /* APCClassInheritanceTree.m */,
 				45E1CDD2228BF3BB00DCD3F0 /* APCClassMapper.h */,
 				45E1CDCF228BF3BB00DCD3F0 /* APCClassMapper.m */,
-				45E1CE04228D34F800DCD3F0 /* APCProxyInstanceDisposer.h */,
-				45E1CE05228D34F800DCD3F0 /* APCProxyInstanceDisposer.m */,
+				45E1CE04228D34F800DCD3F0 /* APCProxyInstanceResource.h */,
+				45E1CE05228D34F800DCD3F0 /* APCProxyInstanceResource.m */,
 				456B1BE622939D87001840FA /* APCStringkey.h */,
 				456B1BE722939D87001840FA /* APCStringkey.m */,
 				456B1BE92293A2C9001840FA /* APCStringkeyString.h */,
@@ -418,7 +418,7 @@
 				45CFD61E22925740000C9438 /* APCMultipleStringkeyString.m in Sources */,
 				456B1BEE2293E96F001840FA /* APCMutableStringkeyString.m in Sources */,
 				45E1CDF7228BF3BB00DCD3F0 /* NSObject+APCTriggerProperty.m in Sources */,
-				45E1CE06228D34F800DCD3F0 /* APCProxyInstanceDisposer.m in Sources */,
+				45E1CE06228D34F800DCD3F0 /* APCProxyInstanceResource.m in Sources */,
 				456B1BE5229395C8001840FA /* APCSingleStringkeyString.m in Sources */,
 				45E1CDE9228BF3BB00DCD3F0 /* APCUserEnvironmentSupportObject.m in Sources */,
 				45E1CDF6228BF3BB00DCD3F0 /* APCRuntime.mm in Sources */,

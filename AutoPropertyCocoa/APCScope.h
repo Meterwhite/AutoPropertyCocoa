@@ -69,6 +69,12 @@ typedef _Atomic(IMP)        IMP;
 #define apc_spinlock OSSpinLock
 #endif
 
+#define APCSemaphoreLockInit            (dispatch_semaphore_create(1))
+#define APCSemaphoreLockLock(lock)      (dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER))
+#define APCSemaphoreUnlockLock(lock)    (dispatch_semaphore_signal(lock))
+
+
+
 
 /**
  Only one line of code completes the block call, checks, and returns the result.

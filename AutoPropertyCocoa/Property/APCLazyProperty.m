@@ -45,20 +45,20 @@
 
 - (void)bindingUserSelector:(SEL)aSelector
 {
-    [self lockLock];
+    dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
     _kindOfUserHook =   APCPropertyHookKindOfSelector;
     _userSelector   =   aSelector?:@selector(new);
     _userBlock      =   nil;
-    [self lockUnlock];
+    dispatch_semaphore_signal(_lock);
 }
 
 - (void)bindindUserBlock:(id)block
 {
-    [self lockLock];
+    dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
     _kindOfUserHook =   APCPropertyHookKindOfBlock;
     _userBlock      =   [block copy];
     _userSelector   =   nil;
-    [self lockUnlock];
+    dispatch_semaphore_signal(_lock);
 }
 
 - (id _Nullable)instancetypeNewObjectByUserSelector

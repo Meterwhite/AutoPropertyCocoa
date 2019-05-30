@@ -36,12 +36,13 @@
 {
 @public
     
-    NSString*       _hooked_name;
+    NSString*               _hooked_name;
 @protected
 
-    APCMethodStyle  _methodStyle;
-    SEL             _outlet;
-    SEL             _inlet;
+    APCMethodStyle          _methodStyle;
+    SEL                     _outlet;
+    SEL                     _inlet;
+    dispatch_semaphore_t    _lock;
 }
 @property (nullable,nonatomic,copy,readonly)NSString*      methodTypeEncoding;
 @property (nullable,nonatomic,weak)APCPropertyHook*        associatedHook;
@@ -51,8 +52,6 @@
 - (nullable SEL)outlet;
 - (nullable SEL)inlet;
 
-- (void)lockLock;
-- (void)lockUnlock;
 
 /**
  NSClass.APCClass.hookedMethod

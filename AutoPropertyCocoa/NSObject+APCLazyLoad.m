@@ -114,11 +114,20 @@
                           hookWithBlock:(id)block
                             hookWithSEL:(SEL)aSelector
 {
+    
     APCLazyProperty* p = apc_lookup_instanceProperty(self, property, @selector(lazyload));
     
     if(p == nil){
         
-        p = [APCLazyProperty instanceWithProperty:property aInstance:self];
+//        @synchronized (self) {
+        
+//            p = apc_lookup_instanceProperty(self, property, @selector(lazyload));
+//            if(p == nil){
+        
+                p = [APCLazyProperty instanceWithProperty:property aInstance:self];
+//            }
+//        }
+        
         if(!apc_object_isProxyInstance(self)){
             
             apc_object_hookWithProxyClass(self);

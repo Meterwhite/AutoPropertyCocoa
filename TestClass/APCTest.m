@@ -649,36 +649,39 @@ APC_TEST_DEMO(MultiThread, 111)
         static dispatch_queue_t queueC;
         static dispatch_queue_t queueD;
         
-        queueA = dispatch_queue_create("A", DISPATCH_QUEUE_CONCURRENT);
-        queueB = dispatch_queue_create("B", DISPATCH_QUEUE_CONCURRENT);
-        queueC = dispatch_queue_create("C", DISPATCH_QUEUE_CONCURRENT);
+        queueA = dispatch_queue_create("A", DISPATCH_QUEUE_SERIAL);
+        queueB = dispatch_queue_create("B", DISPATCH_QUEUE_SERIAL);
+        queueC = dispatch_queue_create("C", DISPATCH_QUEUE_SERIAL);
         
-        for (int i = 1000; i >= 0; i--) {
+        for (int i = 50000; i >= 0; i--) {
             
             
-                dispatch_async(queueA, ^{
-
-                    @autoreleasepool {
-                        
-                        [m apc_unbindLazyLoadForProperty:@key_obj];
-                    }
-                });
-            
-                dispatch_async(queueB, ^{
-                    
-                    @autoreleasepool {
-                        
-                        [m apc_lazyLoadForProperty:@key_obj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
-                            
-                            return @"obj";
-                        }];
-                    }
-                });
-            
-            dispatch_async(queueC, ^{
+            dispatch_async(queueA, ^{
                 
-                [m obj];
+                @autoreleasepool {
+                    
+                    [m apc_unbindLazyLoadForProperty:@key_obj];
+                }
             });
+            
+            dispatch_async(queueB, ^{
+                
+                @autoreleasepool {
+                    
+                    [m apc_lazyLoadForProperty:@key_obj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+                        
+                        return @"obj";
+                    }];
+                }
+            });
+            
+//            dispatch_async(queueC, ^{
+//
+//                @synchronized (m) {
+//
+//                    [m obj];
+//                }
+//            });
         }
         
         
