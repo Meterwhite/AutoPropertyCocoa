@@ -135,6 +135,7 @@ NS_INLINE APCPropertyHook* apc_getPropertyhook_nolock(Class clazz, NSString* pro
 
 NS_INLINE void apc_runtime_proxyinstanceRegister(APCProxyInstance* instance, Class cls)
 {
+#warning ensure no lock?
     {
         //    apc_runtimelock_writer_t writing(apc_runtime_proxyInstanceMapLock);
         [apc_runtime_proxyInstanceMap() setObject:[[APCProxyInstanceDisposer alloc] initWithClass:cls]
@@ -616,6 +617,7 @@ Class apc_object_unproxyClass(id obj)
 
 BOOL apc_object_isProxyInstance(id instance)
 {
+#warning lock?
 //    apc_runtimelock_reader_t reding(apc_runtime_proxyInstanceMapLock);
     return ([apc_runtime_proxyInstanceMap() objectForKey:instance] != nil);
 }
@@ -628,9 +630,14 @@ APCProxyClass apc_instance_getProxyClass(APCProxyInstance* instance)
     return (APCProxyClass)cls;
 }
 
-APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
+APCProxyClass apc_object_hookWithProxyClass(id instance)
 {
-    @synchronized (instance) {
+    pthread_rwlock_t* lock = apc_object_get_rwlock(instance);
+    
+    if(lock == nil) return (APCProxyClass)0;
+    
+    {
+        apc_runtimelock_writer_t writing(*lock);
         
         if(apc_object_isProxyInstance(instance)) {
             
@@ -643,6 +650,7 @@ APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
             
             objc_registerClassPair(cls);
             object_setClass(instance, cls);
+#warning here no lock!, ensure it.
             apc_runtime_proxyinstanceRegister(instance, cls);
         }else if (nil == (cls = objc_getClass(name))){
             
@@ -655,8 +663,9 @@ APCProxyClass apc_object_hookWithProxyClass(id _Nonnull instance)
 
 void apc_instance_unhookFromProxyClass(APCProxyInstance* instance)
 {
-    apc_object_wtlock(instance, ^{
+    apc_object_wrlock(instance, ^{
         
+        ///This can cause potential asynchronous access errors : 'Attempt to use unknown class'.
         object_setClass(instance
                         , apc_class_unproxyClass(object_getClass(instance)));
         

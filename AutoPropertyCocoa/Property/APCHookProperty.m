@@ -17,7 +17,7 @@
     if(self = [super initWithPropertyName:propertyName aClass:aClass]){
         
         _hashcode   = 0;
-        _lock       = APCSemaphoreLockInit;
+//        _lock       = APCSemaphoreLockInit;
     }
     return self;
 }
@@ -27,7 +27,7 @@
     if(self = [super initWithPropertyName:propertyName aInstance:aInstance]){
         
         _hashcode   = 0;
-        _lock       = APCSemaphoreLockInit;
+//        _lock       = APCSemaphoreLockInit;
     }
     return self;
 }

@@ -8,6 +8,7 @@
 #import "NSObject+APCLazyLoad.h"
 #import "APCPropertyHook.h"
 #import "APCLazyProperty.h"
+#import "APCObjectLock.h"
 #import "APCRuntime.h"
 #import "APCScope.h"
 
@@ -114,25 +115,30 @@
                           hookWithBlock:(id)block
                             hookWithSEL:(SEL)aSelector
 {
+    NSLock* lock = apc_object_get_lock(self);
+    
+    NSAssert(lock, @"APC: Can not get object lock! mutiple-thread error.");
     
     APCLazyProperty* p = apc_lookup_instanceProperty(self, property, @selector(lazyload));
     
     if(p == nil){
         
-//        @synchronized (self) {
-        
-//            p = apc_lookup_instanceProperty(self, property, @selector(lazyload));
-//            if(p == nil){
-        
-                p = [APCLazyProperty instanceWithProperty:property aInstance:self];
-//            }
-//        }
-        
-        if(!apc_object_isProxyInstance(self)){
+        ///Some code bind a property in for loop, optimize the number of locks.
+        [lock lock];
+        do {
             
-            apc_object_hookWithProxyClass(self);
-        }
-        apc_instance_setAssociatedProperty(self, p);
+            p = apc_lookup_instanceProperty(self, property, @selector(lazyload));
+            if(p != nil) break;
+            
+            p = [APCLazyProperty instanceWithProperty:property aInstance:self];
+            
+            if(!apc_object_isProxyInstance(self)){
+                
+                apc_object_hookWithProxyClass(self);
+            }
+            apc_instance_setAssociatedProperty(self, p);
+        } while(0);
+        [lock unlock];
     }
     
     if(NO  == (p.accessOption & APCPropertyGetValueEnable)
@@ -157,19 +163,22 @@
                        hookWithBlock:(id)block
                          hookWithSEL:(SEL)aSelector
 {
+    NSLock* lock = apc_object_get_lock(self);
+    NSAssert(lock, @"APC: Can not get object lock! mutiple-thread error.");
     
+    [lock lock];
     APCLazyProperty* p = apc_lookup_property(self, property, @selector(lazyload));
-    
     if(p == nil){
         
         p = [APCLazyProperty instanceWithProperty:property aClass:self];
         apc_registerProperty(p);
     }
+    [lock unlock];
     
     if(NO  == (p.accessOption & APCPropertyGetValueEnable)
        
        ||
-       
+
        NO  == (p.accessOption & APCPropertySetValueEnable)) {
         return;
     }

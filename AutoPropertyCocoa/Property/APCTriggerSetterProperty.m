@@ -41,70 +41,70 @@
 
 - (void)setterBindFrontTrigger:(void (^)(id _Nonnull, id _Nullable))block
 {
-    APCSemaphoreLockLock(_lock);
+//    APCSemaphoreLockLock(_lock);
     _block_fronttrigger = [block copy];
     _triggerOption      |= APCPropertySetterFrontTrigger;
-    APCSemaphoreUnlockLock(_lock);
+//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)setterBindPostTrigger:(void (^)(id _Nonnull, id _Nullable))block
 {
-    APCSemaphoreLockLock(_lock);
+//    APCSemaphoreLockLock(_lock);
     _block_posttrigger  = [block copy];
     _triggerOption      |= APCPropertySetterPostTrigger;
-    APCSemaphoreUnlockLock(_lock);
+//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)setterBindUserTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable))condition
 {
-    APCSemaphoreLockLock(_lock);
+//    APCSemaphoreLockLock(_lock);
     _block_usertrigger  = [block copy];
     _block_usercondition= [condition copy];
     _triggerOption      |= APCPropertySetterUserTrigger;
-    APCSemaphoreUnlockLock(_lock);
+//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)setterBindCountTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition
 {
-    APCSemaphoreLockLock(_lock);
+//    APCSemaphoreLockLock(_lock);
     _block_counttrigger     = [block copy];
     _block_countcondition   = [condition copy];
     _triggerOption          |= APCPropertySetterCountTrigger;
-    APCSemaphoreUnlockLock(_lock);
+//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)setterUnbindFrontTrigger
 {
-    APCSemaphoreLockLock(_lock);
+//    APCSemaphoreLockLock(_lock);
     _block_fronttrigger = nil;
     _triggerOption      &= ~APCPropertySetterFrontTrigger;
-    APCSemaphoreUnlockLock(_lock);
+//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)setterUnbindPostTrigger
 {
-    APCSemaphoreLockLock(_lock);
+//    APCSemaphoreLockLock(_lock);
     _block_posttrigger = nil;
     _triggerOption &= ~APCPropertySetterPostTrigger;
-    APCSemaphoreUnlockLock(_lock);
+//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)setterUnbindUserTrigger
 {
-    APCSemaphoreLockLock(_lock);
+//    APCSemaphoreLockLock(_lock);
     _block_usertrigger      = nil;
     _block_usercondition    = nil;
     _triggerOption          &= ~APCPropertySetterUserTrigger;
-    APCSemaphoreUnlockLock(_lock);
+//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)setterUnbindCountTrigger
 {
-    APCSemaphoreLockLock(_lock);
+//    APCSemaphoreLockLock(_lock);
     _block_counttrigger     = nil;
     _block_countcondition   = nil;
     _triggerOption          &= ~APCPropertySetterCountTrigger;
-    APCSemaphoreUnlockLock(_lock);
+//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)performSetterFrontTriggerBlock:(id)_SELF value:(id)value

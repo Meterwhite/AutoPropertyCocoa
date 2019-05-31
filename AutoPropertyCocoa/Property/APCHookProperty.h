@@ -42,7 +42,6 @@
     APCMethodStyle          _methodStyle;
     SEL                     _outlet;
     SEL                     _inlet;
-    dispatch_semaphore_t    _lock;
 }
 @property (nullable,nonatomic,copy,readonly)NSString*      methodTypeEncoding;
 @property (nullable,nonatomic,weak)APCPropertyHook*        associatedHook;

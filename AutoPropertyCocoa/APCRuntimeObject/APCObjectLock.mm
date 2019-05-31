@@ -36,7 +36,14 @@ static dispatch_semaphore_t         _rwlock_maplock;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-        _rwlock_map     = [NSMapTable weakToStrongObjectsMapTable];
+        _rwlock_map
+        =
+//        [NSMapTable weakToStrongObjectsMapTable];
+        [NSMapTable mapTableWithKeyOptions: NSPointerFunctionsWeakMemory |
+                                            NSPointerFunctionsOpaquePersonality
+         
+                              valueOptions: NSPointerFunctionsStrongMemory |
+                                            NSPointerFunctionsObjectPersonality];
         _rwlock_maplock = APCSemaphoreLockInit;
     });
 }
@@ -75,7 +82,14 @@ static dispatch_semaphore_t         _rwlock_maplock;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-        _objlock_map        = [NSMapTable weakToStrongObjectsMapTable];
+        _objlock_map
+        =
+//        [NSMapTable weakToStrongObjectsMapTable];
+        [NSMapTable mapTableWithKeyOptions: NSPointerFunctionsWeakMemory |
+                                            NSPointerFunctionsOpaquePersonality
+         
+                              valueOptions: NSPointerFunctionsStrongMemory |
+                                            NSPointerFunctionsObjectPersonality];
         _objlock_maplock    = APCSemaphoreLockInit;
     });
 }
@@ -105,7 +119,8 @@ pthread_rwlock_t* apc_object_get_rwlock(id object)
         
         if(lock == nil){
             
-            [_rwlock_map setObject:[[APCRWLock alloc] init] forKey:object];
+            [_rwlock_map setObject: (lock = [[APCRWLock alloc] init])
+                            forKey:object];
         }
         APCSemaphoreUnlockLock(_rwlock_maplock);
     }
@@ -125,7 +140,8 @@ NSLock* apc_object_get_lock(id object)
         lock = [_objlock_map objectForKey:object];
         if(lock == nil){
             
-            [_objlock_map setObject:[[APCObjLock alloc] init] forKey:object];
+            [_objlock_map setObject:(lock = [[APCObjLock alloc] init])
+                             forKey:object];
         }
         APCSemaphoreUnlockLock(_objlock_maplock);
     }
@@ -140,7 +156,7 @@ void apc_object_rdlock(id object, void(NS_NOESCAPE^block)(void))
     block();
 }
 
-void apc_object_wtlock(id object, void(NS_NOESCAPE^block)(void))
+void apc_object_wrlock(id object, void(NS_NOESCAPE^block)(void))
 {
     if(object == nil || block == nil) return;
     apc_runtimelock_writer_t writing(*apc_object_get_rwlock(object));

@@ -15,8 +15,13 @@ OBJC_EXPORT pthread_rwlock_t* _Nullable apc_object_get_rwlock(id _Nullable objec
 
 OBJC_EXPORT void apc_object_rdlock(id _Nullable object, void(NS_NOESCAPE^ _Nullable block)(void));
 
-OBJC_EXPORT void apc_object_wtlock(id _Nullable object, void(NS_NOESCAPE^ _Nullable block)(void));
-#warning <#message#>
+OBJC_EXPORT void apc_object_wrlock(id _Nullable object, void(NS_NOESCAPE^ _Nullable block)(void));
+
+/**
+ The same as apc_object_wrlock(...)
+
+ @param object The first parameter you set.
+ */
 OBJC_EXPORT void apc_safe_instance(id _Nullable object, void(NS_NOESCAPE^ _Nullable block)(id _Nullable object));
 
 #pragma mark - object lock

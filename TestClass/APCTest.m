@@ -653,18 +653,12 @@ APC_TEST_DEMO(MultiThread, 111)
         queueB = dispatch_queue_create("B", DISPATCH_QUEUE_SERIAL);
         queueC = dispatch_queue_create("C", DISPATCH_QUEUE_SERIAL);
         
-        for (int i = 50000; i >= 0; i--) {
+        __block int i = 0;
+//        int* ip = &i;
+        for (i = 10000; i >= 0; i--) {
             
             
             dispatch_async(queueA, ^{
-                
-                @autoreleasepool {
-                    
-                    [m apc_unbindLazyLoadForProperty:@key_obj];
-                }
-            });
-            
-            dispatch_async(queueB, ^{
                 
                 @autoreleasepool {
                     
@@ -675,13 +669,14 @@ APC_TEST_DEMO(MultiThread, 111)
                 }
             });
             
-//            dispatch_async(queueC, ^{
-//
-//                @synchronized (m) {
-//
+            dispatch_async(queueB, ^{
+
+                @autoreleasepool {
+
 //                    [m obj];
-//                }
-//            });
+                    [m apc_unbindLazyLoadForProperty:@key_obj];
+                }
+            });
         }
         
         
