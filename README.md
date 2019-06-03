@@ -3,8 +3,9 @@
 AutoPropertyCocoa
 ===
 ## Introduction
-- Provides `lazy loadind` of property and object-oriented `property hook` by objc runtime.Can freely uninstall any function.More powerful than lazy loading of macro definitions.
+- Provides `lazy loading` of property and object-oriented `property hook` by objc runtime.Can freely uninstall any function.More powerful than lazy loading of macro definitions.
 - Key words :`iOS`/`macOS`/`cocoa`/`lazy load`/`property hook`/`懒加载`/`属性钩子`
+- [中文](https://github.com/qddnovo/AutoPropertyCocoa/blob/master/README-Chines.md)
 
 ## Import
 - Drag directory `AutoPropertyCocoa` into project or use cocoapods
