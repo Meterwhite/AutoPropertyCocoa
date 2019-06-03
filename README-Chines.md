@@ -5,7 +5,7 @@ AutoPropertyCocoa
 ## 简介
 - 该三方主要提供Cocoa的属性懒加载和属性钩子的功能。可以自由的卸载任一功能，优于宏定义形式的懒加载。
 - Key words :`iOS`/`macOS`/`cocoa`/`懒加载`/`属性钩子`
-- [English](https://github.com/qddnovo/AutoPropertyCocoa/blob/master/README.md)
+- [English](https://github.com/qddnovo/AutoPropertyCocoa)
 
 ## 引用
 - 拖拽文件夹`AutoPropertyCocoa`到项目 或者使用cocoapods
