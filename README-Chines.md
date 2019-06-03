@@ -92,9 +92,9 @@ apc_safe_instance(instance, ^(Man* object) {
 ```
 
 ## 针对类的钩子.
-- 如果你不会对针对类的钩子进行解绑操作，忽略此处说明。
+- 如果你没有对针对类的钩子进行解绑操作的需求，忽略此处说明。
 - 针对类的钩子是线程安全的。
-- 对针对类的钩子进行解绑操作建议在main()方法中实现apc_main_classHookFullSupport().
+- 对针类的钩子进行解绑操作建议在main()方法中实现apc_main_classHookFullSupport().
 ```objc
 
 int main(int argc, const char * argv[]) {
