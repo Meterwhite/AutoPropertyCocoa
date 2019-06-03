@@ -2,7 +2,7 @@
 //  APCRuntime.m
 //  AutoPropertyCocoa
 //
-//  Created by Novo on 2019/4/15.
+//  Created by Meterwhite on 2019/4/15.
 //  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 

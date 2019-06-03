@@ -2,7 +2,7 @@
 //  NSObject+AutoWorkPropery.h
 //  AutoWorkProperty
 //
-//  Created by Novo on 2019/3/13.
+//  Created by Meterwhite on 2019/3/13.
 //  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 

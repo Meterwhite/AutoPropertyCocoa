@@ -2,7 +2,7 @@
 //  APCTypeEncodings.h
 //  AutoPropertyCocoa
 //
-//  Created by Novo on 2019/5/7.
+//  Created by Meterwhite on 2019/5/7.
 //  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
