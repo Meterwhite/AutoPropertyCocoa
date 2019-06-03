@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/5/20.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -80,8 +80,10 @@
                                   objects:(id  _Nullable __unsafe_unretained [_Nullable])buffer
                                     count:(NSUInteger)len;
 
-- (void)enumerateKeysAndObjectsUsingBlock:(void (NS_NOESCAPE ^_Nonnull)(NSString* _Nonnull key
-                                                                        , ObjectType _Nonnull obj
-                                                                        , BOOL * _Nonnull stop))block;
+- (void)enumerateKeysAndObjectsUsingBlock:(void (NS_NOESCAPE ^_Nonnull)
+                                           (NSString* _Nonnull key
+                                            , ObjectType _Nonnull obj
+                                            , BOOL * _Nonnull stop)
+                                           )block;
 @end
 

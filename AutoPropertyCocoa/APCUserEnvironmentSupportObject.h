@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/30.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

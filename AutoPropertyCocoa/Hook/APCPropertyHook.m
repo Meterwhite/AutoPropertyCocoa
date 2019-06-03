@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/15.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "APCTriggerGetterProperty.h"
@@ -38,18 +38,12 @@ id _Nullable apc_propertyhook_getter(id _Nullable _SELF,SEL _Nonnull _CMD)
             
             break;
         }
-        ///Find nothing.
-//        @throw
-//
-//        [NSException exceptionWithName:NSGenericException
-//                                reason:@"APC: Can not find any infomation about this property.The data seems to have been deleted in other threads."
-//
-//         "When unhook a class, you should ensure that the property is not accessed by other threads at the same time.Because the user can access a property at any time. And this can't be stopped. "
-//
-//         "Therefore, the mutex lock cannot be used inside the method to achieve effective control. This control can only be done externally by the user."
-//                              userInfo:nil];
         
-//        return apc_propertyhook_getter(_SELF, _CMD);
+        /**
+         Resend
+         :
+         Can not find any infomation about this property.The data seems to have been deleted in other threads.
+         */
         return ((id(*)(id,SEL))objc_msgSend)(_SELF, _CMD);
     } while (0);
     
@@ -138,16 +132,12 @@ void apc_propertyhook_setter(_Nullable id _SELF,SEL _Nonnull _CMD,id _Nullable v
             break;
         }
         
-//        @throw
-//
-//        [NSException exceptionWithName:NSGenericException
-//                                reason:@"APC: Can not find any infomation about this property.The data seems to have been deleted in other threads."
-//
-//         "When unhook a class, you should ensure that the property is not accessed by other threads at the same time.Because the user can access a property at any time. And this can't be stopped. "
-//
-//         "Therefore, the mutex lock cannot be used inside the method to achieve effective control. This control can only be done externally by the user."
-//                              userInfo:nil];
-        apc_propertyhook_setter(_SELF, _CMD, value);
+        /**
+         Resend
+         :
+         Can not find any infomation about this property.The data seems to have been deleted in other threads.
+         */
+        ((id(*)(id,SEL,id))objc_msgSend)(_SELF, _CMD, value);
         return ;
     } while (0);
     
@@ -342,7 +332,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     if(lazyload == nil && _lazyload == nil) return;
     
     void* desired = (void*)CFBridgingRetain(lazyload);
-    while (YES) {
+    while (1) {
         
         void* expected = _lazyload;
         if(atomic_compare_exchange_strong(&_lazyload, &expected, desired)){
@@ -374,7 +364,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     if(getterTrigger == nil && _getterTrigger == nil) return;
     
     void* desired = (void*)CFBridgingRetain(getterTrigger);
-    while (YES) {
+    while (1) {
         
         void* expected = _getterTrigger;
         if(atomic_compare_exchange_strong(&_getterTrigger, &expected, desired)){
@@ -406,7 +396,7 @@ void apc_null_setter(id _Nullable _SELF,SEL _Nonnull _CMD, id _Nullable value)
     if(setterTrigger == nil && _setterTrigger == nil) return;
     
     void* desired = (void*)CFBridgingRetain(setterTrigger);
-    while (YES) {
+    while (1) {
         
         void* expected = _setterTrigger;
         if(atomic_compare_exchange_strong(&_setterTrigger, &expected, desired)){

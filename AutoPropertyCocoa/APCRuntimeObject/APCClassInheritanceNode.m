@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/22.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "APCClassInheritanceNode.h"
@@ -78,7 +78,7 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 {
     APCClassInheritanceNode*    iNode = self;
     NSUInteger                  lev = 0;    
-    while (YES) {
+    while (1) {
         
         if(nil == (iNode = iNode.father ? ((void)(++lev),iNode.father) : iNode.previousBrother)){
             
@@ -93,7 +93,7 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 {
     APCClassInheritanceNode*    iNode = self;
     NSUInteger                  lev = 0;
-    while (YES) {
+    while (1) {
         
         if(nil == (iNode = iNode.father ? iNode.father : iNode.previousBrother)){
             
@@ -156,25 +156,25 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 
 - (BOOL)isRoot
 {
-    return !((BOOL)_father | (BOOL)_previousBrother);
+    return (nil == _father) & (nil == _previousBrother);
 }
 
 - (BOOL)isLeaf
 {
     return
     
-    ((BOOL)_father | (BOOL)_previousBrother)
+    (nil != _father | nil != _previousBrother)
     &
-    !(BOOL)_child
+    (!_child)
     &
-    !(BOOL)_nextBrother;
+    (!_nextBrother);
 }
 
 - (NSUInteger)degree
 {
     return
     
-    (BOOL)_father + (BOOL)_previousBrother + (BOOL)_child + (BOOL)_nextBrother;
+    (NSUInteger)((_Bool)_father + (_Bool)_previousBrother + (_Bool)_child + (_Bool)_nextBrother);
 }
 
 - (NSArray<APCClassInheritanceNode *> *)brothersThatIsSubclassTo:(Class)cls others:(NSArray**)others
@@ -211,7 +211,7 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 {
     APCClassInheritanceNode * iNode = self;
     
-    while (YES){
+    while (1){
         
         if(nil == iNode.previousBrother) break;
         iNode = iNode.previousBrother;
@@ -223,7 +223,7 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 {
     APCClassInheritanceNode * iNode = self;
     
-    while (YES){
+    while (1){
         
         if(nil == iNode.nextBrother)  break;
         iNode = iNode.nextBrother;
@@ -233,9 +233,9 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 
 - (void)clean
 {
-    _child  = nil;
-    _father = nil;
-    _nextBrother        = nil;
-    _previousBrother    = nil;
+    _previousBrother    =   nil;
+    _nextBrother        =   nil;
+    _father             =   nil;
+    _child              =   nil;
 }
 @end

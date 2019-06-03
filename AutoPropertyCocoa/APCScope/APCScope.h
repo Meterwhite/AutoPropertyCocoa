@@ -43,7 +43,7 @@ typedef _Atomic(IMP)        IMP;
 #define APCMemoryBarrier
 #endif
 
-#define APCThreadID ([NSThread currentThread])
+#define APCThreadID (pthread_self())
 
 #if DEBUG & APCDebugLogSwitch
 #define APCDlog(...) NSLog(__VA_ARGS__)
@@ -64,7 +64,7 @@ typedef _Atomic(IMP)        IMP;
 
 #import <libkern/OSAtomic.h>
 #define apc_spinlock_unlock OSSpinLockUnlock
-#define APC_SPINLOCK_INIT OS_SPINLOCK_INIT
+#define apc_spinlock_init OS_SPINLOCK_INIT
 #define apc_spinlock_lock OSSpinLockLock
 #define apc_spinlock OSSpinLock
 #endif
@@ -88,6 +88,7 @@ typedef _Atomic(IMP)        IMP;
     return iblock ? iblock(args) : 0;\
 })()
 
+/** Detect by apc_object_isProxyInstance(...). */
 typedef NSObject        APCProxyInstance;
 typedef Class           APCProxyClass;
 typedef apc_spinlock    APCSpinLock;
@@ -321,6 +322,9 @@ submacro_apc_concat(submacro_apc_plist_,submacro_apc_argcount(__VA_ARGS__))(__VA
 #define submacro_apc_keywordify                 try {} @catch (...) {}
 #endif
 
+#define submacro_apc_plist_0 submacro_apc_plist_2
+
+#define submacro_apc_plist_1 submacro_apc_plist_2
 
 #define submacro_apc_plist_2(OBJ, P1)\
 ((void)(NO && ((void)OBJ.P1, NO)), @[@# P1])

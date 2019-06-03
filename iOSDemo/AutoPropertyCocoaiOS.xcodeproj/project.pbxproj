@@ -7,53 +7,112 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		450AA494226A2CBE0005A745 /* APCClassMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 450AA493226A2CBE0005A745 /* APCClassMapper.m */; };
 		456FC471225DBFBF006CD604 /* Superman.m in Sources */ = {isa = PBXBuildFile; fileRef = 456FC470225DBFBF006CD604 /* Superman.m */; };
-		457118A82283C65E0062F406 /* apc-objc-runtimelock.mm in Sources */ = {isa = PBXBuildFile; fileRef = 457118A72283C65E0062F406 /* apc-objc-runtimelock.mm */; };
-		458142A4226D5F2600A5AA6B /* APCClassInheritanceTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 458142A3226D5F2600A5AA6B /* APCClassInheritanceTree.m */; };
-		458142A7226D5FA700A5AA6B /* APCClassInheritanceNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 458142A6226D5FA700A5AA6B /* APCClassInheritanceNode.m */; };
-		458143BD2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 458143BC2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.m */; };
+		4599114F22A2C940003EBD21 /* APCUserEnvironmentSupportObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599110322A2C93F003EBD21 /* APCUserEnvironmentSupportObject.m */; };
+		4599115022A2C940003EBD21 /* APCScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599110422A2C93F003EBD21 /* APCScope.m */; };
+		4599115122A2C940003EBD21 /* NSString+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599110822A2C93F003EBD21 /* NSString+APCExtension.m */; };
+		4599115222A2C940003EBD21 /* NSObject+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599110922A2C93F003EBD21 /* NSObject+APCExtension.m */; };
+		4599115322A2C940003EBD21 /* APCProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599110C22A2C93F003EBD21 /* APCProperty.m */; };
+		4599115422A2C940003EBD21 /* APCTriggerGetterProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599110D22A2C93F003EBD21 /* APCTriggerGetterProperty.m */; };
+		4599115522A2C940003EBD21 /* APCLazyProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599110E22A2C93F003EBD21 /* APCLazyProperty.m */; };
+		4599115622A2C940003EBD21 /* APCTriggerSetterProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599111022A2C93F003EBD21 /* APCTriggerSetterProperty.m */; };
+		4599115722A2C940003EBD21 /* APCHookProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599111222A2C93F003EBD21 /* APCHookProperty.m */; };
+		4599115822A2C940003EBD21 /* NSObject+APCLazyLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599111622A2C93F003EBD21 /* NSObject+APCLazyLoad.m */; };
+		4599115922A2C940003EBD21 /* APCClassInheritanceTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599111F22A2C93F003EBD21 /* APCClassInheritanceTree.m */; };
+		4599115A22A2C940003EBD21 /* APCClassInheritanceNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599112022A2C93F003EBD21 /* APCClassInheritanceNode.m */; };
+		4599115B22A2C940003EBD21 /* APCStringkeyString.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599112222A2C93F003EBD21 /* APCStringkeyString.m */; };
+		4599115C22A2C940003EBD21 /* APCClassMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599112322A2C93F003EBD21 /* APCClassMapper.m */; };
+		4599115D22A2C940003EBD21 /* APCMultipleStringkeyString.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599112922A2C93F003EBD21 /* APCMultipleStringkeyString.m */; };
+		4599115E22A2C940003EBD21 /* APCMutableStringkeyString.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599112A22A2C93F003EBD21 /* APCMutableStringkeyString.m */; };
+		4599115F22A2C940003EBD21 /* APCSingleStringkeyString.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599112B22A2C93F003EBD21 /* APCSingleStringkeyString.m */; };
+		4599116022A2C940003EBD21 /* APCObjectLock.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4599112E22A2C93F003EBD21 /* APCObjectLock.mm */; };
+		4599116222A2C940003EBD21 /* APCStringkey.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599113422A2C93F003EBD21 /* APCStringkey.m */; };
+		4599116422A2C940003EBD21 /* APCProxyInstanceDisposer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599113722A2C93F003EBD21 /* APCProxyInstanceDisposer.m */; };
+		4599116522A2C940003EBD21 /* APCStringStringDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599113822A2C93F003EBD21 /* APCStringStringDictionary.m */; };
+		4599116622A2C940003EBD21 /* APCRuntime.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4599113922A2C93F003EBD21 /* APCRuntime.mm */; };
+		4599116722A2C940003EBD21 /* NSObject+APCTriggerProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599113C22A2C93F003EBD21 /* NSObject+APCTriggerProperty.m */; };
+		4599116822A2C940003EBD21 /* APCMethodHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599114022A2C93F003EBD21 /* APCMethodHook.m */; };
+		4599116922A2C940003EBD21 /* APCPropertyHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599114122A2C93F003EBD21 /* APCPropertyHook.m */; };
+		4599116A22A2C940003EBD21 /* apc-objc-extension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4599114422A2C93F003EBD21 /* apc-objc-extension.mm */; };
+		4599116B22A2C940003EBD21 /* apc-fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = 4599114622A2C93F003EBD21 /* apc-fishhook.c */; };
+		4599116C22A2C940003EBD21 /* apc-objc-runtimelock.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4599114A22A2C93F003EBD21 /* apc-objc-runtimelock.mm */; };
+		4599116D22A2C940003EBD21 /* APCMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = 4599114E22A2C93F003EBD21 /* APCMethod.m */; };
 		45B12F60225B2AF3002D825E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F5F225B2AF3002D825E /* AppDelegate.m */; };
 		45B12F63225B2AF3002D825E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F62225B2AF3002D825E /* ViewController.m */; };
 		45B12F68225B2AF6002D825E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45B12F67225B2AF6002D825E /* Assets.xcassets */; };
 		45B12F6E225B2AF6002D825E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F6D225B2AF6002D825E /* main.m */; };
 		45B12FB2225B2C5D002D825E /* Man.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F93225B2C5D002D825E /* Man.m */; };
 		45B12FB3225B2C5D002D825E /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F95225B2C5D002D825E /* Person.m */; };
-		45B12FB4225B2C5D002D825E /* APCScope.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12F97225B2C5D002D825E /* APCScope.m */; };
-		45B12FB8225B2C5D002D825E /* NSString+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA1225B2C5D002D825E /* NSString+APCExtension.m */; };
-		45B12FB9225B2C5D002D825E /* APCHookProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA3225B2C5D002D825E /* APCHookProperty.m */; };
-		45B12FBA225B2C5D002D825E /* APCTriggerGetterProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA5225B2C5D002D825E /* APCTriggerGetterProperty.m */; };
-		45B12FBB225B2C5D002D825E /* APCProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA6225B2C5D002D825E /* APCProperty.m */; };
-		45B12FBC225B2C5D002D825E /* APCLazyProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FA9225B2C5D002D825E /* APCLazyProperty.m */; };
-		45B12FBD225B2C5D002D825E /* NSObject+APCLazyLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */; };
-		45B12FBE225B2C5D002D825E /* NSObject+APCTriggerProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */; };
 		45B12FF5225B31D3002D825E /* APCTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 45B12FF4225B31D3002D825E /* APCTest.m */; };
-		45D44A5C22645D55005F1B2E /* APCPropertyHook.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45D44A5B22645D55005F1B2E /* APCPropertyHook.mm */; };
-		45D44A6022647506005F1B2E /* APCMethod.m in Sources */ = {isa = PBXBuildFile; fileRef = 45D44A5F22647506005F1B2E /* APCMethod.m */; };
-		45D44A6422647DBB005F1B2E /* APCRuntime.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45D44A6322647DBB005F1B2E /* APCRuntime.mm */; };
-		45E1CD962289133700DCD3F0 /* apc-objc-os.h in Sources */ = {isa = PBXBuildFile; fileRef = 45E1CD942289133700DCD3F0 /* apc-objc-os.h */; };
-		9FCF5DE92264D93A0059A876 /* APCTriggerSetterProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FCF5DE82264D93A0059A876 /* APCTriggerSetterProperty.m */; };
-		9FCF5DED2264E03D0059A876 /* APCMethodHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FCF5DEC2264E03D0059A876 /* APCMethodHook.m */; };
-		9FD9F76A2284837700F7BF0E /* apc-objc-extension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9FD9F7682284837600F7BF0E /* apc-objc-extension.mm */; };
-		9FD9F7722284841100F7BF0E /* apc-fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = 9FD9F7702284841100F7BF0E /* apc-fishhook.c */; };
-		9FF3F526227C5310001962A7 /* NSObject+APCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FF3F525227C5310001962A7 /* NSObject+APCExtension.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		450AA492226A2CBE0005A745 /* APCClassMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassMapper.h; sourceTree = "<group>"; };
-		450AA493226A2CBE0005A745 /* APCClassMapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassMapper.m; sourceTree = "<group>"; };
 		456FC46F225DBFBE006CD604 /* Superman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Superman.h; sourceTree = "<group>"; };
 		456FC470225DBFBF006CD604 /* Superman.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Superman.m; sourceTree = "<group>"; };
-		457118A22282C9480062F406 /* APCBasicValueVersionScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCBasicValueVersionScope.h; sourceTree = "<group>"; };
-		457118A62283C65E0062F406 /* apc-objc-runtimelock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "apc-objc-runtimelock.h"; sourceTree = "<group>"; };
-		457118A72283C65E0062F406 /* apc-objc-runtimelock.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "apc-objc-runtimelock.mm"; sourceTree = "<group>"; };
-		458142A2226D5F2600A5AA6B /* APCClassInheritanceTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassInheritanceTree.h; sourceTree = "<group>"; };
-		458142A3226D5F2600A5AA6B /* APCClassInheritanceTree.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassInheritanceTree.m; sourceTree = "<group>"; };
-		458142A5226D5FA700A5AA6B /* APCClassInheritanceNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCClassInheritanceNode.h; sourceTree = "<group>"; };
-		458142A6226D5FA700A5AA6B /* APCClassInheritanceNode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCClassInheritanceNode.m; sourceTree = "<group>"; };
-		458143BB2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCUserEnvironmentSupportObject.h; sourceTree = "<group>"; };
-		458143BC2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCUserEnvironmentSupportObject.m; sourceTree = "<group>"; };
-		45AF78E42281820D009935C5 /* APCTypeEncodings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCTypeEncodings.h; sourceTree = "<group>"; };
+		4599110322A2C93F003EBD21 /* APCUserEnvironmentSupportObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCUserEnvironmentSupportObject.m; sourceTree = "<group>"; };
+		4599110422A2C93F003EBD21 /* APCScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCScope.m; sourceTree = "<group>"; };
+		4599110622A2C93F003EBD21 /* NSString+APCExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+APCExtension.h"; sourceTree = "<group>"; };
+		4599110722A2C93F003EBD21 /* NSObject+APCExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCExtension.h"; sourceTree = "<group>"; };
+		4599110822A2C93F003EBD21 /* NSString+APCExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+APCExtension.m"; sourceTree = "<group>"; };
+		4599110922A2C93F003EBD21 /* NSObject+APCExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCExtension.m"; sourceTree = "<group>"; };
+		4599110B22A2C93F003EBD21 /* APCTriggerSetterProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCTriggerSetterProperty.h; sourceTree = "<group>"; };
+		4599110C22A2C93F003EBD21 /* APCProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCProperty.m; sourceTree = "<group>"; };
+		4599110D22A2C93F003EBD21 /* APCTriggerGetterProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCTriggerGetterProperty.m; sourceTree = "<group>"; };
+		4599110E22A2C93F003EBD21 /* APCLazyProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCLazyProperty.m; sourceTree = "<group>"; };
+		4599110F22A2C93F003EBD21 /* APCHookProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCHookProperty.h; sourceTree = "<group>"; };
+		4599111022A2C93F003EBD21 /* APCTriggerSetterProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCTriggerSetterProperty.m; sourceTree = "<group>"; };
+		4599111122A2C93F003EBD21 /* APCProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCProperty.h; sourceTree = "<group>"; };
+		4599111222A2C93F003EBD21 /* APCHookProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCHookProperty.m; sourceTree = "<group>"; };
+		4599111322A2C93F003EBD21 /* APCLazyProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCLazyProperty.h; sourceTree = "<group>"; };
+		4599111422A2C93F003EBD21 /* APCTriggerGetterProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCTriggerGetterProperty.h; sourceTree = "<group>"; };
+		4599111522A2C93F003EBD21 /* NSObject+APCTriggerProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCTriggerProperty.h"; sourceTree = "<group>"; };
+		4599111622A2C93F003EBD21 /* NSObject+APCLazyLoad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCLazyLoad.m"; sourceTree = "<group>"; };
+		4599111722A2C93F003EBD21 /* AutoPropertyCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoPropertyCocoa.h; sourceTree = "<group>"; };
+		4599111822A2C93F003EBD21 /* APCUserEnvironmentSupportObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCUserEnvironmentSupportObject.h; sourceTree = "<group>"; };
+		4599111922A2C93F003EBD21 /* APCRuntime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCRuntime.h; sourceTree = "<group>"; };
+		4599111A22A2C93F003EBD21 /* APCTypeEncodings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCTypeEncodings.h; sourceTree = "<group>"; };
+		4599111B22A2C93F003EBD21 /* APCBasicValueVersionScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCBasicValueVersionScope.h; sourceTree = "<group>"; };
+		4599111C22A2C93F003EBD21 /* APCScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCScope.h; sourceTree = "<group>"; };
+		4599111F22A2C93F003EBD21 /* APCClassInheritanceTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCClassInheritanceTree.m; sourceTree = "<group>"; };
+		4599112022A2C93F003EBD21 /* APCClassInheritanceNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCClassInheritanceNode.m; sourceTree = "<group>"; };
+		4599112122A2C93F003EBD21 /* APCObjectLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCObjectLock.h; sourceTree = "<group>"; };
+		4599112222A2C93F003EBD21 /* APCStringkeyString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCStringkeyString.m; sourceTree = "<group>"; };
+		4599112322A2C93F003EBD21 /* APCClassMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCClassMapper.m; sourceTree = "<group>"; };
+		4599112422A2C93F003EBD21 /* APCStringkey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCStringkey.h; sourceTree = "<group>"; };
+		4599112622A2C93F003EBD21 /* APCMultipleStringkeyString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCMultipleStringkeyString.h; sourceTree = "<group>"; };
+		4599112722A2C93F003EBD21 /* APCSingleStringkeyString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCSingleStringkeyString.h; sourceTree = "<group>"; };
+		4599112822A2C93F003EBD21 /* APCMutableStringkeyString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCMutableStringkeyString.h; sourceTree = "<group>"; };
+		4599112922A2C93F003EBD21 /* APCMultipleStringkeyString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCMultipleStringkeyString.m; sourceTree = "<group>"; };
+		4599112A22A2C93F003EBD21 /* APCMutableStringkeyString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCMutableStringkeyString.m; sourceTree = "<group>"; };
+		4599112B22A2C93F003EBD21 /* APCSingleStringkeyString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCSingleStringkeyString.m; sourceTree = "<group>"; };
+		4599112C22A2C93F003EBD21 /* APCStringStringDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCStringStringDictionary.h; sourceTree = "<group>"; };
+		4599112D22A2C93F003EBD21 /* APCProxyInstanceDisposer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCProxyInstanceDisposer.h; sourceTree = "<group>"; };
+		4599112E22A2C93F003EBD21 /* APCObjectLock.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = APCObjectLock.mm; sourceTree = "<group>"; };
+		4599113122A2C93F003EBD21 /* APCClassInheritanceNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCClassInheritanceNode.h; sourceTree = "<group>"; };
+		4599113222A2C93F003EBD21 /* APCClassInheritanceTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCClassInheritanceTree.h; sourceTree = "<group>"; };
+		4599113322A2C93F003EBD21 /* APCClassMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCClassMapper.h; sourceTree = "<group>"; };
+		4599113422A2C93F003EBD21 /* APCStringkey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCStringkey.m; sourceTree = "<group>"; };
+		4599113522A2C93F003EBD21 /* APCStringkeyString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCStringkeyString.h; sourceTree = "<group>"; };
+		4599113722A2C93F003EBD21 /* APCProxyInstanceDisposer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCProxyInstanceDisposer.m; sourceTree = "<group>"; };
+		4599113822A2C93F003EBD21 /* APCStringStringDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCStringStringDictionary.m; sourceTree = "<group>"; };
+		4599113922A2C93F003EBD21 /* APCRuntime.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = APCRuntime.mm; sourceTree = "<group>"; };
+		4599113A22A2C93F003EBD21 /* NSObject+APCLazyLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCLazyLoad.h"; sourceTree = "<group>"; };
+		4599113B22A2C93F003EBD21 /* APCExtScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCExtScope.h; sourceTree = "<group>"; };
+		4599113C22A2C93F003EBD21 /* NSObject+APCTriggerProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCTriggerProperty.m"; sourceTree = "<group>"; };
+		4599113E22A2C93F003EBD21 /* APCMethodHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCMethodHook.h; sourceTree = "<group>"; };
+		4599113F22A2C93F003EBD21 /* APCPropertyHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCPropertyHook.h; sourceTree = "<group>"; };
+		4599114022A2C93F003EBD21 /* APCMethodHook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCMethodHook.m; sourceTree = "<group>"; };
+		4599114122A2C93F003EBD21 /* APCPropertyHook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCPropertyHook.m; sourceTree = "<group>"; };
+		4599114322A2C93F003EBD21 /* apc-objc-config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-config.h"; sourceTree = "<group>"; };
+		4599114422A2C93F003EBD21 /* apc-objc-extension.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "apc-objc-extension.mm"; sourceTree = "<group>"; };
+		4599114622A2C93F003EBD21 /* apc-fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "apc-fishhook.c"; sourceTree = "<group>"; };
+		4599114722A2C93F003EBD21 /* apc-fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-fishhook.h"; sourceTree = "<group>"; };
+		4599114822A2C93F003EBD21 /* apc-objc-runtimelock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-runtimelock.h"; sourceTree = "<group>"; };
+		4599114922A2C93F003EBD21 /* apc-objc-extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-extension.h"; sourceTree = "<group>"; };
+		4599114A22A2C93F003EBD21 /* apc-objc-runtimelock.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "apc-objc-runtimelock.mm"; sourceTree = "<group>"; };
+		4599114D22A2C93F003EBD21 /* APCMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCMethod.h; sourceTree = "<group>"; };
+		4599114E22A2C93F003EBD21 /* APCMethod.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCMethod.m; sourceTree = "<group>"; };
+		4599116E22A4CED3003EBD21 /* apc-objc-locker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "apc-objc-locker.h"; sourceTree = "<group>"; };
 		45B12F5B225B2AF3002D825E /* AutoPropertyCocoaiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoPropertyCocoaiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45B12F5E225B2AF3002D825E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		45B12F5F225B2AF3002D825E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -66,44 +125,8 @@
 		45B12F93225B2C5D002D825E /* Man.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Man.m; sourceTree = "<group>"; };
 		45B12F94225B2C5D002D825E /* Man.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Man.h; sourceTree = "<group>"; };
 		45B12F95225B2C5D002D825E /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
-		45B12F97225B2C5D002D825E /* APCScope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCScope.m; sourceTree = "<group>"; };
-		45B12FA0225B2C5D002D825E /* NSString+APCExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+APCExtension.h"; sourceTree = "<group>"; };
-		45B12FA1225B2C5D002D825E /* NSString+APCExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+APCExtension.m"; sourceTree = "<group>"; };
-		45B12FA3225B2C5D002D825E /* APCHookProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCHookProperty.m; sourceTree = "<group>"; };
-		45B12FA4225B2C5D002D825E /* APCLazyProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCLazyProperty.h; sourceTree = "<group>"; };
-		45B12FA5225B2C5D002D825E /* APCTriggerGetterProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCTriggerGetterProperty.m; sourceTree = "<group>"; };
-		45B12FA6225B2C5D002D825E /* APCProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCProperty.m; sourceTree = "<group>"; };
-		45B12FA7225B2C5D002D825E /* APCHookProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCHookProperty.h; sourceTree = "<group>"; };
-		45B12FA8225B2C5D002D825E /* APCTriggerGetterProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCTriggerGetterProperty.h; sourceTree = "<group>"; };
-		45B12FA9225B2C5D002D825E /* APCLazyProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCLazyProperty.m; sourceTree = "<group>"; };
-		45B12FAA225B2C5D002D825E /* APCProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCProperty.h; sourceTree = "<group>"; };
-		45B12FAB225B2C5D002D825E /* NSObject+APCTriggerProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCTriggerProperty.h"; sourceTree = "<group>"; };
-		45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCLazyLoad.m"; sourceTree = "<group>"; };
-		45B12FAD225B2C5D002D825E /* AutoPropertyCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoPropertyCocoa.h; sourceTree = "<group>"; };
-		45B12FAE225B2C5D002D825E /* APCScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCScope.h; sourceTree = "<group>"; };
-		45B12FAF225B2C5D002D825E /* NSObject+APCLazyLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCLazyLoad.h"; sourceTree = "<group>"; };
-		45B12FB0225B2C5D002D825E /* APCExtScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCExtScope.h; sourceTree = "<group>"; };
-		45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCTriggerProperty.m"; sourceTree = "<group>"; };
 		45B12FF3225B31D3002D825E /* APCTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCTest.h; sourceTree = "<group>"; };
 		45B12FF4225B31D3002D825E /* APCTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCTest.m; sourceTree = "<group>"; };
-		45D44A5A22645D55005F1B2E /* APCPropertyHook.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCPropertyHook.h; sourceTree = "<group>"; };
-		45D44A5B22645D55005F1B2E /* APCPropertyHook.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = APCPropertyHook.mm; sourceTree = "<group>"; };
-		45D44A5E22647506005F1B2E /* APCMethod.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCMethod.h; sourceTree = "<group>"; };
-		45D44A5F22647506005F1B2E /* APCMethod.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCMethod.m; sourceTree = "<group>"; };
-		45D44A6222647DBB005F1B2E /* APCRuntime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCRuntime.h; sourceTree = "<group>"; };
-		45D44A6322647DBB005F1B2E /* APCRuntime.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = APCRuntime.mm; sourceTree = "<group>"; };
-		45E1CD942289133700DCD3F0 /* apc-objc-os.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "apc-objc-os.h"; sourceTree = "<group>"; };
-		9F737C3522808F05007FEB7E /* apc-objc-config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-config.h"; sourceTree = "<group>"; };
-		9FCF5DE72264D93A0059A876 /* APCTriggerSetterProperty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCTriggerSetterProperty.h; sourceTree = "<group>"; };
-		9FCF5DE82264D93A0059A876 /* APCTriggerSetterProperty.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCTriggerSetterProperty.m; sourceTree = "<group>"; };
-		9FCF5DEB2264E03D0059A876 /* APCMethodHook.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APCMethodHook.h; sourceTree = "<group>"; };
-		9FCF5DEC2264E03D0059A876 /* APCMethodHook.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APCMethodHook.m; sourceTree = "<group>"; };
-		9FD9F7682284837600F7BF0E /* apc-objc-extension.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "apc-objc-extension.mm"; sourceTree = "<group>"; };
-		9FD9F7692284837600F7BF0E /* apc-objc-extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-objc-extension.h"; sourceTree = "<group>"; };
-		9FD9F7702284841100F7BF0E /* apc-fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "apc-fishhook.c"; sourceTree = "<group>"; };
-		9FD9F7712284841100F7BF0E /* apc-fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "apc-fishhook.h"; sourceTree = "<group>"; };
-		9FF3F524227C5310001962A7 /* NSObject+APCExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+APCExtension.h"; sourceTree = "<group>"; };
-		9FF3F525227C5310001962A7 /* NSObject+APCExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+APCExtension.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,17 +140,148 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		458142A1226D5E4600A5AA6B /* APCRuntimeObject */ = {
+		4599110222A2C93F003EBD21 /* AutoPropertyCocoa */ = {
 			isa = PBXGroup;
 			children = (
-				450AA492226A2CBE0005A745 /* APCClassMapper.h */,
-				450AA493226A2CBE0005A745 /* APCClassMapper.m */,
-				458142A2226D5F2600A5AA6B /* APCClassInheritanceTree.h */,
-				458142A3226D5F2600A5AA6B /* APCClassInheritanceTree.m */,
-				458142A5226D5FA700A5AA6B /* APCClassInheritanceNode.h */,
-				458142A6226D5FA700A5AA6B /* APCClassInheritanceNode.m */,
+				4599111722A2C93F003EBD21 /* AutoPropertyCocoa.h */,
+				4599113B22A2C93F003EBD21 /* APCExtScope.h */,
+				4599111922A2C93F003EBD21 /* APCRuntime.h */,
+				4599113922A2C93F003EBD21 /* APCRuntime.mm */,
+				4599111822A2C93F003EBD21 /* APCUserEnvironmentSupportObject.h */,
+				4599110322A2C93F003EBD21 /* APCUserEnvironmentSupportObject.m */,
+				4599113A22A2C93F003EBD21 /* NSObject+APCLazyLoad.h */,
+				4599111622A2C93F003EBD21 /* NSObject+APCLazyLoad.m */,
+				4599111522A2C93F003EBD21 /* NSObject+APCTriggerProperty.h */,
+				4599113C22A2C93F003EBD21 /* NSObject+APCTriggerProperty.m */,
+				4599116F22A507B2003EBD21 /* APCScope */,
+				4599111D22A2C93F003EBD21 /* APCRuntimeObject */,
+				4599110522A2C93F003EBD21 /* Category */,
+				4599113D22A2C93F003EBD21 /* Hook */,
+				4599114C22A2C93F003EBD21 /* Method */,
+				4599110A22A2C93F003EBD21 /* Property */,
+			);
+			name = AutoPropertyCocoa;
+			path = ../../AutoPropertyCocoa;
+			sourceTree = "<group>";
+		};
+		4599110522A2C93F003EBD21 /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				4599110722A2C93F003EBD21 /* NSObject+APCExtension.h */,
+				4599110922A2C93F003EBD21 /* NSObject+APCExtension.m */,
+				4599110622A2C93F003EBD21 /* NSString+APCExtension.h */,
+				4599110822A2C93F003EBD21 /* NSString+APCExtension.m */,
+			);
+			path = Category;
+			sourceTree = "<group>";
+		};
+		4599110A22A2C93F003EBD21 /* Property */ = {
+			isa = PBXGroup;
+			children = (
+				4599110F22A2C93F003EBD21 /* APCHookProperty.h */,
+				4599111222A2C93F003EBD21 /* APCHookProperty.m */,
+				4599111322A2C93F003EBD21 /* APCLazyProperty.h */,
+				4599110E22A2C93F003EBD21 /* APCLazyProperty.m */,
+				4599111122A2C93F003EBD21 /* APCProperty.h */,
+				4599110C22A2C93F003EBD21 /* APCProperty.m */,
+				4599111422A2C93F003EBD21 /* APCTriggerGetterProperty.h */,
+				4599110D22A2C93F003EBD21 /* APCTriggerGetterProperty.m */,
+				4599110B22A2C93F003EBD21 /* APCTriggerSetterProperty.h */,
+				4599111022A2C93F003EBD21 /* APCTriggerSetterProperty.m */,
+			);
+			path = Property;
+			sourceTree = "<group>";
+		};
+		4599111D22A2C93F003EBD21 /* APCRuntimeObject */ = {
+			isa = PBXGroup;
+			children = (
+				4599113122A2C93F003EBD21 /* APCClassInheritanceNode.h */,
+				4599112022A2C93F003EBD21 /* APCClassInheritanceNode.m */,
+				4599113222A2C93F003EBD21 /* APCClassInheritanceTree.h */,
+				4599111F22A2C93F003EBD21 /* APCClassInheritanceTree.m */,
+				4599113322A2C93F003EBD21 /* APCClassMapper.h */,
+				4599112322A2C93F003EBD21 /* APCClassMapper.m */,
+				4599112122A2C93F003EBD21 /* APCObjectLock.h */,
+				4599112E22A2C93F003EBD21 /* APCObjectLock.mm */,
+				4599112D22A2C93F003EBD21 /* APCProxyInstanceDisposer.h */,
+				4599113722A2C93F003EBD21 /* APCProxyInstanceDisposer.m */,
+				4599112422A2C93F003EBD21 /* APCStringkey.h */,
+				4599113422A2C93F003EBD21 /* APCStringkey.m */,
+				4599113522A2C93F003EBD21 /* APCStringkeyString.h */,
+				4599112222A2C93F003EBD21 /* APCStringkeyString.m */,
+				4599112C22A2C93F003EBD21 /* APCStringStringDictionary.h */,
+				4599113822A2C93F003EBD21 /* APCStringStringDictionary.m */,
+				4599112522A2C93F003EBD21 /* APCStringkeyStringCluster */,
 			);
 			path = APCRuntimeObject;
+			sourceTree = "<group>";
+		};
+		4599112522A2C93F003EBD21 /* APCStringkeyStringCluster */ = {
+			isa = PBXGroup;
+			children = (
+				4599112622A2C93F003EBD21 /* APCMultipleStringkeyString.h */,
+				4599112922A2C93F003EBD21 /* APCMultipleStringkeyString.m */,
+				4599112822A2C93F003EBD21 /* APCMutableStringkeyString.h */,
+				4599112A22A2C93F003EBD21 /* APCMutableStringkeyString.m */,
+				4599112722A2C93F003EBD21 /* APCSingleStringkeyString.h */,
+				4599112B22A2C93F003EBD21 /* APCSingleStringkeyString.m */,
+			);
+			path = APCStringkeyStringCluster;
+			sourceTree = "<group>";
+		};
+		4599113D22A2C93F003EBD21 /* Hook */ = {
+			isa = PBXGroup;
+			children = (
+				4599113E22A2C93F003EBD21 /* APCMethodHook.h */,
+				4599114022A2C93F003EBD21 /* APCMethodHook.m */,
+				4599113F22A2C93F003EBD21 /* APCPropertyHook.h */,
+				4599114122A2C93F003EBD21 /* APCPropertyHook.m */,
+				4599114222A2C93F003EBD21 /* apc-objc-runtime */,
+			);
+			path = Hook;
+			sourceTree = "<group>";
+		};
+		4599114222A2C93F003EBD21 /* apc-objc-runtime */ = {
+			isa = PBXGroup;
+			children = (
+				4599114522A2C93F003EBD21 /* apc-fishhook */,
+				4599114322A2C93F003EBD21 /* apc-objc-config.h */,
+				4599114922A2C93F003EBD21 /* apc-objc-extension.h */,
+				4599114422A2C93F003EBD21 /* apc-objc-extension.mm */,
+				4599116E22A4CED3003EBD21 /* apc-objc-locker.h */,
+				4599114822A2C93F003EBD21 /* apc-objc-runtimelock.h */,
+				4599114A22A2C93F003EBD21 /* apc-objc-runtimelock.mm */,
+			);
+			path = "apc-objc-runtime";
+			sourceTree = "<group>";
+		};
+		4599114522A2C93F003EBD21 /* apc-fishhook */ = {
+			isa = PBXGroup;
+			children = (
+				4599114722A2C93F003EBD21 /* apc-fishhook.h */,
+				4599114622A2C93F003EBD21 /* apc-fishhook.c */,
+			);
+			path = "apc-fishhook";
+			sourceTree = "<group>";
+		};
+		4599114C22A2C93F003EBD21 /* Method */ = {
+			isa = PBXGroup;
+			children = (
+				4599114D22A2C93F003EBD21 /* APCMethod.h */,
+				4599114E22A2C93F003EBD21 /* APCMethod.m */,
+			);
+			path = Method;
+			sourceTree = "<group>";
+		};
+		4599116F22A507B2003EBD21 /* APCScope */ = {
+			isa = PBXGroup;
+			children = (
+				4599111B22A2C93F003EBD21 /* APCBasicValueVersionScope.h */,
+				4599111C22A2C93F003EBD21 /* APCScope.h */,
+				4599110422A2C93F003EBD21 /* APCScope.m */,
+				4599111A22A2C93F003EBD21 /* APCTypeEncodings.h */,
+			);
+			path = APCScope;
 			sourceTree = "<group>";
 		};
 		45B12F52225B2AF3002D825E = {
@@ -149,15 +303,15 @@
 		45B12F5D225B2AF3002D825E /* AutoPropertyCocoaiOS */ = {
 			isa = PBXGroup;
 			children = (
-				45B12F96225B2C5D002D825E /* AutoPropertyCocoa */,
+				4599110222A2C93F003EBD21 /* AutoPropertyCocoa */,
 				45B12F91225B2C5D002D825E /* TestClass */,
+				45B12F6D225B2AF6002D825E /* main.m */,
 				45B12F5E225B2AF3002D825E /* AppDelegate.h */,
 				45B12F5F225B2AF3002D825E /* AppDelegate.m */,
 				45B12F61225B2AF3002D825E /* ViewController.h */,
 				45B12F62225B2AF3002D825E /* ViewController.m */,
-				45B12F67225B2AF6002D825E /* Assets.xcassets */,
 				45B12F6C225B2AF6002D825E /* Info.plist */,
-				45B12F6D225B2AF6002D825E /* main.m */,
+				45B12F67225B2AF6002D825E /* Assets.xcassets */,
 			);
 			path = AutoPropertyCocoaiOS;
 			sourceTree = "<group>";
@@ -165,116 +319,17 @@
 		45B12F91225B2C5D002D825E /* TestClass */ = {
 			isa = PBXGroup;
 			children = (
-				456FC46F225DBFBE006CD604 /* Superman.h */,
-				456FC470225DBFBF006CD604 /* Superman.m */,
 				45B12FF3225B31D3002D825E /* APCTest.h */,
 				45B12FF4225B31D3002D825E /* APCTest.m */,
-				45B12F94225B2C5D002D825E /* Man.h */,
-				45B12F93225B2C5D002D825E /* Man.m */,
 				45B12F92225B2C5D002D825E /* Person.h */,
 				45B12F95225B2C5D002D825E /* Person.m */,
+				45B12F94225B2C5D002D825E /* Man.h */,
+				45B12F93225B2C5D002D825E /* Man.m */,
+				456FC46F225DBFBE006CD604 /* Superman.h */,
+				456FC470225DBFBF006CD604 /* Superman.m */,
 			);
 			name = TestClass;
 			path = ../../TestClass;
-			sourceTree = "<group>";
-		};
-		45B12F96225B2C5D002D825E /* AutoPropertyCocoa */ = {
-			isa = PBXGroup;
-			children = (
-				45B12FAD225B2C5D002D825E /* AutoPropertyCocoa.h */,
-				45B12FB0225B2C5D002D825E /* APCExtScope.h */,
-				457118A22282C9480062F406 /* APCBasicValueVersionScope.h */,
-				45D44A6222647DBB005F1B2E /* APCRuntime.h */,
-				45D44A6322647DBB005F1B2E /* APCRuntime.mm */,
-				45B12FAE225B2C5D002D825E /* APCScope.h */,
-				45B12F97225B2C5D002D825E /* APCScope.m */,
-				45AF78E42281820D009935C5 /* APCTypeEncodings.h */,
-				458143BB2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.h */,
-				458143BC2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.m */,
-				45B12FAF225B2C5D002D825E /* NSObject+APCLazyLoad.h */,
-				45B12FAC225B2C5D002D825E /* NSObject+APCLazyLoad.m */,
-				45B12FAB225B2C5D002D825E /* NSObject+APCTriggerProperty.h */,
-				45B12FB1225B2C5D002D825E /* NSObject+APCTriggerProperty.m */,
-				458142A1226D5E4600A5AA6B /* APCRuntimeObject */,
-				45B12F9F225B2C5D002D825E /* Category */,
-				9FCF5DEA2264E0100059A876 /* Hook */,
-				45D44A5D226474CF005F1B2E /* Method */,
-				45B12FA2225B2C5D002D825E /* Property */,
-			);
-			name = AutoPropertyCocoa;
-			path = ../../AutoPropertyCocoa;
-			sourceTree = "<group>";
-		};
-		45B12F9F225B2C5D002D825E /* Category */ = {
-			isa = PBXGroup;
-			children = (
-				45B12FA0225B2C5D002D825E /* NSString+APCExtension.h */,
-				45B12FA1225B2C5D002D825E /* NSString+APCExtension.m */,
-				9FF3F524227C5310001962A7 /* NSObject+APCExtension.h */,
-				9FF3F525227C5310001962A7 /* NSObject+APCExtension.m */,
-			);
-			path = Category;
-			sourceTree = "<group>";
-		};
-		45B12FA2225B2C5D002D825E /* Property */ = {
-			isa = PBXGroup;
-			children = (
-				45B12FA7225B2C5D002D825E /* APCHookProperty.h */,
-				45B12FA3225B2C5D002D825E /* APCHookProperty.m */,
-				45B12FA4225B2C5D002D825E /* APCLazyProperty.h */,
-				45B12FA9225B2C5D002D825E /* APCLazyProperty.m */,
-				45B12FAA225B2C5D002D825E /* APCProperty.h */,
-				45B12FA6225B2C5D002D825E /* APCProperty.m */,
-				45B12FA8225B2C5D002D825E /* APCTriggerGetterProperty.h */,
-				45B12FA5225B2C5D002D825E /* APCTriggerGetterProperty.m */,
-				9FCF5DE72264D93A0059A876 /* APCTriggerSetterProperty.h */,
-				9FCF5DE82264D93A0059A876 /* APCTriggerSetterProperty.m */,
-			);
-			path = Property;
-			sourceTree = "<group>";
-		};
-		45D44A5D226474CF005F1B2E /* Method */ = {
-			isa = PBXGroup;
-			children = (
-				45D44A5E22647506005F1B2E /* APCMethod.h */,
-				45D44A5F22647506005F1B2E /* APCMethod.m */,
-			);
-			path = Method;
-			sourceTree = "<group>";
-		};
-		9F737C3422808F05007FEB7E /* apc-objc-runtime */ = {
-			isa = PBXGroup;
-			children = (
-				9FD9F76F2284841100F7BF0E /* apc-fishhook */,
-				9FD9F7692284837600F7BF0E /* apc-objc-extension.h */,
-				9FD9F7682284837600F7BF0E /* apc-objc-extension.mm */,
-				457118A62283C65E0062F406 /* apc-objc-runtimelock.h */,
-				457118A72283C65E0062F406 /* apc-objc-runtimelock.mm */,
-				9F737C3522808F05007FEB7E /* apc-objc-config.h */,
-				45E1CD942289133700DCD3F0 /* apc-objc-os.h */,
-			);
-			path = "apc-objc-runtime";
-			sourceTree = "<group>";
-		};
-		9FCF5DEA2264E0100059A876 /* Hook */ = {
-			isa = PBXGroup;
-			children = (
-				9F737C3422808F05007FEB7E /* apc-objc-runtime */,
-				9FCF5DEB2264E03D0059A876 /* APCMethodHook.h */,
-				9FCF5DEC2264E03D0059A876 /* APCMethodHook.m */,
-				45D44A5A22645D55005F1B2E /* APCPropertyHook.h */,
-				45D44A5B22645D55005F1B2E /* APCPropertyHook.mm */,
-			);
-			path = Hook;
-			sourceTree = "<group>";
-		};
-		9FD9F76F2284841100F7BF0E /* apc-fishhook */ = {
-			isa = PBXGroup;
-			children = (
-				9FD9F7702284841100F7BF0E /* apc-fishhook.c */,
-				9FD9F7712284841100F7BF0E /* apc-fishhook.h */,
-			);
-			path = "apc-fishhook";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -345,34 +400,41 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9FCF5DED2264E03D0059A876 /* APCMethodHook.m in Sources */,
-				458143BD2277F2ED00A5AA6B /* APCUserEnvironmentSupportObject.m in Sources */,
-				45E1CD962289133700DCD3F0 /* apc-objc-os.h in Sources */,
-				45B12FB9225B2C5D002D825E /* APCHookProperty.m in Sources */,
-				458142A7226D5FA700A5AA6B /* APCClassInheritanceNode.m in Sources */,
+				4599116422A2C940003EBD21 /* APCProxyInstanceDisposer.m in Sources */,
+				4599115D22A2C940003EBD21 /* APCMultipleStringkeyString.m in Sources */,
+				4599115022A2C940003EBD21 /* APCScope.m in Sources */,
+				4599115F22A2C940003EBD21 /* APCSingleStringkeyString.m in Sources */,
+				4599115822A2C940003EBD21 /* NSObject+APCLazyLoad.m in Sources */,
+				4599114F22A2C940003EBD21 /* APCUserEnvironmentSupportObject.m in Sources */,
+				4599116822A2C940003EBD21 /* APCMethodHook.m in Sources */,
+				4599116622A2C940003EBD21 /* APCRuntime.mm in Sources */,
+				4599116922A2C940003EBD21 /* APCPropertyHook.m in Sources */,
+				4599115222A2C940003EBD21 /* NSObject+APCExtension.m in Sources */,
+				4599116722A2C940003EBD21 /* NSObject+APCTriggerProperty.m in Sources */,
+				4599115E22A2C940003EBD21 /* APCMutableStringkeyString.m in Sources */,
 				45B12FF5225B31D3002D825E /* APCTest.m in Sources */,
-				45D44A6022647506005F1B2E /* APCMethod.m in Sources */,
+				4599116D22A2C940003EBD21 /* APCMethod.m in Sources */,
+				4599115A22A2C940003EBD21 /* APCClassInheritanceNode.m in Sources */,
+				4599115422A2C940003EBD21 /* APCTriggerGetterProperty.m in Sources */,
+				4599115622A2C940003EBD21 /* APCTriggerSetterProperty.m in Sources */,
+				4599115722A2C940003EBD21 /* APCHookProperty.m in Sources */,
 				45B12FB2225B2C5D002D825E /* Man.m in Sources */,
+				4599115B22A2C940003EBD21 /* APCStringkeyString.m in Sources */,
+				4599115C22A2C940003EBD21 /* APCClassMapper.m in Sources */,
 				45B12F63225B2AF3002D825E /* ViewController.m in Sources */,
-				9FD9F76A2284837700F7BF0E /* apc-objc-extension.mm in Sources */,
-				9FF3F526227C5310001962A7 /* NSObject+APCExtension.m in Sources */,
+				4599115922A2C940003EBD21 /* APCClassInheritanceTree.m in Sources */,
 				45B12FB3225B2C5D002D825E /* Person.m in Sources */,
-				45B12FBD225B2C5D002D825E /* NSObject+APCLazyLoad.m in Sources */,
-				45B12FBB225B2C5D002D825E /* APCProperty.m in Sources */,
-				450AA494226A2CBE0005A745 /* APCClassMapper.m in Sources */,
-				45B12FBE225B2C5D002D825E /* NSObject+APCTriggerProperty.m in Sources */,
-				9FD9F7722284841100F7BF0E /* apc-fishhook.c in Sources */,
+				4599115122A2C940003EBD21 /* NSString+APCExtension.m in Sources */,
+				4599115522A2C940003EBD21 /* APCLazyProperty.m in Sources */,
+				4599116C22A2C940003EBD21 /* apc-objc-runtimelock.mm in Sources */,
+				4599116B22A2C940003EBD21 /* apc-fishhook.c in Sources */,
+				4599116022A2C940003EBD21 /* APCObjectLock.mm in Sources */,
 				456FC471225DBFBF006CD604 /* Superman.m in Sources */,
-				45B12FBC225B2C5D002D825E /* APCLazyProperty.m in Sources */,
-				457118A82283C65E0062F406 /* apc-objc-runtimelock.mm in Sources */,
-				9FCF5DE92264D93A0059A876 /* APCTriggerSetterProperty.m in Sources */,
-				458142A4226D5F2600A5AA6B /* APCClassInheritanceTree.m in Sources */,
-				45B12FBA225B2C5D002D825E /* APCTriggerGetterProperty.m in Sources */,
-				45B12FB8225B2C5D002D825E /* NSString+APCExtension.m in Sources */,
-				45B12FB4225B2C5D002D825E /* APCScope.m in Sources */,
+				4599115322A2C940003EBD21 /* APCProperty.m in Sources */,
+				4599116A22A2C940003EBD21 /* apc-objc-extension.mm in Sources */,
+				4599116522A2C940003EBD21 /* APCStringStringDictionary.m in Sources */,
 				45B12F6E225B2AF6002D825E /* main.m in Sources */,
-				45D44A6422647DBB005F1B2E /* APCRuntime.mm in Sources */,
-				45D44A5C22645D55005F1B2E /* APCPropertyHook.mm in Sources */,
+				4599116222A2C940003EBD21 /* APCStringkey.m in Sources */,
 				45B12F60225B2AF3002D825E /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/15.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "APCHookProperty.h"
@@ -44,16 +44,6 @@ OBJC_EXPORT APCPropertyHook* _Nullable
 apc_lookup_instancePropertyhook(APCProxyInstance* _Nonnull instance
                                 , NSString* _Nonnull property);
 
-OBJC_EXPORT __kindof APCHookProperty* _Nullable
-apc_lookup_property(Class _Nonnull cls
-                    , NSString* _Nonnull property
-                    , SEL _Nonnull outlet);
-
-OBJC_EXPORT __kindof APCHookProperty* _Nullable
-apc_lookup_instanceProperty(APCProxyInstance* _Nonnull instance
-                            , NSString* _Nonnull property
-                            , SEL _Nonnull outlet);
-
 OBJC_EXPORT APCPropertyHook* _Nullable
 apc_propertyhook_rootHook(APCPropertyHook* _Nonnull hook);
 
@@ -74,7 +64,7 @@ OBJC_EXPORT void
 apc_disposeProperty(APCHookProperty* _Nonnull p);
 
 /**
- @param cls A Class only in APC.
+ @param cls A Class only in APC inheritance.
  */
 OBJC_EXPORT Class _Nullable
 apc_class_getSuperclass(Class _Nonnull cls);
@@ -83,8 +73,6 @@ OBJC_EXPORT void
 apc_class_unhook(Class _Nonnull cls);
 
 #pragma mark - Instance
-OBJC_EXPORT BOOL
-apc_instance_isNeedUnhook(APCProxyInstance* _Nonnull instance);
 
 OBJC_EXPORT void
 apc_instance_setAssociatedProperty(APCProxyInstance* _Nonnull instance
@@ -103,7 +91,7 @@ OBJC_EXPORT Class _Nullable
 apc_class_unproxyClass(APCProxyClass _Nonnull cls);
 
 OBJC_EXPORT Class _Nullable
-apc_object_unproxyClass(id _Nonnull obj);
+apc_object_unproxyClass(id _Nonnull object);
 
 OBJC_EXPORT APCProxyClass _Nullable
 apc_instance_getProxyClass(APCProxyInstance* _Nonnull instance);
@@ -115,4 +103,4 @@ OBJC_EXPORT void
 apc_instance_unhookFromProxyClass(APCProxyInstance* _Nonnull instance);
 
 OBJC_EXPORT BOOL
-apc_object_isProxyInstance(id _Nonnull instance);
+apc_object_isProxyInstance(id _Nonnull object);

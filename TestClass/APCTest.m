@@ -3,11 +3,13 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/8.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "apc-objc-extension.h"
+#import "APCScope.h"
 #import "AutoPropertyCocoa.h"
+#import "APCObjectLock.h"
 #import "APCRuntime.h"
 #import "Superman.h"
 #import "APCTest.h"
@@ -612,7 +614,8 @@ APC_TEST_DEMO(BasicValue, 110)
             
             ++count;
             APCRect rect = {{1024,1024},{1024,1024}};
-            return [NSValue valueWithRect:rect];
+            return [NSValue value:&rect
+                     withObjCType:@encode(APCRect)];
         }];
         
         [m apc_propertySetter:@key_rectValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger icount) {
@@ -638,65 +641,82 @@ APC_TEST_DEMO(BasicValue, 110)
     }
 }
 
-APC_TEST_DEMO(MultiThread, 111)
+APC_TEST_DEMO(InstanceMultiThread, 111)
 {
     APC_TEST_CLEAN
     {
         static Man* m;
         m = [Man new];
-        static dispatch_queue_t queueA;
-        static dispatch_queue_t queueB;
-        static dispatch_queue_t queueC;
-        static dispatch_queue_t queueD;
+        static dispatch_queue_t queue;
         
-        queueA = dispatch_queue_create("A", DISPATCH_QUEUE_SERIAL);
-        queueB = dispatch_queue_create("B", DISPATCH_QUEUE_SERIAL);
-        queueC = dispatch_queue_create("C", DISPATCH_QUEUE_SERIAL);
+        queue = dispatch_queue_create("InstanceMultiThread", DISPATCH_QUEUE_CONCURRENT);
         
         __block int i = 0;
-//        int* ip = &i;
-        for (i = 10000; i >= 0; i--) {
+        for (i = 50000; i >= 0; i--) {
             
             
-            dispatch_async(queueA, ^{
+            dispatch_async(queue, ^{
                 
-                @autoreleasepool {
+                apc_safe_instance(m, ^(id  _Nullable object) {
                     
-                    [m apc_lazyLoadForProperty:@key_obj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+                    [object apc_lazyLoadForProperty:@key_obj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
                         
                         return @"obj";
                     }];
-                }
+                });
             });
             
-            dispatch_async(queueB, ^{
-
-                @autoreleasepool {
-
-//                    [m obj];
-                    [m apc_unbindLazyLoadForProperty:@key_obj];
-                }
+            dispatch_async(queue, ^{
+                
+                apc_safe_instance(m, ^(id  _Nullable object) {
+                    
+                    [object apc_unbindLazyLoadForProperty:@key_obj];
+                });
+            });
+            
+            dispatch_async(queue, ^{
+                
+                apc_safe_instance(m, ^(Man* object) {
+                    
+                    [object obj];
+                });
             });
         }
+    }
+}
+
+APC_TEST_DEMO(ClassMultiThread, 112)
+{
+    APC_TEST_CLEAN
+    {
+        static Man* m;
+        m = [Man new];
+        static dispatch_queue_t queue;
         
+        queue = dispatch_queue_create("ClassMultiThread", DISPATCH_QUEUE_CONCURRENT);
         
-        queueD = dispatch_queue_create("C", DISPATCH_QUEUE_CONCURRENT);
-//
-//        for (int i = 50000; i >= 0; i--) {
-//
-//            dispatch_async(queueA, ^{
-//
-//                [m apc_unbindLazyLoadForProperty:@key_obj];
-//            });
-//
-//            dispatch_async(queueB, ^{
-//
-//                [m apc_lazyLoadForProperty:@key_obj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
-//
-//                    return @"obj";
-//                }];
-//            });
-//        }
+        __block int i = 0;
+        for (i = 50000; i >= 0; i--) {
+            
+            
+            dispatch_async(queue, ^{
+                
+                [Man apc_lazyLoadForProperty:@key_obj usingBlock:^id _Nullable(id_apc_t  _Nonnull instance) {
+                    
+                    return @"obj";
+                }];
+            });
+            
+            dispatch_async(queue, ^{
+                
+                [Man apc_unbindLazyLoadForProperty:@key_obj];
+            });
+            
+            dispatch_async(queue, ^{
+                
+                [m obj];
+            });
+        }
     }
 }
 
@@ -726,7 +746,7 @@ static NSMutableDictionary* _f_map;
 {
     unsigned int count;
     _f_map = [NSMutableDictionary dictionary];
-    Method* m_list = class_copyMethodList(objc_getMetaClass(class_getName(self)), &count);//
+    Method* m_list = class_copyMethodList(objc_getMetaClass(class_getName(self)), &count);
     
     while (count--) {
         

@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/5/21.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "APCMutableStringkeyString.h"
@@ -18,7 +18,7 @@
     }
     
     APCMutableStringkeyString* item = self;
-    while (YES){
+    while (1){
         
         if(item->next == nil) break;
         

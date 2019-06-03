@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/5/5.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "apc-objc-runtimelock.h"
@@ -188,6 +188,7 @@ struct apc_entsize_list_tt {
                 
                 try_free(item->types);
                 ///Erase method data
+                ///This will affect class_copyList and need to reimplement class_copyList(fishhook).
                 memset((Element*)((char*)&first + i*size), 0, size);
                 ///Do not to count --,Let the runtime manage the memory itself.
             }
@@ -429,7 +430,7 @@ public:
                     setArray(newer);
                 }else if (a->count == 2){
                     ///2 -> 1
-                    uint32 newi = del ? 0 : 1;
+                    uint32_t newi = del ? 0 : 1;
                     try_free(elm->types);
                     try_free(a->lists[del]);
                     arrayAndFlag = 0;

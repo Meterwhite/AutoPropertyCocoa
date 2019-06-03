@@ -3,13 +3,14 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/1.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "NSObject+APCTriggerProperty.h"
 #import "APCTriggerGetterProperty.h"
 #import "APCTriggerSetterProperty.h"
 #import "APCPropertyHook.h"
+#import "APCObjectLock.h"
 #import "APCRuntime.h"
 
 @implementation NSObject (APCTriggerProperty)
@@ -25,7 +26,8 @@
 
 + (void)apc_unbindFrontOfPropertyGetter:(NSString*)property
 {
-    APCTriggerGetterProperty* p = apc_lookup_property(self, property, @selector(getterTrigger));
+    APCPropertyHook* hook = apc_getPropertyhook(self, property);
+    APCTriggerGetterProperty* p = hook.getterTrigger;
     if(p != nil){
         
         [p getterUnbindFrontTrigger];
@@ -46,7 +48,8 @@
 
 + (void)apc_unbindBackOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = apc_lookup_property(self, property, @selector(getterTrigger));
+    APCPropertyHook* hook = apc_getPropertyhook(self, property);
+    APCTriggerGetterProperty* p = hook.getterTrigger;
     if(p == nil) return;
     [p getterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -65,7 +68,8 @@
 
 + (void)apc_unbindUserConditionOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = apc_lookup_property(self, property, @selector(getterTrigger));
+    APCPropertyHook* hook = apc_getPropertyhook(self, property);
+    APCTriggerGetterProperty* p = hook.getterTrigger;
     if(p == nil) return;
     [p getterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -84,7 +88,8 @@
 
 + (void)apc_unbindAccessCountConditionOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = apc_lookup_property(self, property, @selector(getterTrigger));
+    APCPropertyHook* hook = apc_getPropertyhook(self, property);
+    APCTriggerGetterProperty* p = hook.getterTrigger;
     if(p == nil) return;
     [p getterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -103,7 +108,8 @@
 
 + (void)apc_unbindFrontOfPropertySetter:(NSString*)property
 {
-    APCTriggerSetterProperty* p = apc_lookup_property(self, property, @selector(setterTrigger));
+    APCPropertyHook* hook = apc_getPropertyhook(self, property);
+    APCTriggerSetterProperty* p = hook.setterTrigger;
     if(p == nil) return;
     [p setterUnbindFrontTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -122,7 +128,8 @@
 
 + (void)apc_unbindBackOfPropertySetter:(NSString *)property
 {
-    APCTriggerSetterProperty* p = apc_lookup_property(self, property, @selector(setterTrigger));
+    APCPropertyHook* hook = apc_getPropertyhook(self, property);
+    APCTriggerSetterProperty* p = hook.setterTrigger;
     if(p == nil) return;
     [p setterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -141,7 +148,8 @@
 
 + (void)apc_unbindUserConditionOfPropertySetter:(NSString *)property
 {
-    APCTriggerSetterProperty* p = apc_lookup_property(self, property, @selector(setterTrigger));
+    APCPropertyHook* hook = apc_getPropertyhook(self, property);
+    APCTriggerSetterProperty* p = hook.setterTrigger;
     if(p == nil) return;
     [p setterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -160,7 +168,8 @@
 
 + (void)apc_unbindAccessCountConditionOfPropertySetter:(NSString *)property
 {
-    APCTriggerSetterProperty* p = apc_lookup_property(self, property, @selector(setterTrigger));
+    APCPropertyHook* hook = apc_getPropertyhook(self, property);
+    APCTriggerSetterProperty* p = hook.setterTrigger;
     if(p == nil) return;
     [p setterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -176,8 +185,9 @@
 {
     if(option == APCPropertyNonTrigger) return;
     
-    APCPropertyHook* hook    = apc_getPropertyhook(self, property);
-    BOOL             regneed = NO;
+    APCPropertyHook* hook       = apc_getPropertyhook(self, property);
+    NSLock*          lock       = apc_object_get_lock(self);
+    BOOL             regneed    = NO;
     __kindof APCHookProperty*   p;
     if(option & APCPropertyTriggerOfGetter){
         
@@ -186,7 +196,16 @@
         
         if((regneed = (p == nil))){
             
-            p = [APCTriggerGetterProperty instanceWithProperty:property aClass:self];
+            [lock lock];
+            
+            if(nil == (p = hook.getterTrigger)){
+                
+                p = [APCTriggerGetterProperty instanceWithProperty:property aClass:self];
+            }else{
+                
+                regneed = NO;
+                [lock unlock];
+            }
         }
         if(option & APCPropertyGetterFrontTrigger){
             
@@ -205,7 +224,11 @@
             [p getterBindCountTrigger:block condition:condition];
         }
         
-        if(regneed) apc_registerProperty(p);
+        if(regneed){
+            
+            apc_registerProperty(p);
+            [lock unlock];
+        }
         
         return;
     }
@@ -213,7 +236,16 @@
     p       = hook.setterTrigger;
     if((regneed = (p == nil))){
         
-        p = [APCTriggerSetterProperty instanceWithProperty:property aClass:self];
+        [lock lock];
+        
+        if(nil == (p = hook.getterTrigger)){
+            
+            p = [APCTriggerSetterProperty instanceWithProperty:property aClass:self];
+        }else{
+            
+            regneed = NO;
+            [lock unlock];
+        }
     }
     if(option & APCPropertySetterFrontTrigger){
         
@@ -232,7 +264,11 @@
         [p setterBindCountTrigger:block condition:condition];
     }
     
-    if(regneed) apc_registerProperty(p);
+    if(regneed){
+        
+        apc_registerProperty(p);
+        [lock unlock];
+    }
 }
 
 #pragma mark - Instance
@@ -247,7 +283,9 @@
 
 - (void)apc_unbindFrontOfPropertyGetter:(NSString*)property
 {
-    APCTriggerGetterProperty* p = apc_lookup_instanceProperty(self, property, @selector(getterTrigger));
+    if(!apc_object_isProxyInstance(self)) return;
+    APCPropertyHook* hook = apc_lookup_instancePropertyhook(self, property);
+    APCTriggerGetterProperty* p = hook.getterTrigger;
     if(p == nil) return;
     [p getterUnbindFrontTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -266,7 +304,9 @@
 
 - (void)apc_unbindBackOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = apc_lookup_instanceProperty(self, property, @selector(getterTrigger));
+    if(!apc_object_isProxyInstance(self)) return;
+    APCPropertyHook* hook = apc_lookup_instancePropertyhook(self, property);
+    APCTriggerGetterProperty* p = hook.getterTrigger;
     if(p == nil) return;
     [p getterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -285,7 +325,9 @@
 
 - (void)apc_unbindUserConditionOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = apc_lookup_instanceProperty(self, property, @selector(getterTrigger));
+    if(!apc_object_isProxyInstance(self)) return;
+    APCPropertyHook* hook = apc_lookup_instancePropertyhook(self, property);
+    APCTriggerGetterProperty* p = hook.getterTrigger;
     if(p == nil) return;
     [p getterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -304,7 +346,9 @@
 
 - (void)apc_unbindAccessCountConditionOfPropertyGetter:(NSString *)property
 {
-    APCTriggerGetterProperty* p = apc_lookup_instanceProperty(self, property, @selector(getterTrigger));
+    if(!apc_object_isProxyInstance(self)) return;
+    APCPropertyHook* hook = apc_lookup_instancePropertyhook(self, property);
+    APCTriggerGetterProperty* p = hook.getterTrigger;
     if(p == nil) return;
     [p getterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -323,7 +367,9 @@
 
 - (void)apc_unbindFrontOfPropertySetter:(NSString*)property
 {
-    APCTriggerSetterProperty* p = apc_lookup_instanceProperty(self, property, @selector(setterTrigger));
+    if(!apc_object_isProxyInstance(self)) return;
+    APCPropertyHook* hook = apc_lookup_instancePropertyhook(self, property);
+    APCTriggerSetterProperty* p = hook.setterTrigger;
     if(p == nil) return;
     [p setterUnbindFrontTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -342,7 +388,9 @@
 
 - (void)apc_unbindBackOfPropertySetter:(NSString *)property
 {
-    APCTriggerSetterProperty* p = apc_lookup_instanceProperty(self, property, @selector(setterTrigger));
+    if(!apc_object_isProxyInstance(self)) return;
+    APCPropertyHook* hook = apc_lookup_instancePropertyhook(self, property);
+    APCTriggerSetterProperty* p = hook.setterTrigger;
     if(p == nil) return;
     [p setterUnbindPostTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -361,7 +409,9 @@
 
 - (void)apc_unbindUserConditionOfPropertySetter:(NSString *)property
 {
-    APCTriggerSetterProperty* p = apc_lookup_instanceProperty(self, property, @selector(setterTrigger));
+    if(!apc_object_isProxyInstance(self)) return;
+    APCPropertyHook* hook = apc_lookup_instancePropertyhook(self, property);
+    APCTriggerSetterProperty* p = hook.setterTrigger;
     if(p == nil) return;
     [p setterUnbindUserTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -380,7 +430,9 @@
 
 - (void)apc_unbindAccessCountConditionOfPropertySetter:(NSString *)property
 {
-    APCTriggerSetterProperty* p = apc_lookup_instanceProperty(self, property, @selector(setterTrigger));
+    if(!apc_object_isProxyInstance(self)) return;
+    APCPropertyHook* hook = apc_lookup_instancePropertyhook(self, property);
+    APCTriggerSetterProperty* p = hook.setterTrigger;
     if(p == nil) return;
     [p setterUnbindCountTrigger];
     if(p.triggerOption == APCPropertyNonTrigger){
@@ -396,17 +448,41 @@
 {
     if(option == APCPropertyNonTrigger) return;
     
-    APCPropertyHook*  hook      = apc_lookup_instancePropertyhook(self, property);
-    BOOL              regneed   = NO;
-    __kindof APCHookProperty*   p;
+    NSLock*             lock        = apc_object_get_lock(self);
+    BOOL                regneed     = NO;
+    APCPropertyHook*    hook;
+    __kindof APCHookProperty* p;
+    
+    if(apc_object_isProxyInstance(self)){
+        
+        hook = apc_lookup_instancePropertyhook(self, property);
+    }else if(option & APCPropertyTriggerOfGetter){
+        
+        goto CALL_NEW_GETTER_PROPERTY;
+    }else{
+        
+        goto CALL_NEW_SETTER_PROPERTY;
+    }
     
     if(option & APCPropertyTriggerOfGetter){
         
-        
         p = hook.getterTrigger;
+        
         if((regneed = (p == nil))){
             
-            p = [APCTriggerGetterProperty instanceWithProperty:property aInstance:self];
+        CALL_NEW_GETTER_PROPERTY:
+            {
+                [lock lock];
+                if(nil == (p = hook.getterTrigger)){
+                    
+                    regneed = YES;
+                    p = [APCTriggerGetterProperty instanceWithProperty:property aInstance:self];
+                }else{
+                    
+                    regneed = NO;
+                    [lock unlock];
+                }
+            }
         }
         if(option & APCPropertyGetterFrontTrigger){
             
@@ -429,6 +505,7 @@
             
             apc_object_hookWithProxyClass(self);
             apc_instance_setAssociatedProperty(self, p);
+            [lock unlock];
         }
         
         return;
@@ -437,7 +514,19 @@
     p = hook.setterTrigger;
     if((regneed = (p == nil))){
         
-        p = [APCTriggerSetterProperty instanceWithProperty:property aInstance:self];
+    CALL_NEW_SETTER_PROPERTY:
+        {
+            [lock lock];
+            if(nil == (p = hook.getterTrigger)){
+                
+                regneed = YES;
+                p = [APCTriggerSetterProperty instanceWithProperty:property aInstance:self];
+            }else{
+                
+                regneed = NO;
+                [lock unlock];
+            }
+        }
     }
     if(option & APCPropertySetterFrontTrigger){
         
@@ -460,6 +549,7 @@
         
         apc_object_hookWithProxyClass(self);
         apc_instance_setAssociatedProperty(self, p);
+        [lock unlock];
     }
 }
 

@@ -19,8 +19,14 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
-    [APCTest testDemoFrom:111 to:112];
-//    [APCTest testDemoFrom:100 to:112];
+    [APCTest testDemoFrom:100 to:113];
+    
+    APCLazyload(self,window,superclass);
+    
+    
+    APCClassUnbindLazyload(AppDelegate, window, superclass,window);
+    
+    
 }
 
 

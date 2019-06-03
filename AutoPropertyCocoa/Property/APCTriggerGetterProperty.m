@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/30.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 #import "APCUserEnvironmentSupportObject.h"
 #import "APCTriggerGetterProperty.h"
@@ -41,70 +41,54 @@
 #pragma mark - getter
 - (void)getterBindFrontTrigger:(void (^)(id _Nonnull))block
 {
-//    APCSemaphoreLockLock(_lock);
     _block_fronttrigger = [block copy];
     _triggerOption |= APCPropertyGetterFrontTrigger;
-//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)getterBindPostTrigger:(void (^)(id _Nonnull, id _Nullable))block
 {
-//    APCSemaphoreLockLock(_lock);
     _block_posttrigger = [block copy];
     _triggerOption |= APCPropertyGetterPostTrigger;
-//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)getterBindUserTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable))condition
 {
-//    APCSemaphoreLockLock(_lock);
     _block_usertrigger   = [block copy];
     _block_usercondition = [condition copy];
     _triggerOption |= APCPropertyGetterUserTrigger;
-//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)getterBindCountTrigger:(void (^)(id _Nonnull, id _Nullable))block condition:(BOOL (^)(id _Nonnull, id _Nullable, NSUInteger))condition
 {
-//    APCSemaphoreLockLock(_lock);
     _block_counttrigger   = [block copy];
     _block_countcondition = [condition copy];
     _triggerOption |= APCPropertyGetterCountTrigger;
-//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)getterUnbindFrontTrigger
 {
-//    APCSemaphoreLockLock(_lock);
     _block_fronttrigger = nil;
     _triggerOption &= ~APCPropertyGetterFrontTrigger;
-//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)getterUnbindPostTrigger
 {
-//    APCSemaphoreLockLock(_lock);
     _block_posttrigger = nil;
     _triggerOption &= ~APCPropertyGetterPostTrigger;
-//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)getterUnbindUserTrigger
 {
-//    APCSemaphoreLockLock(_lock);
     _block_usertrigger   = nil;
     _block_usercondition = nil;
     _triggerOption &= ~APCPropertyGetterUserTrigger;
-//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)getterUnbindCountTrigger
 {
-//    APCSemaphoreLockLock(_lock);
     _block_counttrigger   = nil;
     _block_countcondition = nil;
     _triggerOption &= ~APCPropertyGetterCountTrigger;
-//    APCSemaphoreUnlockLock(_lock);
 }
 
 - (void)performGetterFrontTriggerBlock:(id)_SELF

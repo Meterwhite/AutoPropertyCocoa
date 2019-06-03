@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/20.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "APCClassInheritanceTree.h"
@@ -35,8 +35,16 @@ dispatch_semaphore_signal(_lock);
     if (self) {
         
         _tree = [APCClassInheritanceTree tree];
-        _map  = [NSMapTable weakToWeakObjectsMapTable];
         _lock = dispatch_semaphore_create(1);
+        _map
+        =
+        [NSMapTable mapTableWithKeyOptions:
+         NSPointerFunctionsWeakMemory |
+         NSPointerFunctionsOpaquePersonality
+         
+                              valueOptions:
+         NSPointerFunctionsWeakMemory |
+         NSPointerFunctionsObjectPersonality];
     }
     return self;
 }
@@ -93,7 +101,7 @@ dispatch_semaphore_signal(_lock);
                 ///Connect new brothers in iNodes.
                 e       = iNodes.objectEnumerator;
                 n_curr  = e.nextObject;
-                while (YES) {
+                while (1) {
                     
                     if(n_curr == nil)
                         break;
@@ -109,7 +117,7 @@ dispatch_semaphore_signal(_lock);
                 ///Reconnect the rest nodes as brother to the new one.
                 n_curr  = newNode;
                 e       = others.objectEnumerator;
-                while (YES) {
+                while (1) {
                     
                     if(n_curr == nil)
                         break;
@@ -134,7 +142,7 @@ dispatch_semaphore_signal(_lock);
                 
                 ///Inserted as the last brother node to its subclass.
                 n_curr = iNode.child;
-                while (YES) {
+                while (1) {
                     
                     if(nil == n_curr.nextBrother){
                         break;
@@ -149,7 +157,7 @@ dispatch_semaphore_signal(_lock);
         
         ///New basic brother.
         iNode = _tree.root;
-        while (YES) {
+        while (1) {
             
             if(nil == iNode.nextBrother){
                 

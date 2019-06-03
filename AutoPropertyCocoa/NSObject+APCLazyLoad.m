@@ -3,7 +3,7 @@
 //  AutoWorkProperty
 //
 //  Created by Novo on 2019/3/13.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 #import "NSObject+APCLazyLoad.h"
 #import "APCPropertyHook.h"
@@ -54,10 +54,12 @@
 
 + (void)apc_unbindLazyLoadForProperty:(NSString *)property
 {
-    apc_disposeProperty
-    (
-        apc_lookup_property(self, property, @selector(lazyload))
-    );
+    APCPropertyHook* hook   = apc_getPropertyhook(self, property);
+    APCLazyProperty* p      = hook.lazyload;
+    if(p != nil) {
+        
+        apc_disposeProperty(p);
+    }
 }
 
 
@@ -103,43 +105,47 @@
 
 - (void)apc_unbindLazyLoadForProperty:(NSString* _Nonnull)property
 {
-    apc_instance_removeAssociatedProperty
-    (
-        self
-        ,
-        apc_lookup_instanceProperty(self, property, @selector(lazyload))
-    );
+    if(!apc_object_isProxyInstance(self)) return;
+    APCPropertyHook* hook   = apc_lookup_instancePropertyhook(self, property);
+    APCLazyProperty* p      = hook.lazyload;
+    apc_instance_removeAssociatedProperty(self, p);
+}
+
+- (void)apc_unbindLazyLoadForPropertyArray:(NSArray<NSString *> *)array
+{
+    for (NSString* k in array.reverseObjectEnumerator) {
+        
+        [self apc_unbindLazyLoadForProperty:k];
+    }
 }
 
 - (void)apc_instanceSetLazyLoadProperty:(NSString*)property
                           hookWithBlock:(id)block
                             hookWithSEL:(SEL)aSelector
 {
-    NSLock* lock = apc_object_get_lock(self);
+    NSLock*             lock    = apc_object_get_lock(self);
+    APCPropertyHook*    hook    = nil;
+    APCLazyProperty*    p       = nil;
     
-    NSAssert(lock, @"APC: Can not get object lock! mutiple-thread error.");
-    
-    APCLazyProperty* p = apc_lookup_instanceProperty(self, property, @selector(lazyload));
-    
-    if(p == nil){
-        
-        ///Some code bind a property in for loop, optimize the number of locks.
-        [lock lock];
-        do {
+    [lock lock];
+    {
+        if(apc_object_isProxyInstance(self)){
             
-            p = apc_lookup_instanceProperty(self, property, @selector(lazyload));
-            if(p != nil) break;
+            hook = apc_lookup_instancePropertyhook(self, property);
+            p = hook.lazyload;
+        }
+        
+        if(p == nil){
             
             p = [APCLazyProperty instanceWithProperty:property aInstance:self];
-            
             if(!apc_object_isProxyInstance(self)){
                 
                 apc_object_hookWithProxyClass(self);
             }
             apc_instance_setAssociatedProperty(self, p);
-        } while(0);
-        [lock unlock];
+        }
     }
+    [lock unlock];
     
     if(NO  == (p.accessOption & APCPropertyGetValueEnable)
        
@@ -167,7 +173,7 @@
     NSAssert(lock, @"APC: Can not get object lock! mutiple-thread error.");
     
     [lock lock];
-    APCLazyProperty* p = apc_lookup_property(self, property, @selector(lazyload));
+    APCLazyProperty* p = apc_getPropertyhook(self, property).lazyload;
     if(p == nil){
         
         p = [APCLazyProperty instanceWithProperty:property aClass:self];
@@ -192,4 +198,11 @@
     }
 }
 
++ (void)apc_unbindLazyLoadForPropertyArray:(NSArray<NSString *> *)array
+{
+    for (NSString* k in array.reverseObjectEnumerator) {
+        
+        [self apc_unbindLazyLoadForProperty:k];
+    }
+}
 @end

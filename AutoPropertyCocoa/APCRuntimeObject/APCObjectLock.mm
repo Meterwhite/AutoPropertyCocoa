@@ -3,22 +3,26 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/5/30.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
+#include "apc-objc-locker.h"
 #include "APCObjectLock.h"
-#include "apc-objc-os.h"
 #include "APCScope.h"
 
-@class APCObjLock;
 @class APCRWLock;
 
 #pragma mark - static var
 
-static NSMapTable<id,APCObjLock*>*  _objlock_map;
-static dispatch_semaphore_t         _objlock_maplock;
-static NSMapTable<id,APCRWLock*>*   _rwlock_map;
-static dispatch_semaphore_t         _rwlock_maplock;
+static NSMapTable<id,NSLock*>*          _objlock_map;
+static dispatch_semaphore_t             _objlock_maplock;
+
+static NSMapTable<id,APCRWLock*>*       _rwlock_map;
+static dispatch_semaphore_t             _rwlock_maplock;
+
+static NSMapTable<id,NSRecursiveLock*>* _instancelock_map;
+static dispatch_semaphore_t             _instancelock_maplock;
+
 
 #pragma mark - read-writte lock
 @interface APCRWLock : NSObject
@@ -38,13 +42,34 @@ static dispatch_semaphore_t         _rwlock_maplock;
         
         _rwlock_map
         =
-//        [NSMapTable weakToStrongObjectsMapTable];
-        [NSMapTable mapTableWithKeyOptions: NSPointerFunctionsWeakMemory |
-                                            NSPointerFunctionsOpaquePersonality
-         
-                              valueOptions: NSPointerFunctionsStrongMemory |
-                                            NSPointerFunctionsObjectPersonality];
-        _rwlock_maplock = APCSemaphoreLockInit;
+        [NSMapTable mapTableWithKeyOptions:
+         NSPointerFunctionsWeakMemory   |
+         NSPointerFunctionsOpaquePersonality
+                              valueOptions:
+         NSPointerFunctionsStrongMemory |
+         NSPointerFunctionsObjectPersonality];
+        
+        _objlock_map
+        =
+        [NSMapTable mapTableWithKeyOptions:
+         NSPointerFunctionsWeakMemory   |
+         NSPointerFunctionsOpaquePersonality
+                              valueOptions:
+         NSPointerFunctionsStrongMemory |
+         NSPointerFunctionsObjectPersonality];
+        
+        _instancelock_map
+        =
+        [NSMapTable mapTableWithKeyOptions:
+         NSPointerFunctionsWeakMemory   |
+         NSPointerFunctionsOpaquePersonality
+                              valueOptions:
+         NSPointerFunctionsStrongMemory |
+         NSPointerFunctionsObjectPersonality];
+        
+        _rwlock_maplock         =   APCSemaphoreLockInit;
+        _objlock_maplock        =   APCSemaphoreLockInit;
+        _instancelock_maplock   =   APCSemaphoreLockInit;
     });
 }
 
@@ -64,43 +89,6 @@ static dispatch_semaphore_t         _rwlock_maplock;
 - (void)dealloc
 {
     pthread_rwlock_destroy(&lock);
-}
-@end
-
-@interface APCObjLock : NSObject
-{
-@public
-    
-    NSLock* lock;
-}
-@end
-#pragma mark - object lock
-@implementation APCObjLock
-
-+ (void)load
-{
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        
-        _objlock_map
-        =
-//        [NSMapTable weakToStrongObjectsMapTable];
-        [NSMapTable mapTableWithKeyOptions: NSPointerFunctionsWeakMemory |
-                                            NSPointerFunctionsOpaquePersonality
-         
-                              valueOptions: NSPointerFunctionsStrongMemory |
-                                            NSPointerFunctionsObjectPersonality];
-        _objlock_maplock    = APCSemaphoreLockInit;
-    });
-}
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        lock = [[NSLock alloc] init];
-    }
-    return self;
 }
 @end
 
@@ -128,27 +116,6 @@ pthread_rwlock_t* apc_object_get_rwlock(id object)
     return &(lock->lock);
 }
 
-NSLock* apc_object_get_lock(id object)
-{
-    if(object == nil) return nil;
-    
-    APCObjLock* lock = [_objlock_map objectForKey:object];
-    if(lock == nil){
-        
-        APCSemaphoreLockLock(_objlock_maplock);
-        
-        lock = [_objlock_map objectForKey:object];
-        if(lock == nil){
-            
-            [_objlock_map setObject:(lock = [[APCObjLock alloc] init])
-                             forKey:object];
-        }
-        APCSemaphoreUnlockLock(_objlock_maplock);
-    }
-    
-    return lock->lock;
-}
-
 void apc_object_rdlock(id object, void(NS_NOESCAPE^block)(void))
 {
     if(object == nil || block == nil) return;
@@ -163,9 +130,68 @@ void apc_object_wrlock(id object, void(NS_NOESCAPE^block)(void))
     block();
 }
 
+NSLock* apc_object_get_lock(id object)
+{
+    if(object == nil) return nil;
+    
+    NSLock* lock = [_objlock_map objectForKey:object];
+    if(lock == nil){
+        
+        APCSemaphoreLockLock(_objlock_maplock);
+        
+        lock = [_objlock_map objectForKey:object];
+        if(lock == nil){
+            
+            [_objlock_map setObject:(lock = [[NSLock alloc] init])
+                             forKey:object];
+        }
+        APCSemaphoreUnlockLock(_objlock_maplock);
+    }
+    return lock;
+}
+
+void apc_object_objlock(id object, void(NS_NOESCAPE^block)(void))
+{
+    NSLock* lock = apc_object_get_lock(object);
+    if(lock != nil)
+    {
+        [lock lock];
+        {
+            block();
+        }
+        [lock unlock];
+    }
+}
+
+NS_INLINE NSRecursiveLock* apc_object_get_safeinstance_lock(id object)
+{
+    if(object == nil) return nil;
+    
+    NSRecursiveLock* lock = [_instancelock_map objectForKey:object];
+    if(lock == nil){
+        
+        APCSemaphoreLockLock(_instancelock_maplock);
+        
+        lock = [_instancelock_map objectForKey:object];
+        if(lock == nil){
+            
+            [_instancelock_map setObject:(lock = [[NSRecursiveLock alloc] init])
+                                  forKey:object];
+        }
+        APCSemaphoreUnlockLock(_instancelock_maplock);
+    }
+    return lock;
+}
+
 void apc_safe_instance(id object, void(NS_NOESCAPE^ block)(id object))
 {
-    if(object == nil || block == nil) return;
-    apc_runtimelock_writer_t writing(*apc_object_get_rwlock(object));
-    block(object);
+    NSRecursiveLock* lock = apc_object_get_safeinstance_lock(object);
+    if(lock != nil)
+    {
+        [lock lock];
+        {
+            block(object);
+        }
+        [lock unlock];
+    }
 }

@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/4/8.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "AutoPropertyCocoa.h"
@@ -13,7 +13,7 @@
 
 int main(int argc, char * argv[]) {
     
-    apc_in_main();
+    apc_main_classHookFullSupport();
     
     @autoreleasepool {
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));

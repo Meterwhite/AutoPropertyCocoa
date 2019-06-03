@@ -3,14 +3,15 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/5/9.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #include "apc-objc-runtimelock.h"
 #include "apc-objc-extension.h"
+#include "apc-objc-locker.h"
 #include "apc-fishhook.h"
-#include "apc-objc-os.h"
 #include "APCExtScope.h"
+#include "APCScope.h"
 #include <pthread.h>
 
 
@@ -77,7 +78,7 @@ public:
     
     OS_ALWAYS_INLINE _Bool testingThreadID()
     {
-        return pthread_equal(thread_id, pthread_self());
+        return pthread_equal(thread_id, APCThreadID);
     }
     
     OS_ALWAYS_INLINE void wait_runtimeLockedSuccess()
@@ -129,7 +130,8 @@ static void*(*apc_calloc_ptr)(size_t __count, size_t __size);
 
 void apc_objcruntimelocker_trylock(void)
 {
-    if(apc_objcruntimelocker->testingThreadID()){
+    if(apc_objcruntimelocker &&
+       apc_objcruntimelocker->testingThreadID()){
         
         apc_spinlock_lock(&apc_lockerlock);
         /**

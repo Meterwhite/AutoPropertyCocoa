@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/5/9.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -39,8 +39,7 @@ apc_objcruntimelock_lock(^()__VA_ARGS__)
  
  If you operate on a Class type and will unbind it, calling this method will make the process safer.
  When you operate on a Class type without calling this method,a fake non-method(like apc_null_getter) is generated to undo the behavior of the deleted method when the hooked method is unbound.
- So if you want to swizzle a method for superclass, you should clearly use your target class instead of the class that was once unbundled.If you know this, then you can not call this method.It is no problem.
- 
+ So if you want to swizzle a method for superclass, you should clearly use your target class.If you know this, then you can not call this method.It is no problem.
  */
 OBJC_EXPORT void
 apc_main_classHookFullSupport(void);

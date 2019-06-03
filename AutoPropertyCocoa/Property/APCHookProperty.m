@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/23.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "APCHookProperty.h"
@@ -17,7 +17,6 @@
     if(self = [super initWithPropertyName:propertyName aClass:aClass]){
         
         _hashcode   = 0;
-//        _lock       = APCSemaphoreLockInit;
     }
     return self;
 }
@@ -27,7 +26,6 @@
     if(self = [super initWithPropertyName:propertyName aInstance:aInstance]){
         
         _hashcode   = 0;
-//        _lock       = APCSemaphoreLockInit;
     }
     return self;
 }
@@ -66,6 +64,9 @@
     }
 }
 
+/**
+ NSClass.APCClass.hookedMethod
+ */
 - (NSUInteger)hash
 {
     if(_hashcode == 0){

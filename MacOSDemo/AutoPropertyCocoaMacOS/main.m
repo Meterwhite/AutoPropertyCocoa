@@ -11,6 +11,6 @@
 
 int main(int argc, const char * argv[]) {
     
-//    apc_main_classHookFullSupport();
+    apc_main_classHookFullSupport();
     return NSApplicationMain(argc, argv);
 }

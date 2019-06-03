@@ -3,7 +3,7 @@
 //  AutoWorkProperty
 //
 //  Created by Novo on 2019/3/13.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "APCUserEnvironmentSupportObject.h"
@@ -29,7 +29,7 @@
 #pragma mark - Lazy load for instance.Can be applied to basic-value types.
 
 /**
- Use default @selector(new) to initialize the value.
+ Use default selector '@selector(new)' to initialize the value.
  */
 - (void)apc_lazyLoadForProperty:(nonnull NSString*)property;
 
@@ -40,6 +40,7 @@
 
 
 /**
+ Use selector create lazy-load value.
  ...@selector(array), @selector(dictionary)...
  */
 - (void)apc_lazyLoadForProperty:(nonnull NSString*)property
@@ -48,6 +49,8 @@
 - (void)apc_lazyLoadForPropertyHooks:(nonnull NSDictionary<NSString* ,id>*)propertyHooks;
 
 - (void)apc_unbindLazyLoadForProperty:(nonnull NSString*)property;
+
+- (void)apc_unbindLazyLoadForPropertyArray:(nonnull NSArray<NSString*> *)array;
 
 #pragma mark - Lazy load for class. Can only be applied to object types.
 + (void)apc_lazyLoadForProperty:(nonnull NSString*)property;
@@ -62,9 +65,7 @@
 
 + (void)apc_lazyLoadForPropertyHooks:(nonnull NSDictionary<NSString*,id>*)propertyHooks;
 
-/**
- Ensured that other threads don't access the property when unbinding for class.
- */
 + (void)apc_unbindLazyLoadForProperty:(nonnull NSString*)property;
 
++ (void)apc_unbindLazyLoadForPropertyArray:(nonnull NSArray<NSString*> *)array;
 @end

@@ -3,7 +3,7 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/23.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "APCUserEnvironmentSupportObject.h"
@@ -51,10 +51,6 @@
 - (nullable SEL)outlet;
 - (nullable SEL)inlet;
 
-
-/**
- NSClass.APCClass.hookedMethod
- */
 - (NSUInteger)hash;
 
 #pragma mark - APCUserEnvironmentMessage

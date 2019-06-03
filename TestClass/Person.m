@@ -3,13 +3,14 @@
 //  AutoPropertyCocoa
 //
 //  Created by Novo on 2019/3/14.
-//  Copyright © 2019 Novo. All rights reserved.
+//  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
 #import "AutoPropertyCocoa.h"
 #import "APCPropertyHook.h"
 #import <objc/runtime.h>
 #import "APCRuntime.h"
+#import "APCScope.h"
 #import "Person.h"
 
 @implementation Person
@@ -133,7 +134,8 @@
     [ret appendFormat:@"_objReadonly = %@", _objReadonly];
     
     [ret appendString:@"\n"];
-    [ret appendFormat:@"_rectValue = %@", [NSValue valueWithRect:_rectValue]];
+    [ret appendFormat:@"_rectValue = %@", [NSValue value:&_rectValue
+                                            withObjCType:@encode(APCRect)]];
     
     [ret appendString:@"\n"];
     [ret appendFormat:@"_intValue = %@", @(_intValue)];
