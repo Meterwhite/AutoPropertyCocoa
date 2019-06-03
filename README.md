@@ -1,6 +1,5 @@
 
-!
-[Logo](https://raw.githubusercontent.com/qddnovo/AutoPropertyCocoa/master/Taoist.png)
+![Logo](https://raw.githubusercontent.com/qddnovo/AutoPropertyCocoa/master/Taoist.png)
 AutoPropertyCocoa
 ===
 ## Introduction
