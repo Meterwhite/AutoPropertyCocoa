@@ -80,7 +80,7 @@ union apc_isa_t
     
     # else
     // Available bits in isa field are architecture-specific.
-#   error unknown architecture
+    //#error unknown architecture
     
     // SUPPORT_NONPOINTER_ISA
     #endif

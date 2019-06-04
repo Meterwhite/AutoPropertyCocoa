@@ -6,6 +6,8 @@
 //  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
+#ifdef __cplusplus
+
 #include <Foundation/Foundation.h>
 #include <pthread.h>
 
@@ -60,3 +62,5 @@ public:
         NSCAssert(err == 0, @"pthread_rwlock_unlock failed (%d)", err);
     }
 };
+
+#endif

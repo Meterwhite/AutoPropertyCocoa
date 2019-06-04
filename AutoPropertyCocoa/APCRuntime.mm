@@ -551,7 +551,7 @@ NS_INLINE char* apc_instanceProxyClassName(id instance)
 {
     const char* cname = class_getName(object_getClass(instance));
     char h_str[2*sizeof(uintptr_t)] = {0};
-    sprintf(h_str,"%lX",[instance hash]);
+    sprintf(h_str,"%lX",(unsigned long)[instance hash]);
     char* buf = (char*)malloc(strlen(cname) + strlen(_apcProxyClassID) + strlen(h_str) + 1);
     buf[0] = '\0';
     strcat(buf, cname);

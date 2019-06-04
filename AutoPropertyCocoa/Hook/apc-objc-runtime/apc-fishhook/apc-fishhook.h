@@ -1,7 +1,6 @@
 /**
  AutoPropertyCocoa
- :
- To avoid potential conflicts, AutoPropertyCocoa has embedded fishhook.
+ : Embedded fishhook.
  */
 
 // Copyright (c) 2013, Facebook, Inc.

@@ -84,7 +84,7 @@ struct apc_coder_t {
 #if __LP64__
         uint64_t    value;
 #else
-        uint32      value;
+        uint32_t      value;
 #endif
     };
     
@@ -102,8 +102,9 @@ struct apc_coderimp_t {
         char        encode[sizeof(unsigned long)];
 #if __LP64__
         uint64_t    value;
+        
 #else
-        uint32      value;
+        uint32_t    value;
 #endif
     };
     
@@ -114,7 +115,7 @@ typedef struct apc_coderimp_t APCCoderMapper;
 
 NS_INLINE unsigned long APCCoderValue(const char* enc)
 {
-    APCCoder coder = {0};
+    struct apc_coder_t coder = {0};
     strncpy(coder.encode, enc, sizeof(unsigned long));
     return coder.value;
 }
