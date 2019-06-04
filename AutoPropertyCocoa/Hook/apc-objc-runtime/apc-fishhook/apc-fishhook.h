@@ -1,6 +1,6 @@
 /**
  AutoPropertyCocoa
- : Embedded fishhook.
+ : In order to get rid of cocoapods, fishhook only depends on the iOS platform. This project has a built-in fishhook.Supported the macOS platform.
  */
 
 // Copyright (c) 2013, Facebook, Inc.
