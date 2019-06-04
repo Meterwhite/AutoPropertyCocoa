@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "AutoPropertyCocoa"
-  s.version      = "1.0.0"
+  s.version      = "1.0.2"
 
   s.osx.deployment_target = '10.10'
   s.ios.deployment_target = '7.0'
