@@ -125,7 +125,7 @@
 #if DEBUG
 - (void)dealloc
 {
-    NSLog(@"%s",__func__);
+    APCDlog(@"%s",__func__);
 }
 #endif
 

@@ -3,7 +3,7 @@
 /**
  Set 0 to close log. 1 open.
  */
-#define APCDebugLogSwitch 1
+#define APCDebugLogSwitch 0
 
 /**
  When debug if the following two conditions are met
