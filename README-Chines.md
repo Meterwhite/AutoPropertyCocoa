@@ -44,6 +44,9 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 }];
 
 ```
+
+![Quickview](https://raw.githubusercontent.com/qddnovo/AutoPropertyCocoa/master/Quickview.png)
+
 ## 针对实例的钩子.
 #### 符合低耦合，没有类型污染，推荐！
 - 如果你不会在绑定/解绑实例属性钩子的同时访问这个属性，你可以忽略此处的说明。
