@@ -35,7 +35,7 @@ dispatch_semaphore_signal(_lock);
     if (self) {
         
         _tree = [APCClassInheritanceTree tree];
-        _lock = dispatch_semaphore_create(1);
+        _lock = APCSemaphoreLockInit;
         _map
         =
         [NSMapTable mapTableWithKeyOptions:
