@@ -56,20 +56,20 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 ///Thread-A...
 apc_safe_instance(instance, ^(id object) {
 
-APCLazyload(object, property);
+    APCLazyload(object, property);
 });
 
 ///Thread-B...
 apc_safe_instance(instance, ^(id object) {
 
-APCUnbindLazyload(object, property);
+    APCUnbindLazyload(object, property);
 });
 
 
 ///Thread-C...
 apc_safe_instance(instance, ^(Man* object) {
 
-[object accessProperty];
+    [object accessProperty];
 });
 
 ```

@@ -25,22 +25,22 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 //Front-trigger hook
 [anyone apc_frontOfPropertyGetter:key bindWithBlock:^(id_apc_t instance, id value) {
 
-///Before getter of property called.
+    ///Before getter of property called.
 }];
 
-//Post-trigger hook
+    //Post-trigger hook
 [anyone apc_backOfPropertySetter:key bindWithBlock:^(id_apc_t instance, id value) {
 
-///After setter of property called.
+    ///After setter of property called.
 }];
 
 //Condition-trigger hook
 [anyone apc_propertySetter:key bindUserCondition:^BOOL(id_apc_t instance, id value) {
 
-///Your condition when setter called...
+    ///Your condition when setter called...
 } withBlock:^(id_apc_t instance, id value) {
 
-///If your condition has been triggered.
+    ///If your condition has been triggered.
 }];
 
 ect...
@@ -58,20 +58,20 @@ ect...
 ///Thread-A...
 apc_safe_instance(instance, ^(id object) {
 
-APCLazyload(object, property);
+    APCLazyload(object, property);
 });
 
 ///Thread-B...
 apc_safe_instance(instance, ^(id object) {
 
-APCUnbindLazyload(object, property);
+    APCUnbindLazyload(object, property);
 });
 
 
 ///Thread-C...
 apc_safe_instance(instance, ^(Man* object) {
 
-[object accessProperty];
+    [object accessProperty];
 });
 
 ```
@@ -84,19 +84,19 @@ apc_safe_instance(instance, ^(Man* object) {
 
 int main(int argc, const char * argv[]) {
 
-/*
-1. Call before app or runtime load!
-2. This method will implement the function of deleting the method at runtime, 
-and if it is not called, it will adopt the scheme of analog deletion,
-which will affect the user's use of the method swizzle.
-The effect is that the correct class must be used to method-swizzle , 
-get Method , get imp.
-Exp :
-class_replaceMethod(CorrectClass, ...);
-class_getInstanceMethod(CorrectClass, ...);
-*/
-apc_main_classHookFullSupport();
-return ... ...(argc, argv);
+    /*
+        1. Call before app or runtime load!
+        2. This method will implement the function of deleting the method at runtime, 
+        and if it is not called, it will adopt the scheme of analog deletion,
+        which will affect the user's use of the method swizzle.
+        The effect is that the correct class must be used to method-swizzle , 
+        get Method , get imp.
+        Exp :
+        class_replaceMethod(CorrectClass, ...);
+        class_getInstanceMethod(CorrectClass, ...);
+    */
+    apc_main_classHookFullSupport();
+    return ... ...(argc, argv);
 }
 ```
 ## Basic-value type
@@ -109,17 +109,17 @@ return ... ...(argc, argv);
 ```objc
 [Person apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
 
-return @"Person.gettersetterobj";
+    return @"Person.gettersetterobj";
 }];
 
 [Man apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
-//Call above ↑
-return APCSuperPerformedAsId(instance);
+    //Call above ↑
+    return APCSuperPerformedAsId(instance);
 }];
 
 [Superman apc_lazyLoadForProperty:key usingBlock:^id (id_apc_t instance) {
-//Call above ↑
-return APCSuperPerformedAsId(instance);
+    //Call above ↑
+    return APCSuperPerformedAsId(instance);
 }];
 ```
 
