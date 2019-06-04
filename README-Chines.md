@@ -15,57 +15,37 @@ AutoPropertyCocoa
 ## 示例
 ```objc
 //钩住实例对象的懒加载
-APCLazyload(instance, property, ...);
-APCUnbindLazyload(instance, property, ...);
+APCLazyload(instance, propertyA, propertyB, ...);
+APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
 //钩住类型的懒加载
-APCClassLazyload(Class, property, ...);
-APCClassUnbindLazyload(Class, property, ...);
+APCClassLazyload(Class, propertyA, propertyB, ...);
+APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 
 //前触钩子
 [anyone apc_frontOfPropertyGetter:key bindWithBlock:^(id_apc_t instance, id value) {
 
-///Before getter of property called.
+    ///Before getter of property called.
 }];
 
 //后触钩子
 [anyone apc_backOfPropertySetter:key bindWithBlock:^(id_apc_t instance, id value) {
 
-///After setter of property called.
+    ///After setter of property called.
 }];
 
 //条件触发的钩子
 [anyone apc_propertySetter:key bindUserCondition:^BOOL(id_apc_t instance, id value) {
 
-///Your condition when setter called...
+    ///Your condition when setter called...
 } withBlock:^(id_apc_t instance, id value) {
 
-///If your condition has been triggered.
+    ///If your condition has been triggered.
 }];
 
 ```
-
-## 调用用户的super方法.
-- APCUserEnvironment提供了用户环境，支持用户调用父级的业务方法。
-- `id_apc_t`标记了这个id对象是支持APCUserEnvironment的。
-```objc
-[Person apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
-
-    return @"Person.gettersetterobj";
-}];
-
-[Man apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
-    //调用上方 ↑
-    return APCSuperPerformedAsId(instance);
-}];
-
-[Superman apc_lazyLoadForProperty:key usingBlock:^id (id_apc_t instance) {
-    //调用上方 ↑
-    return APCSuperPerformedAsId(instance);
-}];
-```
-
 ## 针对实例的钩子.
+#### 符合低耦合，没有类型污染，推荐！
 - 如果你不会在绑定/解绑实例属性钩子的同时访问这个属性，你可以忽略此处的说明。
 - 在大量的多线程访问中，绑定/解绑实例属性钩子的同时访问这个属性有很小的概率产生异常： 'Attempt to use unknown class.'。这是由于object_setClass()还没有执行完的时候访问了实例对象。该问题除了进行同步没有办法解决。项目中已经钩住了runtimelock，使用它会影响效率，所以推荐下列的可靠的方案来解决多线程的问题：
 ```objc
@@ -111,8 +91,28 @@ int main(int argc, const char * argv[]) {
 ```
 
 ## 基础值类型
-- 目前支持的结构体类型有: XReact, XPoint, XSize, XEdgeinsets, NSRange.
+#### 目前支持的结构体类型有: XReact, XPoint, XSize, XEdgeinsets, NSRange.
 - 针对类型的钩子属性如果是基础值类型，那么将会是无效的并且会报错。但是针对实例的基础值类型是支持懒加载的，它和对象类型那种判断对象是否存在不同，它只在该属性第一次被访问时触发懒加载。
+
+## 调用用户的super方法.
+- APCUserEnvironment提供了用户环境，支持用户调用父级的业务方法。
+- `id_apc_t`标记了这个id对象是支持APCUserEnvironment的。
+```objc
+[Person apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+
+    return @"Person.gettersetterobj";
+}];
+
+[Man apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+    //调用上方 ↑
+    return APCSuperPerformedAsId(instance);
+}];
+
+[Superman apc_lazyLoadForProperty:key usingBlock:^id (id_apc_t instance) {
+    //调用上方 ↑
+    return APCSuperPerformedAsId(instance);
+}];
+```
 
 ## 可能会做
 - 支持所有结构体类型，如果有需求的话。

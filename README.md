@@ -14,13 +14,13 @@ AutoPropertyCocoa
 ```
 ## Examples
 ```objc
-//Instance lazy-load
-APCLazyload(instance, property, ...);
-APCUnbindLazyload(instance, property, ...);
+//Lazy-loading for instance. 
+APCLazyload(instance, propertyA, propertyB, ...);
+APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
-//Class lazy-load
-APCClassLazyload(Class, property, ...);
-APCClassUnbindLazyload(Class, property, ...);
+//Lazy-loading for Class
+APCClassLazyload(Class, propertyA, propertyB, ...);
+APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 
 //Front-trigger hook
 [anyone apc_frontOfPropertyGetter:key bindWithBlock:^(id_apc_t instance, id value) {
@@ -43,30 +43,12 @@ APCClassUnbindLazyload(Class, property, ...);
     ///If your condition has been triggered.
 }];
 
+ect...
+
 ```
-
-## User super method.
-- APCUserEnvironment supports user call user method in super class.
-- `id_apc_t` marks the id object as supporting APCUserEnvironment.
-```objc
-[Person apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
-
-    return @"Person.gettersetterobj";
-}];
-
-[Man apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
-    //Call above ↑
-    return APCSuperPerformedAsId(instance);
-}];
-
-[Superman apc_lazyLoadForProperty:key usingBlock:^id (id_apc_t instance) {
-    //Call above ↑
-    return APCSuperPerformedAsId(instance);
-}];
-```
-
 ## Hook for instance.
-- You can ignore here, If you don't access the property while binding the property, or access the property while unbinding the property, or bind the property when unbinding the property.
+#### Low coupling, no type pollution, recommended!
+- You can ignore the next instructions, If you don't access the property while binding the property, or access the property while unbinding the property, or bind the property when unbinding the property.
 - In a large number of `multi-threaded` concurrency, bind - unbind, bind - access property, unbind - access property, has a small probability of generating an error : 'Attempt to use unknown class.'The error occurred when an object was accessed when object_setClass() was not completed. Although this probability is relatively small, it is still worthy of attention.This project has implemented the hooking of the runtimelock, which is used to achieve thread safety, but this seriously affects the efficiency, so instead of adopting the scheme, the scheme below is used.
 - It is absolutely safe to use the following form in multi-threaded :
 ```objc
@@ -115,14 +97,33 @@ int main(int argc, const char * argv[]) {
     return ... ...(argc, argv);
 }
 ```
-
 ## Basic-value type
-- The currently supported structure types are: XReact, XPoint, XSize, XEdgeinsets, NSRange.
+#### The currently supported structure types are: XReact, XPoint, XSize, XEdgeinsets, NSRange.
 - Lazy-load is invalid on the base-value type property of the class hook.But is valid on the instance, The lazy loading method is triggered when the instance's underlying value type property is first accessed.
+
+## User super method.
+- APCUserEnvironment supports user call user method in super class.
+- `id_apc_t` marks the id object as supporting APCUserEnvironment.
+```objc
+[Person apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+
+    return @"Person.gettersetterobj";
+}];
+
+[Man apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+    //Call above ↑
+    return APCSuperPerformedAsId(instance);
+}];
+
+[Superman apc_lazyLoadForProperty:key usingBlock:^id (id_apc_t instance) {
+    //Call above ↑
+    return APCSuperPerformedAsId(instance);
+}];
+```
 
 ## Possible to do
 - Support all structure types
-- New border
+- New dynamic border
 
 ## Author
 - Emergency : meterwhite@outlook.com
