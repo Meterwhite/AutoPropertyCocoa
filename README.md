@@ -1,43 +1,44 @@
-# AutoPropertyCocoa
 
-![AutoPropertyCocoa icon](http://ico.ooopic.com/ajax/iconpng/?id=98399.png)
-
+![Logo](https://raw.githubusercontent.com/qddnovo/AutoPropertyCocoa/master/Taoist.png)
+AutoPropertyCocoa
+===
 ## Introduction
-* Mainly provides `lazy loadind` of property and object-oriented `property hook`. 
-* Key words :`iOS`/`macOS`/`cocoa`/`lazy load`/`property hook`/`懒加载`/`属性钩子`
+- Provides `lazy loading` of property and object-oriented `property hook` by objc runtime.Can freely uninstall any function.More powerful than lazy loading of macro definitions.
+- Key words :`iOS`/`macOS`/`cocoa`/`lazy load`/`property hook`/`懒加载`/`属性钩子`
+- [中文](https://github.com/qddnovo/AutoPropertyCocoa/blob/master/README-Chines.md)
 
 ## Import
-* Drag directory `AutoPropertyCocoa` into project
-* `#import "AutoPropertyCocoa.h"`
-* Pod is suported.
+- Drag directory `AutoPropertyCocoa` into project or use cocoapods
 ```objc
 #import "AutoPropertyCocoa.h"
 ```
-
-
 ## Examples
 ```objc
-
+//Instance lazy-load
 APCLazyload(instance, property, ...);
 APCUnbindLazyload(instance, property, ...);
 
+//Class lazy-load
 APCClassLazyload(Class, property, ...);
 APCClassUnbindLazyload(Class, property, ...);
 
+//Front-trigger hook
 [anyone apc_frontOfPropertyGetter:key bindWithBlock:^(id_apc_t instance, id value) {
 
     ///Before getter of property called.
 }];
 
+//Post-trigger hook
 [anyone apc_backOfPropertySetter:key bindWithBlock:^(id_apc_t instance, id value) {
 
     ///After setter of property called.
 }];
 
-[anyone apc_propertySetter:key bindUserCondition:^BOOL(id_apc_t _Nonnull instance, id  _Nullable value) {
+//Condition-trigger hook
+[anyone apc_propertySetter:key bindUserCondition:^BOOL(id_apc_t instance, id value) {
     
     ///Your condition when setter called...
-} withBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+} withBlock:^(id_apc_t instance, id value) {
     
     ///If your condition has been triggered.
 }];
@@ -45,28 +46,29 @@ APCClassUnbindLazyload(Class, property, ...);
 ```
 
 ## User super method.
-### APCUserEnvironment supports user call user method in super class.
-### `id_apc_t` marks the id object as supporting APCUserEnvironment.
+- APCUserEnvironment supports user call user method in super class.
+- `id_apc_t` marks the id object as supporting APCUserEnvironment.
 ```objc
-[Person apc_lazyLoadForProperty:key  usingBlock:^id _Nullable(id_apc_t instance) {
+[Person apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
 
     return @"Person.gettersetterobj";
 }];
 
-[Man apc_lazyLoadForProperty:key  usingBlock:^id _Nullable(id_apc_t instance) {
-    //Call ↑
+[Man apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+    //Call above ↑
     return APCSuperPerformedAsId(instance);
 }];
 
-[Superman apc_lazyLoadForProperty:key usingBlock:^id _Nullable(id_apc_t instance) {
-    //Call ↑
+[Superman apc_lazyLoadForProperty:key usingBlock:^id (id_apc_t instance) {
+    //Call above ↑
     return APCSuperPerformedAsId(instance);
 }];
 ```
 
 ## Hook for instance.
-### In a large number of `multi-threaded` concurrency, bind-unbind, bind-access property, unbind-access property, has a small probability of generating an error : Attempt to use unknown class.
-### It is absolutely safe to use the following form in multi-threaded :
+- You can ignore here, If you don't access the property while binding the property, or access the property while unbinding the property, or bind the property when unbinding the property.
+- In a large number of `multi-threaded` concurrency, bind - unbind, bind - access property, unbind - access property, has a small probability of generating an error : 'Attempt to use unknown class.'The error occurred when an object was accessed when object_setClass() was not completed. Although this probability is relatively small, it is still worthy of attention.This project has implemented the hooking of the runtimelock, which is used to achieve thread safety, but this seriously affects the efficiency, so instead of adopting the scheme, the scheme below is used.
+- It is absolutely safe to use the following form in multi-threaded :
 ```objc
 
 ///Thread-A...
@@ -91,9 +93,9 @@ apc_safe_instance(instance, ^(Man* object) {
 ```
 
 ## Hook for class.
-### Bind or unbind a class is `thread safe`.
-### It is rare to hook a class in general development.
-### If the hooked class needs to be unbind, it is recommended that you implement the following method in main().
+- You can ignore here, if you nerver unbind class hook.
+- Bind or unbind a class hook is `thread safe`.
+- If the hooked class needs to be unbind, it is recommended that you implement the following method in main().
 ```objc
 
 int main(int argc, const char * argv[]) {
@@ -114,6 +116,14 @@ int main(int argc, const char * argv[]) {
 }
 ```
 
+## Basic-value type
+- The currently supported structure types are: XReact, XPoint, XSize, XEdgeinsets, NSRange.
+- Lazy-load is invalid on the base-value type property of the class hook.But is valid on the instance, The lazy loading method is triggered when the instance's underlying value type property is first accessed.
+
+## Possible to do
+- Support all structure types
+- New border
+
 ## Author
-- Me : quxingyi@outlook.com
+- Emergency : meterwhite@outlook.com
 

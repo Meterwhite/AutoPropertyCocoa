@@ -2,7 +2,7 @@
 //  APCStringStringDictionary.h
 //  AutoPropertyCocoa
 //
-//  Created by Novo on 2019/5/20.
+//  Created by Meterwhite on 2019/5/20.
 //  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 

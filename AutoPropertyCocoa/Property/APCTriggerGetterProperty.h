@@ -2,7 +2,7 @@
 //  APCTriggerGetterProperty.h
 //  APCPropertyCocoa
 //
-//  Created by Novo on 2019/3/30.
+//  Created by Meterwhite on 2019/3/30.
 //  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 

@@ -2,7 +2,7 @@
 //  apc-objc-os.cpp
 //  AutoPropertyCocoa
 //
-//  Created by Novo on 2019/5/13.
+//  Created by Meterwhite on 2019/5/13.
 //  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
