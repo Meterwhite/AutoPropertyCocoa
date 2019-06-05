@@ -113,6 +113,7 @@
 		4599114D22A2C93F003EBD21 /* APCMethod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APCMethod.h; sourceTree = "<group>"; };
 		4599114E22A2C93F003EBD21 /* APCMethod.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APCMethod.m; sourceTree = "<group>"; };
 		4599116E22A4CED3003EBD21 /* apc-objc-locker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "apc-objc-locker.h"; sourceTree = "<group>"; };
+		459911FE22A7BAA3003EBD21 /* dyld_priv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dyld_priv.h; sourceTree = "<group>"; };
 		45B12F5B225B2AF3002D825E /* AutoPropertyCocoaiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoPropertyCocoaiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45B12F5E225B2AF3002D825E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		45B12F5F225B2AF3002D825E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -251,6 +252,7 @@
 				4599116E22A4CED3003EBD21 /* apc-objc-locker.h */,
 				4599114822A2C93F003EBD21 /* apc-objc-runtimelock.h */,
 				4599114A22A2C93F003EBD21 /* apc-objc-runtimelock.mm */,
+				459911FE22A7BAA3003EBD21 /* dyld_priv.h */,
 			);
 			path = "apc-objc-runtime";
 			sourceTree = "<group>";

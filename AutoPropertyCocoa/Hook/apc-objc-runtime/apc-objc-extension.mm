@@ -19,9 +19,10 @@
 //#include <stdint.h>
 //#include <assert.h>
 //#include <cstddef>
+#include <malloc/malloc.h>
+#include "dyld_priv.h"
 #include <pthread.h>
 #include <iterator>
-#include <malloc/malloc.h>
 
 struct apc_objc_class;
 struct apc_objc_object;
@@ -29,9 +30,65 @@ struct apc_objc_object;
 typedef struct apc_objc_class *APCClass;
 typedef struct apc_objc_object *id;
 
-static void try_free(const void *p)
+/*
+ Low two bits of mlist->entsize is used as the fixed-up marker.
+ PREOPTIMIZED VERSION:
+ Method lists from shared cache are 1 (uniqued) or 3 (uniqued and sorted).
+ (Protocol method lists are not sorted because of their extra parallel data)
+ Runtime fixed-up method lists get 3.
+ UN-PREOPTIMIZED VERSION:
+ Method lists from shared cache are 1 (uniqued) or 3 (uniqued and sorted)
+ Shared cache's sorting and uniquing are not trusted, but do affect the
+ location of the selector name string.
+ Runtime fixed-up method lists get 2.
+ 
+ High two bits of protocol->flags is used as the fixed-up marker.
+ PREOPTIMIZED VERSION:
+ Protocols from shared cache are 1<<30.
+ Runtime fixed-up protocols get 1<<30.
+ UN-PREOPTIMIZED VERSION:
+ Protocols from shared cache are 1<<30.
+ Shared cache's fixups are not trusted.
+ Runtime fixed-up protocols get 3<<30.
+ */
+
+static uint32_t apc_fixed_up_method_list = 3;
+
+static void apc_try_free(const void *p)
 {
     if (p && malloc_size(p)) free((void *)p);
+}
+
+static inline void *
+apc_memdup(const void *mem, size_t len)
+{
+    void *dup = malloc(len);
+    memcpy(dup, mem, len);
+    return dup;
+}
+
+// strdup that doesn't copy read-only memory
+static inline char *
+apc_strdupIfMutable(const char *str)
+{
+    size_t size = strlen(str) + 1;
+    if (_dyld_is_memory_immutable(str, size)) {
+        return (char *)str;
+    } else {
+        return (char *)apc_memdup(str, size);
+    }
+}
+
+// free apc_strdupIfMutable() result
+static inline void
+apc_freeIfMutable(char *str)
+{
+    size_t size = strlen(str) + 1;
+    if (_dyld_is_memory_immutable(str, size)) {
+        // nothing
+    } else {
+        free(str);
+    }
 }
 
 union apc_isa_t
@@ -177,7 +234,7 @@ struct apc_entsize_list_tt {
         size_t      size = sizeof(Element);
         Element*    item = NULL;
         int32_t     ret  = 0;
-        for(uint32_t i = 0 ; i < count ; i++){
+        for(uint32_t i = 0 ; i < count ; i++) {
             
             item = (Element *)((char*)&first + i*size);
             if(0 == memcmp(item, &nonelm, sizeof(Element))){
@@ -186,7 +243,7 @@ struct apc_entsize_list_tt {
             }
             if(item == elm){
                 
-                try_free(item->types);
+                apc_try_free(item->types);
                 ///Erase method data
                 ///This will affect class_copyList and need to reimplement class_copyList(fishhook).
                 memset((Element*)((char*)&first + i*size), 0, size);
@@ -196,6 +253,53 @@ struct apc_entsize_list_tt {
         return ++ret;
     }
     
+    bool containsElement(Element* elm){
+        
+        for (const auto& meth : *this) {
+            
+            if(&meth == elm){
+                
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     @return return NULL if the list is empty.
+     */
+    List* deletedElementList(Element* elm) {
+        
+        for (const auto& meth : *this) {
+            
+            if(&meth == elm) goto CALL_DELETE;
+        }
+        return NULL;
+    CALL_DELETE:
+        {
+            
+            if(count == 1) return NULL;
+            
+            List *newlist;
+            size_t newlistSize = byteSize(sizeof(Element), count - 1);
+            newlist = (List *)calloc(newlistSize, 1);
+            newlist->entsizeAndFlags =
+            (uint32_t)sizeof(Element) | apc_fixed_up_method_list;
+            newlist->count = 0;
+            
+            for (const auto& meth : *this) {
+                
+                if(&meth == elm) {
+                    
+                    continue;
+                }
+                memcpy(newlist, &meth, sizeof(Element));
+                newlist->count++;
+            }
+            return newlist;
+        }
+    }
+    
     uint32_t entsize() const {
         return entsizeAndFlags & ~FlagMask;
     }
@@ -203,15 +307,112 @@ struct apc_entsize_list_tt {
         return entsizeAndFlags & FlagMask;
     }
     
+    Element& getOrEnd(uint32_t i) const {
+        assert(i <= count);
+        return *(Element *)((uint8_t *)&first + i*entsize());
+    }
+    Element& get(uint32_t i) const {
+        assert(i < count);
+        return getOrEnd(i);
+    }
+    
     size_t byteSize() const {
         return sizeof(*this) + (count-1)*entsize();
     }
     
+    static size_t byteSize(uint32_t entsize, uint32_t count) {
+        return sizeof(apc_entsize_list_tt) + (count-1)*entsize;
+    }
+    
+    List *duplicate() const {
+        auto *dup = (List *)calloc(this->byteSize(), 1);
+        dup->entsizeAndFlags = this->entsizeAndFlags;
+        dup->count = this->count;
+        std::copy(begin(), end(), dup->begin());
+        return dup;
+    }
+    
     struct iterator;
+    const iterator begin() const {
+        return iterator(*static_cast<const List*>(this), 0);
+    }
+    iterator begin() {
+        return iterator(*static_cast<const List*>(this), 0);
+    }
+    const iterator end() const {
+        return iterator(*static_cast<const List*>(this), count);
+    }
+    iterator end() {
+        return iterator(*static_cast<const List*>(this), count);
+    }
+    
     struct iterator {
         uint32_t entsize;
         uint32_t index;  // keeping track of this saves a divide in operator-
         Element* element;
+        
+        typedef std::random_access_iterator_tag iterator_category;
+        typedef Element value_type;
+        typedef ptrdiff_t difference_type;
+        typedef Element* pointer;
+        typedef Element& reference;
+        
+        iterator() { }
+        
+        iterator(const List& list, uint32_t start = 0)
+        : entsize(list.entsize())
+        , index(start)
+        , element(&list.getOrEnd(start))
+        { }
+        
+        const iterator& operator += (ptrdiff_t delta) {
+            element = (Element*)((uint8_t *)element + delta*entsize);
+            index += (int32_t)delta;
+            return *this;
+        }
+        const iterator& operator -= (ptrdiff_t delta) {
+            element = (Element*)((uint8_t *)element - delta*entsize);
+            index -= (int32_t)delta;
+            return *this;
+        }
+        const iterator operator + (ptrdiff_t delta) const {
+            return iterator(*this) += delta;
+        }
+        const iterator operator - (ptrdiff_t delta) const {
+            return iterator(*this) -= delta;
+        }
+        
+        iterator& operator ++ () { *this += 1; return *this; }
+        iterator& operator -- () { *this -= 1; return *this; }
+        iterator operator ++ (int) {
+            iterator result(*this); *this += 1; return result;
+        }
+        iterator operator -- (int) {
+            iterator result(*this); *this -= 1; return result;
+        }
+        
+        ptrdiff_t operator - (const iterator& rhs) const {
+            return (ptrdiff_t)this->index - (ptrdiff_t)rhs.index;
+        }
+        
+        Element& operator * () const { return *element; }
+        Element* operator -> () const { return element; }
+        
+        operator Element& () const { return *element; }
+        
+        bool operator == (const iterator& rhs) const {
+            return this->element == rhs.element;
+        }
+        bool operator != (const iterator& rhs) const {
+            return this->element != rhs.element;
+        }
+        
+        bool operator < (const iterator& rhs) const {
+            return this->element < rhs.element;
+        }
+        bool operator > (const iterator& rhs) const {
+            return this->element > rhs.element;
+        }
     };
 };
 
@@ -222,6 +423,15 @@ struct apc_property_list_t : apc_entsize_list_tt<apc_property_t, apc_property_li
 };
 
 struct apc_method_list_t : apc_entsize_list_tt<apc_method_t, apc_method_list_t, 0x3> {
+    bool isFixedUp() const;
+    void setFixedUp();
+    
+    uint32_t indexOfMethod(const apc_method_t *meth) const {
+        uint32_t i =
+        (uint32_t)(((uintptr_t)meth - (uintptr_t)this) / entsize());
+        assert(i < count);
+        return i;
+    }
 };
 
 struct apc_class_ro_t {
@@ -379,19 +589,19 @@ public:
     void tryFree() {
         if (hasArray()) {
             for (uint32_t i = 0; i < array()->count; i++) {
-                try_free(array()->lists[i]);
+                apc_try_free(array()->lists[i]);
             }
-            try_free(array());
+            apc_try_free(array());
         }
         else if (list) {
-            try_free(list);
+            apc_try_free(list);
         }
     }
     
     void deleteElement(Element* elm) {
         
-        if(hasArray()) {
-            
+        if(hasArray())
+        {
             uint32_t del;
             array_t* a = array();
             for (uint32_t i = 0; i < a->count; i++) {
@@ -426,13 +636,13 @@ public:
                         j++;
                     }
                     
-                    try_free(a->lists[del]);
+                    apc_try_free(a->lists[del]);
                     setArray(newer);
                 }else if (a->count == 2){
                     ///2 -> 1
                     uint32_t newi = del ? 0 : 1;
-                    try_free(elm->types);
-                    try_free(a->lists[del]);
+                    apc_try_free(elm->types);
+                    apc_try_free(a->lists[del]);
                     arrayAndFlag = 0;
                     list = a->lists[newi];
                 }else {
@@ -440,11 +650,93 @@ public:
                     tryFree();
                 }
             }
-        } else if (list) {
-            
+        }
+        else if (list)
+        {
             if(0 == list->deleteElement(elm)) {
                 
                 tryFree();
+            }
+        }
+    }
+    
+    void deleteElement2(Element* elm) {
+        
+        if(hasArray())
+        {
+            uint32_t dx = -1;
+            array_t* a = array();
+            for (uint32_t i = 0; i < a->count; i++)
+            {
+                //List -> apc_method_list
+                List* j_list = a->lists[i];
+                if(j_list->containsElement(elm)){
+                    
+                    List* newlist = j_list->deletedElementList(elm);
+                    if(newlist == NULL){
+                        
+                        dx = i;
+                        goto CALL_DELETE_LIST;
+                    }else{
+                        
+                        apc_try_free(j_list);
+                        a->lists[i] = newlist;
+                        return;
+                    }
+                }
+            }
+            return;
+            
+        CALL_DELETE_LIST:
+            {
+                if(a->count > 2){
+                    ///many -> many
+                    uint32_t  newcount = array()->count - 1 ;
+                    array_t * newer = (array_t *)malloc(array_t::byteSize(newcount));
+                    for (uint32_t i = 0, j = i; i < a->count; i++) {
+                        
+                        if(dx != i) {
+                            
+                            memcpy(newer + j, a->lists + i
+                                   , sizeof(a->lists[0]));
+                            continue;
+                        }
+                        j++;
+                    }
+                    
+                    apc_try_free(a->lists[dx]);
+                    setArray(newer);
+                }else if (a->count == 2){
+                    ///2 -> 1
+                    uint32_t newi = dx ? 0 : 1;
+                    apc_try_free(elm->types);
+                    apc_try_free(a->lists[dx]);
+                    arrayAndFlag = 0;
+                    list = a->lists[newi];
+                }else {
+                    ///1 -> 0
+                    tryFree();
+                    list = NULL;
+                }
+            }
+        }
+        else if(list)
+        {
+            if(list->containsElement(elm))
+            {
+                List* newlist = list->deletedElementList(elm);
+                if(newlist == NULL) {
+                    
+                    tryFree();
+                    arrayAndFlag = 0;
+                    list = NULL;
+                } else {
+                    
+                    apc_try_free(list);
+                    apc_freeIfMutable((char*)(elm->types));
+                    arrayAndFlag = 0;
+                    list = newlist;
+                }
             }
         }
     }
@@ -549,7 +841,7 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
             
             @lockruntime({
 
-                clazz->data()->methods.deleteElement(method);
+                clazz->data()->methods.deleteElement2(method);
             });
             ///Erase cache.
             _objc_flush_caches(cls);
