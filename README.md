@@ -52,7 +52,7 @@ APCLazyload(instance, @propertyA, @propertyB, ...);
 
 APCUnbindLazyload(instance, @propertyA, @propertyB, ...);
 
-[instance apc_unbindLazyLoadForProperty:@keyForTabView];
+[instance apc_unbindLazyLoadForProperty:@property];
 
 ```
 #### Lazy loading of class.
