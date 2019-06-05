@@ -4,37 +4,85 @@ AutoPropertyCocoa
 ===
 ## 简介
 - 该三方主要提供Cocoa的属性懒加载和属性钩子的功能。可以自由的卸载任一功能，优于宏定义形式的懒加载。
-- Key words :`iOS`/`macOS`/`cocoa`/`懒加载`/`属性钩子`
-- [English](https://github.com/qddnovo/AutoPropertyCocoa)
+- 关键词 :`iOS懒加载`/`属性钩子`/`macOS`/`cocoa`/
+- [English documentation](https://github.com/qddnovo/AutoPropertyCocoa)
 
 ## 引用
 - 拖拽文件夹`AutoPropertyCocoa`到项目 或者使用cocoapods
 ```objc
 #import "AutoPropertyCocoa.h"
 ```
-## 示例
+## 目标
 ```objc
-//钩住实例对象的懒加载
-APCLazyload(instance, propertyA, propertyB, ...);
-APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
-//钩住类型的懒加载
+- (id)lazyloadProperty{
+
+    if(_lazyloadProperty == nil){
+    
+        _lazyloadProperty = [XClass ...];
+    }
+    return _lazyloadProperty;
+}
+
+=>
+
+[instance apc_lazyLoadForProperty:@lazyloadProperty usingBlock:^id(id_apc_t instance){
+
+    return [XClass ...];
+}];
+
+```
+## 示例
+#### 针对实例的懒加载。低耦合，无类型污染，推荐！
+```objc
+
+APCLazyload(instance, @propertyA, @propertyB, ...);
+
+[instance apc_lazyLoadForProperty:@property usingBlock:^id(id_apc_t instance){
+
+    return ...;
+}];
+
+[instance apc_lazyLoadForProperty:@arrayProperty selector:@selector(array)];
+
+```
+#### 支持解绑 针对实例的懒加载。
+```objc
+
+APCUnbindLazyload(instance, @propertyA, @propertyB, ...);
+
+[instance apc_unbindLazyLoadForProperty:@keyForTabView];
+
+```
+#### 针对类的懒加载
+```objc
+
 APCClassLazyload(Class, propertyA, propertyB, ...);
+
 APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 
-//前触钩子
+```
+#### 前触发钩子.在一个属性调用前调用。
+```objc
+
 [anyone apc_frontOfPropertyGetter:key bindWithBlock:^(id_apc_t instance, id value) {
 
     ///Before getter of property called.
 }];
 
-//后触钩子
+```
+#### 后触发钩子.在一个属性调用后调用。
+```objc
+
 [anyone apc_backOfPropertySetter:key bindWithBlock:^(id_apc_t instance, id value) {
 
     ///After setter of property called.
 }];
 
-//条件触发的钩子
+```
+#### 条件触发钩子.当满足用户条件时调用。
+```objc
+
 [anyone apc_propertySetter:key bindUserCondition:^BOOL(id_apc_t instance, id value) {
 
     ///Your condition when setter called...
@@ -47,8 +95,31 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 
 ![Quickview](https://raw.githubusercontent.com/qddnovo/AutoPropertyCocoa/master/Quickview.png)
 
-## 针对实例的钩子.
-#### 符合低耦合，没有类型污染，推荐！
+## 基础值类型
+#### 目前支持的结构体类型有: XReact, XPoint, XSize, XEdgeinsets, NSRange.
+- 针对类型的钩子属性如果是基础值类型，那么将会是无效的并且会报错。但是针对实例的基础值类型是支持懒加载的，它和对象类型那种判断对象是否存在不同，它只在该属性第一次被访问时触发懒加载。
+
+## 调用用户的super方法.
+- APCUserEnvironment提供了用户环境，支持用户调用父级的业务方法。
+- `id_apc_t`标记了这个id对象是支持APCUserEnvironment的。
+```objc
+[Person apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+
+    return @"Person.gettersetterobj";
+}];
+
+[Man apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+    //调用上方 ↑
+    return APCSuperPerformedAsId(instance);
+}];
+
+[Superman apc_lazyLoadForProperty:key usingBlock:^id (id_apc_t instance) {
+    //调用上方 ↑
+    return APCSuperPerformedAsId(instance);
+}];
+```
+
+## 针对实例的钩子的线程安全.
 - 如果你不会在绑定/解绑实例属性钩子的同时访问这个属性，你可以忽略此处的说明。
 - 在大量的多线程访问中，绑定/解绑实例属性钩子的同时访问这个属性有很小的概率产生异常： 'Attempt to use unknown class.'。这是由于object_setClass()还没有执行完的时候访问了实例对象。该问题除了进行同步没有办法解决。项目中已经钩住了runtimelock，使用它会影响效率，所以推荐下列的可靠的方案来解决多线程的问题：
 ```objc
@@ -74,7 +145,7 @@ apc_safe_instance(instance, ^(Man* object) {
 
 ```
 
-## 针对类的钩子.
+## 针对类的钩子的线程安全.
 - 如果你没有对针对类的钩子进行解绑操作的需求，忽略此处说明。
 - 针对类的钩子是线程安全的。
 - 对针类的钩子进行解绑操作建议在main()方法中实现apc_main_classHookFullSupport().
@@ -91,30 +162,6 @@ int main(int argc, const char * argv[]) {
     apc_main_classHookFullSupport();
     return ... ...(argc, argv);
 }
-```
-
-## 基础值类型
-#### 目前支持的结构体类型有: XReact, XPoint, XSize, XEdgeinsets, NSRange.
-- 针对类型的钩子属性如果是基础值类型，那么将会是无效的并且会报错。但是针对实例的基础值类型是支持懒加载的，它和对象类型那种判断对象是否存在不同，它只在该属性第一次被访问时触发懒加载。
-
-## 调用用户的super方法.
-- APCUserEnvironment提供了用户环境，支持用户调用父级的业务方法。
-- `id_apc_t`标记了这个id对象是支持APCUserEnvironment的。
-```objc
-[Person apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
-
-    return @"Person.gettersetterobj";
-}];
-
-[Man apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
-    //调用上方 ↑
-    return APCSuperPerformedAsId(instance);
-}];
-
-[Superman apc_lazyLoadForProperty:key usingBlock:^id (id_apc_t instance) {
-    //调用上方 ↑
-    return APCSuperPerformedAsId(instance);
-}];
 ```
 
 ## 可能会做
