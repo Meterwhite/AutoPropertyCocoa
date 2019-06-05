@@ -56,7 +56,10 @@ static uint32_t apc_fixed_up_method_list = 3;
 
 static void apc_try_free(const void *p)
 {
-    if (p && malloc_size(p)) free((void *)p);
+    if (p && malloc_size(p)) {
+        
+        free((void *)p);
+    }
 }
 
 static inline void *
@@ -530,9 +533,8 @@ private:
         arrayAndFlag = (uintptr_t)array | 1;
     }
     
-    void deleteArray() {
-        arrayAndFlag = array();
-        free(arrayAndFlag);
+    void unArray() {
+        arrayAndFlag = (uintptr_t)array();
     }
     
 public:
@@ -664,7 +666,7 @@ public:
         
         if(hasArray())
         {
-            uint32_t dx = -1;
+            uint32_t dx = 0;
             array_t* a = array();
             for (uint32_t i = 0; i < a->count; i++)
             {
@@ -692,29 +694,41 @@ public:
                 if(a->count > 2){
                     ///many -> many
                     uint32_t  newcount = array()->count - 1 ;
-                    array_t * newer = (array_t *)malloc(array_t::byteSize(newcount));
+                    array_t * newer = (array_t *)malloc(array_t::byteSize(newcount));//内存分配错了❌
+                    
                     for (uint32_t i = 0, j = i; i < a->count; i++) {
                         
                         if(dx != i) {
                             
-                            memcpy(newer + j, a->lists + i
-                                   , sizeof(a->lists[0]));
+                            memcpy((newer->lists) + j, (a->lists) + i
+                                   , sizeof(List*));
                             continue;
                         }
                         j++;
                     }
                     
+//                    apc_freeIfMutable((char*)elm->types);
                     apc_try_free(a->lists[dx]);
+                    newer->count = newcount;//2
                     setArray(newer);
+                    
+                    List** s = (*this).beginLists();
+                    List** e = (*this).endLists();
+                    
+                    int ccc = (*this).count();
+                    printf("A");
                 }else if (a->count == 2){
+                    
                     ///2 -> 1
                     uint32_t newi = dx ? 0 : 1;
-                    apc_try_free(elm->types);
+//                    apc_freeIfMutable((char*)elm->types);
                     apc_try_free(a->lists[dx]);
-                    arrayAndFlag = 0;
+                    unArray();
                     list = a->lists[newi];
                 }else {
+                    
                     ///1 -> 0
+//                    apc_freeIfMutable((char*)elm->types);
                     tryFree();
                     list = NULL;
                 }
@@ -727,14 +741,13 @@ public:
                 List* newlist = list->deletedElementList(elm);
                 if(newlist == NULL) {
                     
+//                    apc_freeIfMutable((char*)elm->types);
                     tryFree();
-                    arrayAndFlag = 0;
-                    list = NULL;
+                    list = NULL;//0 1
                 } else {
                     
+//                    apc_freeIfMutable((char*)(elm->types));
                     apc_try_free(list);
-                    apc_freeIfMutable((char*)(elm->types));
-                    arrayAndFlag = 0;
                     list = newlist;
                 }
             }
@@ -809,6 +822,34 @@ struct apc_objc_class : apc_objc_object {
     }
 };
 
+#warning del
+APCMethod *
+bug_class_copyMethodList(APCClass cls, unsigned int *outCount)
+{
+    unsigned int count = 0;
+    APCMethod *result = nil;
+    
+    if (!cls) {
+        if (outCount) *outCount = 0;
+        return nil;
+    }
+    
+    count = cls->data()->methods.count();
+    
+    if (count > 0) {
+        result = (APCMethod *)malloc((count + 1) * sizeof(Method));
+        
+        count = 0;
+        for (auto& meth : cls->data()->methods) {
+            result[count++] = &meth;
+        }
+        result[count] = nil;
+    }
+    
+    if (outCount) *outCount = count;
+    return result;
+}
+
 /*
  ---------------------------------
  ---------------------------------
@@ -831,13 +872,15 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
     
     apc_objc_class* clazz = (__bridge apc_objc_class*)(cls);
     unsigned int    count;
-    apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
+#warning <#message#>
+//    apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
+    apc_method_t**  methods = (apc_method_t**)(bug_class_copyMethodList(clazz, &count));
     apc_method_t*   method;
     
     
     while (count--) {
         
-        if(((method = (apc_method_t*)methods[count])->name) == name){
+        if(sel_isEqual(((method = (apc_method_t*)methods[count])->name), name)){
             
             @lockruntime({
 

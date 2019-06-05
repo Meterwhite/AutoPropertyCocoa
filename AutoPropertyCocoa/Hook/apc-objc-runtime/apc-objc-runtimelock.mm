@@ -182,8 +182,8 @@ void apc_main_classHookFullSupport(void)
         .replacement    =   (void*)apc_class_copyMethodList,
         .replaced       =   (void**)(&apc_class_copyMethodList_ptr)
     };
-    
-    apc_rebind_symbols((struct apc_rebinding[2]){rb_calloc,rb_class_copyMethodList} , 2);
+#warning <#message#>
+    apc_rebind_symbols((struct apc_rebinding[1]){rb_calloc} , 1);
     
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

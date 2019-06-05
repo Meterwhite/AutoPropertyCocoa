@@ -160,7 +160,8 @@ APC_TEST_DEMO(ClassLazyload,102)
             
             return @"setterobj";
         }];
-        
+#warning del
+        APC_TEST_CLEAN;
         {
             APCTestInstance(Man, m);
             
