@@ -29,11 +29,6 @@ extern "C"
     
     IMP _Nullable class_itMethodImplementation_APC(Class _Nonnull cls, SEL _Nonnull name);
     
-
-    
-    Method _Nonnull * _Nullable
-    apc_class_copyMethodList(Class _Nonnull cls, unsigned int * _Nullable outCount);
-    
 #if defined __cplusplus
 };
 #endif

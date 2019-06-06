@@ -230,32 +230,6 @@ struct apc_entsize_list_tt {
     uint32_t count;
     Element first;
     
-    int32_t deleteElement(Element* elm) {
-        
-        static Element nonelm = {0};
-        
-        size_t      size = sizeof(Element);
-        Element*    item = NULL;
-        int32_t     ret  = 0;
-        for(uint32_t i = 0 ; i < count ; i++) {
-            
-            item = (Element *)((char*)&first + i*size);
-            if(0 == memcmp(item, &nonelm, sizeof(Element))){
-                
-               ++ret;
-            }
-            if(item == elm){
-                
-                apc_try_free(item->types);
-                ///Erase method data
-                ///This will affect class_copyList and need to reimplement class_copyList(fishhook).
-                memset((Element*)((char*)&first + i*size), 0, size);
-                ///Do not to count --,Let the runtime manage the memory itself.
-            }
-        }
-        return ++ret;
-    }
-    
     bool containsElement(Element* elm){
         
         for (const auto& meth : *this) {
@@ -285,19 +259,20 @@ struct apc_entsize_list_tt {
             
             List *newlist;
             size_t newlistSize = byteSize(sizeof(Element), count - 1);
-            newlist = (List *)calloc(newlistSize, 1);
+            newlist = (List *)calloc(1, newlistSize);
             newlist->entsizeAndFlags =
             (uint32_t)sizeof(Element) | apc_fixed_up_method_list;
             newlist->count = 0;
-            
+            uint32_t i = 0;
             for (const auto& meth : *this) {
                 
                 if(&meth == elm) {
                     
                     continue;
                 }
-                memcpy(newlist, &meth, sizeof(Element));
+                memcpy((Element*)(&(newlist->first)) + i, &meth, sizeof(Element));
                 newlist->count++;
+                i++;
             }
             return newlist;
         }
@@ -559,7 +534,6 @@ public:
         return iterator(e, e);
     }
     
-    
     uint32_t countLists() {
         if (hasArray()) {
             return array()->count;
@@ -634,14 +608,10 @@ public:
                     array_t * newer = (array_t *)malloc(array_t::byteSize(newcount));
                     for (uint32_t i = 0, j = i; i < a->count; i++) {
                         
-                        if(dx != i) {
-                            
-                            newer->lists[j] = a->lists[i];
-                            j++;
-                            continue;
-                        }
+                        if(dx == i) continue;
+                        newer->lists[j] = a->lists[i];
+                        j++;
                     }
-                    
                     apc_freeIfMutable((char*)elm->types);
                     apc_try_free(a->lists[dx]);
                     apc_try_free(a);
@@ -673,7 +643,7 @@ public:
                     
                     apc_freeIfMutable((char*)elm->types);
                     tryFree();
-                    list = NULL;//0 1
+                    list = NULL;
                 } else {
                     
                     apc_freeIfMutable((char*)(elm->types));
@@ -780,7 +750,7 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
     
     while (count--) {
         
-        if(sel_isEqual(((method = (apc_method_t*)methods[count])->name), name)){
+        if((method = (apc_method_t*)methods[count])->name == name){
             
             @lockruntime({
 
@@ -805,51 +775,10 @@ IMP class_itMethodImplementation_APC(Class cls, SEL name)
     apc_method_t*   method;
     while (count--) {
         
-        if(((method = (apc_method_t*)methods[count])->name) == name){
+        if((method = (apc_method_t*)methods[count])->name == name){
             
             return method->imp;
         }
     }
     return NULL;
-}
-
-static apc_method_t non_method = {0};
-
-Method _Nonnull * _Nullable
-(* _Nonnull apc_class_copyMethodList_ptr)(Class _Nonnull cls, unsigned int * _Nullable outCount) = NULL;
-
-Method *
-apc_class_copyMethodList(Class cls, unsigned int *outCount)
-{
-    unsigned int count;
-    APCMethod* mds = (APCMethod*) apc_class_copyMethodList_ptr(cls, &count);
-    
-    for (int i = 0; i < count; i++) {
-        
-        if(0 == memcmp(&non_method, mds[i], sizeof(apc_method_t))){
-            
-            goto CALL_MEMMOV;
-        }
-    }
-    *outCount = count;
-    return (Method *)mds;
-    
-CALL_MEMMOV:
-    
-    APCMethod *result = nil;
-    int newCount = 0;
-    for (int i = 0, j = 1; i < count; i++) {
-        
-        if(0 != memcmp(&non_method, mds[i], sizeof(apc_method_t))){
-            
-            result = (APCMethod*)realloc(result, j*sizeof(APCMethod*));
-            result[j - 1] = mds[i];
-            ++j;
-            ++newCount;
-        }
-    }
-    
-    *outCount = newCount;
-    free(mds);
-    return (Method *)result;
 }
