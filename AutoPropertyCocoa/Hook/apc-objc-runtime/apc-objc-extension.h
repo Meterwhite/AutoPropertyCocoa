@@ -11,9 +11,6 @@
 
 #import <objc/runtime.h>
 
-extern Method _Nonnull * _Nullable
-(* _Nonnull apc_class_copyMethodList_ptr)(Class _Nonnull cls, unsigned int * _Nullable outCount);
-
 #if defined __cplusplus
 extern "C"
 {
