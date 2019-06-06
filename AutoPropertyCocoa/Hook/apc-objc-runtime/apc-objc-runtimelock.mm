@@ -174,15 +174,6 @@ void apc_main_classHookFullSupport(void)
         .replaced       =   (void**)(&apc_calloc_ptr)
     };
     
-    struct apc_rebinding
-    rb_class_copyMethodList
-    =
-    {
-        .name           =   "class_copyMethodList",
-        .replacement    =   (void*)apc_class_copyMethodList,
-        .replaced       =   (void**)(&apc_class_copyMethodList_ptr)
-    };
-#warning <#message#>
     apc_rebind_symbols((struct apc_rebinding[1]){rb_calloc} , 1);
     
     static dispatch_once_t onceToken;

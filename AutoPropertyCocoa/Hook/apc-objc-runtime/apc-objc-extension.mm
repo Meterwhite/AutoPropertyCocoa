@@ -27,8 +27,8 @@
 struct apc_objc_class;
 struct apc_objc_object;
 
-typedef struct apc_objc_class *APCClass;
-typedef struct apc_objc_object *id;
+typedef struct apc_objc_class   *APCClass;
+typedef struct apc_objc_object  *id;
 
 /*
  Low two bits of mlist->entsize is used as the fixed-up marker.
@@ -62,25 +62,25 @@ static void apc_try_free(const void *p)
     }
 }
 
-static inline void *
-apc_memdup(const void *mem, size_t len)
-{
-    void *dup = malloc(len);
-    memcpy(dup, mem, len);
-    return dup;
-}
+//static inline void *
+//apc_memdup(const void *mem, size_t len)
+//{
+//    void *dup = malloc(len);
+//    memcpy(dup, mem, len);
+//    return dup;
+//}
 
 // strdup that doesn't copy read-only memory
-static inline char *
-apc_strdupIfMutable(const char *str)
-{
-    size_t size = strlen(str) + 1;
-    if (_dyld_is_memory_immutable(str, size)) {
-        return (char *)str;
-    } else {
-        return (char *)apc_memdup(str, size);
-    }
-}
+//static inline char *
+//apc_strdupIfMutable(const char *str)
+//{
+//    size_t size = strlen(str) + 1;
+//    if (_dyld_is_memory_immutable(str, size)) {
+//        return (char *)str;
+//    } else {
+//        return (char *)apc_memdup(str, size);
+//    }
+//}
 
 // free apc_strdupIfMutable() result
 static inline void
@@ -604,73 +604,10 @@ public:
         
         if(hasArray())
         {
-            uint32_t del;
-            array_t* a = array();
-            for (uint32_t i = 0; i < a->count; i++) {
-                
-                //List -> apc_method_list
-                List* j_list = a->lists[i];
-                for (uint32_t j = 0; j < j_list->count; j++) {
-                    
-                    if(0 == j_list->deleteElement(elm)) {
-                        
-                        del= i;
-                        goto CALL_DELETE_LIST;
-                    }
-                }
-            }
-            return;
-            
-        CALL_DELETE_LIST:
-            {
-                if(a->count > 2){
-                    ///many -> many
-                    uint32_t  newcount = array()->count - 1 ;
-                    array_t * newer = (array_t *)malloc(array_t::byteSize(newcount));
-                    for (uint32_t i = 0, j = i; i < a->count; i++) {
-                        
-                        if(del != i) {
-                            
-                            memcpy(newer + j, a->lists + i
-                                   , sizeof(a->lists[0]));
-                            continue;
-                        }
-                        j++;
-                    }
-                    
-                    apc_try_free(a->lists[del]);
-                    setArray(newer);
-                }else if (a->count == 2){
-                    ///2 -> 1
-                    uint32_t newi = del ? 0 : 1;
-                    apc_try_free(elm->types);
-                    apc_try_free(a->lists[del]);
-                    arrayAndFlag = 0;
-                    list = a->lists[newi];
-                }else {
-                    ///1 -> 0
-                    tryFree();
-                }
-            }
-        }
-        else if (list)
-        {
-            if(0 == list->deleteElement(elm)) {
-                
-                tryFree();
-            }
-        }
-    }
-    
-    void deleteElement2(Element* elm) {
-        
-        if(hasArray())
-        {
             uint32_t dx = 0;
             array_t* a = array();
             for (uint32_t i = 0; i < a->count; i++)
             {
-                //List -> apc_method_list
                 List* j_list = a->lists[i];
                 if(j_list->containsElement(elm)){
                     
@@ -694,41 +631,34 @@ public:
                 if(a->count > 2){
                     ///many -> many
                     uint32_t  newcount = array()->count - 1 ;
-                    array_t * newer = (array_t *)malloc(array_t::byteSize(newcount));//内存分配错了❌
-                    
+                    array_t * newer = (array_t *)malloc(array_t::byteSize(newcount));
                     for (uint32_t i = 0, j = i; i < a->count; i++) {
                         
                         if(dx != i) {
                             
-                            memcpy((newer->lists) + j, (a->lists) + i
-                                   , sizeof(List*));
+                            newer->lists[j] = a->lists[i];
+                            j++;
                             continue;
                         }
-                        j++;
                     }
                     
-//                    apc_freeIfMutable((char*)elm->types);
+                    apc_freeIfMutable((char*)elm->types);
                     apc_try_free(a->lists[dx]);
-                    newer->count = newcount;//2
+                    apc_try_free(a);
+                    newer->count = newcount;
                     setArray(newer);
-                    
-                    List** s = (*this).beginLists();
-                    List** e = (*this).endLists();
-                    
-                    int ccc = (*this).count();
-                    printf("A");
                 }else if (a->count == 2){
                     
                     ///2 -> 1
                     uint32_t newi = dx ? 0 : 1;
-//                    apc_freeIfMutable((char*)elm->types);
+                    apc_freeIfMutable((char*)elm->types);
                     apc_try_free(a->lists[dx]);
                     unArray();
                     list = a->lists[newi];
                 }else {
                     
                     ///1 -> 0
-//                    apc_freeIfMutable((char*)elm->types);
+                    apc_freeIfMutable((char*)elm->types);
                     tryFree();
                     list = NULL;
                 }
@@ -741,12 +671,12 @@ public:
                 List* newlist = list->deletedElementList(elm);
                 if(newlist == NULL) {
                     
-//                    apc_freeIfMutable((char*)elm->types);
+                    apc_freeIfMutable((char*)elm->types);
                     tryFree();
                     list = NULL;//0 1
                 } else {
                     
-//                    apc_freeIfMutable((char*)(elm->types));
+                    apc_freeIfMutable((char*)(elm->types));
                     apc_try_free(list);
                     list = newlist;
                 }
@@ -822,34 +752,6 @@ struct apc_objc_class : apc_objc_object {
     }
 };
 
-#warning del
-APCMethod *
-bug_class_copyMethodList(APCClass cls, unsigned int *outCount)
-{
-    unsigned int count = 0;
-    APCMethod *result = nil;
-    
-    if (!cls) {
-        if (outCount) *outCount = 0;
-        return nil;
-    }
-    
-    count = cls->data()->methods.count();
-    
-    if (count > 0) {
-        result = (APCMethod *)malloc((count + 1) * sizeof(Method));
-        
-        count = 0;
-        for (auto& meth : cls->data()->methods) {
-            result[count++] = &meth;
-        }
-        result[count] = nil;
-    }
-    
-    if (outCount) *outCount = count;
-    return result;
-}
-
 /*
  ---------------------------------
  ---------------------------------
@@ -872,9 +774,7 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
     
     apc_objc_class* clazz = (__bridge apc_objc_class*)(cls);
     unsigned int    count;
-#warning <#message#>
-//    apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
-    apc_method_t**  methods = (apc_method_t**)(bug_class_copyMethodList(clazz, &count));
+    apc_method_t**  methods = (apc_method_t**)(class_copyMethodList(cls, &count));
     apc_method_t*   method;
     
     
@@ -884,7 +784,7 @@ void class_removeMethod_APC_OBJC2(Class cls, SEL name)
             
             @lockruntime({
 
-                clazz->data()->methods.deleteElement2(method);
+                clazz->data()->methods.deleteElement(method);
             });
             ///Erase cache.
             _objc_flush_caches(cls);
