@@ -37,7 +37,7 @@ AutoPropertyCocoa
 #### Lazy loading of instance.Low coupling, no type pollution, recommended! 
 ```objc
 
-APCLazyload(instance, @propertyA, @propertyB, ...);
+APCLazyload(instance, propertyA, propertyB, ...);
 
 [instance apc_lazyLoadForProperty:@property usingBlock:^id(id_apc_t instance){
 
@@ -50,7 +50,7 @@ APCLazyload(instance, @propertyA, @propertyB, ...);
 #### Unbind lazy loading of instance is supported.
 ```objc
 
-APCUnbindLazyload(instance, @propertyA, @propertyB, ...);
+APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
 [instance apc_unbindLazyLoadForProperty:@property];
 
@@ -66,7 +66,7 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 #### Front-trigger hook.Called before a property is called.
 ```objc
 
-[anyone apc_frontOfPropertyGetter:key bindWithBlock:^(id_apc_t instance, id value) {
+[anyone apc_frontOfPropertyGetter:@key bindWithBlock:^(id_apc_t instance, id value) {
 
     ///Before getter of property called.
 }];
@@ -75,7 +75,7 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 #### Post-trigger hook.Called after a property is called.
 ```objc
 
-[anyone apc_backOfPropertySetter:key bindWithBlock:^(id_apc_t instance, id value) {
+[anyone apc_backOfPropertySetter:@key bindWithBlock:^(id_apc_t instance, id value) {
 
     ///After setter of property called.
 }];
@@ -84,7 +84,7 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 #### Condition-trigger hook.Called when the user condition is true.
 ```objc
 
-[anyone apc_propertySetter:key bindUserCondition:^BOOL(id_apc_t instance, id value) {
+[anyone apc_propertySetter:@key bindUserCondition:^BOOL(id_apc_t instance, id value) {
 
     ///Your condition when setter called...
 } withBlock:^(id_apc_t instance, id value) {
@@ -104,17 +104,17 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 - APCUserEnvironment supports user call user method in super class.
 - `id_apc_t` marks the id object as supporting APCUserEnvironment.
 ```objc
-[Person apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+[Person apc_lazyLoadForProperty:@key  usingBlock:^id (id_apc_t instance) {
 
     return @"Person.gettersetterobj";
 }];
 
-[Man apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+[Man apc_lazyLoadForProperty:@key  usingBlock:^id (id_apc_t instance) {
     //Call above ↑
     return APCSuperPerformedAsId(instance);
 }];
 
-[Superman apc_lazyLoadForProperty:key usingBlock:^id (id_apc_t instance) {
+[Superman apc_lazyLoadForProperty:@key usingBlock:^id (id_apc_t instance) {
     //Call above ↑
     return APCSuperPerformedAsId(instance);
 }];
@@ -140,7 +140,7 @@ apc_safe_instance(instance, ^(id object) {
 
 
 ///Thread-C...
-apc_safe_instance(instance, ^(Man* object) {
+apc_safe_instance(instance, ^(SomeClass* object) {
 
     [object accessProperty];
 });

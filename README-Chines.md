@@ -5,6 +5,7 @@ AutoPropertyCocoa
 ## 简介
 - 该三方主要提供Cocoa的属性懒加载和属性钩子的功能。完美闭环，绿色环保可增加可卸载，优于宏定义形式的懒加载。
 - 关键词 :`iOS懒加载` `属性钩子` `macOS` `cocoa` `class_removeMethods` `runtimelock`
+- 随手一赞，好运百万
 - [English documentation](https://github.com/qddnovo/AutoPropertyCocoa)
 
 ## 引用
@@ -36,7 +37,7 @@ AutoPropertyCocoa
 #### 针对实例的懒加载。低耦合，无类型污染，推荐！
 ```objc
 
-APCLazyload(instance, @propertyA, @propertyB, ...);
+APCLazyload(instance, propertyA, propertyB, ...);
 
 [instance apc_lazyLoadForProperty:@property usingBlock:^id(id_apc_t instance){
 
@@ -49,7 +50,7 @@ APCLazyload(instance, @propertyA, @propertyB, ...);
 #### 支持解绑 针对实例的懒加载。
 ```objc
 
-APCUnbindLazyload(instance, @propertyA, @propertyB, ...);
+APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
 [instance apc_unbindLazyLoadForProperty:@property];
 
@@ -65,7 +66,7 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 #### 前触发钩子.在一个属性调用前调用。
 ```objc
 
-[anyone apc_frontOfPropertyGetter:key bindWithBlock:^(id_apc_t instance, id value) {
+[anyone apc_frontOfPropertyGetter:@key bindWithBlock:^(id_apc_t instance, id value) {
 
     ///Before getter of property called.
 }];
@@ -74,7 +75,7 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 #### 后触发钩子.在一个属性调用后调用。
 ```objc
 
-[anyone apc_backOfPropertySetter:key bindWithBlock:^(id_apc_t instance, id value) {
+[anyone apc_backOfPropertySetter:@key bindWithBlock:^(id_apc_t instance, id value) {
 
     ///After setter of property called.
 }];
@@ -83,7 +84,7 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 #### 条件触发钩子.当满足用户条件时调用。
 ```objc
 
-[anyone apc_propertySetter:key bindUserCondition:^BOOL(id_apc_t instance, id value) {
+[anyone apc_propertySetter:@key bindUserCondition:^BOOL(id_apc_t instance, id value) {
 
     ///Your condition when setter called...
 } withBlock:^(id_apc_t instance, id value) {
@@ -103,17 +104,17 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 - APCUserEnvironment提供了用户环境，支持用户调用父级的业务方法。
 - `id_apc_t`标记了这个id对象是支持APCUserEnvironment的。
 ```objc
-[Person apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+[Person apc_lazyLoadForProperty:@key  usingBlock:^id (id_apc_t instance) {
 
     return @"Person.gettersetterobj";
 }];
 
-[Man apc_lazyLoadForProperty:key  usingBlock:^id (id_apc_t instance) {
+[Man apc_lazyLoadForProperty:@key  usingBlock:^id (id_apc_t instance) {
     //调用上方 ↑
     return APCSuperPerformedAsId(instance);
 }];
 
-[Superman apc_lazyLoadForProperty:key usingBlock:^id (id_apc_t instance) {
+[Superman apc_lazyLoadForProperty:@key usingBlock:^id (id_apc_t instance) {
     //调用上方 ↑
     return APCSuperPerformedAsId(instance);
 }];
@@ -138,7 +139,7 @@ apc_safe_instance(instance, ^(id object) {
 
 
 ///Thread-C...
-apc_safe_instance(instance, ^(Man* object) {
+apc_safe_instance(instance, ^(SomeClass* object) {
 
     [object accessProperty];
 });
@@ -155,7 +156,11 @@ int main(int argc, const char * argv[]) {
 
     /*
         1.在应用启动器或在runtime加载前调用.
-        2.该方法实现了删除runtiem中method的功能。如果不调用该方法则会采用模拟删除方法的策略，也就是用一个空方法来占据本应删除的方法，该方法将调用向父级传递。但是这会影响method swizzle，影响获取method ，影响从类中获取imp。具体表现在使用这几类沿着继承链查找方法相关的API的时候会获取到APC项目提供的占位方法。解决方案就是，使用准确的类型或者实现apc_main_classHookFullSupport()：
+        2.该方法实现了删除runtiem中method的功能。如果不调用该方法则会采用模拟删除方法的策略，
+        也就是用一个空方法来占据本应删除的方法，该方法将调用向父级传递。
+        但是这会影响method swizzle，影响获取method ，影响从类中获取imp。
+        具体表现在使用这几类沿着继承链查找方法相关的API的时候会获取到APC项目提供的占位方法。
+        解决方案就是，使用准确的类型或者实现apc_main_classHookFullSupport()：
         class_replaceMethod(CorrectClass, ...);
         class_getInstanceMethod(CorrectClass, ...);
     */
