@@ -31,6 +31,10 @@ AutoPropertyCocoa
     return [XClass ...];
 }];
 
+or =>
+
+APCLazyload(instance, lazyloadProperty);
+
 ```
 
 ## Examples
