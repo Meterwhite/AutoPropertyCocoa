@@ -32,6 +32,10 @@ AutoPropertyCocoa
     return [XClass ...];
 }];
 
+or =>
+
+APCLazyload(instance, lazyloadProperty);
+
 ```
 ## 示例
 #### 针对实例的懒加载。低耦合，无类型污染，推荐！
