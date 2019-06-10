@@ -1,11 +1,11 @@
 
-![Logo](https://raw.githubusercontent.com/qddnovo/AutoPropertyCocoa/master/Taoist.png)
+![Logo](https://raw.githubusercontent.com/Meterwhite/AutoPropertyCocoa/master/Taoist.png)
 AutoPropertyCocoa
 ===
 ## Introduction
 - Provides `lazy loading` of property and object-oriented `property hook` by objc runtime.Perfect closed loop, can be added or unloaded.More powerful than lazy loading of macro definitions.
 - Key words : `lazy property` `iOS lazy loading` `macOS lazy loading` `property hook` `iOS懒加载` `属性钩子`  `class_removeMethods` `runtimelock`
-- [中文文档](https://github.com/qddnovo/AutoPropertyCocoa/blob/master/README-Chines.md)
+- [中文文档](https://github.com/Meterwhite/AutoPropertyCocoa/blob/master/README-Chines.md)
 
 ## Import
 - Drag directory `AutoPropertyCocoa` into project or use cocoapods

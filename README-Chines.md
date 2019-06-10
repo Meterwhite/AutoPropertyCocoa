@@ -1,12 +1,12 @@
 
-![Logo](https://raw.githubusercontent.com/qddnovo/AutoPropertyCocoa/master/Taoist.png)
+![Logo](https://raw.githubusercontent.com/Meterwhite/AutoPropertyCocoa/master/Taoist.png)
 AutoPropertyCocoa
 ===
 ## 简介
 - 该三方主要提供Cocoa的属性懒加载和属性钩子的功能。完美闭环，绿色环保可增加可卸载，优于宏定义形式的懒加载。
 - 关键词 :`iOS懒加载` `属性钩子` `macOS` `cocoa` `class_removeMethods` `runtimelock`
 - 随手一赞，好运百万
-- [English documentation](https://github.com/qddnovo/AutoPropertyCocoa)
+- [English documentation](https://github.com/Meterwhite/AutoPropertyCocoa)
 
 ## 引用
 - 拖拽文件夹`AutoPropertyCocoa`到项目 或者使用cocoapods
