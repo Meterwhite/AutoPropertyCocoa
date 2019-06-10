@@ -106,13 +106,9 @@ public:
         dispatch_queue_t q
         =
         dispatch_queue_create("APCOBJCRuntimelocker::triggerObjcRuntimelockAsync", DISPATCH_QUEUE_SERIAL);
-        ///The serial queue guarantees that the locker will not be changed when the task is executed.
+        
         dispatch_async(q, ^{
             
-            /**
-             The runtimelock will be locked in the function objc_allocateProtocol() and then 'calloc' will be called.
-             Use fishhook to hook the 'calloc' function, then block 'calloc' to know that we can unlock the thread after completing our work.
-             */
             this->thread_id = pthread_self();
             objc_allocateProtocol("CN198964");
         });
@@ -134,15 +130,11 @@ void apc_objcruntimelocker_trylock(void)
        apc_objcruntimelocker->testingThreadID()){
         
         apc_spinlock_lock(&apc_lockerlock);
-        /**
-         objc_allocateProtocol(...) ---> [here] ---> calloc(...) ---> userblock(...)
-         */
+        
         apc_objcruntimelocker->signal_runtimeLockedSuccess();
-        /**
-         userblock(...) ---> [here] ---> No longer blocking the thread.
-         */
+        
         apc_objcruntimelocker->wait_unlockRuntime();
-        //Make sure it won't be executed again
+        
         apc_objcruntimelocker = nil;
         apc_spinlock_unlock(&apc_lockerlock);
     }
