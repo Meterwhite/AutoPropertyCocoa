@@ -3,7 +3,7 @@
 AutoPropertyCocoa
 ===
 ## Introduction
-- Provides `lazy loading` of property and object-oriented `property hook` by objc runtime.Perfect closed loop, can be added or unloaded.More powerful than lazy loading of macro definitions.
+- Provides green `lazy loading` of property and  `property hook` by objc runtime to achieve convenience in special situations.
 - Key words :  `iOS懒加载` `属性钩子` `lazy property` `iOS lazy loading` `macOS lazy loading` `property hook` `class_removeMethods` `runtimelock`
 - [中文文档](https://github.com/Meterwhite/AutoPropertyCocoa/blob/master/README-Chines.md)
 
@@ -19,19 +19,12 @@ AutoPropertyCocoa
 
     if(_lazyloadProperty == nil){
     
-        _lazyloadProperty = [XClass ...];
+        _lazyloadProperty = [OneClass new];
     }
     return _lazyloadProperty;
 }
 
 =>
-
-[instance apc_lazyLoadForProperty:@lazyloadProperty usingBlock:^id(id_apc_t instance){
-
-    return [XClass ...];
-}];
-
-or =>
 
 APCLazyload(instance, lazyloadProperty);
 
@@ -43,12 +36,12 @@ APCLazyload(instance, lazyloadProperty);
 
 APCLazyload(instance, propertyA, propertyB, ...);
 
-[instance apc_lazyLoadForProperty:@property usingBlock:^id(id_apc_t instance){
+[instance apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
 
-    return ...;
+    return [OneClass initWork];
 }];
 
-[instance apc_lazyLoadForProperty:@arrayProperty selector:@selector(array)];
+[instance apc_lazyLoadForProperty:@"arrayProperty" selector:@selector(array)];
 
 ```
 #### Unbind lazy loading of instance is supported.
@@ -56,21 +49,21 @@ APCLazyload(instance, propertyA, propertyB, ...);
 
 APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
-[instance apc_unbindLazyLoadForProperty:@property];
+[instance apc_unbindLazyLoadForProperty:@"property"];
 
 ```
 #### Lazy loading of class.
 ```objc
 
-APCClassLazyload(Class, propertyA, propertyB, ...);
+APCClassLazyload(OneClass, propertyA, propertyB, ...);
 
-APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
+APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
 
 ```
 #### Front-trigger hook.Called before a property is called.
 ```objc
 
-[anyone apc_frontOfPropertyGetter:@key bindWithBlock:^(id_apc_t instance, id value) {
+[anyone apc_frontOfPropertyGetter:@"key" bindWithBlock:^(id_apc_t instance, id value) {
 
     ///Before getter of property called.
 }];
@@ -79,7 +72,7 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 #### Post-trigger hook.Called after a property is called.
 ```objc
 
-[anyone apc_backOfPropertySetter:@key bindWithBlock:^(id_apc_t instance, id value) {
+[anyone apc_backOfPropertySetter:@"key" bindWithBlock:^(id_apc_t instance, id value) {
 
     ///After setter of property called.
 }];
@@ -88,7 +81,7 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 #### Condition-trigger hook.Called when the user condition is true.
 ```objc
 
-[anyone apc_propertySetter:@key bindUserCondition:^BOOL(id_apc_t instance, id value) {
+[anyone apc_propertySetter:@"key" bindUserCondition:^BOOL(id_apc_t instance, id value) {
 
     ///Your condition when setter called...
 } withBlock:^(id_apc_t instance, id value) {
@@ -108,17 +101,17 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 - APCUserEnvironment supports user call user method in super class.
 - `id_apc_t` marks the id object as supporting APCUserEnvironment.
 ```objc
-[Person apc_lazyLoadForProperty:@key  usingBlock:^id (id_apc_t instance) {
+[Person apc_lazyLoadForProperty:@"key"  usingBlock:^id (id_apc_t instance) {
 
     return @"Person.gettersetterobj";
 }];
 
-[Man apc_lazyLoadForProperty:@key  usingBlock:^id (id_apc_t instance) {
+[Man apc_lazyLoadForProperty:@"key"  usingBlock:^id (id_apc_t instance) {
     //Call above ↑
     return APCSuperPerformedAsId(instance);
 }];
 
-[Superman apc_lazyLoadForProperty:@key usingBlock:^id (id_apc_t instance) {
+[Superman apc_lazyLoadForProperty:@"key" usingBlock:^id (id_apc_t instance) {
     //Call above ↑
     return APCSuperPerformedAsId(instance);
 }];

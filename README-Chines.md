@@ -3,7 +3,7 @@
 AutoPropertyCocoa
 ===
 ## 简介
-- 该三方主要提供Cocoa的属性懒加载和属性钩子的功能。完美闭环，绿色环保可增加可卸载，优于宏定义形式的懒加载。
+- 该三方主要提供objc的绿色属性懒加载和属性钩子的功能以及属性的钩子功能来实现特殊情况下的便利。
 - 关键词 :`iOS懒加载` `属性钩子` `macOS` `cocoa` `class_removeMethods` `runtimelock`
 - 随手一赞，好运百万
 - [English documentation](https://github.com/Meterwhite/AutoPropertyCocoa)
@@ -20,19 +20,10 @@ AutoPropertyCocoa
 
     if(_lazyloadProperty == nil){
     
-        _lazyloadProperty = [XClass ...];
+        _lazyloadProperty = [OneClass new];
     }
     return _lazyloadProperty;
 }
-
-=>
-
-[instance apc_lazyLoadForProperty:@lazyloadProperty usingBlock:^id(id_apc_t instance){
-
-    return [XClass ...];
-}];
-
-or =>
 
 APCLazyload(instance, lazyloadProperty);
 
@@ -43,12 +34,12 @@ APCLazyload(instance, lazyloadProperty);
 
 APCLazyload(instance, propertyA, propertyB, ...);
 
-[instance apc_lazyLoadForProperty:@property usingBlock:^id(id_apc_t instance){
+[instance apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
 
-    return ...;
+    return [OneClass initWork];
 }];
 
-[instance apc_lazyLoadForProperty:@arrayProperty selector:@selector(array)];
+[instance apc_lazyLoadForProperty:@"arrayProperty" selector:@selector(array)];
 
 ```
 #### 支持解绑 针对实例的懒加载。
@@ -56,21 +47,21 @@ APCLazyload(instance, propertyA, propertyB, ...);
 
 APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
-[instance apc_unbindLazyLoadForProperty:@property];
+[instance apc_unbindLazyLoadForProperty:@"property"];
 
 ```
 #### 针对类的懒加载
 ```objc
 
-APCClassLazyload(Class, propertyA, propertyB, ...);
+APCClassLazyload(OneClass, propertyA, propertyB, ...);
 
-APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
+APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
 
 ```
 #### 前触发钩子.在一个属性调用前调用。
 ```objc
 
-[anyone apc_frontOfPropertyGetter:@key bindWithBlock:^(id_apc_t instance, id value) {
+[anyone apc_frontOfPropertyGetter:@"key" bindWithBlock:^(id_apc_t instance, id value) {
 
     ///Before getter of property called.
 }];
@@ -79,7 +70,7 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 #### 后触发钩子.在一个属性调用后调用。
 ```objc
 
-[anyone apc_backOfPropertySetter:@key bindWithBlock:^(id_apc_t instance, id value) {
+[anyone apc_backOfPropertySetter:@"key" bindWithBlock:^(id_apc_t instance, id value) {
 
     ///After setter of property called.
 }];
@@ -88,7 +79,7 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 #### 条件触发钩子.当满足用户条件时调用。
 ```objc
 
-[anyone apc_propertySetter:@key bindUserCondition:^BOOL(id_apc_t instance, id value) {
+[anyone apc_propertySetter:@"key" bindUserCondition:^BOOL(id_apc_t instance, id value) {
 
     ///Your condition when setter called...
 } withBlock:^(id_apc_t instance, id value) {
@@ -108,17 +99,17 @@ APCClassUnbindLazyload(Class, propertyA, propertyB, ...);
 - APCUserEnvironment提供了用户环境，支持用户调用父级的业务方法。
 - `id_apc_t`标记了这个id对象是支持APCUserEnvironment的。
 ```objc
-[Person apc_lazyLoadForProperty:@key  usingBlock:^id (id_apc_t instance) {
+[Person apc_lazyLoadForProperty:@"key"  usingBlock:^id (id_apc_t instance) {
 
     return @"Person.gettersetterobj";
 }];
 
-[Man apc_lazyLoadForProperty:@key  usingBlock:^id (id_apc_t instance) {
+[Man apc_lazyLoadForProperty:@"key"  usingBlock:^id (id_apc_t instance) {
     //调用上方 ↑
     return APCSuperPerformedAsId(instance);
 }];
 
-[Superman apc_lazyLoadForProperty:@key usingBlock:^id (id_apc_t instance) {
+[Superman apc_lazyLoadForProperty:@"key" usingBlock:^id (id_apc_t instance) {
     //调用上方 ↑
     return APCSuperPerformedAsId(instance);
 }];
