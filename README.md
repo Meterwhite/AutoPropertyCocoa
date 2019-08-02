@@ -8,7 +8,7 @@ AutoPropertyCocoa
 - [中文文档](https://github.com/Meterwhite/AutoPropertyCocoa/blob/master/README-Chines.md)
 
 ## Import
-- Drag directory `AutoPropertyCocoa` into project or use cocoapods
+- Using `cocoapods` or drag `AutoPropertyCocoa` into project.
 ```objc
 #import "AutoPropertyCocoa.h"
 ```
