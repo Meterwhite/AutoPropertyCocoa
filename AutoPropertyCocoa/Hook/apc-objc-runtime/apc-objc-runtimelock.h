@@ -41,24 +41,24 @@ apc_objcruntimelock_lock(^()__VA_ARGS__)
  When you operate on a Class type without calling this method,a fake non-method(like apc_null_getter) is generated to undo the behavior of the deleted method when the hooked method is unbound.
  So if you want to swizzle a method for superclass, you should clearly use your target class.If you know this, then you can not call this method.It is no problem.
  */
-OBJC_EXPORT void
+FOUNDATION_EXPORT void
 apc_main_classHookFullSupport(void);
 
-OBJC_EXPORT _Bool
+FOUNDATION_EXPORT _Bool
 apc_contains_objcruntimelock(void);
 
-OBJC_EXPORT void
+FOUNDATION_EXPORT void
 apc_objcruntimelock_lock(void(NS_NOESCAPE^userblock)(void));
 
 #if DEBUG
 
-OBJC_EXPORT void
+FOUNDATION_EXPORT void
 apc_debug_objcruntimelock_delete(void);
 
-OBJC_EXPORT void
+FOUNDATION_EXPORT void
 apc_debug_objcruntimelock_create(void);
 
-OBJC_EXPORT void
+FOUNDATION_EXPORT void
 apc_debug_test_objcruntimelock(void);
 
 #endif

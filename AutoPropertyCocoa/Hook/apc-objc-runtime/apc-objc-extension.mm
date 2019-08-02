@@ -6,7 +6,7 @@
 //  Copyright (c) 2019 GitHub, Inc. All rights reserved.
 //
 
-#import "apc-objc-runtimelock.h"
+#include "apc-objc-runtimelock.h"
 #include "apc-objc-extension.h"
 #include "apc-objc-config.h"
 

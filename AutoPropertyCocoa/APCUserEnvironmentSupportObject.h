@@ -81,16 +81,16 @@ submacro_apc_concat(apc_debug_super_method_id, submacro_apc_argcount(__VA_ARGS__
 #define apc_debug_super_method_id5 apc_debug_super_method_id1
 #define apc_debug_super_method_id6 apc_debug_super_method_id1
 
-OBJC_EXPORT void
+FOUNDATION_EXPORT void
 apc_debug_super_method_void1(id_apc_t _Nonnull instance);
 
-OBJC_EXPORT void
+FOUNDATION_EXPORT void
 apc_debug_super_method_void2(id_apc_t _Nonnull instance, id _Nullable object);
 
-OBJC_EXPORT BOOL
+FOUNDATION_EXPORT BOOL
 apc_debug_super_method_BOOL2(id_apc_t _Nonnull instance, id _Nullable object);
 
-OBJC_EXPORT id _Nullable
+FOUNDATION_EXPORT id _Nullable
 apc_debug_super_method_id1(id_apc_t _Nonnull instance);
 
 #else
