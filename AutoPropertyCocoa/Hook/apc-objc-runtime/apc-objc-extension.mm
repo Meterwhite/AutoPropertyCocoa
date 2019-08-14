@@ -20,7 +20,7 @@
 //#include <assert.h>
 //#include <cstddef>
 #include <malloc/malloc.h>
-#include "dyld_priv.h"
+//#include "dyld_priv.h"
 #include <pthread.h>
 #include <iterator>
 
@@ -86,12 +86,14 @@ static void apc_try_free(const void *p)
 static inline void
 apc_freeIfMutable(char *str)
 {
-    size_t size = strlen(str) + 1;
-    if (_dyld_is_memory_immutable(str, size)) {
-        // nothing
-    } else {
+    //_dyld_is_memory_immutable : This private API caused the online line to be rejected!!!
+    
+    //size_t size = strlen(str) + 1;
+    //if (_dyld_is_memory_immutable(str, size)) {
+    //    // nothing
+    //} else {
         free(str);
-    }
+    //}
 }
 
 union apc_isa_t
@@ -612,7 +614,7 @@ public:
                         newer->lists[j] = a->lists[i];
                         j++;
                     }
-                    apc_freeIfMutable((char*)elm->types);
+                    //apc_freeIfMutable((char*)elm->types);
                     apc_try_free(a->lists[dx]);
                     apc_try_free(a);
                     newer->count = newcount;
@@ -621,14 +623,14 @@ public:
                     
                     ///2 -> 1
                     uint32_t newi = dx ? 0 : 1;
-                    apc_freeIfMutable((char*)elm->types);
+                    //apc_freeIfMutable((char*)elm->types);
                     apc_try_free(a->lists[dx]);
                     unArray();
                     list = a->lists[newi];
                 }else {
                     
                     ///1 -> 0
-                    apc_freeIfMutable((char*)elm->types);
+                    //apc_freeIfMutable((char*)elm->types);
                     tryFree();
                     list = NULL;
                 }
@@ -641,12 +643,12 @@ public:
                 List* newlist = list->deletedElementList(elm);
                 if(newlist == NULL) {
                     
-                    apc_freeIfMutable((char*)elm->types);
+                    //apc_freeIfMutable((char*)elm->types);
                     tryFree();
                     list = NULL;
                 } else {
                     
-                    apc_freeIfMutable((char*)(elm->types));
+                    //apc_freeIfMutable((char*)(elm->types));
                     apc_try_free(list);
                     list = newlist;
                 }
