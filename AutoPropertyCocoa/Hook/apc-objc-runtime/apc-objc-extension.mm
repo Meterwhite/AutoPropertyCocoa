@@ -83,18 +83,18 @@ static void apc_try_free(const void *p)
 //}
 
 // free apc_strdupIfMutable() result
-static inline void
-apc_freeIfMutable(char *str)
-{
-    //_dyld_is_memory_immutable : This private API caused the online line to be rejected!!!
-    
-    //size_t size = strlen(str) + 1;
-    //if (_dyld_is_memory_immutable(str, size)) {
-    //    // nothing
-    //} else {
-        free(str);
-    //}
-}
+//static inline void
+//apc_freeIfMutable(char *str)
+//{
+//    _dyld_is_memory_immutable : This private API caused the online line to be rejected!!!
+//
+//    size_t size = strlen(str) + 1;
+//    if (_dyld_is_memory_immutable(str, size)) {
+//        // nothing
+//    } else {
+//        free(str);
+//    }
+//}
 
 union apc_isa_t
 {
