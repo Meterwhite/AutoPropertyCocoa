@@ -8,7 +8,7 @@ AutoPropertyCocoa
 - [中文文档](https://github.com/Meterwhite/AutoPropertyCocoa/blob/master/README-Chines.md)
 
 ## Import
-- Using `cocoapods` or drag `AutoPropertyCocoa` into project.
+- Using `cocoapods`(`better`) or drag `AutoPropertyCocoa` into project.
 ```objc
 #import "AutoPropertyCocoa.h"
 ```
@@ -24,42 +24,62 @@ AutoPropertyCocoa
     return _lazyloadProperty;
 }
 
-=>
+==to=>
 
+1.
+APCClassLazyload(OneClass, lazyloadProperty);
+
+2.
 APCLazyload(instance, lazyloadProperty);
-
 ```
 
 ## Examples
-#### Lazy loading of instance.Low coupling, no type pollution, recommended! 
+#### Lazy loading of class.
 ```objc
+///Maybe used in +load, +initialize, -init, -viewDidLoad... 
+///As long as it is called before calling your property, it will work fine.
 
+1.
+APCClassLazyload(OneClass, propertyA, propertyB, ...);
+
+APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
+
+2.
+[OneClass apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
+
+    return [OneClass initWork];
+}];
+
+3.
+[OneClass apc_lazyLoadForProperty:@"arrayProperty" selector:@selector(array)];
+
+```
+#### Lazy loading of instance.Low coupling, no type pollution.
+```objc
+///instance may be controller, model ...
+///Maybe used in -init, -viewDidLoad... 
+1.
 APCLazyload(instance, propertyA, propertyB, ...);
 
+2.
 [instance apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
 
     return [OneClass initWork];
 }];
 
+3.
 [instance apc_lazyLoadForProperty:@"arrayProperty" selector:@selector(array)];
-
 ```
 #### Unbind lazy loading of instance is supported.
 ```objc
-
+1.
 APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
+2.
 [instance apc_unbindLazyLoadForProperty:@"property"];
 
 ```
-#### Lazy loading of class.
-```objc
 
-APCClassLazyload(OneClass, propertyA, propertyB, ...);
-
-APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
-
-```
 #### Front-trigger hook.Called before a property is called.
 ```objc
 
@@ -119,7 +139,7 @@ APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
 
 ## Lazy loading of instance thread safe.
 - You can ignore the next instructions, If you don't access the property while binding the property, or access the property while unbinding the property, or bind the property when unbinding the property.
-- In a large number of `multi-threaded` concurrency, bind - unbind, bind - access property, unbind - access property, has a small probability of generating an error : 'Attempt to use unknown class.'The error occurred when an object was accessed when object_setClass() was not completed. Although this probability is relatively small, it is still worthy of attention.This project has implemented the hooking of the runtimelock, which is used to achieve thread safety, but this seriously affects the efficiency, so instead of adopting the scheme, the scheme below is used.
+- Tests show that in a large number of `multi-threaded` concurrency, bind - unbind, bind - access property, unbind - access property, has a small probability of generating an error : 'Attempt to use unknown class.'The error occurred when an object was accessed when object_setClass() was not completed. Although this probability is relatively small, it is still worthy of attention.This project has implemented the hooking of the runtimelock, which is used to achieve thread safety, but this seriously affects the efficiency, so instead of adopting the scheme, the scheme below is used.
 - It is absolutely safe to use the following form in multi-threaded :
 ```objc
 
@@ -142,6 +162,7 @@ apc_safe_instance(instance, ^(SomeClass* object) {
     [object accessProperty];
 });
 
+There is almost no need to consider this situation in actual development.
 ```
 
 ## Lazy loading of class thread safe.

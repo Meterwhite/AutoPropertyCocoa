@@ -9,7 +9,7 @@ AutoPropertyCocoa
 - [English documentation](https://github.com/Meterwhite/AutoPropertyCocoa)
 
 ## 引用
-- 拖拽文件夹`AutoPropertyCocoa`到项目 或者使用cocoapods
+- 使用cocoapods(`推荐`)  或者 拖拽文件夹`AutoPropertyCocoa`到项目
 ```objc
 #import "AutoPropertyCocoa.h"
 ```
@@ -25,13 +25,40 @@ AutoPropertyCocoa
     return _lazyloadProperty;
 }
 
+==变化=>
+
+1.
+APCClassLazyload(OneClass, lazyloadProperty);
+
+2.
 APCLazyload(instance, lazyloadProperty);
 
 ```
 ## 示例
-#### 针对实例的懒加载。低耦合，无类型污染，推荐！
+#### 针对类的懒加载
 ```objc
+///通常使用在+load, +initialize, -init, -viewDidLoad中。
+///只要在属性访问前调用，就会正常工作。
 
+1.
+APCClassLazyload(OneClass, propertyA, propertyB, ...);
+
+APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
+
+2.
+[OneClass apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
+
+    return [OneClass initWork];
+}];
+
+3.
+[OneClass apc_lazyLoadForProperty:@"arrayProperty" selector:@selector(array)];
+
+```
+#### 仅针对一个实例对象的懒加载。
+```objc
+///实例对象通常是控制器，模型等。
+///通常使用在 -init, -viewDidLoad中。
 APCLazyload(instance, propertyA, propertyB, ...);
 
 [instance apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
@@ -39,10 +66,8 @@ APCLazyload(instance, propertyA, propertyB, ...);
     return [OneClass initWork];
 }];
 
-[instance apc_lazyLoadForProperty:@"arrayProperty" selector:@selector(array)];
-
 ```
-#### 支持解绑 针对实例的懒加载。
+#### 支持解绑'针对实例'的懒加载。
 ```objc
 
 APCUnbindLazyload(instance, propertyA, propertyB, ...);
@@ -50,14 +75,7 @@ APCUnbindLazyload(instance, propertyA, propertyB, ...);
 [instance apc_unbindLazyLoadForProperty:@"property"];
 
 ```
-#### 针对类的懒加载
-```objc
 
-APCClassLazyload(OneClass, propertyA, propertyB, ...);
-
-APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
-
-```
 #### 前触发钩子.在一个属性调用前调用。
 ```objc
 
@@ -116,8 +134,8 @@ APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
 ```
 
 ## 针对实例的钩子的线程安全.
-- 如果你不会在绑定/解绑实例属性钩子的同时访问这个属性，你可以忽略此处的说明。
-- 在大量的多线程访问中，绑定/解绑实例属性钩子的同时访问这个属性有很小的概率产生异常： 'Attempt to use unknown class.'。这是由于object_setClass()还没有执行完的时候访问了实例对象。该问题除了进行同步没有办法解决。项目中已经钩住了runtimelock，使用它会影响效率，所以推荐下列的可靠的方案来解决多线程的问题：
+- 如果你不会在绑定/解绑实例属性钩子的同时访问这个属性，可以完全忽略此处的说明。
+- 测试表明 : 在及其大量的多线程访问中，绑定/解绑实例属性钩子的同时访问这个属性有非常小的概率产生异常： 'Attempt to use unknown class.'。这是由于object_setClass()还没有执行完的时候访问了实例对象。该问题除了进行同步没有办法解决。项目中已经钩住了runtimelock，使用它会影响效率，所以推荐下列的可靠的方案来解决多线程的问题：
 ```objc
 
 ///Thread-A...
@@ -139,12 +157,13 @@ apc_safe_instance(instance, ^(SomeClass* object) {
     [object accessProperty];
 });
 
+实际开发中几乎不需要考虑这种情况
 ```
 
 ## 针对类的钩子的线程安全.
-- 如果你没有对针对类的钩子进行解绑操作的需求，忽略此处说明。
+- 如果你没有对针对类的钩子进行解绑操作的需求，可以完全忽略此处说明。
 - 针对类的钩子是线程安全的。
-- 对针类的钩子进行解绑操作建议在main()方法中实现apc_main_classHookFullSupport().
+- 对针类的钩子进行解绑操作`建议`在main()方法中实现apc_main_classHookFullSupport().
 ```objc
 
 int main(int argc, const char * argv[]) {
