@@ -26,7 +26,7 @@ _Bool apc_contains_objcruntimelock(void)
 {
 #if APCDebugSchemeDiagnosticsGuardMalloc
     
-    return return true;
+    return true;
 #else
     unsigned int i = sizeof(pthread_mutex_t);
     while (i -= sizeof(long)) {

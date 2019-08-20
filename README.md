@@ -2,17 +2,18 @@
 ![Logo](https://raw.githubusercontent.com/Meterwhite/AutoPropertyCocoa/master/Taoist.png)
 AutoPropertyCocoa
 ===
-## Introduction
-- Provides green `lazy loading` of property and  `property hook` by objc runtime to achieve convenience in special situations.
-- Key words :  `iOS懒加载` `属性钩子` `lazy property` `iOS lazy loading` `macOS lazy loading` `property hook` `class_removeMethods` `runtimelock`
-- [中文文档](https://github.com/Meterwhite/AutoPropertyCocoa/blob/master/README-Chines.md)
+## 简介
+- 该三方主要提供objc的绿色属性懒加载和属性钩子的功能以及属性的钩子功能来实现特殊情况下的便利。
+- 关键词 :`iOS懒加载` `属性钩子` `macOS` `cocoa` `class_removeMethods` `runtimelock`
+- 随手一赞，好运百万
+- [English documentation](https://github.com/Meterwhite/AutoPropertyCocoa/blob/master/README-English.md)
 
-## Import
-- Using `cocoapods`(`better`) or drag `AutoPropertyCocoa` into project.
+## 引用
+- 使用cocoapods(`推荐`)  或者 拖拽文件夹`AutoPropertyCocoa`到项目
 ```objc
 #import "AutoPropertyCocoa.h"
 ```
-## Main target
+## 目标
 ```objc
 
 - (id)lazyloadProperty{
@@ -24,20 +25,20 @@ AutoPropertyCocoa
     return _lazyloadProperty;
 }
 
-==to=>
+==变化=>
 
 1.
 APCClassLazyload(OneClass, lazyloadProperty);
 
 2.
 APCLazyload(instance, lazyloadProperty);
-```
 
-## Examples
-#### Lazy loading of class.
+```
+## 示例
+#### 针对类的懒加载
 ```objc
-///Maybe used in +load, +initialize, -init, -viewDidLoad... 
-///As long as it is called before calling your property, it will work fine.
+///通常使用在+load, +initialize, -init, -viewDidLoad中。
+///只要在属性访问前调用，就会正常工作。
 
 1.
 APCClassLazyload(OneClass, propertyA, propertyB, ...);
@@ -54,33 +55,28 @@ APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
 [OneClass apc_lazyLoadForProperty:@"arrayProperty" selector:@selector(array)];
 
 ```
-#### Lazy loading of instance.Low coupling, no type pollution.
+#### 仅针对一个实例对象的懒加载。
 ```objc
-///instance may be controller, model ...
-///Maybe used in -init, -viewDidLoad... 
-1.
+///实例对象通常是控制器，模型等。
+///通常使用在 -init, -viewDidLoad中。
 APCLazyload(instance, propertyA, propertyB, ...);
 
-2.
 [instance apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
 
     return [OneClass initWork];
 }];
 
-3.
-[instance apc_lazyLoadForProperty:@"arrayProperty" selector:@selector(array)];
 ```
-#### Unbind lazy loading of instance is supported.
+#### 支持解绑'针对实例'的懒加载。
 ```objc
-1.
+
 APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
-2.
 [instance apc_unbindLazyLoadForProperty:@"property"];
 
 ```
 
-#### Front-trigger hook.Called before a property is called.
+#### 前触发钩子.在一个属性调用前调用。
 ```objc
 
 [anyone apc_frontOfPropertyGetter:@"key" bindWithBlock:^(id_apc_t instance, id value) {
@@ -89,7 +85,7 @@ APCUnbindLazyload(instance, propertyA, propertyB, ...);
 }];
 
 ```
-#### Post-trigger hook.Called after a property is called.
+#### 后触发钩子.在一个属性调用后调用。
 ```objc
 
 [anyone apc_backOfPropertySetter:@"key" bindWithBlock:^(id_apc_t instance, id value) {
@@ -98,7 +94,7 @@ APCUnbindLazyload(instance, propertyA, propertyB, ...);
 }];
 
 ```
-#### Condition-trigger hook.Called when the user condition is true.
+#### 条件触发钩子.当满足用户条件时调用。
 ```objc
 
 [anyone apc_propertySetter:@"key" bindUserCondition:^BOOL(id_apc_t instance, id value) {
@@ -113,13 +109,13 @@ APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
 ![Quickview](https://raw.githubusercontent.com/qddnovo/AutoPropertyCocoa/master/Quickview.png)
 
-## Basic-value type
-#### The currently supported structure types are: XReact, XPoint, XSize, XEdgeinsets, NSRange.
-- Lazy-load is invalid on the base-value type property of the class hook.But is valid on the instance, The lazy loading method is triggered when the instance's underlying value type property is first accessed.
+## 基础值类型
+#### 目前支持的结构体类型有: XReact, XPoint, XSize, XEdgeinsets, NSRange.
+- 针对类型的钩子属性如果是基础值类型，那么将会是无效的并且会报错。但是针对实例的基础值类型是支持懒加载的，它和对象类型那种判断对象是否存在不同，它只在该属性第一次被访问时触发懒加载。
 
-## User super method.
-- APCUserEnvironment supports user call user method in super class.
-- `id_apc_t` marks the id object as supporting APCUserEnvironment.
+## 调用用户的super方法.
+- APCUserEnvironment提供了用户环境，支持用户调用父级的业务方法。
+- `id_apc_t`标记了这个id对象是支持APCUserEnvironment的。
 ```objc
 [Person apc_lazyLoadForProperty:@"key"  usingBlock:^id (id_apc_t instance) {
 
@@ -127,20 +123,19 @@ APCUnbindLazyload(instance, propertyA, propertyB, ...);
 }];
 
 [Man apc_lazyLoadForProperty:@"key"  usingBlock:^id (id_apc_t instance) {
-    //Call above ↑
+    //调用上方 ↑
     return APCSuperPerformedAsId(instance);
 }];
 
 [Superman apc_lazyLoadForProperty:@"key" usingBlock:^id (id_apc_t instance) {
-    //Call above ↑
+    //调用上方 ↑
     return APCSuperPerformedAsId(instance);
 }];
 ```
 
-## Lazy loading of instance thread safe.
-- You can ignore the next instructions, If you don't access the property while binding the property, or access the property while unbinding the property, or bind the property when unbinding the property.
-- Tests show that in a large number of `multi-threaded` concurrency, bind - unbind, bind - access property, unbind - access property, has a small probability of generating an error : 'Attempt to use unknown class.'The error occurred when an object was accessed when object_setClass() was not completed. Although this probability is relatively small, it is still worthy of attention.This project has implemented the hooking of the runtimelock, which is used to achieve thread safety, but this seriously affects the efficiency, so instead of adopting the scheme, the scheme below is used.
-- It is absolutely safe to use the following form in multi-threaded :
+## 针对实例的钩子的线程安全.
+- 如果你不会在绑定/解绑实例属性钩子的同时访问这个属性，可以完全忽略此处的说明。
+- 测试表明 : 在及其大量的多线程访问中，绑定/解绑实例属性钩子的同时访问这个属性有非常小的概率产生异常： 'Attempt to use unknown class.'。这是由于object_setClass()还没有执行完的时候访问了实例对象。该问题除了进行同步没有办法解决。项目中已经钩住了runtimelock，使用它会影响效率，所以推荐下列的可靠的方案来解决多线程的问题：
 ```objc
 
 ///Thread-A...
@@ -162,25 +157,24 @@ apc_safe_instance(instance, ^(SomeClass* object) {
     [object accessProperty];
 });
 
-There is almost no need to consider this situation in actual development.
+实际开发中几乎不需要考虑这种情况
 ```
 
-## Lazy loading of class thread safe.
-- You can ignore here, if you nerver unbind class hook.
-- Bind or unbind a class hook is `thread safe`.
-- If the hooked class needs to be unbind, it is recommended that you implement the following method in main().
+## 针对类的钩子的线程安全.
+- 如果你没有对针对类的钩子进行解绑操作的需求，可以完全忽略此处说明。
+- 针对类的钩子是线程安全的。
+- 对针类的钩子进行解绑操作`建议`在main()方法中实现apc_main_classHookFullSupport().
 ```objc
 
 int main(int argc, const char * argv[]) {
 
     /*
-        1. Call before app or runtime load!
-        2. This method will implement the function of deleting the method at runtime, 
-        and if it is not called, it will adopt the scheme of analog deletion,
-        which will affect the user's use of the method swizzle.
-        The effect is that the correct class must be used to method-swizzle , 
-        get Method , get imp.
-        Exp :
+        1.在应用启动器或在runtime加载前调用.
+        2.该方法实现了删除runtiem中method的功能。如果不调用该方法则会采用模拟删除方法的策略，
+        也就是用一个空方法来占据本应删除的方法，该方法将调用向父级传递。
+        但是这会影响method swizzle，影响获取method ，影响从类中获取imp。
+        具体表现在使用这几类沿着继承链查找方法相关的API的时候会获取到APC项目提供的占位方法。
+        解决方案就是，使用准确的类型或者实现apc_main_classHookFullSupport()：
         class_replaceMethod(CorrectClass, ...);
         class_getInstanceMethod(CorrectClass, ...);
     */
@@ -189,10 +183,10 @@ int main(int argc, const char * argv[]) {
 }
 ```
 
-## Possible to do
-- Support all structure types
-- New dynamic border
+## 可能会做
+- 支持所有结构体类型，如果有需求的话。
+- 动态边界
 
-## Author
-- Emergency : meterwhite@outlook.com
+## 作者
+- 紧急 : meterwhite@outlook.com
 
