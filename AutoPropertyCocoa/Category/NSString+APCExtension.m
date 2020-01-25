@@ -42,17 +42,10 @@
 
 - (NSString *)apc_firstCharUpper
 {
-    if (self.length == 0)
-        
-        return self;
-    
+    if (self.length == 0) return self;
     NSMutableString *string = [NSMutableString string];
     [string appendString:[NSString stringWithFormat:@"%c", [self characterAtIndex:0]].uppercaseString];
-    
-    if (self.length >= 2)
-        
-        [string appendString:[self substringFromIndex:1]];
-    
+    if (self.length >= 2) [string appendString:[self substringFromIndex:1]];
     return string;
 }
 @end

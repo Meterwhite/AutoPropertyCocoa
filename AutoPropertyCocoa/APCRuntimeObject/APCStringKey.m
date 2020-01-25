@@ -15,7 +15,6 @@
 {
     self = [super init];
     if (self) {
-        
         value = string;
     }
     return self;
@@ -39,18 +38,14 @@
 - (BOOL)isEqual:(APCStringkey*)object
 {
     if(value == object->value) return YES;
-    
     if(value.length != object->value.length) return NO;
-    
     return [value isEqualToString:object->value];
 }
 
 - (BOOL)isEqualToString:(NSString *)string
 {
     if(value == string) return YES;
-    
     if(value.length != string.length) return NO;
-    
     return [value isEqualToString:string];
 }
 

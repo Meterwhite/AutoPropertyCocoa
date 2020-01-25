@@ -46,16 +46,13 @@ static NSMapTable<Class,APCStringStringDictionary<__kindof APCMethodHook*>*>*
 apc_runtime_property_classmapper()
 {
     if(nil == _apc_runtime_property_classmapper){
-        
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
-            
             _apc_runtime_property_classmapper
             =
             [NSMapTable mapTableWithKeyOptions:
              NSPointerFunctionsStrongMemory |
              NSPointerFunctionsOpaquePersonality
-             
                                   valueOptions:
              NSPointerFunctionsStrongMemory |
              NSPointerFunctionsObjectPersonality];
@@ -73,10 +70,8 @@ apc_runtime_propertyhook(Class __unsafe_unretained _Nonnull clazz, NSString* _No
 static APCClassMapper* apc_runtime_inherit_map()
 {
     if(nil == _apc_runtime_inherit_mapper){
-        
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
-            
             _apc_runtime_inherit_mapper = [[APCClassMapper alloc] init];
         });
     }
@@ -86,18 +81,14 @@ static APCClassMapper* apc_runtime_inherit_map()
 static void apc_runtime_inherit_register(Class cls)
 {
     APCClassMapper* map = apc_runtime_inherit_map();
-    
     if(![map containsClass:cls])
-        
         [map addClass:cls];
 }
 
 static void apc_runtime_inherit_dispose(Class cls)
 {
     APCClassMapper* map = apc_runtime_inherit_map();
-    
     if([map containsClass:cls])
-        
         [map removeClass:cls];
 }
 
@@ -110,16 +101,13 @@ static NSMapTable<APCProxyInstance*, APCProxyInstanceDisposer*>*
 apc_runtime_proxyInstanceMap()
 {
     if(nil == _apc_runtime_proxyInstanceMap){
-        
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
-            
             _apc_runtime_proxyInstanceMap
             =
             [NSMapTable mapTableWithKeyOptions:
              NSPointerFunctionsWeakMemory |
              NSPointerFunctionsOpaquePersonality
-
                                   valueOptions:
              NSPointerFunctionsStrongMemory |
              NSPointerFunctionsObjectPersonality];
@@ -131,7 +119,6 @@ apc_runtime_proxyInstanceMap()
 NS_INLINE APCPropertyHook* apc_getPropertyhook_nolock(Class clazz, NSString* property)
 {
     if(clazz == nil){
-        
         return (APCPropertyHook*)0;
     }
     return apc_runtime_propertyhook(clazz, property);
@@ -140,7 +127,6 @@ NS_INLINE APCPropertyHook* apc_getPropertyhook_nolock(Class clazz, NSString* pro
 NS_INLINE void apc_runtime_proxyinstanceRegister(APCProxyInstance* instance, Class cls)
 {
     [apc_runtime_proxyInstanceMap()
-     
      setObject:[[APCProxyInstanceDisposer alloc] initWithClass:cls]
      forKey:instance];
 }
@@ -159,22 +145,17 @@ NS_INLINE void apc_propertyhook_dispose_nolock(APCPropertyHook* hook)
     NSMapTable*         c_map   = apc_runtime_property_classmapper();
     ///Update super hook
     for (Class iCls in c_map) {
-        
         if(apc_class_getSuperclass(iCls) == hook.hookclass){
-            
             ///key - hook
             for (APCPropertyHook* iHook in [[c_map objectForKey:iCls] objectEnumerator]) {
-                
                 iHook->_superhook = hook->_superhook;
             }
         }
     }
     ///Remova all.
     [[c_map objectForKey:hook.hookclass] removeObjectForKey:hook.propertyName];
-    
     ///Update class inheritence list
     if(0 == [[c_map objectForKey:hook.hookclass] count]){
-        
         apc_runtime_inherit_dispose(hook.hookclass);
     }
 }
@@ -183,15 +164,10 @@ NS_INLINE void apc_propertyhook_dispose_nolock(APCPropertyHook* hook)
 void apc_unhook_allClass(void)
 {
     apc_runtimelock_writer_t wrting(apc_runtimelock);
-    
     NSMapTable* c_map = apc_runtime_property_classmapper();
-    
     if([c_map count] == 0) return;
-    
     for (APCStringStringDictionary* dictionary in [c_map objectEnumerator]) {
-        
         for (__kindof APCMethodHook* hook in [dictionary objectEnumerator]) {
-            
             ///Ensure that - unhook is without runtimelock.
             ((void(*)(id,SEL))objc_msgSend)(hook, _apc_sel_unhook);
         }
@@ -206,7 +182,6 @@ void apc_unhook_allInstance(void)
     ///Copy to prevent mutations when enumerating.
     NSArray* allInstances = [apc_runtime_proxyInstanceMap() objectEnumerator].allObjects;
     for (APCProxyInstance* item in allInstances) {
-        
         apc_instance_unhookFromProxyClass(item);
     }
 }
@@ -219,42 +194,31 @@ void apc_unhook_all(void)
 
 APCPropertyHook* apc_lookup_propertyhook(Class clazz, NSString* property)
 {
-    
     if(clazz == nil) return (APCPropertyHook*)0;
-    
     apc_runtimelock_reader_t reading(apc_runtimelock);
     APCPropertyHook* ret = nil;
     do {
-        
         if(nil != (ret = apc_runtime_propertyhook(clazz, property)))
-            
             break;
     } while (nil != (clazz = class_getSuperclass(clazz)));
-    
     return ret;
 }
 
 APCPropertyHook* apc_getPropertyhook(Class clazz, NSString* property)
 {
     if(clazz == nil){
-        
         return (APCPropertyHook*)0;
     }
-    
     apc_runtimelock_reader_t reading(apc_runtimelock);
-    
     return apc_runtime_propertyhook(clazz, property);
 }
 
 APCPropertyHook* apc_lookup_superPropertyhook_inRange(Class from, Class to, NSString* property)
 {
     apc_runtimelock_reader_t reading(apc_runtimelock);
-    
     APCPropertyHook* ret;
     while ([(from = apc_class_getSuperclass(from)) isSubclassOfClass:to]) {
-        
         if(nil != (ret = apc_runtime_propertyhook(from, property)))
-            
             return ret;
     }
     return (APCPropertyHook*)0;
@@ -263,17 +227,12 @@ APCPropertyHook* apc_lookup_superPropertyhook_inRange(Class from, Class to, NSSt
 APCPropertyHook* apc_lookup_sourcePropertyhook_inRange(Class from, Class to, NSString* property)
 {
     apc_runtimelock_reader_t reading(apc_runtimelock);
-    
     if([from isSubclassOfClass:to]){
-        
         APCPropertyHook* ret;
         do {
-            
             if(nil != (ret = apc_runtime_propertyhook(from, property)) &&
                ret->_old_implementation)
-                
                 return ret;
-            
         } while ([(from = apc_class_getSuperclass(from)) isSubclassOfClass:to]);
     }
     return (APCPropertyHook*)0;
@@ -282,16 +241,12 @@ APCPropertyHook* apc_lookup_sourcePropertyhook_inRange(Class from, Class to, NSS
 APCPropertyHook* apc_propertyhook_rootHook(APCPropertyHook* hook)
 {
     apc_runtimelock_reader_t reading(apc_runtimelock);
-    
     APCPropertyHook* root = hook;
     do {
-        
         if(root.superhook == nil)
             break;
-        
         root = root.superhook;
     } while (1);
-    
     return root;
 }
 
@@ -299,26 +254,18 @@ __kindof APCHookProperty* apc_propertyhook_lookupSuperProperty(APCPropertyHook* 
 {
     APCPropertyOwnerKind owner = hook.kindOfOwner;//Symmetric locking.
     if(owner == APCPropertyOwnerKindOfClass){
-        
         pthread_rwlock_rdlock(&apc_runtimelock);
     }
-    
     __kindof APCHookProperty* ret;
     Ivar  ivar = class_getInstanceVariable(object_getClass(hook), ivarname);
     do {
-        
-        
         if((ret = object_getIvar(hook, ivar))){
-            
             break;
         }
     } while (nil != (hook = hook->_superhook));
-    
     if(owner == APCPropertyOwnerKindOfClass){
-        
         pthread_rwlock_unlock(&apc_runtimelock);
     }
-    
     return ret;
 }
 
@@ -332,15 +279,11 @@ Class apc_class_getSuperclass(Class cls)
 void apc_class_unhook(Class cls)
 {
     apc_runtimelock_writer_t wrting(apc_runtimelock);
-    
     APCStringStringDictionary* dictionary
     =
     [apc_runtime_property_classmapper() objectForKey:cls];
-    
     if(dictionary == nil) return;
-    
     for (APCPropertyHook* iHook in dictionary.objectEnumerator) {
-        
         ((void(*)(id,SEL))objc_msgSend)(iHook, _apc_sel_unhook);
     }
 }
@@ -348,42 +291,30 @@ void apc_class_unhook(Class cls)
 void apc_registerProperty(APCHookProperty* p)
 {
     apc_runtimelock_writer_t wrting(apc_runtimelock);
-    
     APCStringStringDictionary* dictionary
     =
     [apc_runtime_property_classmapper() objectForKey:p->_des_class];
-    
     APCPropertyHook*    itHook;
     APCPropertyHook*    hook;
     if(dictionary == nil) {
-        
         dictionary = [APCStringStringDictionary dictionary];
         [apc_runtime_property_classmapper() setObject:dictionary forKey:p->_des_class];
         apc_runtime_inherit_register(p->_des_class);
     }
-    
     hook = [dictionary objectForKey:p->_hooked_name];
-    
     if(hook != nil){
-        
         ((void(*)(id,SEL,id))objc_msgSend)(hook, p.inlet, p);
         return;
     }
-    
     ///Creat new hook
     hook = [APCPropertyHook hookWithProperty:p];
     [dictionary setObject:hook forKey:p.mappingKeyString];
-    
     ///Update superhook
     hook->_superhook = apc_getPropertyhook_nolock(apc_class_getSuperclass(p->_des_class), p->_hooked_name);
-    
     ///Subhook
     for (Class iCls in apc_runtime_property_classmapper()) {
-
         if(apc_class_getSuperclass(iCls) ==  p->_des_class){
-            
             if(nil != (itHook = apc_getPropertyhook_nolock(iCls, p->_hooked_name))){
-                
                 itHook->_superhook = hook;
             }
         }
@@ -393,21 +324,14 @@ void apc_registerProperty(APCHookProperty* p)
 void apc_disposeProperty(APCHookProperty* _Nonnull p)
 {
     if(!p.associatedHook) return;
-    
     apc_runtimelock_writer_t wrting(apc_runtimelock);
-    
     [p.associatedHook unbindProperty:p];
-    
     if([p.associatedHook isEmpty]){
-        
         [[apc_runtime_property_classmapper() objectForKey:p->_des_class]
-         
          removeObjectsForKey:p->_hooked_name];
         apc_propertyhook_dispose_nolock(p.associatedHook);
     }else{
-        
         [[apc_runtime_property_classmapper() objectForKey:p->_des_class]
-         
          removeObjectForKey:p->_hooked_name];
     }
 }
@@ -415,40 +339,28 @@ void apc_disposeProperty(APCHookProperty* _Nonnull p)
 __kindof APCHookProperty* apc_property_getSuperProperty(APCHookProperty* p)
 {
     apc_runtimelock_reader_t reading(apc_runtimelock);
-    
     APCPropertyHook* hook;
     if(p.kindOfOwner == APCPropertyOwnerKindOfInstance){
-        
         Class cls = p->_des_class;
-        
         do {
-            
             if(nil != (hook = apc_runtime_propertyhook(cls, p->_hooked_name))){
                 break;
             }
         } while (nil != (cls = class_getSuperclass(cls)));
     } else {
-        
         hook = [apc_runtime_propertyhook(p->_des_class, p->_hooked_name) superhook];
     }
-    
     if(hook != nil) {
-        
         APCHookProperty* item;
         do {
-            
             if(nil != (item = ((id(*)(id,SEL))objc_msgSend)(hook, p.outlet))){
-                
                 return item;
             }
         }while (nil != (hook = [hook superhook]));
     }
-
     return (APCHookProperty*)0;
 }
-
 #pragma mark - For instance - private
-
 /**
  (string)property : hook
  */
@@ -456,13 +368,9 @@ static APCStringStringDictionary<__kindof APCMethodHook*>*
 apc_instance_boundDictionary(APCProxyInstance* instance)
 {
     APCStringStringDictionary* dictionary;
-    
     if(nil == (dictionary = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
-        
         @synchronized (instance) {
-            
             if(nil == (dictionary = objc_getAssociatedObject(instance, &_keyForAPCInstanceBoundMapper))){
-                
                 dictionary = [APCStringStringDictionary dictionary];
                 objc_setAssociatedObject(instance
                                          , &_keyForAPCInstanceBoundMapper
@@ -498,19 +406,15 @@ APCPropertyHook* apc_lookup_instancePropertyhook(APCProxyInstance* instance, NSS
 void apc_instance_setAssociatedProperty(APCProxyInstance* instance, APCHookProperty* p)
 {
     pthread_rwlock_t* lock = apc_object_get_rwlock(instance);
-    
     if(lock == nil) return;
-    
     apc_runtimelock_writer_t writing(*lock);
     if(!apc_object_isProxyInstance(instance)) return;///Thread protect
     APCStringStringDictionary* dictionary = apc_instance_boundDictionary(instance);
     APCPropertyHook* hook = [dictionary objectForKey:p->_hooked_name];
     if(hook == nil){
-        
         hook = [APCPropertyHook hookWithProperty:p];
         [dictionary setObject:hook forKey:p.mappingKeyString];
     }else{
-        
         [hook bindProperty:p];
     }
 }
@@ -520,26 +424,19 @@ void apc_instance_removeAssociatedProperty(APCProxyInstance* instance, APCHookPr
     APCStringStringDictionary* dictionary;
     {
         pthread_rwlock_t* lock = apc_object_get_rwlock(instance);
-        
         if(lock == nil) return;
-        
         apc_runtimelock_writer_t writing(*lock);
         if(!apc_object_isProxyInstance(instance)) return;///Thread protect
         if(p.associatedHook == nil) return;
-        
         dictionary = apc_instance_boundDictionary(instance);
         [p.associatedHook unbindProperty:p];
         if([p.associatedHook isEmpty]){
-            
             [dictionary removeObjectsForKey:p->_hooked_name];
         }else{
-            
             [dictionary removeObjectForKey:p->_hooked_name];
         }
     }
-    
     if([dictionary count] == 0){
-        
         apc_instance_unhookFromProxyClass(instance);
     }
 }
@@ -571,7 +468,6 @@ Class apc_class_unproxyClass(APCProxyClass cls)
     const char* cname = class_getName(cls);
     const char* loc = strstr(cname, _apcProxyClassID);
     if(loc != NULL){
-        
         char* name = (char*)malloc(1 + loc - cname);
         strncpy(name, cname, loc - cname);
         name[loc - cname] = '\0';
@@ -585,7 +481,6 @@ Class apc_object_unproxyClass(id object)
 {
     Class ret = object_getClass(object);
     if(apc_object_isProxyInstance(object)){
-        
         ret = apc_class_unproxyClass(ret);
     }
     return (Class)ret;
@@ -607,26 +502,19 @@ APCProxyClass apc_instance_getProxyClass(APCProxyInstance* instance)
 APCProxyClass apc_object_hookWithProxyClass(id instance)
 {
     pthread_rwlock_t* lock = apc_object_get_rwlock(instance);
-    
     if(lock == nil) return (APCProxyClass)0;
-    
     {
         apc_runtimelock_writer_t writing(*lock);
-        
         if(apc_object_isProxyInstance(instance)) {
-            
             return object_getClass(instance);
         }
-        
         char*           name = apc_instanceProxyClassName(instance);
         APCProxyClass   cls  = objc_allocateClassPair(object_getClass(instance), name, 0);
         if(cls != nil){
-            
             objc_registerClassPair(cls);
             object_setClass(instance, cls);
             apc_runtime_proxyinstanceRegister(instance, cls);
         }else if (nil == (cls = objc_getClass(name))){
-            
             fprintf(stderr, "APC: Can not register class '%s' in runtime.",name);
         }
         free(name);
@@ -637,13 +525,10 @@ APCProxyClass apc_object_hookWithProxyClass(id instance)
 void apc_instance_unhookFromProxyClass(APCProxyInstance* instance)
 {
     apc_object_wrlock(instance, ^{
-        
         ///This can cause potential asynchronous access errors : 'Attempt to use unknown class'.
         object_setClass(instance
                         , apc_class_unproxyClass(object_getClass(instance)));
-        
         apc_removeInstanceBoundDictionary(instance);
-        
         apc_runtime_proxyinstanceUnregister(instance);
     });
 }

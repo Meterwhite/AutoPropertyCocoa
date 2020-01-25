@@ -10,18 +10,11 @@
 
 @implementation APCStringStringDictionary
 {
-    NSMapTable          <APCStringkeyString*, id>*
-    _manager;
-
-    NSMutableDictionary <NSString*, id>*
-    _read_data;
-    
+    NSMapTable          <APCStringkeyString*, id>*  _manager;
+    NSMutableDictionary <NSString*, id>*            _read_data;
     ///Immutable type can increase reading speed by 10~20%
-    NSDictionary        <NSString*, id>*
-    _readonly;
-    
-    NSMutableArray*
-    _values;
+    NSDictionary        <NSString*, id>*            _readonly;
+    NSMutableArray*                                 _values;
 }
 
 
@@ -34,7 +27,6 @@
 {
     self = [super init];
     if (self) {
-        
         _read_data  = [NSMutableDictionary dictionaryWithCapacity:31];
         _manager    = [NSMapTable strongToStrongObjectsMapTable];
         _values     = [NSMutableArray arrayWithCapacity:31];
@@ -65,13 +57,10 @@
 - (void)setObject:(id)anObject forKey:(APCStringkeyString *)mKey
 {
     for (APCStringkeyString * item in mKey.head) {
-        
         [_manager setObject:anObject forKey:item];
         [_read_data setObject:anObject forKey:item->value];
     }
-    
     [_values addObject:anObject];
-    
     _readonly = [_read_data copy];
 }
 
@@ -84,21 +73,16 @@
 {
     APCStringkeyString* iKey;
     for (APCStringkeyString* item in _manager.keyEnumerator) {
-        
         if([item isEqualToString:aKey]){
-            
             iKey = item;
             break;
         }
     }
-    
     if(iKey == nil) return;
-    
     [_manager removeObjectForKey:iKey];
     [_read_data removeObjectForKey:iKey->value];
     id value = [_readonly objectForKey:aKey];
     if(![[_read_data allValues] containsObject:value]){
-        
         [_values removeObject:value];
     }
     _readonly = [_read_data copy];
@@ -108,27 +92,19 @@
 {
     APCStringkeyString* iKey;
     for (APCStringkeyString* item in _manager.keyEnumerator) {
-        
         if([item isEqualToString:aKey]){
-            
             iKey = item;
             break;
         }
     }
-    
     if(iKey == nil) return;
-    
     ///Find head key
     iKey = iKey.head;
-    
     for (iKey in iKey.head) {
-        
         [_manager removeObjectForKey:iKey];
         [_read_data removeObjectForKey:iKey->value];
     }
-    
     [_values removeObject:[_readonly objectForKey:aKey]];
-    
     _readonly = [_read_data copy];
 }
 

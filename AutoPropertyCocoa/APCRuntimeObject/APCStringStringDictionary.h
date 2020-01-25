@@ -44,7 +44,7 @@
 
 @property (readonly) NSUInteger count;
 @property (nullable,readonly,copy) NSArray<NSString*> *allKeys;
-- (nullable NSArray<NSString*> *)allKeysForObject:(nonnull ObjectType)anObject;
+- (nullable NSArray<NSString *> *)allKeysForObject:(nonnull ObjectType)anObject;
 
 /**
  Non-repeating mapped objects.
@@ -81,9 +81,6 @@
                                     count:(NSUInteger)len;
 
 - (void)enumerateKeysAndObjectsUsingBlock:(void (NS_NOESCAPE ^_Nonnull)
-                                           (NSString* _Nonnull key
-                                            , ObjectType _Nonnull obj
-                                            , BOOL * _Nonnull stop)
-                                           )block;
+ (NSString* _Nonnull key , ObjectType _Nonnull obj ,BOOL * _Nonnull stop))block;
 @end
 

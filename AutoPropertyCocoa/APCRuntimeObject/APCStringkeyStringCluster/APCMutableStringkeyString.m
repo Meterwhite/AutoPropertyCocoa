@@ -13,18 +13,13 @@
 - (void)appendString:(NSString *)aString
 {
     if(atomic_load(&(_head->_enumerating)) > 0){
-        
         atomic_fetch_add(&(_head->_mutation), 1);
     }
-    
     APCMutableStringkeyString* item = self;
     while (1){
-        
         if(item->next == nil) break;
-        
         item = item->next;
     }
-    
     APCMutableStringkeyString* newer = [APCMutableStringkeyString stringkeyWithString:aString];
     item->next = newer;
     newer->_head = _head;
@@ -38,9 +33,7 @@
 - (void)appendStringkeyString:(APCStringkeyString *)aStringkeyString
 {
     APCMutableStringkeyString* item = self;
-    
     do {
-        
         [self appendString:item->value];
     } while (nil != (item = item->next));
 }

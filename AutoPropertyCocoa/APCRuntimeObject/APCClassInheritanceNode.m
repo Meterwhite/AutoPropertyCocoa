@@ -11,19 +11,13 @@
 static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 {
     if(node == nil) {
-        
         return;
     }
-    
     [result addObject:node];
-    
     if (node.child != nil){
-        
         apc_node_DLR(node.child, result);
     }
-    
     if(node.nextBrother != nil){
-        
         apc_node_DLR(node.nextBrother, result);
     }
 }
@@ -34,27 +28,19 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 - (NSString *)description
 {
     NSMutableString* str = [NSMutableString string];
-    
     if(nil != _child){
-        
         [str appendFormat:@"%@⇤", NSStringFromClass(_child.value)];
     }
-    
     [str appendFormat:@"⎨%@",NSStringFromClass(_value)];
     if(nil == _father && nil == _previousBrother){
-        
         [str appendString:@"(root)"];
     }else if (nil == _child && nil == _nextBrother){
-        
         [str appendString:@"(leaf)"];
     }
     [str appendString:@"⎬"];
-    
     if(nil != _nextBrother){
-        
         [str appendFormat:@"⇢%@", NSStringFromClass(_nextBrother.value)];
     }
-    
     return [str copy];
 }
 #endif
@@ -68,7 +54,6 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 {
     self = [super init];
     if (self) {
-        
         _value = cls;
     }
     return self;
@@ -79,13 +64,10 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
     APCClassInheritanceNode*    iNode = self;
     NSUInteger                  lev = 0;    
     while (1) {
-        
         if(nil == (iNode = iNode.father ? ((void)(++lev),iNode.father) : iNode.previousBrother)){
-            
             break;
         }
     }
-    
     return lev;
 }
 
@@ -94,14 +76,11 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
     APCClassInheritanceNode*    iNode = self;
     NSUInteger                  lev = 0;
     while (1) {
-        
         if(nil == (iNode = iNode.father ? iNode.father : iNode.previousBrother)){
-            
             break;
         }
         ++lev;
     }
-    
     return lev;
 }
 
@@ -161,20 +140,12 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 
 - (BOOL)isLeaf
 {
-    return
-    
-    (nil != _father | nil != _previousBrother)
-    &
-    (!_child)
-    &
-    (!_nextBrother);
+    return (nil != _father | nil != _previousBrother) & (!_child) & (!_nextBrother);
 }
 
 - (NSUInteger)degree
 {
-    return
-    
-    (NSUInteger)((_Bool)_father + (_Bool)_previousBrother + (_Bool)_child + (_Bool)_nextBrother);
+    return (NSUInteger)((_Bool)_father + (_Bool)_previousBrother + (_Bool)_child + (_Bool)_nextBrother);
 }
 
 - (NSArray<APCClassInheritanceNode *> *)brothersThatIsSubclassTo:(Class)cls others:(NSArray**)others
@@ -210,9 +181,7 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 - (APCClassInheritanceNode *)rootDirectBrother
 {
     APCClassInheritanceNode * iNode = self;
-    
     while (1){
-        
         if(nil == iNode.previousBrother) break;
         iNode = iNode.previousBrother;
     }
@@ -222,9 +191,7 @@ static void apc_node_DLR(APCClassInheritanceNode* node, NSMutableArray* result)
 - (APCClassInheritanceNode *)leafDirectBrother
 {
     APCClassInheritanceNode * iNode = self;
-    
     while (1){
-        
         if(nil == iNode.nextBrother)  break;
         iNode = iNode.nextBrother;
     }

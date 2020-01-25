@@ -222,19 +222,19 @@ APC_TEST_DEMO(ClassTrigger,104)
         __block ushort apc_propertyGetterbindUserCondition_2 = 0;
         __block ushort apc_propertyGetterbindAccessCountCondition_2 = 0;
         
-        [Man apc_frontOfPropertyGetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance) {
+        [Man apc_willGet:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance) {
             
             ++flag;
             NSParameterAssert(flag == 1);
         }];
         
-        [Man apc_backOfPropertyGetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [Man apc_didGet:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             ++flag;
             NSParameterAssert(flag == 2);
         }];
         
-        [Man apc_propertyGetter:@key_obj bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [Man apc_get:@key_obj bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             apc_propertyGetterbindUserCondition_2++;
             return 1;
@@ -243,7 +243,7 @@ APC_TEST_DEMO(ClassTrigger,104)
             apc_propertyGetterbindUserCondition_2++;
         }];
         
-        [Man apc_propertyGetter:@key_intValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+        [Man apc_get:@key_intValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
             
             apc_propertyGetterbindAccessCountCondition_2++;
             return 1;
@@ -266,19 +266,19 @@ APC_TEST_DEMO(ClassTrigger,104)
         __block ushort apc_propertySetterbindUserCondition_2 = 0;
         __block ushort apc_propertySetterbindAccessCountCondition_2 = 0;
         
-        [Man apc_frontOfPropertySetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance) {
+        [Man apc_willSet:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance) {
             
             ++flag;
             NSParameterAssert(flag == 1);
         }];
         
-        [Man apc_backOfPropertySetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [Man apc_didSet:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             ++flag;
             NSParameterAssert(flag == 2);
         }];
         
-        [Man apc_propertySetter:@key_obj bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [Man apc_set:@key_obj bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             if([value integerValue] == 100){
             
@@ -290,7 +290,7 @@ APC_TEST_DEMO(ClassTrigger,104)
             apc_propertySetterbindUserCondition_2++;
         }];
         
-        [Man apc_propertySetter:@key_intValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+        [Man apc_set:@key_intValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
             
             apc_propertySetterbindAccessCountCondition_2++;
             return 1;
@@ -317,19 +317,19 @@ APC_TEST_DEMO(InstanceTrigger,105)
         __block ushort apc_propertyGetterbindUserCondition_2 = 0;
         __block ushort apc_propertyGetterbindAccessCountCondition_2 = 0;
         
-        [m apc_frontOfPropertyGetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance) {
+        [m apc_willGet:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance) {
             
             ++flag;
             NSParameterAssert(flag == 1);
         }];
         
-        [m apc_backOfPropertyGetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [m apc_didGet:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             ++flag;
             NSParameterAssert(flag == 2);
         }];
         
-        [m apc_propertyGetter:@key_obj bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [m apc_get:@key_obj bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             apc_propertyGetterbindUserCondition_2++;
             return 1;
@@ -338,7 +338,7 @@ APC_TEST_DEMO(InstanceTrigger,105)
             apc_propertyGetterbindUserCondition_2++;
         }];
         
-        [m apc_propertyGetter:@key_intValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+        [m apc_get:@key_intValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
             
             apc_propertyGetterbindAccessCountCondition_2++;
             return 1;
@@ -361,19 +361,19 @@ APC_TEST_DEMO(InstanceTrigger,105)
         __block ushort apc_propertySetterbindAccessCountCondition_2 = 0;
         
         APCTestInstance(Man, m);
-        [m apc_frontOfPropertySetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance) {
+        [m apc_willSet:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance) {
             
             ++flag;
             NSParameterAssert(flag == 1);
         }];
         
-        [m apc_backOfPropertySetter:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [m apc_didSet:@key_obj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             ++flag;
             NSParameterAssert(flag == 2);
         }];
         
-        [m apc_propertySetter:@key_obj bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [m apc_set:@key_obj bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             if([value integerValue] == 100){
                 
@@ -385,7 +385,7 @@ APC_TEST_DEMO(InstanceTrigger,105)
             apc_propertySetterbindUserCondition_2++;
         }];
         
-        [m apc_propertySetter:@key_intValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+        [m apc_set:@key_intValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
             
             apc_propertySetterbindAccessCountCondition_2++;
             return 1;
@@ -430,7 +430,7 @@ APC_TEST_DEMO(ClassMix,106)
         NSParameterAssert([m.gettersetterobj isEqualToString:@"Man.gettersetterobj"]);
         NSParameterAssert([sm.gettersetterobj isEqualToString:@"Superman.gettersetterobj"]);
         
-        [Person apc_propertyGetter:@key_gettersetterobj bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+        [Person apc_get:@key_gettersetterobj bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
             
             if(count == 0){
                 
@@ -479,12 +479,12 @@ APC_TEST_DEMO(InstanceMix,107)
             return @"obj";
         }];
         
-        [m apc_backOfPropertySetter:@key_gettersetterobj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [m apc_didSet:@key_gettersetterobj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             ++count;
         }];
         
-        [m apc_propertySetter:@key_gettersetterobj bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
+        [m apc_set:@key_gettersetterobj bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger count) {
             
             ++count;
             return YES;
@@ -519,7 +519,7 @@ APC_TEST_DEMO(ClassInstanceMix,108)
             return @"Man.obj";
         }];
         
-        [Man apc_backOfPropertySetter:@key_setterobj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [Man apc_didSet:@key_setterobj bindWithBlock:^(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             ++count;
         }];
@@ -598,7 +598,7 @@ APC_TEST_DEMO(BasicValue, 110)
             return @(1024);
         }];
         
-        [m apc_propertyGetter:@key_intValue bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
+        [m apc_get:@key_intValue bindUserCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value) {
             
             ++count;
             if([value integerValue] > 0){
@@ -618,7 +618,7 @@ APC_TEST_DEMO(BasicValue, 110)
                      withObjCType:@encode(APCRect)];
         }];
         
-        [m apc_propertySetter:@key_rectValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger icount) {
+        [m apc_set:@key_rectValue bindAccessCountCondition:^BOOL(id_apc_t  _Nonnull instance, id  _Nullable value, NSUInteger icount) {
             
             if(icount == 0){
                 ++count;

@@ -3,7 +3,7 @@
 AutoPropertyCocoa
 ===
 ## Introduction
-- Provides green `lazy loading` of property and  `property hook` by objc runtime to achieve convenience in special situations.
+- Full objc property `lazy loading` and property automation transactions..
 - Key words :  `iOS懒加载` `属性钩子` `lazy property` `iOS lazy loading` `macOS lazy loading` `property hook` `class_removeMethods` `runtimelock`
 - [中文文档](https://github.com/Meterwhite/AutoPropertyCocoa)
 
@@ -16,9 +16,7 @@ AutoPropertyCocoa
 ```objc
 
 - (id)lazyloadProperty{
-
     if(_lazyloadProperty == nil){
-    
         _lazyloadProperty = [OneClass new];
     }
     return _lazyloadProperty;
@@ -46,7 +44,6 @@ APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
 
 2.
 [OneClass apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
-
     return [OneClass initWork];
 }];
 
@@ -63,7 +60,6 @@ APCLazyload(instance, propertyA, propertyB, ...);
 
 2.
 [instance apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
-
     return [OneClass initWork];
 }];
 
@@ -80,35 +76,29 @@ APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
 ```
 
-#### Front-trigger hook.Called before a property is called.
+#### Pre-trigger transaction of property.Called before a property is called.
 ```objc
 
-[anyone apc_frontOfPropertyGetter:@"key" bindWithBlock:^(id_apc_t instance, id value) {
-
+[anyone apc_willGet:@"key" bindWithBlock:^(id_apc_t instance, id value) {
     ///Before getter of property called.
 }];
 
 ```
-#### Post-trigger hook.Called after a property is called.
+#### Post-trigger transaction of property.Called after a property is called.
 ```objc
 
-[anyone apc_backOfPropertySetter:@"key" bindWithBlock:^(id_apc_t instance, id value) {
-
+[anyone apc_didSet:@"key" bindWithBlock:^(id_apc_t instance, id value) {
     ///After setter of property called.
 }];
 
 ```
-#### Condition-trigger hook.Called when the user condition is true.
+#### Condition-trigger transaction of property.Called when the user condition is true.
 ```objc
-
-[anyone apc_propertySetter:@"key" bindUserCondition:^BOOL(id_apc_t instance, id value) {
-
+[anyone apc_set:@"key" bindUserCondition:^BOOL(id_apc_t instance, id value) {
     ///Your condition when setter called...
 } withBlock:^(id_apc_t instance, id value) {
-
     ///If your condition has been triggered.
 }];
-
 ```
 
 ![Quickview](https://raw.githubusercontent.com/qddnovo/AutoPropertyCocoa/master/Quickview.png)
@@ -122,7 +112,6 @@ APCUnbindLazyload(instance, propertyA, propertyB, ...);
 - `id_apc_t` marks the id object as supporting APCUserEnvironment.
 ```objc
 [Person apc_lazyLoadForProperty:@"key"  usingBlock:^id (id_apc_t instance) {
-
     return @"Person.gettersetterobj";
 }];
 
@@ -145,20 +134,17 @@ APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
 ///Thread-A...
 apc_safe_instance(instance, ^(id object) {
-
     APCLazyload(object, property);
 });
 
 ///Thread-B...
 apc_safe_instance(instance, ^(id object) {
-
     APCUnbindLazyload(object, property);
 });
 
 
 ///Thread-C...
 apc_safe_instance(instance, ^(SomeClass* object) {
-
     [object accessProperty];
 });
 
@@ -188,11 +174,3 @@ int main(int argc, const char * argv[]) {
     return ... ...(argc, argv);
 }
 ```
-
-## Possible to do
-- Support all structure types
-- New dynamic border
-
-## Author
-- Emergency : meterwhite@outlook.com
-

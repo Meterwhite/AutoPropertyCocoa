@@ -26,18 +26,12 @@ class apc_runtimelock_reader_t : apc_nocopy_t {
 public:
     apc_runtimelock_reader_t(pthread_rwlock_t& newLock) : lock(newLock)
     {
-        const int err __attribute__((unused))
-        =
-        pthread_rwlock_rdlock(&lock);
-        
+        const int err __attribute__((unused)) = pthread_rwlock_rdlock(&lock);
         NSCAssert(err == 0, @"pthread_rwlock_rdlock failed (%d)", err);
     }
     ~apc_runtimelock_reader_t()
     {
-        const int err __attribute__((unused))
-        =
-        pthread_rwlock_unlock(&lock);
-        
+        const int err __attribute__((unused)) = pthread_rwlock_unlock(&lock);
         NSCAssert(err == 0, @"pthread_rwlock_unlock failed (%d)", err);
     }
 };

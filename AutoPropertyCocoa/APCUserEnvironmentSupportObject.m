@@ -81,7 +81,7 @@
 #pragma mark - Overwrite NSProxy
 - (void)forwardInvocation:(NSInvocation *)invocation
 {
-    return [_instance forwardInvocation:invocation];
+    [_instance forwardInvocation:invocation];
 }
 
 - (nullable NSMethodSignature *)methodSignatureForSelector:(SEL)sel

@@ -20,17 +20,12 @@ typedef NS_OPTIONS (char,APCMethodStyle){
 };
 
 @protocol APCMethodProtocol <NSObject>
-
 @required
 @property (nonatomic,readonly) APCMethodStyle methodStyle;
-
 @end
 
 
 @interface APCMethod : NSObject<APCMethodProtocol>
-
-
 @property (nonatomic,readonly) APCMethodStyle methodStyle;
-
 @end
 

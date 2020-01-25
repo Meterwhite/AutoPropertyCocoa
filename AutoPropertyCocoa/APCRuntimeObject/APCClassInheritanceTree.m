@@ -18,12 +18,9 @@
 - (NSString *)description
 {
     NSMutableString* str = [NSMutableString string];
-    
     for (APCClassInheritanceNode *item in _references) {
-        
         [str appendFormat:@"%@\n",item];
     }
-    
     return [str copy];
 }
 #endif
@@ -44,15 +41,11 @@
 {
     NSMutableArray* nodes = [NSMutableArray array];
     for (APCClassInheritanceNode *item in _references) {
-        
         if([cls isSubclassOfClass:item.value]){
-            
             [nodes addObject:item];
         }
     }
-    
     [nodes sortUsingSelector:@selector(depthToRootCompare:)];
-    
     return nodes.lastObject;
 }
 
@@ -69,9 +62,7 @@
 - (void)remapForRoot
 {
     for (APCClassInheritanceNode* item in _references) {
-        
         if(nil == item.father && nil == item.previousBrother){
-            
             _root = item;
         }
     }
@@ -98,36 +89,26 @@
 - (NSArray<APCClassInheritanceNode*>*)leafnodesInBrotherBranch
 {
     if(self.isEmpty){
-        
         return nil;
     }
-    
     NSMutableArray* ret = [NSMutableArray array];
     for (APCClassInheritanceNode* item in _references) {
-        
         if(nil == item.nextBrother){
-            
             [ret addObject:item];
         }
     }
-    
     [ret sortUsingSelector:@selector(brotherLevelFromRootCompare:)];
-    
     return [ret copy];
 }
 
 - (NSArray<APCClassInheritanceNode *> *)leafnodesInChildBranch
 {
     if(self.isEmpty){
-        
         return nil;
     }
-    
     NSMutableArray* ret = [NSMutableArray array];
     for (APCClassInheritanceNode* item in _references) {
-        
         if(nil == item.child){
-            
             [ret addObject:item];
         }
     }

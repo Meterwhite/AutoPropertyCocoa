@@ -28,7 +28,6 @@ static dispatch_semaphore_t             _instancelock_maplock;
 @interface APCRWLock : NSObject
 {
 @public
-    
     pthread_rwlock_t lock;
 }
 @end
@@ -40,32 +39,20 @@ static dispatch_semaphore_t             _instancelock_maplock;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
-        _rwlock_map
-        =
-        [NSMapTable mapTableWithKeyOptions:
-         NSPointerFunctionsWeakMemory   |
-         NSPointerFunctionsOpaquePersonality
-                              valueOptions:
-         NSPointerFunctionsStrongMemory |
-         NSPointerFunctionsObjectPersonality];
+        _rwlock_map = [NSMapTable mapTableWithKeyOptions:
+                       NSPointerFunctionsWeakMemory | NSPointerFunctionsOpaquePersonality
+                                            valueOptions:
+                       NSPointerFunctionsStrongMemory | NSPointerFunctionsObjectPersonality];
         
-        _objlock_map
-        =
-        [NSMapTable mapTableWithKeyOptions:
-         NSPointerFunctionsWeakMemory   |
-         NSPointerFunctionsOpaquePersonality
-                              valueOptions:
-         NSPointerFunctionsStrongMemory |
-         NSPointerFunctionsObjectPersonality];
+        _objlock_map = [NSMapTable mapTableWithKeyOptions:
+                        NSPointerFunctionsWeakMemory | NSPointerFunctionsOpaquePersonality
+                                             valueOptions:
+                        NSPointerFunctionsStrongMemory | NSPointerFunctionsObjectPersonality];
         
-        _instancelock_map
-        =
-        [NSMapTable mapTableWithKeyOptions:
-         NSPointerFunctionsWeakMemory   |
-         NSPointerFunctionsOpaquePersonality
-                              valueOptions:
-         NSPointerFunctionsStrongMemory |
-         NSPointerFunctionsObjectPersonality];
+        _instancelock_map = [NSMapTable mapTableWithKeyOptions:
+                             NSPointerFunctionsWeakMemory | NSPointerFunctionsOpaquePersonality
+                                                  valueOptions:
+                             NSPointerFunctionsStrongMemory | NSPointerFunctionsObjectPersonality];
         
         _rwlock_maplock         =   APCSemaphoreLockInit;
         _objlock_maplock        =   APCSemaphoreLockInit;
@@ -77,11 +64,7 @@ static dispatch_semaphore_t             _instancelock_maplock;
 {
     self = [super init];
     if (self) {
-        
-        const int err __attribute__((unused))
-        =
-        pthread_rwlock_init(&lock, 0);
-        
+        const int err __attribute__((unused)) = pthread_rwlock_init(&lock, 0);
         NSCAssert(err == 0, @"pthread_rwlock_init failed (%d)", err);
     }
     return self;
@@ -97,22 +80,16 @@ static dispatch_semaphore_t             _instancelock_maplock;
 pthread_rwlock_t* apc_object_get_rwlock(id object)
 {
     if(object == nil) return nil;
-    
     APCRWLock* lock = [_rwlock_map objectForKey:object];
     if(lock == nil){
-        
         APCSemaphoreLockLock(_rwlock_maplock);
-        
         lock = [_rwlock_map objectForKey:object];
-        
         if(lock == nil){
-            
             [_rwlock_map setObject: (lock = [[APCRWLock alloc] init])
                             forKey:object];
         }
         APCSemaphoreUnlockLock(_rwlock_maplock);
     }
-    
     return &(lock->lock);
 }
 
@@ -133,15 +110,11 @@ void apc_object_wrlock(id object, void(NS_NOESCAPE^block)(void))
 NSLock* apc_object_get_lock(id object)
 {
     if(object == nil) return nil;
-    
     NSLock* lock = [_objlock_map objectForKey:object];
     if(lock == nil){
-        
         APCSemaphoreLockLock(_objlock_maplock);
-        
         lock = [_objlock_map objectForKey:object];
         if(lock == nil){
-            
             [_objlock_map setObject:(lock = [[NSLock alloc] init])
                              forKey:object];
         }
@@ -166,15 +139,11 @@ void apc_object_objlock(id object, void(NS_NOESCAPE^block)(void))
 NS_INLINE NSRecursiveLock* apc_object_get_safeinstance_lock(id object)
 {
     if(object == nil) return nil;
-    
     NSRecursiveLock* lock = [_instancelock_map objectForKey:object];
     if(lock == nil){
-        
         APCSemaphoreLockLock(_instancelock_maplock);
-        
         lock = [_instancelock_map objectForKey:object];
         if(lock == nil){
-            
             [_instancelock_map setObject:(lock = [[NSRecursiveLock alloc] init])
                                   forKey:object];
         }

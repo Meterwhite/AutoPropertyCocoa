@@ -3,9 +3,8 @@
 AutoPropertyCocoa
 ===
 ## 简介
-- 该三方主要提供objc的绿色属性懒加载和属性钩子的功能以及属性的钩子功能来实现特殊情况下的便利。
+- 完整的objc的属性懒加载和属性自动化事务。
 - 关键词 :`iOS懒加载` `属性钩子` `macOS` `cocoa` `class_removeMethods` `runtimelock`
-- 随手一赞，好运百万
 - [English documentation](https://github.com/Meterwhite/AutoPropertyCocoa/blob/master/README-English.md)
 
 ## 引用
@@ -17,9 +16,7 @@ AutoPropertyCocoa
 ```objc
 
 - (id)lazyloadProperty{
-
     if(_lazyloadProperty == nil){
-    
         _lazyloadProperty = [OneClass new];
     }
     return _lazyloadProperty;
@@ -47,7 +44,6 @@ APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
 
 2.
 [OneClass apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
-
     return [OneClass initWork];
 }];
 
@@ -62,7 +58,6 @@ APCClassUnbindLazyload(OneClass, propertyA, propertyB, ...);
 APCLazyload(instance, propertyA, propertyB, ...);
 
 [instance apc_lazyLoadForProperty:@"property" usingBlock:^id(id_apc_t instance){
-
     return [OneClass initWork];
 }];
 
@@ -76,35 +71,29 @@ APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
 ```
 
-#### 前触发钩子.在一个属性调用前调用。
+#### 属性前触事务.
 ```objc
 
-[anyone apc_frontOfPropertyGetter:@"key" bindWithBlock:^(id_apc_t instance, id value) {
-
+[anyone apc_willGet:@"key" bindWithBlock:^(id_apc_t instance, id value) {
     ///Before getter of property called.
 }];
 
 ```
-#### 后触发钩子.在一个属性调用后调用。
+#### 属性后触事务.
 ```objc
 
-[anyone apc_backOfPropertySetter:@"key" bindWithBlock:^(id_apc_t instance, id value) {
-
+[anyone apc_didSet:@"key" bindWithBlock:^(id_apc_t instance, id value) {
     ///After setter of property called.
 }];
 
 ```
-#### 条件触发钩子.当满足用户条件时调用。
+#### 属性条件事务.
 ```objc
-
-[anyone apc_propertySetter:@"key" bindUserCondition:^BOOL(id_apc_t instance, id value) {
-
+[anyone apc_set:@"key" bindUserCondition:^BOOL(id_apc_t instance, id value) {
     ///Your condition when setter called...
 } withBlock:^(id_apc_t instance, id value) {
-
     ///If your condition has been triggered.
 }];
-
 ```
 
 ![Quickview](https://raw.githubusercontent.com/qddnovo/AutoPropertyCocoa/master/Quickview.png)
@@ -140,20 +129,17 @@ APCUnbindLazyload(instance, propertyA, propertyB, ...);
 
 ///Thread-A...
 apc_safe_instance(instance, ^(id object) {
-
     APCLazyload(object, property);
 });
 
 ///Thread-B...
 apc_safe_instance(instance, ^(id object) {
-
     APCUnbindLazyload(object, property);
 });
 
 
 ///Thread-C...
 apc_safe_instance(instance, ^(SomeClass* object) {
-
     [object accessProperty];
 });
 
@@ -182,11 +168,3 @@ int main(int argc, const char * argv[]) {
     return ... ...(argc, argv);
 }
 ```
-
-## 可能会做
-- 支持所有结构体类型，如果有需求的话。
-- 动态边界
-
-## 作者
-- 紧急 : meterwhite@outlook.com
-

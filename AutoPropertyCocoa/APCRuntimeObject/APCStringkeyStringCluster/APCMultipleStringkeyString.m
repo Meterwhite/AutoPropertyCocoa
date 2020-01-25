@@ -14,29 +14,21 @@
                                                     getter:(NSString*)getter
                                                     setter:(NSString*)setter
 {
-    
     APCMultipleStringkeyString* isetter = setter ? [self stringkey] : nil;
     APCMultipleStringkeyString* igetter = getter ? [self stringkey] : nil;
     APCMultipleStringkeyString* ihead   = [self stringkey];
-    
     ihead->value    =   property;
     ihead->_head    =   ihead;
-    
     do {
-        
         if(igetter == nil) break;
-        
         ihead->next        =   igetter;
         igetter->value     =   getter;
         igetter->_head     =   ihead;
-        
         if(isetter == nil) break;
-        
         igetter->next     =   isetter;
         isetter->value    =   setter;
         isetter->_head    =   ihead;
     } while (0);
-    
     return ihead;
 }
 
@@ -45,20 +37,16 @@
     APCMultipleStringkeyString* previous    = nil;
     APCMultipleStringkeyString* current     = nil;
     for (NSString* item in array) {
-        
         if(previous == nil){
-            
             _head       = self;
             current     = self;
         }else {
-            
             current = [self.class stringkeyWithString:item];
             previous->next  = current;
             previous->_head = self;
         }
         previous = current;
     }
-    
     return self;
 }
 
@@ -76,47 +64,35 @@
 {
     APCMultipleStringkeyString* item = _head;
     NSUInteger count = 1;
-    
-    while (nil != (item = item->next))
+    while (nil != (item = item->next)) {
         ++count;
-    
+    }
     return count;
 }
 
 - (BOOL)isEqualToStringkeyString:(APCStringkeyString *)stringstring
 {
     if(self == stringstring) return YES;
-    
     if(self.length != stringstring.length) return NO;
-    
     APCStringkeyString* selfKey = self;
     while (selfKey != nil && stringstring != nil) {
-        
         if(selfKey){
-            
             if(![selfKey isEqual:stringstring]) return NO;
-            
             selfKey         = selfKey->next;
             stringstring    = stringstring->next;
         }
     }
-    
     if(selfKey == nil && stringstring == nil) return YES;
-    
     return NO;
 }
 
 - (NSArray<NSString *> *)allStrings
 {
     NSMutableArray* ret = [NSMutableArray array];
-    
     APCMultipleStringkeyString* item = _head;
-    
     do {
-        
         [ret addObject:item->value];
     } while (nil != (item = item->next));
-    
     return [ret copy];
 }
 
@@ -128,11 +104,9 @@
     NSUInteger      length  = self.length;
     NSUInteger      count   = 0;
     if(counted == 0){
-        
         state->mutationsPtr = (unsigned long*)(&(_head->_mutation));
         atomic_fetch_add(&_enumerating, 1);
     }else if (counted >= length) {
-        
         atomic_fetch_sub(&_enumerating, 1);
         return 0;
     }
@@ -140,19 +114,15 @@
     for (APCMultipleStringkeyString* item = self
          ; (counted < length) && (count < len)
          ; (count++, counted++, item = item->next) ) {
-        
         buffer[count] = item;
     }
     state->state = counted;
-    
     return count;
 }
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    return
-    
-    [[APCMultipleStringkeyString allocWithZone:zone] initWithStringArray:self.allStrings];
+    return [[APCMultipleStringkeyString allocWithZone:zone] initWithStringArray:self.allStrings];
 }
 
 - (void)dealloc

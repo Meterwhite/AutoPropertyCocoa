@@ -8,8 +8,6 @@
 
 #import "APCTriggerGetterProperty.h"
 
-
-
 @interface APCTriggerSetterProperty : APCHookProperty
 
 @property (nonatomic,assign,readonly) APCPropertyTriggerOption triggerOption;

@@ -94,7 +94,6 @@
 - (void)performGetterFrontTriggerBlock:(id)_SELF
 {
     if(_block_fronttrigger){
-
         _block_fronttrigger(APCUserEnvironmentObject(_SELF, self));
     }
 }
@@ -102,7 +101,6 @@
 - (void)performGetterPostTriggerBlock:(id)_SELF value:(id)value
 {
     if(_block_posttrigger){
-        
         _block_posttrigger(APCUserEnvironmentObject(_SELF, self), value);
     }
 }
@@ -110,7 +108,6 @@
 - (BOOL)performGetterUserConditionBlock:(id)_SELF value:(id)value
 {
     if(_block_usercondition){
-        
         return _block_usercondition(APCUserEnvironmentObject(_SELF, self), value);
     }
     return NO;
@@ -119,7 +116,6 @@
 - (void)performGetterUserTriggerBlock:(id)_SELF value:(id)value
 {
     if(_block_usertrigger){
-        
         _block_usertrigger(APCUserEnvironmentObject(_SELF, self), value);
     }
 }
@@ -127,7 +123,6 @@
 - (void)performGetterCountTriggerBlock:(id)_SELF value:(id)value
 {
     if(_block_counttrigger){
-        
         _block_counttrigger(APCUserEnvironmentObject(_SELF, self), value);
     }
 }
@@ -135,7 +130,6 @@
 - (BOOL)performGetterCountConditionBlock:(id)_SELF value:(id)value
 {
     if(_block_countcondition){
-        
         return _block_countcondition(APCUserEnvironmentObject(_SELF, self), value, self.accessCount);
     }
     return NO;

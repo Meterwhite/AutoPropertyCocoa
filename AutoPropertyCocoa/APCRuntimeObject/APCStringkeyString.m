@@ -22,20 +22,11 @@
                                      getter:(NSString*)getter
                                      setter:(NSString*)setter
 {
-    
     NSAssert(property, @"APC: Property can not be nil!");
-    
     if(getter || setter){
-        
-        return
-        
-        [APCMultipleStringkeyString stringkeyStringWithProperty:property
-                                                         getter:getter
-                                                         setter:setter];
+        return [APCMultipleStringkeyString stringkeyStringWithProperty:property getter:getter setter:setter];
     }
-    return
-    
-    [APCSingleStringkeyString stringkeyStringWithString:property];
+    return [APCSingleStringkeyString stringkeyStringWithString:property];
 }
 
 + (instancetype)stringkeyStringFromArray:(NSArray<NSString *> *)array
@@ -50,30 +41,15 @@
 
 - (BOOL)isEqualToStringkeyString:(APCStringkeyString *)stringstring
 {
-    @throw
-    
-    [NSException exceptionWithName:NSDestinationInvalidException
-                            reason:@"APC: Subclass responsibility."
-                          userInfo:nil];
+    @throw  [NSException exceptionWithName:NSDestinationInvalidException reason:@"APC: Subclass responsibility." userInfo:nil];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id  _Nullable [])buffer count:(NSUInteger)len
 {
-    @throw
-    
-    [NSException exceptionWithName:NSDestinationInvalidException
-                            reason:@"APC: Subclass responsibility."
-                          userInfo:nil];
+    @throw  [NSException exceptionWithName:NSDestinationInvalidException reason:@"APC: Subclass responsibility." userInfo:nil];
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
-{
-    
-    @throw
-    
-    [NSException exceptionWithName:NSDestinationInvalidException
-                            reason:@"APC: Subclass responsibility."
-                          userInfo:nil];
+- (id)copyWithZone:(nullable NSZone *)zone {  @throw  [NSException exceptionWithName:NSDestinationInvalidException reason:@"APC: Subclass responsibility." userInfo:nil];
 }
 
 - (id)mutableCopyWithZone:(nullable NSZone *)zone
